@@ -4,52 +4,78 @@ import { showAdminToast, showConfirmDialog } from '../core/utils.js';
 
 let previewInterval = null;
 
+/**
+ * Memuat pengaturan countdown global dari server
+ */
 async function loadGlobalSettings() {
   try {
-    const res = await fetchAdmin('/settings/countdown');
-    if (res.status === 'success') {
-      adminState.globalSettings = res.data;
-      renderGlobalSettings(res.data);
+    // Konsisten menggunakan endpoint admin
+    const res = await fetchAdmin('/admin/settings/countdown');
+    if (res && (res.status === 'success' || res.success)) {
+      const settingsData = res.data || res.settings || {};
+      adminState.globalSettings = settingsData;
+      renderGlobalSettings(settingsData);
     }
   } catch (err) {
     console.warn('Gagal memuat pengaturan global:', err);
   }
 }
 
+/**
+ * Memperbarui tampilan preview countdown secara realtime di dashboard admin
+ */
 function updateCountdownPreview(isoDate) {
   const previewEl = document.getElementById('adminCountdownLivePreview');
   if (!previewEl) return;
 
+  // Hentikan interval lama jika ada
   if (previewInterval) {
     clearInterval(previewInterval);
     previewInterval = null;
   }
 
   if (!isoDate) {
-    previewEl.innerHTML = '<span style="color: #f59e0b;"><i class="fa-solid fa-clock-rotate-left"></i> TANGGAL BELUM DITENTUKAN</span> — Tampilan di website menampilkan placeholder status -- Hari -- Jam.';
+    previewEl.innerHTML = '<span style="color: #f59e0b;"><i class="fa-solid fa-clock-rotate-left"></i> TANGGAL BELUM DITENTUKAN</span> — Tampilan di website akan menampilkan status placeholder.';
     return;
   }
 
   const targetTime = new Date(isoDate).getTime();
+
+  if (isNaN(targetTime)) {
+    previewEl.innerHTML = '<span style="color: #ef4444;"><i class="fa-solid fa-triangle-exclamation"></i> FORMAT TANGGAL TIDAK VALID</span>';
+    return;
+  }
+
   const tick = () => {
     const now = Date.now();
     const diff = targetTime - now;
+
     if (diff <= 0) {
       previewEl.innerHTML = '<span style="color: #ef4444;"><i class="fa-solid fa-flag-checkered"></i> RACE DAY SUDAH LEWAT / SEDANG BERLANGSUNG</span>';
       return;
     }
+
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
     const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-    previewEl.innerHTML = `<span style="color: #10b981;"><i class="fa-solid fa-circle-check"></i> AKTIF:</span> ${days} Hari : ${hours} Jam : ${minutes} Menit : ${seconds} Detik (${new Date(isoDate).toLocaleString('id-ID', { dateStyle: 'full', timeStyle: 'short' })} WIB)`;
+
+    const formattedDateStr = new Date(isoDate).toLocaleString('id-ID', { 
+      dateStyle: 'full', 
+      timeStyle: 'short' 
+    });
+
+    previewEl.innerHTML = `<span style="color: #10b981;"><i class="fa-solid fa-circle-check"></i> AKTIF:</span> ${days} Hari : ${hours} Jam : ${minutes} Menit : ${seconds} Detik (${formattedDateStr} WIB)`;
   };
 
   tick();
   previewInterval = setInterval(tick, 1000);
 }
 
-function renderGlobalSettings(settings) {
+/**
+ * Merender elemen-elemen UI form pengaturan global admin
+ */
+function renderGlobalSettings(settings = {}) {
   const input = document.getElementById('globalCountdownInput');
   const badge = document.getElementById('globalStatusBadge');
   const toggleBtn = document.getElementById('btnToggleGlobalClosed');
@@ -57,11 +83,19 @@ function renderGlobalSettings(settings) {
   if (input) {
     if (settings.eventCountdownDate) {
       const d = new Date(settings.eventCountdownDate);
-      const pad = (n) => String(n).padStart(2, '0');
-      input.value = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+      if (!isNaN(d.getTime())) {
+        const pad = (n) => String(n).padStart(2, '0');
+        input.value = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+      } else {
+        input.value = '';
+      }
     } else {
       input.value = '';
     }
+
+    // Pasang listener input agar preview ter-update langsung saat tanggal diubah pengguna
+    input.removeEventListener('change', handleInputChangePreview);
+    input.addEventListener('change', handleInputChangePreview);
   }
 
   updateCountdownPreview(settings.eventCountdownDate);
@@ -87,36 +121,58 @@ function renderGlobalSettings(settings) {
   }
 }
 
+/**
+ * Handler internal saat input tanggal diubah secara manual di Form
+ */
+function handleInputChangePreview(e) {
+  const val = e.target.value;
+  if (!val) {
+    updateCountdownPreview(null);
+  } else {
+    updateCountdownPreview(new Date(val).toISOString());
+  }
+}
+
+/**
+ * Menyimpan tanggal target countdown baru ke server
+ */
 async function handleSaveGlobalCountdown() {
   const input = document.getElementById('globalCountdownInput');
   if (!input || !input.value) {
-    showAdminToast('warning', 'Peringatan', 'Harap tentukan tanggal dan waktu countdown, atau klik tombol Belum Ditentukan.');
+    showAdminToast('warning', 'Peringatan', 'Harap tentukan tanggal dan waktu countdown terlebih dahulu.');
     return;
   }
 
   const isoDate = new Date(input.value).toISOString();
 
   try {
+    const isClosed = adminState.globalSettings?.isRegistrationClosed || false;
+
     const res = await fetchAdmin('/admin/settings/countdown', {
       method: 'PUT',
       body: JSON.stringify({
         eventCountdownDate: isoDate,
-        isRegistrationClosed: adminState.globalSettings?.isRegistrationClosed || false
+        isRegistrationClosed: isClosed
       })
     });
 
-    if (res.status === 'success') {
+    if (res && (res.status === 'success' || res.success)) {
+      if (!adminState.globalSettings) adminState.globalSettings = {};
       adminState.globalSettings.eventCountdownDate = isoDate;
+
       updateCountdownPreview(isoDate);
-      showAdminToast('success', 'Tersimpan', 'Tanggal target race day berhasil diperbarui di database!');
+      showAdminToast('success', 'Tersimpan', 'Tanggal target race day berhasil diperbarui!');
     } else {
-      showAdminToast('error', 'Gagal', res.message);
+      showAdminToast('error', 'Gagal', res.message || 'Gagal menyimpan pengaturan countdown.');
     }
   } catch (err) {
     showAdminToast('error', 'Kesalahan Server', err.message);
   }
 }
 
+/**
+ * Mengosongkan tanggal target countdown
+ */
 async function handleResetGlobalCountdown() {
   const confirmed = await showConfirmDialog({
     title: 'Kosongkan Tanggal Countdown?',
@@ -128,28 +184,36 @@ async function handleResetGlobalCountdown() {
   if (!confirmed) return;
 
   try {
+    const isClosed = adminState.globalSettings?.isRegistrationClosed || false;
+
     const res = await fetchAdmin('/admin/settings/countdown', {
       method: 'PUT',
       body: JSON.stringify({
         eventCountdownDate: null,
-        isRegistrationClosed: adminState.globalSettings?.isRegistrationClosed || false
+        isRegistrationClosed: isClosed
       })
     });
 
-    if (res.status === 'success') {
+    if (res && (res.status === 'success' || res.success)) {
+      if (!adminState.globalSettings) adminState.globalSettings = {};
       adminState.globalSettings.eventCountdownDate = null;
+
       const input = document.getElementById('globalCountdownInput');
       if (input) input.value = '';
+
       updateCountdownPreview(null);
-      showAdminToast('success', 'Dikosongkan', 'Tanggal target race day telah dikosongkan. Landing page menampilkan status belum ditentukan.');
+      showAdminToast('success', 'Dikosongkan', 'Tanggal target race day telah dikosongkan.');
     } else {
-      showAdminToast('error', 'Gagal', res.message);
+      showAdminToast('error', 'Gagal', res.message || 'Gagal mengosongkan tanggal.');
     }
   } catch (err) {
     showAdminToast('error', 'Kesalahan Server', err.message);
   }
 }
 
+/**
+ * Buka / Tutup Pendaftaran Event Secara Global
+ */
 async function handleToggleGlobalClosed() {
   const currentStatus = adminState.globalSettings?.isRegistrationClosed || false;
   const newStatus = !currentStatus;
@@ -166,23 +230,37 @@ async function handleToggleGlobalClosed() {
   if (!confirmed) return;
 
   try {
+    const currentDate = adminState.globalSettings?.eventCountdownDate || null;
+
     const res = await fetchAdmin('/admin/settings/countdown', {
       method: 'PUT',
       body: JSON.stringify({
-        eventCountdownDate: adminState.globalSettings?.eventCountdownDate || null,
+        eventCountdownDate: currentDate,
         isRegistrationClosed: newStatus
       })
     });
 
-    if (res.status === 'success') {
+    if (res && (res.status === 'success' || res.success)) {
+      if (!adminState.globalSettings) adminState.globalSettings = {};
       adminState.globalSettings.isRegistrationClosed = newStatus;
+
       renderGlobalSettings(adminState.globalSettings);
       showAdminToast('success', 'Status Berubah', newStatus ? 'Pendaftaran resmi DITUTUP!' : 'Pendaftaran resmi DIBUKA!');
     } else {
-      showAdminToast('error', 'Gagal', res.message);
+      showAdminToast('error', 'Gagal', res.message || 'Gagal mengubah status pendaftaran.');
     }
   } catch (err) {
     showAdminToast('error', 'Kesalahan Server', err.message);
+  }
+}
+
+/**
+ * Hentikan timer preview saat berpindah halaman admin
+ */
+function destroyCountdownPreview() {
+  if (previewInterval) {
+    clearInterval(previewInterval);
+    previewInterval = null;
   }
 }
 
@@ -191,5 +269,6 @@ export {
   renderGlobalSettings,
   handleSaveGlobalCountdown,
   handleResetGlobalCountdown,
-  handleToggleGlobalClosed
+  handleToggleGlobalClosed,
+  destroyCountdownPreview
 };

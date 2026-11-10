@@ -3,9 +3,9 @@
      ========================================================================= -->
 <section class="tickets-section" id="kategori">
   <div class="container">
-    <div class="section-header">
+    <div class="section-header text-center">
       <div class="section-tag">
-        <i class="fa-solid fa-tags"></i> Tiket yang tersedia
+        <i class="fa-solid fa-tags" aria-hidden="true"></i> Tiket yang Tersedia
       </div>
       <h2 class="section-title">Pilih Tantangan Jarak Lari Anda</h2>
       <p class="section-desc">
@@ -14,24 +14,65 @@
       </p>
     </div>
 
-    <!-- Container Tiket Dinamis -->
-    <div class="tickets-grid" id="ticketsGrid">
-      <!-- Loading Skeleton Cards -->
+    <!-- Container Tiket Dinamis (Di-render via JavaScript) -->
+    <div 
+      class="tickets-grid" 
+      id="ticketsGrid" 
+      aria-live="polite" 
+      aria-busy="true"
+    >
+      <!-- Loading Skeleton Card 1 -->
       <div class="glass-card ticket-card sk-card">
-        <div class="sk" style="width: 120px; height: 24px; margin-bottom: 16px;"></div>
-        <div class="sk" style="width: 80%; height: 36px; margin-bottom: 12px;"></div>
-        <div class="sk" style="width: 50%; height: 48px; margin-bottom: 24px;"></div>
-        <div class="sk" style="width: 100%; height: 180px; margin-bottom: 24px;"></div>
-        <div class="sk" style="width: 100%; height: 50px; border-radius: 30px;"></div>
+        <div class="sk" style="width: 100px; height: 24px; border-radius: 12px; margin-bottom: 16px;"></div>
+        <div class="sk" style="width: 75%; height: 32px; border-radius: 8px; margin-bottom: 12px;"></div>
+        <div class="sk" style="width: 50%; height: 44px; border-radius: 8px; margin-bottom: 24px;"></div>
+        <div class="ticket-features-sk" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px;">
+          <div class="sk" style="width: 100%; height: 20px; border-radius: 4px;"></div>
+          <div class="sk" style="width: 90%; height: 20px; border-radius: 4px;"></div>
+          <div class="sk" style="width: 95%; height: 20px; border-radius: 4px;"></div>
+          <div class="sk" style="width: 80%; height: 20px; border-radius: 4px;"></div>
+        </div>
+        <div class="sk" style="width: 100%; height: 48px; border-radius: 30px;"></div>
       </div>
+
+      <!-- Loading Skeleton Card 2 -->
       <div class="glass-card ticket-card sk-card">
-        <div class="sk" style="width: 120px; height: 24px; margin-bottom: 16px;"></div>
-        <div class="sk" style="width: 80%; height: 36px; margin-bottom: 12px;"></div>
-        <div class="sk" style="width: 50%; height: 48px; margin-bottom: 24px;"></div>
-        <div class="sk" style="width: 100%; height: 180px; margin-bottom: 24px;"></div>
-        <div class="sk" style="width: 100%; height: 50px; border-radius: 30px;"></div>
+        <div class="sk" style="width: 100px; height: 24px; border-radius: 12px; margin-bottom: 16px;"></div>
+        <div class="sk" style="width: 75%; height: 32px; border-radius: 8px; margin-bottom: 12px;"></div>
+        <div class="sk" style="width: 50%; height: 44px; border-radius: 8px; margin-bottom: 24px;"></div>
+        <div class="ticket-features-sk" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px;">
+          <div class="sk" style="width: 100%; height: 20px; border-radius: 4px;"></div>
+          <div class="sk" style="width: 90%; height: 20px; border-radius: 4px;"></div>
+          <div class="sk" style="width: 95%; height: 20px; border-radius: 4px;"></div>
+          <div class="sk" style="width: 80%; height: 20px; border-radius: 4px;"></div>
+        </div>
+        <div class="sk" style="width: 100%; height: 48px; border-radius: 30px;"></div>
+      </div>
+
+      <!-- Loading Skeleton Card 3 -->
+      <div class="glass-card ticket-card sk-card">
+        <div class="sk" style="width: 100px; height: 24px; border-radius: 12px; margin-bottom: 16px;"></div>
+        <div class="sk" style="width: 75%; height: 32px; border-radius: 8px; margin-bottom: 12px;"></div>
+        <div class="sk" style="width: 50%; height: 44px; border-radius: 8px; margin-bottom: 24px;"></div>
+        <div class="ticket-features-sk" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px;">
+          <div class="sk" style="width: 100%; height: 20px; border-radius: 4px;"></div>
+          <div class="sk" style="width: 90%; height: 20px; border-radius: 4px;"></div>
+          <div class="sk" style="width: 95%; height: 20px; border-radius: 4px;"></div>
+          <div class="sk" style="width: 80%; height: 20px; border-radius: 4px;"></div>
+        </div>
+        <div class="sk" style="width: 100%; height: 48px; border-radius: 30px;"></div>
       </div>
     </div>
+
+    <!-- Template State Kosong / Pendaftaran Ditutup (Hidden by default) -->
+    <template id="ticketClosedTemplate">
+      <div class="empty-tickets-notice text-center p-8 bg-white/5 rounded-xl border border-white/10">
+        <i class="fa-solid fa-lock text-4xl text-yellow-500 mb-3" aria-hidden="true"></i>
+        <h3 class="text-xl font-bold text-white mb-2">Pendaftaran Resmi Ditutup</h3>
+        <p class="text-gray-400 max-w-md mx-auto">
+          Kuota pendaftaran untuk seluruh kategori lari telah terpenuhi atau masa pendaftaran telah berakhir.
+        </p>
+      </div>
+    </template>
   </div>
 </section>
-
