@@ -1,0 +1,26 @@
+<div class="admin-tab-pane" id="pane-events">
+          <div class="admin-section">
+            <div class="admin-section-header">
+              <div>
+                <h3><i class="fa-solid fa-calendar-days" style="color: var(--color-primary);"></i> Manajemen Kategori Lomba & Tiket</h3>
+                <p>Tambah, edit, hapus, atur kuota, harga, dan status buka/tutup per kategori.</p>
+              </div>
+              <div class="admin-action-bar">
+                <button class="btn btn-secondary btn-sm" id="btnRefreshEvents">
+                  <i class="fa-solid fa-rotate"></i> Segarkan
+                </button>
+                <button class="btn btn-primary btn-sm btn-glow" id="btnOpenCreateEventModal" data-permission="events:create">
+                  <i class="fa-solid fa-plus"></i> Tambah Event Baru
+                </button>
+              </div>
+            </div>
+
+            <!-- List of Event Cards -->
+            <div class="admin-events-list" id="adminEventsContainer">
+              <div style="text-align: center; padding: 40px; grid-column: span 2;">
+                <i class="fa-solid fa-spinner fa-spin" style="font-size: 2rem; color: var(--color-primary);"></i>
+                <p style="margin-top: 10px; color: var(--color-text-muted);">Memuat daftar event...</p>
+              </div>
+            </div>
+          </div>
+        </div>

@@ -1,0 +1,133 @@
+<div class="admin-tab-pane" id="pane-whatsapp-web">
+          <div class="admin-section" style="padding: 0; background: transparent; border: none; box-shadow: none;">
+            <!-- Header Ringkasan Status Gateway -->
+            <div style="background: #FFFFFF; border: 1px solid var(--color-border-subtle); border-radius: var(--radius-lg); padding: 18px 24px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+              <div>
+                <h3 style="margin: 0 0 4px 0; font-size: 1.25rem; color: #0F172A; display: flex; align-items: center; gap: 10px;">
+                  <i class="fa-brands fa-whatsapp" style="color: #22C55E; font-size: 1.5rem;"></i>
+                  WhatsApp Web Enterprise Console
+                </h3>
+                <p style="margin: 0; font-size: 0.85rem; color: var(--color-text-muted);">
+                  Pantau koneksi perangkat tertaut, database nomor peserta, dan kirim pesan interaktif langsung dari admin layaknya WhatsApp Web.
+                </p>
+              </div>
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <div id="waWebHeaderStatus">
+                  <span class="badge" style="background: #FEF2F2; color: #DC2626; border: 1px solid #FECACA; padding: 6px 14px; font-weight: 700;">
+                    <i class="fa-solid fa-circle-xmark"></i> Status: Terputus
+                  </span>
+                </div>
+                <button type="button" class="btn btn-secondary btn-sm" id="btnRefreshWaWeb">
+                  <i class="fa-solid fa-rotate"></i> Segarkan Status
+                </button>
+                <button type="button" class="btn btn-primary btn-sm btn-glow" id="btnGoToWaQr">
+                  <i class="fa-solid fa-qrcode"></i> Scan QR Baru
+                </button>
+              </div>
+            </div>
+
+            <!-- WhatsApp Web 2-Column Console Layout -->
+            <div class="wa-web-layout">
+              <!-- Left Sidebar: Profile & Contacts -->
+              <div class="wa-web-sidebar">
+                <div class="wa-web-profile-bar">
+                  <div class="wa-web-profile-info">
+                    <div class="wa-avatar" id="waWebMyAvatar">
+                      <i class="fa-brands fa-whatsapp"></i>
+                    </div>
+                    <div>
+                      <div style="font-weight: 700; font-size: 0.92rem; color: #0F172A;" id="waWebMyNumber">
+                        Memuat nomor...
+                      </div>
+                      <div style="font-size: 0.72rem; color: #22C55E; font-weight: 600; display: flex; align-items: center; gap: 4px;" id="waWebMyStatusText">
+                        <span style="width: 7px; height: 7px; background: #22C55E; border-radius: 50%; display: inline-block;"></span> Online &amp; Terhubung
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <button type="button" class="btn-icon" id="btnWaWebSync" title="Sinkronisasi Sesi" style="background: none; border: none; cursor: pointer; color: #64748B; font-size: 1rem;">
+                      <i class="fa-solid fa-arrows-rotate"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Search Contact Box -->
+                <div class="wa-web-search-box">
+                  <div style="position: relative;">
+                    <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94A3B8; font-size: 0.85rem;"></i>
+                    <input type="text" class="form-input form-input-sm" id="waContactSearchInput" placeholder="Cari pelari / nomor HP..." style="padding-left: 34px; border-radius: 20px; background: #FFFFFF;">
+                  </div>
+                </div>
+
+                <!-- Contact List Container -->
+                <div class="wa-web-contact-list" id="waContactListContainer">
+                  <div style="padding: 30px 16px; text-align: center; color: var(--color-text-muted); font-size: 0.85rem;">
+                    <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 1.5rem; margin-bottom: 8px; color: var(--color-primary); display: block;"></i>
+                    Memuat daftar kontak peserta...
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right Area: Live Chat Messenger -->
+              <div class="wa-web-main" id="waChatMainContainer">
+                <!-- Chat Header -->
+                <div class="wa-chat-header" id="waChatHeaderBar">
+                  <div style="display: flex; align-items: center; gap: 12px;">
+                    <div class="wa-avatar" style="background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%); width: 40px; height: 40px; font-size: 0.88rem;" id="waActiveAvatar">
+                      TR
+                    </div>
+                    <div>
+                      <div style="font-weight: 700; font-size: 0.95rem; color: #0F172A;" id="waActiveName">
+                        Pilih Peserta untuk Chat
+                      </div>
+                      <div style="font-size: 0.78rem; color: #64748B; display: flex; align-items: center; gap: 8px;">
+                        <span id="waActivePhone">-</span>
+                        <span id="waActiveBadge"></span>
+                      </div>
+                    </div>
+                  </div>
+                  <div style="display: flex; gap: 8px;" id="waChatHeaderActions">
+                    <button type="button" class="btn btn-secondary btn-sm" id="btnQuickSendPaidTicket" title="Kirim E-Tiket PDF Lunas">
+                      <i class="fa-solid fa-ticket" style="color: #22C55E;"></i> Kirim Tiket
+                    </button>
+                    <button type="button" class="btn btn-secondary btn-sm" id="btnQuickSendPending" title="Kirim Tagihan & Link Bayar">
+                      <i class="fa-solid fa-clock" style="color: #F59E0B;"></i> Tagihan
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Chat Messages Scroll Box -->
+                <div class="wa-chat-scroll" id="waChatMessagesBox">
+                  <div class="wa-system-pill">
+                    <i class="fa-solid fa-lock"></i> Pesan terenkripsi end-to-end melalui WhatsApp Dedicated Server Gateway
+                  </div>
+                  <div style="text-align: center; color: #64748B; font-size: 0.85rem; margin: 40px auto; max-width: 360px; background: rgba(255,255,255,0.7); padding: 20px; border-radius: 12px;">
+                    <i class="fa-brands fa-whatsapp" style="font-size: 3rem; color: #22C55E; margin-bottom: 12px; display: block;"></i>
+                    <strong>Pilih kontak peserta di sebelah kiri</strong><br>
+                    <span style="font-size: 0.8rem; color: #64748B;">Anda dapat mengirim notifikasi manual, update bukti bayar, atau chat pesan kustom langsung ke nomor WhatsApp peserta.</span>
+                  </div>
+                </div>
+
+                <!-- Chat Input Footer -->
+                <div class="wa-chat-input-bar" id="waChatInputArea">
+                  <div style="display: flex; gap: 10px; align-items: center;">
+                    <select class="form-input form-input-sm" id="waQuickTemplateSelect" style="max-width: 260px; font-size: 0.8rem;">
+                      <option value="">⚡ Pilih Template Cepat...</option>
+                      <option value="PAID_TICKET">🎫 Konfirmasi Pembayaran &amp; E-Tiket PDF</option>
+                      <option value="PENDING_INVOICE">⏳ Pengingat Tagihan &amp; Link Pembayaran</option>
+                      <option value="RACEPACK_INFO">🎽 Informasi Pengambilan Race Pack</option>
+                      <option value="THANK_YOU">🙏 Ucapan Terima Kasih Panitia Tegal Run</option>
+                    </select>
+                    <small style="color: #64748B; font-size: 0.76rem;">Template otomatis terisi dengan nama &amp; data peserta</small>
+                  </div>
+                  <div class="wa-chat-input-row">
+                    <textarea class="form-input" id="waDirectChatInput" rows="2" placeholder="Ketik pesan WhatsApp langsung ke peserta..." style="resize: none; font-size: 0.88rem;"></textarea>
+                    <button type="button" class="btn btn-primary btn-glow" id="btnSendWaDirectMsg" style="height: 100%; min-height: 52px; padding: 0 20px;">
+                      <i class="fa-solid fa-paper-plane"></i> Kirim
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>

@@ -1,0 +1,254 @@
+<div class="admin-tab-pane" id="pane-cms">
+          <form id="formCmsSettings">
+            <!-- 1. Identitas & Hero Section -->
+            <div class="admin-section">
+              <div class="admin-section-header">
+                <div>
+                  <h3><i class="fa-solid fa-heading" style="color: var(--color-primary);"></i> Identitas Website & Banner Hero Utama</h3>
+                  <p>Atur judul website, slogan, teks hero banner, dan gambar latar depan.</p>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Judul Website (Title Browser Tab)</label>
+                  <input type="text" class="form-input" id="cmsSiteTitle" placeholder="Tegal Run 2027 - Official Half Marathon">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Tagline Slogan</label>
+                  <input type="text" class="form-input" id="cmsSiteTagline" placeholder="Lari Bersama Menembus Batas di Kota Bahari">
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Teks Badge Hero (Pill)</label>
+                  <input type="text" class="form-input" id="cmsHeroBadge" placeholder="🔥 PENDAFTARAN RESMI DIBUKA">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">URL Gambar Banner Hero</label>
+                  <input type="url" class="form-input" id="cmsHeroBgImage" placeholder="https://images.unsplash.com/...">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Judul Utama Hero (H1)</label>
+                <input type="text" class="form-input" id="cmsHeroTitle" placeholder="Tegal Run 2027: Lari Bersama Menembus Batas">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Subjudul Hero / Deskripsi Singkat</label>
+                <textarea class="form-input" id="cmsHeroSubtitle" rows="2" placeholder="Kompetisi lari terbesar di Kota Bahari dengan standar race profesional..."></textarea>
+              </div>
+            </div>
+
+            <!-- 1.5. Live Event Stats Grid (Bebas Tambah & Bisa Otomatis dari Data) -->
+            <div class="admin-section">
+              <div class="admin-section-header" style="flex-wrap: wrap; gap: 12px;">
+                <div>
+                  <h3><i class="fa-solid fa-chart-line" style="color: var(--color-primary);"></i> Live Event Stats Grid (Banner Statistik Hero)</h3>
+                  <p>Bebas menambahkan, mengubah, atau menghapus kartu statistik. Bisa menggunakan data otomatis real-time dari database atau angka kustom manual.</p>
+                </div>
+                <button type="button" class="btn btn-secondary btn-sm" id="btnAddCmsStatItem">
+                  <i class="fa-solid fa-plus"></i> Tambah Kartu Statistik
+                </button>
+              </div>
+
+              <!-- Dynamic Repeater Container -->
+              <div id="cmsStatsItemsContainer" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px;">
+                <!-- Di-render oleh cms.js -->
+              </div>
+            </div>
+
+            <!-- 2. Rute Lari & Google Maps Embed -->
+            <div class="admin-section">
+              <div class="admin-section-header">
+                <div>
+                  <h3><i class="fa-solid fa-map-location-dot" style="color: var(--color-primary);"></i> Rute Lari & Link Google Maps</h3>
+                  <p>Paste link Google Maps (URL langsung atau kode iframe embed) serta gambar rute.</p>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Judul Section Rute</label>
+                  <input type="text" class="form-input" id="cmsRouteTitle" placeholder="Rute Lari Resmi & Titik Kumpul">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">URL Gambar Peta Rute Lari</label>
+                  <input type="url" class="form-input" id="cmsRouteMapImage" placeholder="https://images.unsplash.com/...">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Deskripsi Rute Lari</label>
+                <textarea class="form-input" id="cmsRouteDesc" rows="2" placeholder="Jalur datar beraspal mulus melintasi landmark bersejarah..."></textarea>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">
+                  <i class="fa-brands fa-google" style="color: #4285F4;"></i> Link / Embed Google Maps <span class="req">*</span>
+                </label>
+                <textarea class="form-input" id="cmsGmapsUrl" rows="2" placeholder="Paste link Google Maps Embed atau tag <iframe src='https://www.google.com/maps/embed?...'></iframe> di sini"></textarea>
+                <div class="form-hint">
+                  Tips: Buka Google Maps > Bagikan (Share) > Sematkan Peta (Embed a map) > Salin HTML / URL src-nya dan paste di sini.
+                </div>
+              </div>
+
+              <!-- Route Specifications (Start Time & COT) -->
+              <div style="margin-top: 16px; padding: 16px; background: rgba(15, 23, 42, 0.4); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px;">
+                <div style="font-weight: 700; margin-bottom: 12px; color: var(--color-primary); font-size: 0.95rem;">
+                  <i class="fa-solid fa-stopwatch"></i> Spesifikasi Waktu Flag-Off & Cut Off Time (COT)
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">Flag-Off 10K (Waktu Mulai)</label>
+                    <input type="text" class="form-input" id="cmsRouteStart10k" placeholder="05:45 WIB">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Cut Off Time (COT) 10K</label>
+                    <input type="text" class="form-input" id="cmsRouteCot10k" placeholder="2 Jam 30 Menit">
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">Flag-Off 5K (Waktu Mulai)</label>
+                    <input type="text" class="form-input" id="cmsRouteStart5k" placeholder="06:15 WIB">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Cut Off Time (COT) 5K</label>
+                    <input type="text" class="form-input" id="cmsRouteCot5k" placeholder="1 Jam 30 Menit">
+                  </div>
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label class="form-label">Link Unduh File GPX Rute Resmi</label>
+                  <input type="text" class="form-input" id="cmsRouteGpxUrl" placeholder="https://... atau /assets/rute-tegal-run.gpx">
+                </div>
+              </div>
+            </div>
+
+            <!-- 3. Fasilitas, Kategori & Gambar Media -->
+            <div class="admin-section">
+              <div class="admin-section-header" style="flex-wrap: wrap; gap: 12px;">
+                <div>
+                  <h3><i class="fa-solid fa-images" style="color: var(--color-primary);"></i> Section Fasilitas, Kategori & Media Gambar</h3>
+                  <p>Kustomisasi teks pengantar, media preview, dan daftar fasilitas pelari (bisa tambah/hapus kartu secara bebas).</p>
+                </div>
+                <button type="button" class="btn btn-secondary btn-sm" id="btnAddCmsFacilityItem">
+                  <i class="fa-solid fa-plus"></i> Tambah Kartu Fasilitas
+                </button>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Judul Section Fasilitas</label>
+                  <input type="text" class="form-input" id="cmsFacilitiesTitle" placeholder="Fasilitas & Layanan Unggulan">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">URL Gambar Fasilitas / Race Village</label>
+                  <input type="url" class="form-input" id="cmsFacilitiesImage" placeholder="https://images.unsplash.com/...">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Deskripsi Section Fasilitas</label>
+                <textarea class="form-input" id="cmsFacilitiesDesc" rows="2" placeholder="Kenyamanan dan keselamatan pelari adalah prioritas utama kami..."></textarea>
+              </div>
+
+              <!-- Dynamic Facilities Repeater Container -->
+              <div style="margin-top: 16px; margin-bottom: 24px;">
+                <label class="form-label" style="font-weight: 700; color: var(--color-primary);">Daftar Butir Fasilitas Pelari (Dynamic Cards)</label>
+                <div id="cmsFacilitiesItemsContainer" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px;">
+                  <!-- Di-render oleh cms.js -->
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Judul Section Tiket</label>
+                  <input type="text" class="form-input" id="cmsTicketsTitle" placeholder="Pilih Tantangan Jarak Lari Anda">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">URL Gambar Preview Medali Finisher</label>
+                  <input type="url" class="form-input" id="cmsMedalImage" placeholder="https://images.unsplash.com/...">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Deskripsi Section Tiket</label>
+                <textarea class="form-input" id="cmsTicketsDesc" rows="2" placeholder="Tersedia kategori kompetitif bagi atlet dan fun run santai..."></textarea>
+              </div>
+            </div>
+
+            <!-- 3.5. Perizinan & Kepatuhan Hukum (Legal) -->
+            <div class="admin-section">
+              <div class="admin-section-header" style="flex-wrap: wrap; gap: 12px;">
+                <div>
+                  <h3><i class="fa-solid fa-shield-halved" style="color: var(--color-primary);"></i> Section Perizinan & Kepatuhan Hukum</h3>
+                  <p>Pengaturan teks legalitas dan daftar poin kepatuhan hukum resmi (bisa tambah/hapus kartu secara bebas).</p>
+                </div>
+                <button type="button" class="btn btn-secondary btn-sm" id="btnAddCmsLegalItem">
+                  <i class="fa-solid fa-plus"></i> Tambah Poin Legalitas
+                </button>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Judul Utama Legalitas</label>
+                <input type="text" class="form-input" id="cmsLegalTitle" placeholder="Perizinan & Kepatuhan Hukum Resmi">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Deskripsi Legalitas</label>
+                <textarea class="form-input" id="cmsLegalDesc" rows="2" placeholder="Tegal Run 2027 diselenggarakan dengan izin resmi pemerintah daerah..."></textarea>
+              </div>
+
+              <!-- Dynamic Legal Repeater Container -->
+              <div style="margin-top: 16px;">
+                <label class="form-label" style="font-weight: 700; color: var(--color-primary);">Daftar Poin Kepatuhan Hukum (Dynamic Cards)</label>
+                <div id="cmsLegalItemsContainer" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px;">
+                  <!-- Di-render oleh cms.js -->
+                </div>
+              </div>
+            </div>
+
+            <!-- 4. Kontak & Footer -->
+            <div class="admin-section">
+              <div class="admin-section-header">
+                <div>
+                  <h3><i class="fa-solid fa-address-book" style="color: var(--color-primary);"></i> Informasi Kontak & Footer Website</h3>
+                  <p>Alamat sekretariat, kontak panitia, dan hak cipta footer.</p>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Email Resmi Panitia</label>
+                  <input type="email" class="form-input" id="cmsContactEmail" placeholder="kontak@tegalrun.id">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">WhatsApp / Telepon Panitia</label>
+                  <input type="text" class="form-input" id="cmsContactPhone" placeholder="+62 812-3456-7890">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Alamat Sekretariat Pelaksana</label>
+                <input type="text" class="form-input" id="cmsContactAddress" placeholder="Alun-Alun Kota Tegal, Jawa Tengah">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Teks Hak Cipta Footer</label>
+                <input type="text" class="form-input" id="cmsFooterCopyright" placeholder="Hak Cipta Terpelihara © 2027 Panitia Resmi Tegal Run.">
+              </div>
+
+              <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--color-border-subtle);">
+                <a href="/" target="_blank" class="btn btn-secondary btn-sm">
+                  <i class="fa-solid fa-arrow-up-right-from-square"></i> Lihat Website
+                </a>
+                <button type="submit" class="btn btn-primary btn-sm btn-glow" id="btnSaveCmsSubmit">
+                  <i class="fa-solid fa-floppy-disk"></i> Simpan Seluruh Konten Website
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>

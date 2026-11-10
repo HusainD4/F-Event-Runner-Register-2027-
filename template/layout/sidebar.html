@@ -1,0 +1,123 @@
+<!-- =========================================================================
+     MODULAR ADMIN SIDEBAR - TEGAL RUN 2027
+     ========================================================================= -->
+<aside class="admin-sidebar" id="adminSidebar">
+  <!-- Sidebar Header / Branding -->
+  <div class="sidebar-header">
+    <div class="sidebar-brand">
+      <div class="brand-icon">
+        <i class="fa-solid fa-person-running"></i>
+      </div>
+      <div class="brand-text">
+        TEGAL RUN <span>2027</span>
+        <div class="brand-tag">PORTAL ADMIN</div>
+      </div>
+    </div>
+    <button class="sidebar-close-btn" id="btnCloseSidebar" title="Tutup Menu">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </div>
+
+  <!-- Sidebar User Profile Snapshot -->
+  <div class="sidebar-profile">
+    <div class="profile-avatar">
+      <i class="fa-solid fa-user-shield"></i>
+    </div>
+    <div class="profile-details">
+      <h4 id="sidebarAdminFullName">Administrator</h4>
+      <span class="role-badge" id="sidebarAdminRole">SUPERADMIN</span>
+    </div>
+  </div>
+
+  <!-- Navigation Menu -->
+  <nav class="sidebar-nav">
+    <div class="nav-section-title">MENU UTAMA</div>
+
+    <button class="nav-item active" data-nav="dashboard" data-page="page:dashboard">
+      <i class="fa-solid fa-gauge-high"></i>
+      <span>Dashboard Overview</span>
+    </button>
+
+    <button class="nav-item" data-nav="events" data-page="page:events">
+      <i class="fa-solid fa-calendar-days"></i>
+      <span>Manajemen Event</span>
+      <span class="nav-badge" id="navEventsCount">2</span>
+    </button>
+
+    <button class="nav-item" data-nav="participants" data-page="page:participants">
+      <i class="fa-solid fa-users"></i>
+      <span>Manajemen Peserta</span>
+    </button>
+
+    <button class="nav-item" data-nav="racepack" data-page="page:racepack">
+      <i class="fa-solid fa-box-open" style="color: #F97316;"></i>
+      <span>Racepack</span>
+      <span class="badge" style="background: #FFEDD5; color: #EA580C; font-size: 0.68rem; font-weight: 800; padding: 2px 6px; border-radius: 4px; margin-left: auto;">SCAN</span>
+    </button>
+
+    <button class="nav-item" data-nav="orders" data-page="page:orders">
+      <i class="fa-solid fa-receipt"></i>
+      <span>Transaksi & Order</span>
+    </button>
+
+    <button class="nav-item" data-nav="notif-logs" data-page="page:notif-logs">
+      <i class="fa-solid fa-paper-plane"></i>
+      <span>Log Notifikasi & Peserta</span>
+    </button>
+
+    <button class="nav-item" data-nav="whatsapp-web" data-page="page:whatsapp-web">
+      <i class="fa-brands fa-whatsapp" style="color: #22C55E;"></i>
+      <span>WhatsApp Web Console</span>
+    </button>
+
+    <div class="nav-section-title">KONFIGURASI</div>
+
+    <button class="nav-item" data-nav="bib-settings" data-page="page:bib-settings">
+      <i class="fa-solid fa-id-badge" style="color: #6366F1;"></i>
+      <span>Pengaturan BIB &amp; E-Tiket</span>
+    </button>
+
+    <button class="nav-item" data-nav="cms" data-page="page:cms">
+      <i class="fa-solid fa-pen-ruler"></i>
+      <span>Konten Website & CMS</span>
+    </button>
+
+    <button class="nav-item" data-nav="countdown" data-page="page:countdown">
+      <i class="fa-solid fa-stopwatch-20"></i>
+      <span>Countdown & Status Event</span>
+    </button>
+
+    <button class="nav-item" data-nav="notifications" data-page="page:notifications">
+      <i class="fa-solid fa-bell"></i>
+      <span>Konfigurasi Notifikasi</span>
+    </button>
+
+    <button class="nav-item" data-nav="admins" data-page="page:admins" data-role="SUPERADMIN">
+      <i class="fa-solid fa-shield-halved"></i>
+      <span>Kelola Admin & RBAC</span>
+    </button>
+
+    <button class="nav-item" data-nav="routes" data-page="page:routes">
+      <i class="fa-solid fa-map-pin"></i>
+      <span>Rute &amp; Checkpoint</span>
+    </button>
+
+    <button class="nav-item" data-nav="logs" data-page="page:logs">
+      <i class="fa-solid fa-clock-rotate-left"></i>
+      <span>Log Audit Sistem</span>
+    </button>
+  </nav>
+
+  <!-- Sidebar Footer -->
+  <div class="sidebar-footer">
+    <a href="/" target="_blank" class="sidebar-action-btn" title="Buka Landing Page">
+      <i class="fa-solid fa-arrow-up-right-from-square"></i>
+      <span>Lihat Website</span>
+    </a>
+    <button type="button" class="sidebar-action-btn logout-btn" id="btnSidebarLogout" title="Keluar dari Portal Admin">
+      <i class="fa-solid fa-arrow-right-from-bracket"></i>
+      <span>Keluar</span>
+    </button>
+  </div>
+</aside>
+

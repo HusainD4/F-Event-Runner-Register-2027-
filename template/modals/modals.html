@@ -1,0 +1,382 @@
+<!-- =========================================================================
+     MODAL 1: CHECKOUT & WAR TIKET FORM (3-STEP WITH UU PDP CONSENT)
+     ========================================================================= -->
+<div class="modal-overlay" id="regModal">
+  <div class="modal-container">
+    <div class="modal-header">
+      <div class="modal-title-group">
+        <h3><i class="fa-solid fa-bolt" style="color: var(--color-primary); margin-right: 8px;"></i> Formulir Pendaftaran Tegal Run 2027</h3>
+        <p>Lengkapi identitas penanggung jawab & pelari sesuai data KTP asli.</p>
+      </div>
+      <button class="modal-close-btn" id="modalCloseBtn">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <!-- Stepper Navigation -->
+    <div class="modal-steps">
+      <div class="step-indicator active" id="stepIndicator1">
+        <div class="step-num">1</div>
+        <span>Kategori & Pemesan</span>
+      </div>
+      <div class="step-indicator" id="stepIndicator2">
+        <div class="step-num">2</div>
+        <span>Data Peserta</span>
+      </div>
+      <div class="step-indicator" id="stepIndicator3">
+        <div class="step-num">3</div>
+        <span>Persetujuan & Bayar</span>
+      </div>
+    </div>
+
+    <!-- Modal Body -->
+    <div class="modal-body">
+      <!-- STEP 1: PILIH KATEGORI & DATA PEMESAN -->
+      <div id="stepSection1">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Kategori Lari <span class="req">*</span></label>
+            <select class="form-select" id="modalEventSelect"></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Jumlah Tiket / Peserta <span class="req">*</span></label>
+            <select class="form-select" id="modalParticipantCount">
+              <option value="1">1 Orang Peserta</option>
+              <option value="2">2 Orang Peserta</option>
+              <option value="3">3 Orang Peserta</option>
+              <option value="4">4 Orang Peserta</option>
+              <option value="5">5 Orang Peserta</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="card-embedded">
+          <h4 style="font-size: 1.05rem; font-weight: 800; color: #0F172A; margin-bottom: 14px;">
+            <i class="fa-solid fa-user-shield" style="color: var(--color-primary);"></i> Data Penanggung Jawab Pemesanan
+          </h4>
+
+          <div class="form-group">
+            <label class="form-label">Nama Lengkap Pemesan <span class="req">*</span></label>
+            <input type="text" class="form-input" id="bookerName" placeholder="Contoh: Budi Santoso" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Alamat Email Aktif <span class="req">*</span></label>
+              <input type="email" class="form-input" id="bookerEmail" placeholder="nama@email.com" required>
+              <div class="form-hint">E-Tiket & invoice Midtrans otomatis dikirim ke email ini.</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Nomor WhatsApp Aktif <span class="req">*</span></label>
+              <input type="tel" class="form-input" id="bookerPhone" placeholder="Contoh: 081234567890" required>
+              <div class="form-hint">Digunakan untuk menerima notifikasi E-Tiket via WhatsApp.</div>
+            </div>
+          </div>
+
+          <div style="margin-top: 14px; padding-top: 12px; border-top: 1px dashed #CBD5E1;">
+            <label class="checkbox-container" style="cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
+              <input type="checkbox" id="checkSameAsBooker">
+              <span class="checkmark"></span>
+              <span class="checkbox-label" style="font-weight: 700; font-size: 0.9rem; color: #1E293B;">
+                Gunakan Data Penanggung Jawab Pemesanan sebagai Peserta #1
+              </span>
+            </label>
+            <div class="form-hint" style="margin-left: 28px; margin-top: 2px;">
+              Nama dan nomor WhatsApp penanggung jawab akan otomatis mengisi data formulir Peserta #1.
+            </div>
+          </div>
+        </div>
+
+        <!-- Rincian Biaya & Layanan Step 1 -->
+        <div class="card-embedded" style="background: #F8FAFC; border: 1px solid var(--color-border-subtle); margin-top: 14px; padding: 16px;">
+          <h4 style="font-size: 0.95rem; font-weight: 800; color: #0F172A; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-receipt" style="color: var(--color-primary);"></i> Estimasi Rincian Biaya &amp; Layanan
+          </h4>
+          <div style="display: flex; justify-content: space-between; font-size: 0.88rem; margin-bottom: 6px;">
+            <span style="color: var(--color-text-muted);">Subtotal Tiket:</span>
+            <strong id="step1TicketsSubtotal" style="color: #0F172A;">Rp 0</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 0.88rem; margin-bottom: 8px;">
+            <span style="color: var(--color-text-muted);" id="step1FeeLabel">Biaya Layanan:</span>
+            <strong id="step1FeeAmount" style="color: #EA580C;">Rp 0</strong>
+          </div>
+          <div style="border-top: 1px dashed #CBD5E1; padding-top: 8px; display: flex; justify-content: space-between; align-items: center; font-weight: 800; font-size: 1.05rem;">
+            <span style="color: #0F172A;">Total Tagihan:</span>
+            <span style="color: var(--color-primary);" id="step1GrandTotal">Rp 0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 2: DATA PESERTA (REPEATER) -->
+      <div id="stepSection2" style="display: none;">
+        <div id="participantsContainer"></div>
+      </div>
+
+      <!-- STEP 3: RINGKASAN & PERSETUJUAN UU PDP -->
+      <div id="stepSection3" style="display: none;">
+        <div id="summaryReviewBox"></div>
+
+        <!-- UU PDP Mandatory Consent Checkbox -->
+        <div class="consent-box">
+          <label class="checkbox-container">
+            <input type="checkbox" id="checkConsentPDP" required>
+            <span class="checkmark"></span>
+            <span class="checkbox-label">
+              <strong>Persetujuan Pemrosesan Data Pribadi (UU PDP No. 27/2022)</strong><br>
+              Saya memberikan persetujuan eksplisit kepada Komite Tegal Run 2027 untuk memproses data NIK, 
+              kontak darurat, dan data medis yang saya serahkan demi kepentingan identifikasi nomor BIB, 
+              penanganan gawat darurat medis di lintasan, serta penerbitan polis asuransi perlombaan.
+            </span>
+          </label>
+        </div>
+
+        <div class="consent-box" style="margin-top: 12px;">
+          <label class="checkbox-container">
+            <input type="checkbox" id="checkConsentWaiver" required>
+            <span class="checkmark"></span>
+            <span class="checkbox-label">
+              <strong>Pelepasan Tanggung Jawab Medis (Liability Waiver)</strong><br>
+              Saya menyatakan dalam kondisi fisik yang sehat dan terlatih untuk menyelesaikan kategori lari ini. 
+              Saya memahami risiko olahraga maraton dan mematuhi seluruh peraturan panitia penyelenggara.
+            </span>
+          </label>
+        </div>
+
+        <div class="midtrans-badge-box">
+          <i class="fa-solid fa-lock" style="color: #10B981; font-size: 1.2rem;"></i>
+          <span style="font-size: 0.85rem; color: #475569;">
+            Pembayaran diamankan secara real-time via <strong>Midtrans Snap</strong> (QRIS, VA Bank BCA, BRI, Mandiri, BNI, Kartu Kredit).
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="modal-footer">
+      <div class="order-total-preview">
+        <span class="total-label">Total Tagihan</span>
+        <span class="total-amount" id="modalTotalAmount">Rp 0</span>
+      </div>
+
+      <div class="modal-footer-actions" style="display: flex; gap: 10px;">
+        <button type="button" class="btn btn-secondary btn-sm" id="btnModalPrev" style="display: none;">
+          <i class="fa-solid fa-arrow-left"></i> Kembali
+        </button>
+        <button type="button" class="btn btn-primary btn-sm" id="btnModalNext">
+          Lanjut <i class="fa-solid fa-arrow-right"></i>
+        </button>
+        <button type="button" class="btn btn-primary btn-sm btn-glow" id="btnModalSubmit" style="display: none;">
+          <i class="fa-solid fa-credit-card"></i> Bayar Sekarang (Midtrans)
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- =========================================================================
+     MODAL 2: KEBIJAKAN PRIVASI (UU PDP NO. 27 TAHUN 2022)
+     ========================================================================= -->
+<div class="modal-overlay" id="privacyModal">
+  <div class="modal-container" style="max-width: 800px;">
+    <div class="modal-header">
+      <div class="modal-title-group">
+        <h3><i class="fa-solid fa-shield-halved" style="color: var(--color-primary); margin-right: 8px;"></i> Kebijakan Privasi Data Pribadi (UU PDP)</h3>
+        <p>Berdasarkan Undang-Undang Republik Indonesia Nomor 27 Tahun 2022</p>
+      </div>
+      <button class="modal-close-btn" id="privacyCloseBtn">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="modal-body legal-document-text">
+      <h4>1. Pengendali Data Pribadi</h4>
+      <p>
+        Pengendali Data Pribadi untuk seluruh aktivitas pendaftaran Tegal Run 2027 adalah <strong>Komite Pelaksana Tegal Run 2027</strong> yang berkedudukan di Tegal, Jawa Tengah. Kami berkomitmen melindungi data pribadi Anda sesuai UU No. 27 Tahun 2022 tentang Perlindungan Data Pribadi (UU PDP) dan UU No. 1 Tahun 2024 tentang ITE.
+      </p>
+
+      <h4>2. Data Pribadi yang Dikumpulkan</h4>
+      <p>Data yang kami kumpulkan mencakup:</p>
+      <ul>
+        <li><strong>Data Pribadi Umum:</strong> Nama Lengkap sesuai KTP, Nomor Induk Kependudukan (NIK 16 digit), Tempat & Tanggal Lahir, Jenis Kelamin, Alamat Lengkap Domisili, Nomor Telepon/WhatsApp, dan Alamat Surel (Email).</li>
+        <li><strong>Data Pribadi Spesifik/Sensitif:</strong> Golongan Darah dan Riwayat Penyakit/Alergi Medis yang diserahkan secara sukarela untuk penanganan darurat tim medis ambulans di rute perlombaan.</li>
+      </ul>
+
+      <h4>3. Dasar Hukum dan Tujuan Pemrosesan</h4>
+      <p>Pemrosesan data pribadi Anda dilakukan berdasarkan persetujuan eksplisit (Consent) untuk tujuan:</p>
+      <ul>
+        <li>Verifikasi kepemilikan nomor dada (BIB) resmi guna mencegah pemalsuan identitas atau praktik joki atletik.</li>
+        <li>Penerbitan polis asuransi perlindungan kecelakaan olahraga selama berlangsungnya perlombaan.</li>
+        <li>Penyelamatan jiwa (Vital Interest) oleh tim dokter darurat jika terjadi kolaps medis di lintasan.</li>
+        <li>Pengiriman hasil waktu lomba (Race Timing) dan e-Certificate resmi.</li>
+      </ul>
+
+      <h4>4. Keamanan dan Batas Masa Retensi Data</h4>
+      <p>
+        Data disimpan pada server terenkripsi dengan protokol SSL/TLS 256-bit dan pembatasan akses ketat. 
+        Masa simpan (retensi) data maksimal adalah 1 (satu) tahun kalender setelah event selesai untuk kebutuhan audit keselamatan dan keuangan resmi, setelah itu data dianonimkan atau dimusnahkan secara aman.
+      </p>
+
+      <h4>5. Hak Anda sebagai Subjek Data</h4>
+      <p>
+        Berdasarkan Pasal 5 s.d. Pasal 13 UU PDP, Anda berhak mengakses, memperbaiki kesalahan data, menolak pemrosesan otomatis, serta mengajukan permohonan penghapusan data Anda. Hubungi Petugas Perlindungan Data kami melalui surel resmi: <code>dpo@tegalrun.id</code>.
+      </p>
+    </div>
+
+    <div class="modal-footer" style="justify-content: flex-end;">
+      <button class="btn btn-secondary btn-sm" id="privacyOkBtn">Tutup Dokumen</button>
+    </div>
+  </div>
+</div>
+
+<!-- =========================================================================
+     MODAL 3: SYARAT & KETENTUAN (TERMS & CONDITIONS)
+     ========================================================================= -->
+<div class="modal-overlay" id="termsModal">
+  <div class="modal-container" style="max-width: 800px;">
+    <div class="modal-header">
+      <div class="modal-title-group">
+        <h3><i class="fa-solid fa-file-contract" style="color: var(--color-primary); margin-right: 8px;"></i> Syarat & Ketentuan Peserta Lari</h3>
+        <p>Regulasi Resmi Perlombaan Tegal Run 2027</p>
+      </div>
+      <button class="modal-close-btn" id="termsCloseBtn">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="modal-body legal-document-text">
+      <h4>1. Ketentuan Umum Kepesertaan</h4>
+      <p>
+        Pendaftaran terbuka untuk Warga Negara Indonesia (WNI) dan Warga Negara Asing (WNA) yang memiliki identitas resmi (KTP/SIM/Paspor). 
+        Peserta wajib memilih kategori yang sesuai dengan kemampuan fisik dan mematuhi batas waktu Cut-Off Time (COT).
+      </p>
+
+      <h4>2. Larangan Praktik Joki & Pengalihan BIB</h4>
+      <p>
+        Nomor BIB bersifat personal dan tidak dapat diperjualbelikan atau dialihkan kepada pihak lain tanpa persetujuan tertulis resmi panitia. 
+        Pelanggaran terhadap pasal ini akan mengakibatkan diskualifikasi instan, pencabutan hak medali finisher, dan hilangnya perlindungan santunan asuransi.
+      </p>
+
+      <h4>3. Pelepasan Tanggung Jawab Medis (Waiver of Liability)</h4>
+      <p>
+        Dengan menyelesaikan pendaftaran, peserta menyadari bahwa lari maraton adalah aktivitas fisik berkategori intensitas tinggi. 
+        Peserta membebaskan panitia penyelenggara, sponsor, dan aparat pengamanan dari tuntutan hukum perdata maupun pidana atas cedera fisik, kehilangan harta benda, atau insiden yang diakibatkan oleh kondisi kesehatan bawaan peserta yang tidak diungkapkan kepada tim medis.
+      </p>
+
+      <h4>4. Kebijakan Keadaan Kahar (Force Majeure)</h4>
+      <p>
+        Apabila terjadi keadaan darurat bencana alam, kebakaran, kerusuhan sosial, atau kebijakan pemerintah terkait keamanan wilayah yang menyebabkan acara dibatalkan, panitia tidak berkewajiban mengembalikan biaya pendaftaran yang telah digunakan untuk produksi racepack dan operasional awal.
+      </p>
+    </div>
+
+    <div class="modal-footer" style="justify-content: flex-end;">
+      <button class="btn btn-secondary btn-sm" id="termsOkBtn">Saya Mengerti</button>
+    </div>
+  </div>
+</div>
+
+<!-- =========================================================================
+     MODAL 4: SIZE CHART JERSEY
+     ========================================================================= -->
+<div class="modal-overlay" id="sizeChartModal">
+  <div class="modal-container" style="max-width: 600px;">
+    <div class="modal-header">
+      <div class="modal-title-group">
+        <h3><i class="fa-solid fa-ruler-combined" style="color: var(--color-primary); margin-right: 8px;"></i> Panduan Ukuran Jersey (Size Chart)</h3>
+        <p>Standar Athletic Fit Dewasa (Toleransi Ukuran ±1-2 cm)</p>
+      </div>
+      <button class="modal-close-btn" id="sizeChartCloseBtn">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <table class="size-chart-table">
+        <thead>
+          <tr>
+            <th>Ukuran</th>
+            <th>Lebar Dada (cm)</th>
+            <th>Panjang Baju (cm)</th>
+            <th>Rekomendasi Berat (kg)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>XS</strong></td>
+            <td>46 cm</td>
+            <td>66 cm</td>
+            <td>45 - 52 kg</td>
+          </tr>
+          <tr>
+            <td><strong>S</strong></td>
+            <td>48 cm</td>
+            <td>68 cm</td>
+            <td>53 - 62 kg</td>
+          </tr>
+          <tr>
+            <td><strong>M</strong> (Standar)</td>
+            <td>50 cm</td>
+            <td>70 cm</td>
+            <td>63 - 72 kg</td>
+          </tr>
+          <tr>
+            <td><strong>L</strong></td>
+            <td>52 cm</td>
+            <td>72 cm</td>
+            <td>73 - 82 kg</td>
+          </tr>
+          <tr>
+            <td><strong>XL</strong></td>
+            <td>54 cm</td>
+            <td>74 cm</td>
+            <td>83 - 92 kg</td>
+          </tr>
+          <tr>
+            <td><strong>XXL</strong></td>
+            <td>56 cm</td>
+            <td>76 cm</td>
+            <td>93 - 105 kg</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="form-hint" style="margin-top: 14px;">
+        *Tips: Jika Anda menyukai jersey yang lebih leluasa saat berlari, kami menyarankan memilih 1 tingkat ukuran lebih besar.
+      </p>
+    </div>
+
+    <div class="modal-footer" style="justify-content: flex-end;">
+      <button class="btn btn-secondary btn-sm" id="sizeChartOkBtn">Tutup</button>
+    </div>
+  </div>
+</div>
+
+<!-- =========================================================================
+     MODAL 5: DETAIL LENGKAP & RINCIAN TIKET
+     ========================================================================= -->
+<div class="modal-overlay" id="ticketDetailModal">
+  <div class="modal-container" style="max-width: 760px;">
+    <div class="modal-header">
+      <div class="modal-title-group">
+        <h3 id="tdModalTitle"><i class="fa-solid fa-circle-info" style="color: var(--color-primary); margin-right: 8px;"></i> Rincian Lengkap Tiket</h3>
+        <p id="tdModalCategory">Kategori Lari & Fasilitas Resmi Tegal Run 2027</p>
+      </div>
+      <button class="modal-close-btn" id="ticketDetailCloseBtn">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="modal-body" id="ticketDetailBody">
+      <div style="text-align: center; padding: 30px;">
+        <i class="fa-solid fa-spinner fa-spin" style="font-size: 2rem; color: var(--color-primary);"></i>
+        <p style="margin-top: 10px; color: var(--color-text-muted);">Memuat rincian tiket dari server...</p>
+      </div>
+    </div>
+
+    <div class="modal-footer" style="justify-content: space-between;">
+      <button class="btn btn-secondary btn-sm" id="ticketDetailCloseBtn2">Tutup</button>
+      <button class="btn btn-primary btn-sm btn-glow" id="tdModalRegisterBtn">
+        <i class="fa-solid fa-ticket"></i> Daftar Kategori Ini Sekarang
+      </button>
+    </div>
+  </div>
+</div>
+

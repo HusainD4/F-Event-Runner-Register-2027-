@@ -1,0 +1,261 @@
+<div class="admin-tab-pane" id="pane-bib-settings">
+  <div class="admin-section">
+    <div class="admin-section-header" style="flex-wrap: wrap; gap: 14px;">
+      <div>
+        <h3 style="display: flex; align-items: center; gap: 8px;">
+          <i class="fa-solid fa-id-badge" style="color: #6366F1;"></i>
+          Pengaturan Nomor BIB, Format QR &amp; Petunjuk E-Tiket
+        </h3>
+        <p>Tentukan kapan dan bagaimana nomor BIB digenerate, atur awalan QR Code terenkripsi (<code>BEBASNAMA|enkripsi_teks</code>), serta kelola teks petunjuk E-Tiket secara terpusat.</p>
+      </div>
+      <div class="admin-action-bar">
+        <button type="button" class="btn btn-secondary btn-sm" id="btnRefreshBibSettings">
+          <i class="fa-solid fa-rotate"></i> Segarkan Pengaturan
+        </button>
+      </div>
+    </div>
+
+    <!-- KPI Summary Grid -->
+    <div class="admin-kpi-grid" style="margin-bottom: 24px;">
+      <div class="kpi-card" style="border: 1px solid #C7D2FE; background: #EEF2FF;">
+        <div class="kpi-icon blue" style="background: #4F46E5; color: #FFFFFF;"><i class="fa-solid fa-id-card"></i></div>
+        <div class="kpi-details">
+          <span class="kpi-label" style="color: #3730A3; font-weight: 700;">TOTAL BIB SUDAH DITERBITKAN</span>
+          <h3 class="kpi-val" id="kpiBibAssigned" style="color: #312E81;">0</h3>
+          <span class="kpi-sub" style="color: #4338CA;">Peserta telah memegang nomor dada resmi</span>
+        </div>
+      </div>
+
+      <div class="kpi-card" style="border: 1px solid #FED7AA; background: #FFF7ED;">
+        <div class="kpi-icon orange" style="background: #EA580C; color: #FFFFFF;"><i class="fa-solid fa-clock-rotate-left"></i></div>
+        <div class="kpi-details">
+          <span class="kpi-label" style="color: #9A3412; font-weight: 700;">BELUM MEMILIKI BIB (LUNAS)</span>
+          <h3 class="kpi-val" id="kpiBibUnassigned" style="color: #C2410C;">0</h3>
+          <span class="kpi-sub" style="color: #9A3412;">Menunggu generate otomatis / manual</span>
+        </div>
+      </div>
+
+      <div class="kpi-card" style="border: 1px solid #E2E8F0; background: #FFFFFF;">
+        <div class="kpi-icon green" style="background: #10B981; color: #FFFFFF;"><i class="fa-solid fa-qrcode"></i></div>
+        <div class="kpi-details">
+          <span class="kpi-label">Format Aktif QR Code</span>
+          <h3 class="kpi-val" id="kpiQrFormatPreview" style="font-size: 1.15rem; font-family: monospace; color: #0F172A;">TEGALRUN|...</h3>
+          <span class="kpi-sub" style="color: #059669;"><i class="fa-solid fa-lock"></i> AES-256 Enkripsi Aman</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Settings Layout (2 Columns) -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 24px; align-items: start;">
+      
+      <!-- COLUMN 1: PENGATURAN OTOMATISASI & FORMAT NOMOR BIB -->
+      <div class="glass-card" style="padding: 24px; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 18px; box-shadow: 0 4px 14px rgba(0,0,0,0.03);">
+        <h4 style="font-size: 1.05rem; font-weight: 800; color: #0F172A; margin-bottom: 6px; display: flex; align-items: center; gap: 8px;">
+          <i class="fa-solid fa-gears" style="color: #6366F1;"></i>
+          Aturan Generate Nomor BIB
+        </h4>
+        <p style="font-size: 0.82rem; color: #64748B; margin-bottom: 20px;">
+          Tentukan waktu generate nomor BIB peserta dan atur pola format penomoran sesuai regulasi lomba.
+        </p>
+
+        <form id="formBibGenerationSettings">
+          <!-- Timing Selection -->
+          <div class="form-group" style="margin-bottom: 18px;">
+            <label class="form-label" style="font-weight: 700; color: #0F172A;">
+              Kapan Nomor BIB Diterbitkan? <span style="color: #EF4444;">*</span>
+            </label>
+            <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 6px;">
+              <label style="display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; border: 1px solid #E2E8F0; border-radius: 10px; cursor: pointer; transition: all 0.2s ease;">
+                <input type="radio" name="bibTiming" value="PAYMENT_SUCCESS" checked style="margin-top: 3px;">
+                <div>
+                  <strong style="display: block; font-size: 0.88rem; color: #0F172A;">Otomatis Saat Pembayaran Lunas (Recommended)</strong>
+                  <span style="font-size: 0.78rem; color: #64748B;">Nomor BIB langsung diterbitkan begitu status pesanan di Midtrans menjadi SETTLEMENT / CAPTURE.</span>
+                </div>
+              </label>
+
+              <label style="display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; border: 1px solid #E2E8F0; border-radius: 10px; cursor: pointer; transition: all 0.2s ease;">
+                <input type="radio" name="bibTiming" value="RACEPACK_CHECKIN" style="margin-top: 3px;">
+                <div>
+                  <strong style="display: block; font-size: 0.88rem; color: #0F172A;">Otomatis Saat Pengambilan Racepack (RPC Check-in)</strong>
+                  <span style="font-size: 0.78rem; color: #64748B;">Nomor BIB baru digenerate saat panitia memindai E-Tiket dan menyerahkan fisik racepack di booth.</span>
+                </div>
+              </label>
+
+              <label style="display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; border: 1px solid #E2E8F0; border-radius: 10px; cursor: pointer; transition: all 0.2s ease;">
+                <input type="radio" name="bibTiming" value="MANUAL" style="margin-top: 3px;">
+                <div>
+                  <strong style="display: block; font-size: 0.88rem; color: #0F172A;">Manual Dari Sistem Admin Saja</strong>
+                  <span style="font-size: 0.78rem; color: #64748B;">Sistem tidak mengenerate otomatis. Admin menetapkan via tombol "Generate Massal" atau input per peserta.</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Format Rules -->
+          <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 12px; padding: 16px; margin-bottom: 20px;">
+            <span style="font-size: 0.76rem; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 12px;">
+              Pola Format Penomoran BIB Global:
+            </span>
+
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 12px;">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" style="font-size: 0.78rem;">Prefix / Awalan</label>
+                <input type="text" class="form-input" id="bibInputPrefix" placeholder="10-" value="10-" style="font-family: monospace;">
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" style="font-size: 0.78rem;">Panjang Digit Angka</label>
+                <input type="number" class="form-input" id="bibInputDigitLength" min="2" max="6" value="4">
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 12px;">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" style="font-size: 0.78rem;">Nomor Mulai (Start)</label>
+                <input type="number" class="form-input" id="bibInputStartNumber" min="1" value="1001">
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" style="font-size: 0.78rem;">Suffix / Akhiran (Opsional)</label>
+                <input type="text" class="form-input" id="bibInputSuffix" placeholder="-2027" style="font-family: monospace;">
+              </div>
+            </div>
+
+            <!-- Live Preview -->
+            <div style="background: #FFFFFF; border: 1px dashed #CBD5E1; border-radius: 8px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 0.75rem; color: #64748B; font-weight: 600;">Contoh Hasil Nomor BIB:</span>
+              <strong id="bibFormatPreviewText" style="font-family: monospace; font-size: 1.15rem; color: #FF6B00; font-weight: 800;">10-1001</strong>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <button type="submit" class="btn btn-primary" id="btnSaveBibSettings" style="flex: 1;">
+              <i class="fa-solid fa-floppy-disk"></i> Simpan Pengaturan BIB
+            </button>
+            <button type="button" class="btn btn-secondary" id="btnTriggerBulkGenerate" style="flex: 1; border-color: #C7D2FE; color: #4338CA;">
+              <i class="fa-solid fa-wand-magic-sparkles"></i> Generate Massal Sekarang
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- COLUMN 2: FORMAT QR CODE & TEKS PETUNJUK E-TIKET -->
+      <div style="display: flex; flex-direction: column; gap: 24px;">
+        
+        <!-- CARD 2A: PENGATURAN AWALAN (PREFIX) QR CODE -->
+        <div class="glass-card" style="padding: 24px; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 18px; box-shadow: 0 4px 14px rgba(0,0,0,0.03);">
+          <h4 style="font-size: 1.05rem; font-weight: 800; color: #0F172A; margin-bottom: 6px; display: flex; align-items: center; gap: 8px;">
+            <i class="fa-solid fa-qrcode" style="color: #10B981;"></i>
+            Pengaturan Awalan (Prefix) &amp; Enkripsi QR Code
+          </h4>
+          <p style="font-size: 0.82rem; color: #64748B; margin-bottom: 16px;">
+            Ganti awalan QR Code dengan nama bebas. Format yang dihasilkan berupa <code>BEBASNAMA|enkripsi_teks</code> yang terlindungi enkripsi kriptografi AES-256.
+          </p>
+
+          <form id="formQrPrefixSettings">
+            <div class="form-group" style="margin-bottom: 14px;">
+              <label class="form-label" style="font-weight: 700; color: #0F172A;">
+                Awalan (Prefix) Nama QR Code <span style="color: #EF4444;">*</span>
+              </label>
+              <div style="display: flex; gap: 10px;">
+                <input type="text" class="form-input" id="qrInputPrefix" placeholder="TEGALRUN" value="TEGALRUN" required style="font-family: monospace; text-transform: uppercase; font-weight: 700;">
+                <button type="submit" class="btn btn-primary" id="btnSaveQrPrefix">
+                  <i class="fa-solid fa-check"></i> Simpan
+                </button>
+              </div>
+              <small style="color: #64748B; font-size: 0.74rem; display: block; margin-top: 5px;">
+                Contoh: <code>TEGALRUN</code>, <code>TR2027</code>, <code>TEGALBAHARI</code>, dll.
+              </small>
+            </div>
+
+            <div style="background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 10px; padding: 12px 14px; font-size: 0.8rem; color: #166534;">
+              <div style="display: flex; align-items: center; gap: 6px; font-weight: 700; margin-bottom: 4px;">
+                <i class="fa-solid fa-shield-check"></i> Keamanan Enkripsi Kriptografi Aktif
+              </div>
+              <div>QR Code yang di-generate menggunakan format <code><span id="qrPrefixExample">TEGALRUN</span>|&lt;ciphertext_aes256&gt;</code> untuk menjamin keaslian tiket dari pemalsuan.</div>
+            </div>
+          </form>
+        </div>
+
+        <!-- CARD 2B: PENGATURAN TEKS PETUNJUK PENGAMBILAN RACEPACK & RACE DAY -->
+        <div class="glass-card" style="padding: 24px; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 18px; box-shadow: 0 4px 14px rgba(0,0,0,0.03);">
+          <h4 style="font-size: 1.05rem; font-weight: 800; color: #0F172A; margin-bottom: 6px; display: flex; align-items: center; gap: 8px;">
+            <i class="fa-solid fa-list-check" style="color: var(--color-primary);"></i>
+            Petunjuk Pengambilan Racepack &amp; Race Day
+          </h4>
+          <p style="font-size: 0.82rem; color: #64748B; margin-bottom: 16px;">
+            Sesuaikan teks petunjuk yang tampil pada bagian bawah E-Tiket peserta. Masukkan 1 poin per baris.
+          </p>
+
+          <form id="formRacepackInstructions">
+            <div class="form-group" style="margin-bottom: 12px;">
+              <label class="form-label" style="font-weight: 700; color: #0F172A;">Judul Petunjuk</label>
+              <input type="text" class="form-input" id="rpcInstructionsTitle" value="Petunjuk Pengambilan Racepack &amp; Race Day:">
+            </div>
+
+            <div class="form-group" style="margin-bottom: 16px;">
+              <label class="form-label" style="font-weight: 700; color: #0F172A;">Poin-Poin Petunjuk (1 baris per poin)</label>
+              <textarea class="form-input" id="rpcInstructionsTextarea" rows="5" style="resize: vertical; font-size: 0.85rem; line-height: 1.6;"></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary" id="btnSaveRpcInstructions" style="width: 100%;">
+              <i class="fa-solid fa-floppy-disk"></i> Simpan Petunjuk E-Tiket
+            </button>
+          </form>
+        </div>
+
+        <!-- CARD 2C: PENGATURAN BIAYA LAYANAN & TIMER PEMBAYARAN -->
+        <div class="glass-card" style="padding: 24px; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 18px; box-shadow: 0 4px 14px rgba(0,0,0,0.03); margin-top: 24px;">
+          <h4 style="font-size: 1.05rem; font-weight: 800; color: #0F172A; margin-bottom: 6px; display: flex; align-items: center; gap: 8px;">
+            <i class="fa-solid fa-stopwatch-20" style="color: #EA580C;"></i>
+            Batas Waktu Pembayaran &amp; Biaya Layanan
+          </h4>
+          <p style="font-size: 0.82rem; color: #64748B; margin-bottom: 16px;">
+            Atur countdown timer pembayaran untuk Midtrans serta konfigurasikan biaya layanan transaksi.
+          </p>
+
+          <form id="formPaymentFeeSettings">
+            <div class="form-group" style="margin-bottom: 14px;">
+              <label class="form-label" style="font-weight: 700; color: #0F172A;">
+                Batas Waktu Pembayaran (Menit) <span style="color: #EF4444;">*</span>
+              </label>
+              <input type="number" min="5" max="1440" class="form-input" id="settingPaymentTimerMinutes" value="30" required>
+              <small style="color: #64748B; font-size: 0.74rem; display: block; margin-top: 4px;">
+                Waktu yang diberikan kepada peserta untuk menyelesaikan pembayaran Midtrans (contoh: 15, 30, atau 60 menit).
+              </small>
+            </div>
+
+            <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 12px; padding: 14px; margin-bottom: 16px;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                <label style="font-weight: 700; font-size: 0.88rem; color: #0F172A; display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                  <input type="checkbox" id="settingFeeEnabled">
+                  <span>Aktifkan Biaya Layanan</span>
+                </label>
+                <span class="badge" id="badgeFeeStatus" style="background: #E2E8F0; color: #475569;">Nonaktif</span>
+              </div>
+
+              <div id="groupFeeConfig" style="display: none;">
+                <div class="form-group" style="margin-bottom: 10px;">
+                  <label class="form-label" style="font-size: 0.82rem; font-weight: 600;">Metode Penerapan Biaya:</label>
+                  <select class="form-select" id="settingFeeType">
+                    <option value="PER_TRANSACTION">Per Transaksi (Dibebankan 1x per checkout)</option>
+                    <option value="PER_TICKET">Per Tiket (Dikalikan dengan jumlah peserta)</option>
+                  </select>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label class="form-label" style="font-size: 0.82rem; font-weight: 600;">Nominal Biaya Layanan (Rp):</label>
+                  <input type="number" min="0" step="500" class="form-input" id="settingFeeAmount" placeholder="5000" value="5000">
+                </div>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary" id="btnSavePaymentFeeSettings" style="width: 100%;">
+              <i class="fa-solid fa-floppy-disk"></i> Simpan Pengaturan Pembayaran
+            </button>
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+

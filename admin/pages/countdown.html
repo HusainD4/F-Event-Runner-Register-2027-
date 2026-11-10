@@ -1,0 +1,45 @@
+<div class="admin-tab-pane" id="pane-countdown">
+          <div class="admin-section">
+            <div class="admin-section-header">
+              <div>
+                <h3><i class="fa-solid fa-stopwatch-20" style="color: var(--color-primary);"></i> Pengaturan Tanggal Event & Status Pendaftaran</h3>
+                <p>Tersimpan langsung di database backend untuk mengontrol countdown landing page dan status penutupan.</p>
+              </div>
+              <span class="event-status-tag open" id="globalStatusBadge" style="font-size: 0.82rem; padding: 6px 14px;">
+                <i class="fa-solid fa-signal"></i> Pendaftaran Aktif
+              </span>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 24px; align-items: flex-end;">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" style="font-size: 0.9rem;">
+                  <i class="fa-solid fa-calendar-days" style="color: var(--color-primary);"></i> Tanggal & Waktu Race Day (Target Hitung Mundur)
+                </label>
+                <input type="datetime-local" class="form-input" id="globalCountdownInput" style="font-size: 1rem; padding: 12px 16px; font-weight: 700;">
+                <div class="form-hint">Contoh: 28 Februari 2027 pukul 06:00 WIB (Waktu Indonesia Barat).</div>
+              </div>
+
+              <div style="display: flex; gap: 12px; justify-content: flex-end; flex-wrap: wrap;">
+                <button type="button" class="btn btn-secondary btn-sm" id="btnResetGlobalCountdown" data-permission="events:update" title="Kosongkan tanggal agar landing page menampilkan Tanggal Belum Ditentukan">
+                  <i class="fa-solid fa-rotate-left"></i> Belum Ditentukan / Reset
+                </button>
+                <button type="button" class="btn btn-outline btn-sm" id="btnToggleGlobalClosed" data-permission="events:update">
+                  <i class="fa-solid fa-lock"></i> Tutup Seluruh Pendaftaran
+                </button>
+                <button type="button" class="btn btn-primary btn-sm btn-glow" id="btnSaveGlobalCountdown" data-permission="events:update">
+                  <i class="fa-solid fa-floppy-disk"></i> Simpan Tanggal Countdown
+                </button>
+              </div>
+            </div>
+
+            <!-- Preview Status Live Countdown -->
+            <div style="margin-top: 24px; padding: 20px; background: rgba(15, 23, 42, 0.4); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px;">
+              <div style="font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--color-text-muted); font-weight: 700; margin-bottom: 8px;">
+                <i class="fa-solid fa-eye" style="color: var(--color-primary); margin-right: 6px;"></i> Live Status Landing Page
+              </div>
+              <div id="adminCountdownLivePreview" style="font-size: 1.15rem; font-weight: 700; color: #fff;">
+                Memuat status countdown...
+              </div>
+            </div>
+          </div>
+        </div>

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cek Status Tiket &amp; E-Tiket Resmi - Tegal Run 2027</title>
+  
+  <meta name="description" content="Layanan resmi pengecekan status tiket, bukti pembayaran, dan unduh E-Tiket lomba Tegal Run 2027. Cari berdasarkan Email, WhatsApp, atau NIK KTP.">
+  <meta name="theme-color" content="#FF6B00">
+  
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23FF6B00'><path d='M13.5 5.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM9.8 8.9L7 23h2.1l1.8-8 2.1 2v6h2v-7.5l-2.1-2 .6-3C14.8 12 16.8 13 19 13v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1L6 8.3V13h2V9.6l1.8-.7z'/></svg>">
+
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- FontAwesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/cek-tiket.css">
+  <script type="text/javascript" src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="SB-Mid-client-hc3TYjTLt4VL13se4GMywi4H"></script>
+
+  <style>
+    :root { --color-primary: #FF6B00; --color-primary-hover: #E05E00; --color-bg: #F8FAFC; --color-card-bg: #FFFFFF; --color-text-title: #0F172A; --color-text-body: #334155; --color-text-muted: #64748B; --color-border: #E2E8F0; --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px; --shadow-sm: 0 1px 3px rgba(0,0,0,0.05); --shadow-md: 0 10px 25px -5px rgba(0,0,0,0.05); --shadow-lg: 0 20px 25px -5px rgba(0,0,0,0.1); }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body.td-page { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--color-bg); color: var(--color-text-body); line-height: 1.5; min-height: 100vh; display: flex; flex-direction: column; }
+    .container { width: 100%; margin: 0 auto; padding-left: 16px; padding-right: 16px; }
+    .td-header-bar { background: #FFF; border-bottom: 1px solid var(--color-border); position: sticky; top: 0; z-index: 40; box-shadow: var(--shadow-sm); }
+    .td-header-inner { height: 56px; display: flex; align-items: center; justify-content: space-between; max-width: 1100px; }
+    .section-tag { display: inline-flex; align-items: center; gap: 6px; background: rgba(255, 107, 0, 0.08); color: var(--color-primary); padding: 4px 12px; border-radius: 99px; font-size: 0.775rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+    .page-title { font-size: clamp(1.35rem, 4vw, 2rem); font-weight: 800; color: var(--color-text-title); margin: 8px 0 6px; line-height: 1.25; }
+    .page-desc { color: var(--color-text-muted); font-size: clamp(0.825rem, 2vw, 0.9rem); max-width: 580px; margin: 0 auto; line-height: 1.4; }
+    .search-card { background: var(--color-card-bg); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: 20px; box-shadow: var(--shadow-md); margin-top: 18px; }
+    
+    /* Selector Tab (Desktop) & Select Option (Mobile) */
+    .search-type-selector { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+    .mobile-type-select { display: none; width: 100%; margin-top: 6px; padding-left: 14px; }
+    
+    .type-pill { background: #F1F5F9; border: 1px solid transparent; color: #475569; padding: 7px 12px; border-radius: var(--radius-sm); font-size: 0.825rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s ease; font-family: inherit; }
+    .type-pill:hover { background: #E2E8F0; color: var(--color-text-title); }
+    .type-pill.active { background: var(--color-primary); color: #FFF; box-shadow: 0 4px 12px rgba(255, 107, 0, 0.25); }
+    
+    .search-input-wrapper { position: relative; margin: 14px 0 10px; display: flex; align-items: center; }
+    .search-input-wrapper i#searchIcon { position: absolute; left: 14px; color: #94A3B8; font-size: 1rem; pointer-events: none; }
+    .form-input { width: 100%; padding: 11px 14px 11px 42px; border: 1.5px solid var(--color-border); border-radius: var(--radius-md); font-size: 0.9rem; font-family: inherit; color: var(--color-text-title); background-color: #FFF; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
+    select.form-input, textarea.form-input { padding-left: 14px; }
+    .form-input:focus { border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.15); }
+    
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 9px 18px; border-radius: var(--radius-md); font-size: 0.875rem; font-weight: 700; cursor: pointer; border: 1px solid transparent; text-decoration: none; transition: all 0.2s ease; font-family: inherit; }
+    .btn-sm { padding: 7px 12px; font-size: 0.8rem; }
+    .btn-primary { background: var(--color-primary); color: #FFF; }
+    .btn-primary:hover { background: var(--color-primary-hover); }
+    .btn-secondary { background: #F1F5F9; color: #334155; border-color: #CBD5E1; }
+    .btn-secondary:hover { background: #E2E8F0; }
+    .btn-glow { box-shadow: 0 4px 14px rgba(255, 107, 0, 0.35); }
+    
+    .cancel-dialog-backdrop { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 100; display: none; align-items: center; justify-content: center; padding: 16px; }
+    .cancel-dialog-backdrop.active, .cancel-dialog-backdrop[style*="display: block"], .cancel-dialog-backdrop[style*="display: flex"] { display: flex !important; }
+    .cancel-dialog { background: #FFF; width: 100%; max-width: 500px; border-radius: var(--radius-lg); padding: 20px; box-shadow: var(--shadow-lg); max-height: 90vh; overflow-y: auto; animation: modalFadeIn 0.2s ease-out; }
+    @keyframes modalFadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+    .admin-modal-close { background: transparent; border: none; font-size: 1.25rem; color: #94A3B8; cursor: pointer; padding: 4px; border-radius: 4px; }
+    .req { color: #DC2626; }
+
+    /* Ringkas & Simpel Khusus Mode Mobile (< 576px) */
+    @media (max-width: 576px) {
+      .container { padding-left: 12px; padding-right: 12px; }
+      .search-card { padding: 14px; margin-top: 14px; border-radius: 12px; }
+      .search-type-selector { display: none; } /* Sembunyikan tab pil rumit di mobile */
+      .mobile-type-select { display: block; }  /* Munculkan dropdown simpel */
+      .btn-submit-wrapper, .btn-submit-wrapper button, .modal-actions button { width: 100%; }
+      .modal-actions { flex-direction: column-reverse; gap: 8px; }
+      #searchFormatHint { font-size: 0.75rem; margin-bottom: 14px; }
+    }
+  </style>
+</head>
+<body class="td-page">
+
+  <div class="toast-container" id="cekToastContainer"></div>
+
+  <!-- Header Navigation -->
+  <header class="td-header-bar">
+    <div class="container td-header-inner">
+      <a href="/" class="btn btn-secondary btn-sm">
+        <i class="fa-solid fa-arrow-left"></i> <span>Beranda</span>
+      </a>
+      <div class="brand" style="font-size: 1.1rem; display: flex; align-items: center; gap: 8px;">
+        <div class="brand-icon" style="width: 30px; height: 30px; font-size: 0.85rem; background: var(--color-primary); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+          <i class="fa-solid fa-person-running"></i>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container" style="padding-top: 20px; padding-bottom: 60px; max-width: 860px;">
+    <!-- Title Section -->
+    <div style="text-align: center; margin-bottom: 16px;">
+      <div class="section-tag">
+        <i class="fa-solid fa-qrcode"></i> Portal Peserta
+      </div>
+      <h1 class="page-title">Cek Status Tiket &amp; E-Tiket</h1>
+      <p class="page-desc">
+        Masukkan Email, Nomor WhatsApp, NIK KTP, atau Order ID yang terdaftar untuk cek status pembayaran &amp; E-Tiket.
+      </p>
+    </div>
+
+    <!-- Search Form Card -->
+    <div class="search-card">
+      <form id="formCekTiket">
+        <div class="form-group" style="margin-bottom: 12px;">
+          <label class="form-label" style="font-size: 0.85rem; font-weight: 700; color: var(--color-text-title); display: block;">Pilih Jenis Pencarian:</label>
+          
+          <!-- Dropdown ringkas khusus Mobile -->
+          <select class="form-input mobile-type-select" id="mobileSearchTypeSelect">
+            <option value="all">✨ Deteksi Otomatis</option>
+            <option value="email">✉️ Email Pendaftar</option>
+            <option value="phone">💬 No. WhatsApp</option>
+            <option value="nik">🪪 NIK KTP (16 Digit)</option>
+            <option value="orderId">🧾 Order ID (TR-xxx)</option>
+          </select>
+
+          <!-- Tab Pil untuk Desktop -->
+          <div class="search-type-selector" id="searchTypeTabs">
+            <button type="button" class="type-pill active" data-type="all"><i class="fa-solid fa-wand-magic-sparkles"></i> Deteksi Otomatis</button>
+            <button type="button" class="type-pill" data-type="email"><i class="fa-solid fa-envelope"></i> Email Pendaftar</button>
+            <button type="button" class="type-pill" data-type="phone"><i class="fa-brands fa-whatsapp"></i> No. WhatsApp</button>
+            <button type="button" class="type-pill" data-type="nik"><i class="fa-solid fa-id-card"></i> NIK KTP</button>
+            <button type="button" class="type-pill" data-type="orderId"><i class="fa-solid fa-receipt"></i> Order ID</button>
+          </div>
+          <input type="hidden" id="selectedSearchType" value="all">
+        </div>
+
+        <div class="search-input-wrapper">
+          <i class="fa-solid fa-magnifying-glass" id="searchIcon"></i>
+          <input type="text" class="form-input" id="searchKeyword" placeholder="Ketik Email, WA, NIK, atau Order ID" required autocomplete="off">
+        </div>
+
+        <div id="searchFormatHint" style="color: #64748B; display: flex; align-items: flex-start; gap: 6px;">
+          <i class="fa-solid fa-circle-info" style="color: var(--color-primary); margin-top: 2px;"></i>
+          <span>Gunakan data identitas yang persis dimasukkan saat mendaftar.</span>
+        </div>
+
+        <div class="btn-submit-wrapper" style="display: flex; justify-content: flex-end; margin-top: 14px;">
+          <button type="submit" class="btn btn-primary btn-glow" id="btnSearchTiket">
+            <i class="fa-solid fa-search"></i> Cek Tiket Saya
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Search Result Section -->
+    <div id="resultContainer" style="margin-top: 20px;">
+      <!-- Dynamic result list -->
+    </div>
+  </main>
+
+  <!-- Modal Pembatalan Pesanan -->
+  <div class="cancel-dialog-backdrop" id="modalCancelBackdrop">
+    <div class="cancel-dialog">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+        <h4 style="margin: 0; color: #DC2626; font-size: 1.1rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+          <i class="fa-solid fa-triangle-exclamation"></i> Batalkan Pesanan Tiket
+        </h4>
+        <button type="button" class="admin-modal-close" id="btnCloseCancelModal"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div style="background: #FEF2F2; border: 1px solid #FECACA; border-radius: var(--radius-md); padding: 10px 12px; margin-bottom: 14px; font-size: 0.8rem; color: #991B1B; line-height: 1.4;">
+        <i class="fa-solid fa-circle-exclamation"></i> Pembatalan mandiri <strong>HANYA</strong> berlaku untuk status <strong>BELUM DIBAYAR (PENDING)</strong>.
+      </div>
+
+      <form id="formCancelOrder">
+        <input type="hidden" id="cancelTargetOrderId">
+
+        <div class="form-group" style="margin-bottom: 12px;">
+          <label class="form-label" style="font-size: 0.825rem; font-weight: 700; display: block; margin-bottom: 4px;">Alasan Pembatalan <span class="req">*</span></label>
+          <select class="form-input" id="cancelReasonSelect" required>
+            <option value="">-- Pilih Alasan --</option>
+            <option value="Salah memilih kategori jarak lomba">Salah memilih kategori jarak (5K/10K)</option>
+            <option value="Ingin mengganti ukuran jersey / data peserta">Ingin mengganti ukuran jersey / data</option>
+            <option value="Berhalangan hadir pada tanggal pelaksanaan">Berhalangan hadir (28 Feb 2027)</option>
+            <option value="Kendala pada metode pembayaran">Kendala metode pembayaran</option>
+            <option value="Lainnya">Alasan lainnya</option>
+          </select>
+        </div>
+
+        <div class="form-group" id="groupCancelCustomReason" style="display: none; margin-bottom: 12px;">
+          <label class="form-label" style="font-size: 0.825rem; font-weight: 700; display: block; margin-bottom: 4px;">Tuliskan Alasan <span class="req">*</span></label>
+          <textarea class="form-input" id="cancelCustomReason" rows="2" placeholder="Jelaskan alasan pembatalan..."></textarea>
+        </div>
+
+        <div class="form-group" style="margin-top: 12px; display: flex; flex-direction: column; gap: 8px;">
+          <label style="display: flex; gap: 8px; font-size: 0.8rem; cursor: pointer; color: #475569;">
+            <input type="checkbox" id="checkCancelConfirm1" required style="margin-top: 2px;">
+            <span>Konfirmasi transaksi <strong>belum dibayarkan</strong>.</span>
+          </label>
+          <label style="display: flex; gap: 8px; font-size: 0.8rem; cursor: pointer; color: #475569;">
+            <input type="checkbox" id="checkCancelConfirm2" required style="margin-top: 2px;">
+            <span>Paham bahwa kuota tiket akan dilepas kembali.</span>
+          </label>
+        </div>
+
+        <div class="modal-actions" style="display: flex; justify-content: flex-end; margin-top: 16px;">
+          <button type="button" class="btn btn-secondary btn-sm" id="btnDismissCancelModal">Batal</button>
+          <button type="submit" class="btn btn-sm btn-glow" style="background: #DC2626; color: #FFF; border-color: #DC2626;" id="btnSubmitCancelOrder">
+            <i class="fa-solid fa-ban"></i> Ya, Batalkan Pesanan
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script type="module" src="/js/cek-tiket.js"></script>
+
+  <!-- Script Penyelaras Dropdown Mobile & Tab Desktop (Tanpa mengubah logic utama backend) -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const mobileSelect = document.getElementById('mobileSearchTypeSelect');
+      const hiddenInput = document.getElementById('selectedSearchType');
+      const desktopTabs = document.querySelectorAll('#searchTypeTabs .type-pill');
+
+      if (mobileSelect && hiddenInput) {
+        mobileSelect.addEventListener('change', (e) => {
+          hiddenInput.value = e.target.value;
+          desktopTabs.forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.type === e.target.value);
+          });
+        });
+      }
+    });
+  </script>
+</body>
+</html>

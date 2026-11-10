@@ -1,0 +1,52 @@
+<!-- =========================================================================
+     FLOATING BOTTOM MOBILE DOCK NAVBAR (MODERN GLASS STYLE)
+     ========================================================================= -->
+<div class="mobile-bottom-dock">
+  <style>
+    .mobile-bottom-dock { position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); z-index: 999; width: calc(100% - 24px); max-width: 440px; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(226, 232, 240, 0.8); border-radius: 99px; padding: 6px; box-shadow: 0 12px 32px -4px rgba(15, 23, 42, 0.12), 0 4px 12px rgba(0, 0, 0, 0.04); display: none; }
+    .dock-items { display: flex; align-items: center; justify-content: space-between; list-style: none; margin: 0; padding: 0; }
+    .dock-item { flex: 1; text-align: center; }
+    .dock-item a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 8px 4px; border-radius: 99px; text-decoration: none; color: #64748B; font-size: 0.7rem; font-weight: 600; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); position: relative; }
+    .dock-item a i { font-size: 1.05rem; transition: transform 0.25s ease, color 0.25s ease; }
+    .dock-item a:hover { color: #FF6B00; transform: translateY(-2px); }
+    .dock-item a.active { color: #FF6B00; background: rgba(255, 107, 0, 0.1); font-weight: 700; }
+    .dock-item a.active i { transform: scale(1.15); color: #FF6B00; }
+    .dock-item.dock-cta a { background: linear-gradient(135deg, #FF6B00 0%, #FF852D 100%); color: #FFF; font-weight: 700; padding: 9px 6px; box-shadow: 0 4px 12px rgba(255, 107, 0, 0.35); }
+    .dock-item.dock-cta a:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 6px 16px rgba(255, 107, 0, 0.45); color: #FFF; }
+    .dock-item.dock-cta a i { color: #FFF; }
+    @media (max-width: 868px) { .mobile-bottom-dock { display: block; } }
+  </style>
+
+  <ul class="dock-items">
+    <li class="dock-item">
+      <a href="#beranda" class="active">
+        <i class="fa-solid fa-house"></i>
+        <span>Beranda</span>
+      </a>
+    </li>
+    <li class="dock-item">
+      <a href="#kategori">
+        <i class="fa-solid fa-ticket"></i>
+        <span>Kategori</span>
+      </a>
+    </li>
+    <li class="dock-item">
+      <a href="#rute">
+        <i class="fa-solid fa-map"></i>
+        <span>Rute</span>
+      </a>
+    </li>
+    <li class="dock-item">
+      <a href="/cek-tiket.html">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <span>Cek Tiket</span>
+      </a>
+    </li>
+    <li class="dock-item dock-cta">
+      <a href="#" id="dockDaftarBtn">
+        <i class="fa-solid fa-bolt"></i>
+        <span>Daftar</span>
+      </a>
+    </li>
+  </ul>
+</div>

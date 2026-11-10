@@ -1,0 +1,49 @@
+<div class="admin-tab-pane" id="pane-orders">
+          <div class="admin-section">
+            <div class="admin-section-header">
+              <div>
+                <h3><i class="fa-solid fa-receipt" style="color: var(--color-primary);"></i> Transaksi & Pesanan Tiket</h3>
+                <p>Verifikasi status pembayaran (Midtrans Payment Gateway) dan manajemen order manual.</p>
+              </div>
+              <div class="admin-action-bar">
+                <select class="form-input form-input-sm" id="filterOrderStatus" style="width: 170px;">
+                  <option value="">Semua Status</option>
+                  <option value="SETTLEMENT">SETTLEMENT (Lunas)</option>
+                  <option value="PENDING">PENDING</option>
+                  <option value="CANCEL">CANCEL (Batal)</option>
+                  <option value="REFUND">REFUND</option>
+                </select>
+                <input type="text" class="form-input form-input-sm" id="searchOrder" placeholder="Cari Order ID / Nama..." style="width: 200px;">
+                <button class="btn btn-secondary btn-sm" id="btnRefreshOrders">
+                  <i class="fa-solid fa-rotate"></i> Segarkan
+                </button>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>No</th>
+                    <th>Order ID / Invoice</th>
+                    <th>Tipe Pendaftaran</th>
+                    <th>Pemesan</th>
+                    <th>Email & Telepon</th>
+                    <th>Jumlah Peserta</th>
+                    <th>Total Nominal</th>
+                    <th>Status Pembayaran</th>
+                    <th>Tanggal Transaksi</th>
+                    <th>Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="adminOrdersTableBody">
+                  <tr>
+                    <td colspan="10" style="text-align: center; padding: 30px; color: var(--color-text-muted);">
+                      Memuat data transaksi...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>

@@ -1,0 +1,33 @@
+<div class="admin-tab-pane" id="pane-logs">
+          <div class="admin-section">
+            <div class="admin-section-header">
+              <div>
+                <h3><i class="fa-solid fa-clock-rotate-left" style="color: var(--color-primary);"></i> Rekam Jejak Audit & Keamanan Sistem</h3>
+                <p>Audit trail untuk setiap perubahan konfigurasi, pendaftaran, dan mutasi data.</p>
+              </div>
+              <button class="btn btn-secondary btn-sm" id="btnRefreshLogs">
+                <i class="fa-solid fa-rotate"></i> Segarkan Log
+              </button>
+            </div>
+
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Waktu (WIB)</th>
+                    <th>Kode Aksi</th>
+                    <th>Deskripsi Aktivitas</th>
+                    <th>Pelaksana / Admin</th>
+                  </tr>
+                </thead>
+                <tbody id="adminAuditLogsTableBody">
+                  <tr>
+                    <td colspan="4" style="text-align: center; padding: 20px; color: var(--color-text-muted);">
+                      Memuat log audit...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>

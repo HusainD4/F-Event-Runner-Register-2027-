@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Portal - Tegal Run 2027</title>
+  
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#FF6B00">
+  
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23FF6B00'><path d='M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z'/></svg>">
+
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- FontAwesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/admin.css">
+
+  <!-- HTML5 QR Code Scanner Library (Cross-browser Camera & Photo QR Scanner) -->
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+</head>
+<body class="admin-body">
+
+  <div class="toast-container" id="adminToastContainer"></div>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- =========================================================================
+       1. LOGIN SECTION (JIKA BELUM LOGIN)
+       ========================================================================= -->
+  <div class="admin-login-wrapper" id="adminLoginSection">
+    <div class="admin-login-card glass-card">
+      <div class="admin-login-header">
+        <div class="brand-icon" style="margin: 0 auto 14px auto;">
+          <i class="fa-solid fa-shield-halved"></i>
+        </div>
+        <h2>Portal Admin Tegal Run 2027</h2>
+        <p>Masuk menggunakan kredensial admin resmi untuk mengelola event & peserta.</p>
+      </div>
+
+      <form id="adminLoginForm">
+        <div class="form-group">
+          <label class="form-label">Username atau Email <span class="req">*</span></label>
+          <input type="text" class="form-input" id="adminIdentifier" placeholder="Masukkan username / email" required autocomplete="username">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Kata Sandi (Password) <span class="req">*</span></label>
+          <input type="password" class="form-input" id="adminPassword" placeholder="••••••••" required autocomplete="current-password">
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-glow" style="width: 100%; margin-top: 10px;" id="btnLoginSubmit">
+          <i class="fa-solid fa-right-to-bracket"></i> Masuk ke Dashboard Admin
+        </button>
+      </form>
+
+      <div style="text-align: center; margin-top: 24px;">
+        <a href="/" class="btn-text-link">
+          <i class="fa-solid fa-arrow-left"></i> Kembali ke Website Utama
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       2. DASHBOARD ADMIN DENGAN MODULAR SIDEBAR & PANES
+       ========================================================================= -->
+  <div class="admin-dashboard-wrapper" id="adminDashboardSection" style="display: none;">
+    <!-- Container Sidebar Modular (Loaded from /template/layout/sidebar.html) -->
+    <div id="sidebarMount"></div>
+
+    <!-- Main Content Area -->
+    <div class="admin-main-wrapper">
+      <!-- Top Bar -->
+      <header class="admin-topbar">
+        <div class="topbar-left">
+          <button class="btn-sidebar-toggle" id="btnToggleSidebar" title="Buka Menu">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+          <div class="page-heading">
+            <h2 class="page-title" id="pageTitle">Dashboard Overview</h2>
+            <span class="page-breadcrumb" id="pageBreadcrumb">Portal Admin / Ringkasan Real-Time</span>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <div class="system-pill">
+            <span class="system-pill-dot"></span>
+            <span>Sistem Online</span>
+          </div>
+          <div class="admin-badge-role" id="adminRoleBadge">SUPERADMIN</div>
+          <div class="admin-info-text" style="display: flex; flex-direction: column; line-height: 1.2;">
+            <strong id="adminFullName" style="font-size: 0.88rem; color: #0F172A;">Administrator</strong>
+            <small id="adminUsername" style="font-size: 0.74rem; color: #64748B;">@superadmin</small>
+          </div>
+        </div>
+      </header>
+
+      <!-- Modular Panes Container: Injected from /admin/pages/*.html -->
+      <main class="admin-content-body" id="adminPanesContainer">
+        <!-- Rendered modularly via JS -->
+      </main>
+    </div>
+  </div>
+
+  <!-- Modular Modals Container: Injected from /admin/modals/modals.html -->
+  <div id="adminModalsContainer"></div>
+
+  <!-- Modal Closer helper fallback -->
+  <script>
+    function closeAdminModal(backdropId) {
+      document.getElementById(backdropId)?.classList.remove('open');
+    }
+  </script>
+
+  <!-- Modular Admin App Entry -->
+  <script type="module" src="./js/admin.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,86 @@
+<div class="admin-tab-pane" id="pane-participants">
+  <div class="admin-section">
+    <div class="admin-section-header" style="flex-wrap: wrap; gap: 14px;">
+      <div>
+        <h3 style="display: flex; align-items: center; gap: 8px;">
+          <i class="fa-solid fa-users" style="color: var(--color-primary);"></i>
+          Database Peserta &amp; Validasi Pelari
+        </h3>
+        <p>Kelola data lengkap pelari, nomor BIB, status verifikasi pembayaran Midtrans, dan status serah terima Racepack (Check-in).</p>
+      </div>
+      <div class="admin-action-bar" style="flex-wrap: wrap; gap: 8px;">
+        <input type="text" class="form-input form-input-sm" id="searchParticipant" placeholder="Cari Nama, BIB, NIK, No. HP..." style="width: 230px;">
+        <select class="form-input form-input-sm" id="filterParticipantCategory" style="width: 150px;">
+          <option value="">Semua Kategori</option>
+          <option value="10K">10K Only</option>
+          <option value="5K">5K Only</option>
+        </select>
+        <button class="btn btn-secondary btn-sm" id="btnExportCsv">
+          <i class="fa-solid fa-file-csv"></i> Unduh CSV
+        </button>
+        <button class="btn btn-primary btn-sm btn-glow" id="btnOpenCreateParticipantModal" data-permission="participants:create">
+          <i class="fa-solid fa-user-plus"></i> Tambah Peserta Manual
+        </button>
+      </div>
+    </div>
+
+    <!-- Segmented Tab Filter: Pisahkan per Status Pembayaran & Racepack -->
+    <div class="participant-tabs-nav" style="display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 6px; border-bottom: 1px solid #E2E8F0;">
+      <button type="button" class="btn btn-primary btn-sm part-tab-btn active" data-tab="ALL" id="partTabAll" style="border-radius: 20px; font-weight: 700; font-size: 0.8rem; display: flex; align-items: center; gap: 6px;">
+        <i class="fa-solid fa-layer-group"></i> Semua Peserta <span class="badge" style="background: rgba(255,255,255,0.3); color: #FFFFFF;" id="countPartAll">0</span>
+      </button>
+      <button type="button" class="btn btn-outline btn-sm part-tab-btn" data-tab="SETTLED" id="partTabSettled" style="border-radius: 20px; font-weight: 700; font-size: 0.8rem; display: flex; align-items: center; gap: 6px; border-color: #86EFAC; color: #15803D;">
+        <i class="fa-solid fa-circle-check"></i> Pembayaran Sukses (Lunas) <span class="badge" style="background: #DCFCE7; color: #166534;" id="countPartSettled">0</span>
+      </button>
+      <button type="button" class="btn btn-outline btn-sm part-tab-btn" data-tab="PENDING" id="partTabPending" style="border-radius: 20px; font-weight: 700; font-size: 0.8rem; display: flex; align-items: center; gap: 6px; border-color: #FDE68A; color: #B45309;">
+        <i class="fa-solid fa-clock"></i> Menunggu Bayar (Pending) <span class="badge" style="background: #FEF3C7; color: #92400E;" id="countPartPending">0</span>
+      </button>
+      <button type="button" class="btn btn-outline btn-sm part-tab-btn" data-tab="CANCELLED" id="partTabCancelled" style="border-radius: 20px; font-weight: 700; font-size: 0.8rem; display: flex; align-items: center; gap: 6px; border-color: #FECACA; color: #B91C1C;">
+        <i class="fa-solid fa-ban"></i> Dibatalkan / Expired <span class="badge" style="background: #FEE2E2; color: #991B1B;" id="countPartCancelled">0</span>
+      </button>
+      <button type="button" class="btn btn-outline btn-sm part-tab-btn" data-tab="RACEPACK_DONE" id="partTabRacepackDone" style="border-radius: 20px; font-weight: 700; font-size: 0.8rem; display: flex; align-items: center; gap: 6px; border-color: #A7F3D0; color: #047857;">
+        <i class="fa-solid fa-box-check"></i> Racepack Sudah Diambil <span class="badge" style="background: #D1FAE5; color: #065F46;" id="countPartRacepackDone">0</span>
+      </button>
+      <button type="button" class="btn btn-outline btn-sm part-tab-btn" data-tab="RACEPACK_PENDING" id="partTabRacepackPending" style="border-radius: 20px; font-weight: 700; font-size: 0.8rem; display: flex; align-items: center; gap: 6px; border-color: #FED7AA; color: #C2410C;">
+        <i class="fa-solid fa-box-open"></i> Racepack Belum Diambil <span class="badge" style="background: #FFEDD5; color: #9A3412;" id="countPartRacepackPending">0</span>
+      </button>
+    </div>
+
+    <!-- Info Banner Aktif -->
+    <div id="participantFilterBanner" style="padding: 10px 16px; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: var(--radius-md); margin-bottom: 14px; font-size: 0.82rem; color: #475569; display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        Menampilkan tabel: <strong id="participantActiveTabTitle" style="color: #0F172A;">Semua Peserta Terdaftar</strong> (<span id="participantFilteredCount">0</span> peserta)
+      </div>
+      <div style="font-size: 0.78rem; color: #64748B;">
+        <i class="fa-solid fa-info-circle"></i> Gunakan tab di atas untuk memfilter tabel atau tampilkan seluruhnya.
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>Nama Peserta (KTP)</th>
+            <th>Nomor &amp; Nama BIB</th>
+            <th>NIK (KTP)</th>
+            <th>Kategori</th>
+            <th>Gender &amp; Gol. Darah</th>
+            <th>Jersey</th>
+            <th>Kontak Darurat</th>
+            <th>Status Pembayaran</th>
+            <th>Status Racepack</th>
+            <th style="text-align: center; min-width: 110px;">Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="adminParticipantsTableBody">
+          <tr>
+            <td colspan="11" style="text-align: center; padding: 30px; color: var(--color-text-muted);">
+              Memuat data peserta...
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

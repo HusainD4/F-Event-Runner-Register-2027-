@@ -1,0 +1,16 @@
+{
+  "name": "tegal-run-frontend-2027",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Frontend UI Platform Pendaftaran & War Tiket Tegal Run 2027",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 5173",
+    "build": "vite build",
+    "preview": "vite preview --port 5173"
+  },
+  "devDependencies": {
+    "vite": "^6.0.7"
+  }
+}
+

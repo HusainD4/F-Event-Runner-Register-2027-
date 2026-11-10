@@ -1,0 +1,75 @@
+<!-- =========================================================================
+     RUTE & MAP CHECKPOINTS
+     ========================================================================= -->
+<section class="route-section" id="rute">
+  <div class="container">
+    <div class="route-container">
+      <div class="glass-card route-info-card">
+        <div class="section-tag" style="margin-bottom: 12px;">
+          <i class="fa-solid fa-route"></i> Jalur Lari Steril
+        </div>
+        <h2 class="section-title" id="routeSectionTitle" style="text-align: left; font-size: 2rem;">
+          Rute Datar Pesisir Pantura Tegal
+        </h2>
+        <p id="routeSectionDesc" style="color: var(--color-text-muted); font-size: 0.95rem;">
+          Jalur lari disterilkan bekerja sama dengan Satlantas Polres Tegal Kota dan Dishub, 
+          menjamin keamanan pelari dari polusi dan kendaraan bermotor.
+        </p>
+
+        <div class="route-specs-grid">
+          <div class="route-spec-item">
+            <span class="spec-label">Start / Flag-Off 10K</span>
+            <span class="spec-val" id="routeStart10k">05:45 WIB</span>
+          </div>
+          <div class="route-spec-item">
+            <span class="spec-label">Start / Flag-Off 5K</span>
+            <span class="spec-val" id="routeStart5k">06:15 WIB</span>
+          </div>
+          <div class="route-spec-item">
+            <span class="spec-label">Cut-Off Time (COT) 10K</span>
+            <span class="spec-val" id="routeCot10k">2 Jam 30 Menit</span>
+          </div>
+          <div class="route-spec-item">
+            <span class="spec-label">Cut-Off Time (COT) 5K</span>
+            <span class="spec-val" id="routeCot5k">1 Jam 30 Menit</span>
+          </div>
+        </div>
+
+        <div class="route-checklist" id="routeChecklistContainer">
+          <!-- Loaded dynamically from /api/routes -->
+        </div>
+      </div>
+
+      <div class="glass-card route-visual-card">
+        <div class="route-badge-float">
+          <i class="fa-solid fa-certificate"></i> Terverifikasi PASI
+        </div>
+        <div class="route-map-mock">
+          <svg class="route-path-svg" viewBox="0 0 500 400" fill="none">
+            <circle cx="90" cy="310" r="14" fill="#FF6B00" opacity="0.2"/>
+            <circle cx="90" cy="310" r="7" fill="#FF6B00"/>
+            <circle cx="240" cy="200" r="14" fill="#FF851B" opacity="0.2"/>
+            <circle cx="240" cy="200" r="7" fill="#FF851B"/>
+            <circle cx="420" cy="110" r="14" fill="#10B981" opacity="0.2"/>
+            <circle cx="420" cy="110" r="7" fill="#10B981"/>
+            <path d="M 90 310 Q 160 270 240 200 T 420 110" stroke="#FF6B00" stroke-width="4" stroke-dasharray="6 6"/>
+            <path d="M 420 110 C 370 200 230 330 90 310" stroke="#0F172A" stroke-width="3" stroke-opacity="0.25"/>
+          </svg>
+
+          <div style="z-index: 2; text-align: center; padding: 24px;">
+            <div class="map-icon-circle">
+              <i class="fa-solid fa-map-location"></i>
+            </div>
+            <h4 style="font-size: 1.25rem; font-weight: 800; color: #0F172A; margin-bottom: 6px;">Peta Rute Tegal Run 2027</h4>
+            <p style="font-size: 0.85rem; color: #64748B; max-width: 320px; margin: 0 auto 16px auto;">
+              Unduh rute digital GPX untuk jam tangan Garmin, Coros, Polar, atau aplikasi Strava Anda.
+            </p>
+            <a href="#" class="btn btn-sm btn-secondary" id="btnDownloadGpx">
+              <i class="fa-solid fa-download"></i> Unduh File GPX (Strava/Garmin)
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

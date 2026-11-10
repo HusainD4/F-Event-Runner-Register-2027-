@@ -1,0 +1,30 @@
+<!-- =========================================================================
+     PAGE SKELETON LOADER (MINIMALIST & ANIMATED)
+     ========================================================================= -->
+<div class="page-skeleton" id="pageSkeleton">
+  <style>
+    .page-skeleton { padding: 40px 16px; width: 100%; display: flex; justify-content: center; }
+    .page-skeleton-inner { width: 100%; max-width: 900px; margin: 0 auto; }
+    .sk { background: #E2E8F0; background: linear-gradient(90deg, #E2E8F0 25%, #F1F5F9 37%, #E2E8F0 63%); background-size: 400% 100%; animation: skShimmer 1.4s ease infinite; border-radius: 12px; }
+    @keyframes skShimmer { 0% { background-position: 100% 50%; } 100% { background-position: 0 50%; } }
+    .page-skeleton-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+    .page-skeleton-card { height: 220px; border-radius: 16px; }
+    @media (max-width: 576px) {
+      .page-skeleton { padding: 20px 12px; }
+      .sk-title { height: 36px !important; }
+      .sk-banner { height: 120px !important; }
+      .page-skeleton-grid { grid-template-columns: 1fr; gap: 14px; }
+    }
+  </style>
+
+  <div class="page-skeleton-inner">
+    <div class="sk" style="width: 160px; height: 28px; margin: 0 auto 16px; border-radius: 99px;"></div>
+    <div class="sk sk-title" style="width: 75%; height: 44px; margin: 0 auto 12px;"></div>
+    <div class="sk" style="width: 55%; height: 20px; margin: 0 auto 30px;"></div>
+    <div class="sk sk-banner" style="width: 100%; height: 150px; margin-bottom: 28px; border-radius: 20px;"></div>
+    <div class="page-skeleton-grid">
+      <div class="sk page-skeleton-card"></div>
+      <div class="sk page-skeleton-card"></div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,273 @@
+<div class="admin-tab-pane" id="pane-racepack">
+  <div class="admin-section">
+    <div class="admin-section-header" style="flex-wrap: wrap; gap: 14px;">
+      <div>
+        <h3 style="display: flex; align-items: center; gap: 8px;">
+          <i class="fa-solid fa-box-open" style="color: var(--color-primary);"></i>
+          Pengambilan Racepack &amp; Validasi E-Tiket (RPC)
+        </h3>
+        <p>Pindai QR Code E-Tiket via kamera HP atau cari data peserta secara instan untuk verifikasi status bayar, ukuran jersey, dan serah terima paket lomba.</p>
+      </div>
+      <div class="admin-action-bar">
+        <button type="button" class="btn btn-secondary btn-sm" id="btnRefreshRacepackStats">
+          <i class="fa-solid fa-rotate"></i> Segarkan Data
+        </button>
+      </div>
+    </div>
+
+    <!-- KPI Summary Grid -->
+    <div class="admin-kpi-grid" style="margin-bottom: 20px;">
+      <div class="kpi-card" style="border: 1px solid #BBF7D0; background: #F0FDF4;">
+        <div class="kpi-icon green" style="background: #22C55E; color: #FFFFFF;"><i class="fa-solid fa-circle-check"></i></div>
+        <div class="kpi-details">
+          <span class="kpi-label" style="color: #166534; font-weight: 700;">SUDAH DIAMBIL (CHECK-IN)</span>
+          <h3 class="kpi-val" id="rpcKpiCheckedIn" style="color: #15803D;">0</h3>
+          <span class="kpi-sub" style="color: #166534;" id="rpcKpiPercentage">0% dari peserta lunas</span>
+        </div>
+      </div>
+
+      <div class="kpi-card" style="border: 1px solid #FED7AA; background: #FFF7ED;">
+        <div class="kpi-icon orange" style="background: #F97316; color: #FFFFFF;"><i class="fa-solid fa-box-open"></i></div>
+        <div class="kpi-details">
+          <span class="kpi-label" style="color: #9A3412; font-weight: 700;">BELUM DIAMBIL (SISA)</span>
+          <h3 class="kpi-val" id="rpcKpiRemaining" style="color: #C2410C;">0</h3>
+          <span class="kpi-sub" style="color: #9A3412;">Paket lomba siap diserahkan</span>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon blue"><i class="fa-solid fa-users"></i></div>
+        <div class="kpi-details">
+          <span class="kpi-label">Total Peserta Berhak (Lunas)</span>
+          <h3 class="kpi-val" id="rpcKpiPaidTotal">0</h3>
+          <span class="kpi-sub">Pembayaran terverifikasi</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main 2-Column Interface: Left Scan/Search, Right Checklist Validation -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 20px; align-items: start;">
+      
+      <!-- LEFT COLUMN: CAMERA SCANNER & MANUAL SEARCH -->
+      <div>
+        <!-- Camera Scanner Card (Mobile First) -->
+        <div class="glass-card" style="padding: 20px; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: var(--radius-xl); box-shadow: var(--shadow-sm); margin-bottom: 20px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+            <h4 style="margin: 0; font-size: 1rem; color: #0F172A; display: flex; align-items: center; gap: 8px;">
+              <i class="fa-solid fa-camera" style="color: var(--color-primary);"></i>
+              Kamera Scanner QR E-Tiket (HP / Tablet)
+            </h4>
+            <span class="badge" id="rpcCameraStatusBadge" style="background: #F1F5F9; color: #475569; font-size: 0.72rem; font-weight: 700;">
+              Standby
+            </span>
+          </div>
+
+          <!-- Video Camera Viewport -->
+          <div id="rpcCameraContainer" style="position: relative; width: 100%; min-height: 270px; background: #0F172A; border-radius: 12px; overflow: hidden; display: flex; align-items: center; justify-content: center; margin-bottom: 14px; border: 2px dashed #CBD5E1;">
+            <video id="rpcVideoElem" playsinline style="width: 100%; height: 100%; object-fit: cover; display: none;"></video>
+            <canvas id="rpcCanvasElem" style="display: none;"></canvas>
+
+            <!-- Crosshair Overlay Scan Guide -->
+            <div id="rpcScanCrosshair" style="display: none; position: absolute; width: 180px; height: 180px; border: 3px solid #22C55E; border-radius: 16px; box-shadow: 0 0 0 9999px rgba(0,0,0,0.5); pointer-events: none; z-index: 10;">
+              <div style="position: absolute; top: -28px; width: 100%; text-align: center; color: #22C55E; font-size: 0.72rem; font-weight: 700; text-shadow: 0 1px 3px rgba(0,0,0,0.8);">
+                ARAHKAN KE QR CODE
+              </div>
+            </div>
+
+            <!-- Placeholder saat kamera belum dinyalakan -->
+            <div id="rpcCameraPlaceholder" style="text-align: center; padding: 24px; color: #94A3B8;">
+              <i class="fa-solid fa-qrcode" style="font-size: 3.5rem; margin-bottom: 12px; color: #64748B; display: block;"></i>
+              <strong style="color: #F8FAFC; display: block; font-size: 0.95rem; margin-bottom: 4px;">Kamera Siap Digunakan</strong>
+              <span style="font-size: 0.78rem; color: #94A3B8;">Pilih salah satu mode di bawah: Live Video Scanner atau Foto Kamera HP.</span>
+            </div>
+          </div>
+
+          <!-- Native Mobile Camera Input: Direct Camera Access on any Smartphone -->
+          <input type="file" id="rpcNativeCameraInput" accept="image/*" capture="environment" style="display: none;">
+
+          <!-- Camera Buttons -->
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <button type="button" class="btn btn-primary btn-glow" id="btnStartRpcCamera" style="flex: 1; min-width: 150px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+              <i class="fa-solid fa-video"></i> Aktifkan Live Scanner
+            </button>
+            <button type="button" class="btn btn-secondary" id="btnTriggerNativeCamera" style="flex: 1; min-width: 150px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+              <i class="fa-solid fa-camera"></i> Foto E-Tiket (Kamera HP)
+            </button>
+            <button type="button" class="btn btn-outline btn-sm" id="btnStopRpcCamera" style="display: none; color: #EF4444; border-color: #FECACA;">
+              <i class="fa-solid fa-video-slash"></i> Matikan Kamera
+            </button>
+          </div>
+        </div>
+
+        <!-- Manual Search Box -->
+        <div class="glass-card" style="padding: 20px; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: var(--radius-xl); box-shadow: var(--shadow-sm);">
+          <h4 style="margin: 0 0 10px 0; font-size: 0.95rem; color: #0F172A; display: flex; align-items: center; gap: 8px;">
+            <i class="fa-solid fa-keyboard" style="color: #64748B;"></i>
+            Pencarian Manual (Jika QR Tidak Terbaca)
+          </h4>
+          <p style="font-size: 0.78rem; color: #64748B; margin: 0 0 14px 0;">
+            Masukkan Nomor BIB, Order ID, Invoice, NIK 16 digit, atau Nama lengkap pelari:
+          </p>
+
+          <form id="formRpcManualSearch" style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <input type="text" class="form-input" id="rpcSearchInput" placeholder="Contoh: 05-0012, ORDER-..., atau NIK" style="flex: 1; min-width: 180px; font-weight: 700;">
+            <button type="submit" class="btn btn-secondary" id="btnRpcSearchSubmit">
+              <i class="fa-solid fa-magnifying-glass"></i> Cari
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN: VERIFICATION DETAILS & RACEPACK CHECKLIST -->
+      <div>
+        <div class="glass-card" id="rpcVerificationContainer" style="padding: 24px; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: var(--radius-xl); box-shadow: var(--shadow-sm); min-height: 480px;">
+          
+          <!-- State 1: Belum Ada Data yang Di-scan -->
+          <div id="rpcEmptyState" style="text-align: center; padding: 60px 20px; color: #94A3B8;">
+            <div style="width: 80px; height: 80px; border-radius: 50%; background: #F1F5F9; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px auto; color: #64748B; font-size: 2rem;">
+              <i class="fa-solid fa-shirt"></i>
+            </div>
+            <h4 style="color: #0F172A; font-size: 1.15rem; margin: 0 0 6px 0;">Menunggu Scan E-Tiket Peserta</h4>
+            <p style="font-size: 0.85rem; color: #64748B; max-width: 380px; margin: 0 auto 20px auto;">
+              Arahkan kamera ke QR Code E-Tiket pelari atau ketikkan nomor BIB/Order ID pada kolom pencarian di sebelah kiri.
+            </p>
+            <div style="display: inline-flex; align-items: center; gap: 8px; background: #FFF7ED; border: 1px solid #FED7AA; padding: 8px 16px; border-radius: 20px; font-size: 0.78rem; color: #9A3412;">
+              <i class="fa-solid fa-triangle-exclamation"></i> Pastikan status pembayaran telah LUNAS sebelum menyerahkan racepack.
+            </div>
+          </div>
+
+          <!-- State 2A: Tampilan QR Master (Banyak Peserta dalam 1 Order) -->
+          <div id="rpcMasterState" style="display: none;"></div>
+
+          <!-- State 2: Data Terverifikasi (Tampil setelah Scan / Search) -->
+          <div id="rpcDetailsState" style="display: none;">
+            <!-- Status Pembayaran Banner -->
+            <div id="rpcPaymentBanner" style="padding: 14px 18px; border-radius: 12px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <span id="rpcPaymentIcon" style="font-size: 1.5rem;"></span>
+                <div>
+                  <div style="font-weight: 800; font-size: 0.95rem;" id="rpcPaymentTitle">MEMERIKSA PEMBAYARAN</div>
+                  <div style="font-size: 0.76rem;" id="rpcPaymentSub">Status Midtrans</div>
+                </div>
+              </div>
+              <span class="badge" id="rpcPaymentBadge" style="font-weight: 800; font-size: 0.76rem; padding: 6px 12px;"></span>
+            </div>
+
+            <!-- Participant Identity Profile -->
+            <div style="border-bottom: 1px solid #E2E8F0; padding-bottom: 18px; margin-bottom: 18px;">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 12px;">
+                <div>
+                  <span class="badge" style="background: #EFF6FF; color: #1D4ED8; font-weight: 800; font-size: 0.74rem; margin-bottom: 6px;" id="rpcEventCategory">Kategori 10K</span>
+                  <h3 style="font-size: 1.4rem; font-weight: 800; color: #0F172A; margin: 0 0 4px 0;" id="rpcFullName">NAMA LENGKAP</h3>
+                  <div style="font-size: 0.8rem; color: #64748B;">
+                    NIK: <code id="rpcNik" style="font-weight: 700; color: #334155;">3328...</code> • Gender: <strong id="rpcGender">LAKI-LAKI</strong> • Gol. Darah: <strong id="rpcBloodType">O</strong>
+                  </div>
+                </div>
+                <!-- Nomor BIB Display Besar -->
+                <div style="background: linear-gradient(135deg, #0F172A 0%, #334155 100%); color: #FFFFFF; padding: 10px 18px; border-radius: 12px; text-align: center; box-shadow: 0 4px 12px rgba(15,23,42,0.15);">
+                  <div style="font-size: 0.68rem; color: #94A3B8; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">NOMOR BIB</div>
+                  <div style="font-size: 1.6rem; font-weight: 900; letter-spacing: 1px; color: #38BDF8;" id="rpcBibNumber">----</div>
+                  <div style="font-size: 0.7rem; color: #E2E8F0;" id="rpcBibName">NAMA DADA</div>
+                </div>
+              </div>
+
+              <!-- Kontak Darurat & Order ID -->
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; font-size: 0.78rem; background: #F8FAFC; padding: 10px 14px; border-radius: 8px;">
+                <div>
+                  <span style="color: #64748B;">No. HP Peserta:</span> <strong id="rpcPhone">-</strong>
+                </div>
+                <div>
+                  <span style="color: #64748B;">Kontak Darurat:</span> <strong id="rpcEmergency">-</strong>
+                </div>
+                <div style="grid-column: span 2;">
+                  <span style="color: #64748B;">Order ID / Invoice:</span> <code id="rpcOrderId" style="font-size: 0.76rem;">-</code>
+                </div>
+              </div>
+            </div>
+
+            <!-- Jersey & Perlengkapan Checklist Box -->
+            <div style="margin-bottom: 22px;">
+              <h4 style="font-size: 0.95rem; font-weight: 800; color: #0F172A; margin: 0 0 12px 0; display: flex; align-items: center; justify-content: space-between;">
+                <span><i class="fa-solid fa-list-check" style="color: var(--color-primary);"></i> Checklist Perlengkapan Racepack:</span>
+                <span class="badge" style="background: #F1F5F9; color: #0F172A; font-size: 0.76rem;" id="rpcJerseyBadge">Size: M</span>
+              </h4>
+
+              <div style="display: flex; flex-direction: column; gap: 10px;" id="rpcChecklistGroup">
+                <!-- Checklist 1: BIB -->
+                <label style="display: flex; align-items: center; gap: 12px; background: #F8FAFC; padding: 12px 14px; border-radius: 8px; border: 1px solid #E2E8F0; cursor: pointer;">
+                  <input type="checkbox" id="chkItemBib" checked style="width: 18px; height: 18px; accent-color: var(--color-primary);">
+                  <div>
+                    <strong style="font-size: 0.88rem; color: #0F172A;">Nomor Dada Lomba (BIB)</strong>
+                    <div style="font-size: 0.74rem; color: #64748B;">Sesuai nomor yang tertera di layar (<span id="chkBibText">--</span>)</div>
+                  </div>
+                </label>
+
+                <!-- Checklist 2: Jersey -->
+                <label style="display: flex; align-items: center; gap: 12px; background: #F8FAFC; padding: 12px 14px; border-radius: 8px; border: 1px solid #E2E8F0; cursor: pointer;">
+                  <input type="checkbox" id="chkItemJersey" checked style="width: 18px; height: 18px; accent-color: var(--color-primary);">
+                  <div>
+                    <strong style="font-size: 0.88rem; color: #0F172A;">Jersey Resmi Tegal Run 2027</strong>
+                    <div style="font-size: 0.74rem; color: #64748B;">Ukuran: <strong id="chkJerseySizeText" style="color: var(--color-primary);">M</strong> • Tipe: <span id="chkJerseyTypeText">Dry-Fit Official</span></div>
+                  </div>
+                </label>
+
+                <!-- Checklist 3: Timing Chip -->
+                <label style="display: flex; align-items: center; gap: 12px; background: #F8FAFC; padding: 12px 14px; border-radius: 8px; border: 1px solid #E2E8F0; cursor: pointer;">
+                  <input type="checkbox" id="chkItemChip" checked style="width: 18px; height: 18px; accent-color: var(--color-primary);">
+                  <div>
+                    <strong style="font-size: 0.88rem; color: #0F172A;">Timing Chip PASI</strong>
+                    <div style="font-size: 0.74rem; color: #64748B;">Chip pencatat waktu di balik BIB untuk validasi finish</div>
+                  </div>
+                </label>
+
+                <!-- Checklist 4: Goodie Bag & Panduan -->
+                <label style="display: flex; align-items: center; gap: 12px; background: #F8FAFC; padding: 12px 14px; border-radius: 8px; border: 1px solid #E2E8F0; cursor: pointer;">
+                  <input type="checkbox" id="chkItemBag" checked style="width: 18px; height: 18px; accent-color: var(--color-primary);">
+                  <div>
+                    <strong style="font-size: 0.88rem; color: #0F172A;">Drawstring Bag &amp; Race Guide</strong>
+                    <div style="font-size: 0.74rem; color: #64748B;">Tas serut lomba, nomor penitipan bag drop, buku panduan race</div>
+                  </div>
+                </label>
+
+                <!-- Checklist 5: Suplemen & Refreshment -->
+                <label style="display: flex; align-items: center; gap: 12px; background: #F8FAFC; padding: 12px 14px; border-radius: 8px; border: 1px solid #E2E8F0; cursor: pointer;">
+                  <input type="checkbox" id="chkItemRefreshment" checked style="width: 18px; height: 18px; accent-color: var(--color-primary);">
+                  <div>
+                    <strong style="font-size: 0.88rem; color: #0F172A;">Suplemen &amp; Produk Sponsor</strong>
+                    <div style="font-size: 0.74rem; color: #64748B;">Minuman isotonik, gel energi, dan voucher mitra lomba</div>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <!-- Existing Checkin Status (Jika Sudah Check-in) -->
+            <div id="rpcAlreadyCheckedInBox" style="display: none; padding: 14px 18px; background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 10px; margin-bottom: 18px;">
+              <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                <div>
+                  <div style="font-weight: 800; font-size: 0.92rem; color: #166534; display: flex; align-items: center; gap: 6px;">
+                    <i class="fa-solid fa-circle-check"></i> RACEPACK SUDAH DISERAHKAN
+                  </div>
+                  <div style="font-size: 0.76rem; color: #15803D; margin-top: 2px;" id="rpcCheckinTimestampText">
+                    Diserahkan pada: -
+                  </div>
+                </div>
+                <button type="button" class="btn btn-outline btn-sm" id="btnRevertRpcCheckin" style="color: #DC2626; border-color: #FECACA; font-size: 0.74rem;">
+                  <i class="fa-solid fa-rotate-left"></i> Batalkan Check-in (Revert)
+                </button>
+              </div>
+            </div>
+
+            <!-- Action Confirm Button -->
+            <div id="rpcActionBtnWrapper">
+              <button type="button" class="btn btn-primary btn-glow" id="btnConfirmRpcCheckin" style="width: 100%; font-size: 1.05rem; padding: 14px 20px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                <i class="fa-solid fa-box-check" style="font-size: 1.25rem;"></i>
+                Konfirmasi &amp; Serahkan Racepack Sekarang
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

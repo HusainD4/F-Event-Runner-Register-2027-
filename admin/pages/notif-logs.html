@@ -1,0 +1,99 @@
+<div class="admin-tab-pane" id="pane-notif-logs">
+          <div class="admin-section">
+            <div class="admin-section-header">
+              <div>
+                <h3><i class="fa-solid fa-paper-plane" style="color: var(--color-primary);"></i> Log Pengiriman Notifikasi &amp; Status Peserta</h3>
+                <p>Pantau data peserta yang sudah menerima e-tiket / notifikasi WhatsApp &amp; Email, serta kirim manual secara instan.</p>
+              </div>
+              <div class="admin-action-bar">
+                <button class="btn btn-secondary btn-sm" id="btnRefreshNotifLogs">
+                  <i class="fa-solid fa-rotate"></i> Segarkan Data
+                </button>
+                <button class="btn btn-primary btn-sm btn-glow" id="btnBatchSendNotif">
+                  <i class="fa-solid fa-envelopes-bulk"></i> Kirim Semua yang Belum Terkirim
+                </button>
+              </div>
+            </div>
+
+            <!-- KPI Summary Cards -->
+            <div class="admin-kpi-grid" style="margin-bottom: 24px;">
+              <div class="kpi-card">
+                <div class="kpi-icon blue"><i class="fa-solid fa-receipt"></i></div>
+                <div class="kpi-details">
+                  <span class="kpi-label">Total Pesanan / Pendaftar</span>
+                  <h3 class="kpi-val" id="kpiNotifTotalOrders">0</h3>
+                  <span class="kpi-sub">Seluruh transaksi terdata</span>
+                </div>
+              </div>
+
+              <div class="kpi-card">
+                <div class="kpi-icon green"><i class="fa-solid fa-circle-check"></i></div>
+                <div class="kpi-details">
+                  <span class="kpi-label">Notifikasi Terkirim</span>
+                  <h3 class="kpi-val" id="kpiNotifSentCount" style="color: #10B981;">0</h3>
+                  <span class="kpi-sub">WhatsApp / Email Sukses</span>
+                </div>
+              </div>
+
+              <div class="kpi-card">
+                <div class="kpi-icon orange"><i class="fa-solid fa-clock"></i></div>
+                <div class="kpi-details">
+                  <span class="kpi-label">Belum Terkirim / Pending</span>
+                  <h3 class="kpi-val" id="kpiNotifPendingCount" style="color: #F59E0B;">0</h3>
+                  <span class="kpi-sub">Menunggu pengiriman admin</span>
+                </div>
+              </div>
+
+              <div class="kpi-card">
+                <div class="kpi-icon purple"><i class="fa-brands fa-whatsapp"></i></div>
+                <div class="kpi-details">
+                  <span class="kpi-label">Mode Pengiriman Saat Ini</span>
+                  <h3 class="kpi-val" id="kpiNotifDispatchMode" style="font-size: 1.15rem; color: #38BDF8;">OTOMATIS</h3>
+                  <span class="kpi-sub" id="kpiNotifSessionStatus">Sesi WA: Memeriksa...</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Filter & Search Bar -->
+            <div style="display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; justify-content: space-between;">
+              <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+                <input type="text" class="form-input form-input-sm" id="searchNotifLogs" placeholder="Cari Nama, No WA, Order ID, BIB..." style="width: 260px;">
+                <select class="form-input form-input-sm" id="filterNotifDeliveryStatus" style="width: 190px;">
+                  <option value="">Semua Status Pengiriman</option>
+                  <option value="SENT">Sudah Terkirim (Sent)</option>
+                  <option value="UNSENT">Belum Terkirim / Pending</option>
+                </select>
+              </div>
+              <div style="font-size: 0.82rem; color: var(--color-text-muted);">
+                <i class="fa-solid fa-circle-info"></i> Klik <strong>"Kirim Sekarang"</strong> untuk mengirim pesan WhatsApp berisi status pembayaran &amp; file PDF tiket.
+              </div>
+            </div>
+
+            <!-- Table of Notification Logs -->
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th style="width: 45px;">No</th>
+                    <th>Order ID / Invoice</th>
+                    <th>Nama Peserta (KTP)</th>
+                    <th>Kontak (WA &amp; Email)</th>
+                    <th>Kategori &amp; BIB</th>
+                    <th>Status Bayar</th>
+                    <th>Status Kirim WA</th>
+                    <th>Status Kirim Email</th>
+                    <th>Waktu Terkirim</th>
+                    <th style="text-align: center; width: 140px;">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="notifLogsTableBody">
+                  <tr>
+                    <td colspan="10" style="text-align: center; padding: 30px; color: var(--color-text-muted);">
+                      Memuat data log notifikasi...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>

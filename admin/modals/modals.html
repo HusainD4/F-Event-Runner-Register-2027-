@@ -1,0 +1,459 @@
+<!-- MODAL 1: EVENT CREATE / EDIT -->
+  <div class="admin-modal-backdrop" id="modalEventBackdrop">
+    <div class="admin-modal-dialog">
+      <div class="admin-modal-header">
+        <h4 id="modalEventTitle"><i class="fa-solid fa-calendar-plus" style="color: var(--color-primary);"></i> Form Kategori Event</h4>
+        <button class="admin-modal-close" onclick="closeAdminModal('modalEventBackdrop')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form id="formEvent">
+        <input type="hidden" id="eventFormId">
+        <div class="admin-modal-body">
+          <div class="form-group">
+            <label class="form-label">Nama Tiket / Kategori Event <span class="req">*</span></label>
+            <input type="text" class="form-input" id="eventFormTicketName" placeholder="Contoh: 10K Open Marathon 2027" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Kategori Jarak <span class="req">*</span></label>
+              <input type="text" class="form-input" id="eventFormCategory" placeholder="10K / 5K / 21K" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Total Kuota (Stok) <span class="req">*</span></label>
+              <input type="number" class="form-input" id="eventFormStock" min="1" placeholder="500" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Harga Tiket (Rp) <span class="req">*</span></label>
+              <input type="number" class="form-input" id="eventFormPrice" min="0" step="5000" placeholder="250000" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tanggal Pelaksanaan</label>
+              <input type="datetime-local" class="form-input" id="eventFormDate">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">URL Gambar Tiket / Cover Kategori</label>
+              <input type="url" class="form-input" id="eventFormTicketImage" placeholder="https://images.unsplash.com/...">
+            </div>
+            <div class="form-group">
+              <label class="form-label">URL Gambar Medali Finisher</label>
+              <input type="url" class="form-input" id="eventFormMedalImage" placeholder="https://images.unsplash.com/...">
+            </div>
+          </div>
+          <div class="form-group">
+            <label style="display: flex; align-items: center; gap: 8px; font-weight: 600; cursor: pointer;">
+              <input type="checkbox" id="eventFormIsClosed">
+              <span>Tutup pendaftaran untuk kategori ini</span>
+            </label>
+          </div>
+        </div>
+        <div class="admin-modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="closeAdminModal('modalEventBackdrop')">Batal</button>
+          <button type="submit" class="btn btn-primary btn-sm btn-glow" id="btnSaveEventSubmit">
+            <i class="fa-solid fa-floppy-disk"></i> Simpan Event
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 2: PARTICIPANT CREATE / EDIT -->
+  <div class="admin-modal-backdrop" id="modalParticipantBackdrop">
+    <div class="admin-modal-dialog" style="max-width: 700px;">
+      <div class="admin-modal-header">
+        <h4 id="modalParticipantTitle"><i class="fa-solid fa-user-plus" style="color: var(--color-primary);"></i> Form Data Peserta</h4>
+        <button class="admin-modal-close" onclick="closeAdminModal('modalParticipantBackdrop')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form id="formParticipant">
+        <input type="hidden" id="partFormId">
+        <div class="admin-modal-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Pilih Kategori Event <span class="req">*</span></label>
+              <select class="form-input" id="partFormEventId" required>
+                <!-- Populated dynamically -->
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Nama BIB Dada <span class="req">*</span></label>
+              <input type="text" class="form-input" id="partFormBibName" maxlength="15" placeholder="Maks. 15 karakter" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Nama Lengkap (Sesuai KTP) <span class="req">*</span></label>
+              <input type="text" class="form-input" id="partFormFullName" placeholder="Nama KTP" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Nomor Induk Kependudukan (NIK 16 Digit) <span class="req">*</span></label>
+              <input type="text" class="form-input" id="partFormNik" maxlength="16" pattern="\d{16}" placeholder="16 digit angka" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Jenis Kelamin <span class="req">*</span></label>
+              <select class="form-input" id="partFormGender" required>
+                <option value="MALE">Laki-Laki (MALE)</option>
+                <option value="FEMALE">Perempuan (FEMALE)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Golongan Darah <span class="req">*</span></label>
+              <select class="form-input" id="partFormBloodType" required>
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="AB">AB</option>
+                <option value="O">O</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Ukuran Jersey <span class="req">*</span></label>
+              <select class="form-input" id="partFormSize" required>
+                <option value="S">S</option>
+                <option value="M" selected>M</option>
+                <option value="L">L</option>
+                <option value="XL">XL</option>
+                <option value="XXL">XXL</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Tempat Lahir</label>
+              <input type="text" class="form-input" id="partFormBirthPlace" placeholder="Tegal" value="Tegal">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tanggal Lahir</label>
+              <input type="date" class="form-input" id="partFormBirthDate" value="1995-05-15">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Alamat Lengkap</label>
+            <input type="text" class="form-input" id="partFormAddress" placeholder="Jl. Pancasila No. 12" value="Jl. Pancasila No. 12, Tegal">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Nama Kontak Darurat <span class="req">*</span></label>
+              <input type="text" class="form-input" id="partFormEmergencyName" placeholder="Contoh: Budi Santoso" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">No. HP Kontak Darurat <span class="req">*</span></label>
+              <input type="tel" class="form-input" id="partFormEmergencyPhone" placeholder="Contoh: 081234567890" required>
+            </div>
+          </div>
+        </div>
+        <div class="admin-modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="closeAdminModal('modalParticipantBackdrop')">Batal</button>
+          <button type="submit" class="btn btn-primary btn-sm btn-glow" id="btnSavePartSubmit">
+            <i class="fa-solid fa-floppy-disk"></i> Simpan Data Peserta
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 3: ORDER STATUS UPDATE -->
+  <div class="admin-modal-backdrop" id="modalOrderBackdrop">
+    <div class="admin-modal-dialog" style="max-width: 480px;">
+      <div class="admin-modal-header">
+        <h4><i class="fa-solid fa-file-pen" style="color: var(--color-primary);"></i> Update Status Transaksi</h4>
+        <button class="admin-modal-close" onclick="closeAdminModal('modalOrderBackdrop')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form id="formOrderStatus">
+        <input type="hidden" id="orderFormId">
+        <div class="admin-modal-body">
+          <div class="form-group">
+            <label class="form-label">Order ID</label>
+            <input type="text" class="form-input" id="orderFormDisplayId" readonly style="background: #F1F5F9; font-weight: 700;">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Status Pembayaran Baru <span class="req">*</span></label>
+            <select class="form-input" id="orderFormStatus" required>
+              <option value="SETTLEMENT">SETTLEMENT (Pembayaran Berhasil / Lunas)</option>
+              <option value="PENDING">PENDING (Menunggu Pembayaran)</option>
+              <option value="CANCEL">CANCEL (Dibatalkan)</option>
+              <option value="REFUND">REFUND (Pengembalian Dana)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Alasan / Catatan Perubahan</label>
+            <input type="text" class="form-input" id="orderFormReason" placeholder="Contoh: Konfirmasi manual transfer bank">
+          </div>
+        </div>
+        <div class="admin-modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="closeAdminModal('modalOrderBackdrop')">Batal</button>
+          <button type="submit" class="btn btn-primary btn-sm btn-glow">
+            <i class="fa-solid fa-check"></i> Perbarui Status
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 4: ADMIN USER CREATE / EDIT (SUPERADMIN ONLY) -->
+  <div class="admin-modal-backdrop" id="modalAdminUserBackdrop">
+    <div class="admin-modal-dialog" style="max-width: 520px;">
+      <div class="admin-modal-header">
+        <h4 id="modalAdminUserTitle"><i class="fa-solid fa-user-shield" style="color: var(--color-primary);"></i> Form Akun Petugas Admin</h4>
+        <button class="admin-modal-close" onclick="closeAdminModal('modalAdminUserBackdrop')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form id="formAdminUser">
+        <input type="hidden" id="adminUserFormId">
+        <div class="admin-modal-body">
+          <div class="form-group">
+            <label class="form-label">Nama Lengkap Petugas <span class="req">*</span></label>
+            <input type="text" class="form-input" id="adminUserFullName" placeholder="Nama Petugas" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Username <span class="req">*</span></label>
+              <input type="text" class="form-input" id="adminUserUsername" placeholder="username_admin" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email Petugas <span class="req">*</span></label>
+              <input type="email" class="form-input" id="adminUserEmail" placeholder="admin@tegalrun.id" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Pilih Peran / Role Akses <span class="req">*</span></label>
+            <select class="form-input" id="adminUserRoleId" required>
+              <!-- Populated dynamically from /admin/roles -->
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Kata Sandi (Password) <span class="req" id="adminPasswordReq">*</span></label>
+            <input type="password" class="form-input" id="adminUserPassword" placeholder="Minimal 8 karakter">
+            <div class="form-hint" id="adminPasswordHint">Wajib diisi untuk akun baru. Kosongkan jika tidak ingin mengubah password saat edit.</div>
+          </div>
+        </div>
+        <div class="admin-modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="closeAdminModal('modalAdminUserBackdrop')">Batal</button>
+          <button type="submit" class="btn btn-primary btn-sm btn-glow">
+            <i class="fa-solid fa-user-check"></i> Simpan Akun Admin
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ROLE CREATE / EDIT PERMISSIONS (SUPERADMIN ONLY) -->
+  <div class="admin-modal-backdrop" id="modalRoleBackdrop">
+    <div class="admin-modal-dialog" style="max-width: 760px;">
+      <div class="admin-modal-header">
+        <h4 id="modalRoleTitle"><i class="fa-solid fa-key" style="color: var(--color-primary);"></i> Atur Hak Akses Halaman Role</h4>
+        <button class="admin-modal-close" onclick="closeAdminModal('modalRoleBackdrop')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form id="formRole">
+        <input type="hidden" id="roleFormId">
+        <div class="admin-modal-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Nama Role <span class="req">*</span></label>
+              <input type="text" class="form-input" id="roleFormName" placeholder="CONTOH: SPONSORSHIP" required style="font-weight: 700; text-transform: uppercase;">
+              <small class="form-hint" id="roleNameHint">Gunakan huruf kapital (A-Z) dan underscore (_).</small>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Deskripsi Singkat Tanggung Jawab</label>
+              <input type="text" class="form-input" id="roleFormDesc" placeholder="Contoh: Mengelola promosi sponsor dan exposure website">
+            </div>
+          </div>
+
+          <div style="margin-top: 16px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+            <div>
+              <strong style="font-size: 0.9rem; color: #0F172A;">Pilih Halaman Admin yang Dapat Diakses:</strong>
+              <div style="font-size: 0.76rem; color: #64748B;">Petugas hanya akan melihat menu dan memiliki hak akses sesuai halaman yang dicentang.</div>
+            </div>
+            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+              <button type="button" class="btn btn-outline btn-sm" id="btnSelectAllPages" style="padding: 2px 8px; font-size: 0.72rem;">Pilih Semua</button>
+              <button type="button" class="btn btn-outline btn-sm" id="btnClearAllPages" style="padding: 2px 8px; font-size: 0.72rem;">Bersihkan</button>
+              <button type="button" class="btn btn-outline btn-sm" id="btnPresetDefaultPages" style="padding: 2px 8px; font-size: 0.72rem;">Preset Standar</button>
+            </div>
+          </div>
+
+          <!-- Module Checkboxes Grid -->
+          <div id="roleModulesContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; max-height: 380px; overflow-y: auto; padding: 4px;">
+            <!-- Populated dynamically from SYSTEM_MODULES -->
+          </div>
+        </div>
+        <div class="admin-modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="closeAdminModal('modalRoleBackdrop')">Batal</button>
+          <button type="submit" class="btn btn-primary btn-sm btn-glow" id="btnSaveRoleSubmit">
+            <i class="fa-solid fa-floppy-disk"></i> Simpan Hak Akses ke Database
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: KELOLA BENEFIT & FASILITAS EVENT (CRUD LENGKAP) -->
+  <div class="admin-modal-backdrop" id="modalEventBenefitsBackdrop">
+    <div class="admin-modal-dialog" style="max-width: 680px;">
+      <div class="admin-modal-header">
+        <div>
+          <h4 id="benefitModalHeaderTitle"><i class="fa-solid fa-gift" style="color: var(--color-primary);"></i> Kelola Benefit & Race Pack</h4>
+          <span style="font-size: 0.8rem; color: #64748B;" id="benefitModalSubtitle">Event Kategori</span>
+        </div>
+        <button class="admin-modal-close" onclick="closeAdminModal('modalEventBenefitsBackdrop')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="admin-modal-body" style="padding-top: 16px;">
+        <!-- Form Tambah / Edit Benefit -->
+        <div class="glass-card" style="padding: 18px; border: 1px solid var(--border-glass-orange); background: #FFF7ED; border-radius: var(--radius-lg); margin-bottom: 20px;">
+          <h5 style="font-size: 0.92rem; font-weight: 800; color: #0F172A; margin: 0 0 12px 0; display: flex; align-items: center; justify-content: space-between;">
+            <span id="benefitFormTitle"><i class="fa-solid fa-plus-circle" style="color: var(--color-primary);"></i> Tambah Fasilitas / Benefit Baru</span>
+            <button type="button" class="btn btn-outline btn-sm" id="btnCancelBenefitEdit" style="display: none; padding: 2px 8px; font-size: 0.72rem;">Batal Edit</button>
+          </h5>
+
+          <form id="formEventBenefit">
+            <input type="hidden" id="benefitFormEventId">
+            <input type="hidden" id="benefitFormId">
+
+            <div class="form-row">
+              <div class="form-group" style="margin-bottom: 10px;">
+                <label class="form-label">Nama Fasilitas / Benefit <span class="req">*</span></label>
+                <input type="text" class="form-input" id="benefitFormName" placeholder="Contoh: Official Race Singlet Dry-Fit" required>
+              </div>
+              <div class="form-group" style="margin-bottom: 10px;">
+                <label class="form-label">URL Gambar / Icon (Opsional)</label>
+                <input type="url" class="form-input" id="benefitFormImage" placeholder="https://...">
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 12px;">
+              <label class="form-label">Deskripsi Fasilitas <span class="req">*</span></label>
+              <textarea class="form-input" id="benefitFormDesc" rows="2" placeholder="Contoh: Bahan dry-fit breathable anti-bakteri dengan sablon reflektif" required></textarea>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end;">
+              <button type="submit" class="btn btn-primary btn-sm btn-glow" id="btnSaveBenefitSubmit">
+                <i class="fa-solid fa-check"></i> Simpan Benefit
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Tabel Daftar Benefit yang Tersimpan di Database -->
+        <div>
+          <h5 style="font-size: 0.88rem; font-weight: 800; color: #0F172A; margin: 0 0 10px 0;">
+            <i class="fa-solid fa-list-check" style="color: var(--color-primary);"></i> Daftar Benefit yang Tersimpan di Database (<span id="benefitListCount">0</span>)
+          </h5>
+          <div class="table-responsive" style="max-height: 280px; overflow-y: auto;">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th style="width: 35%;">Nama Benefit</th>
+                  <th>Deskripsi</th>
+                  <th style="width: 80px; text-align: center;">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="eventBenefitsTableBody">
+                <!-- Populated dynamically via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="admin-modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="closeAdminModal('modalEventBenefitsBackdrop')">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ROUTE POINT CREATE / EDIT -->
+  <div class="admin-modal-backdrop" id="modalRoutePointBackdrop">
+    <div class="admin-modal-dialog" style="max-width: 640px;">
+      <div class="admin-modal-header">
+        <h4 id="modalRoutePointTitle"><i class="fa-solid fa-map-pin" style="color: var(--color-primary);"></i> Form Checkpoint Rute</h4>
+        <button class="admin-modal-close" onclick="closeAdminModal('modalRoutePointBackdrop')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form id="formRoutePoint">
+        <input type="hidden" id="routeFormId">
+        <div class="admin-modal-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Nomor Urutan <span class="req">*</span></label>
+              <input type="number" class="form-input" id="routeFormOrderIndex" min="1" placeholder="1" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Jarak (Km) <span class="req">*</span></label>
+              <input type="number" class="form-input" id="routeFormDistanceKm" step="0.1" min="0" placeholder="2.5" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Nama Checkpoint <span class="req">*</span></label>
+            <input type="text" class="form-input" id="routeFormName" placeholder="Contoh: Start & Finish: Alun-Alun Kota Tegal" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Kategori <span class="req">*</span></label>
+              <select class="form-input" id="routeFormCategory" required>
+                <option value="ALL">ALL (10K &amp; 5K)</option>
+                <option value="10K">10K Only</option>
+                <option value="5K">5K Only</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Icon (Emoji / FA class)</label>
+              <input type="text" class="form-input" id="routeFormIcon" placeholder="🏁 atau fa-flag">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Deskripsi Checkpoint</label>
+            <textarea class="form-input" id="routeFormDescription" rows="2" placeholder="Keterangan titik checkpoint..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">URL Gambar Checkpoint (Opsional)</label>
+            <input type="url" class="form-input" id="routeFormImage" placeholder="https://images.unsplash.com/...">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label style="display:flex;align-items:center;gap:8px;font-weight:600;cursor:pointer;">
+                <input type="checkbox" id="routeFormIsWaterStation">
+                <span>💧 Water Station</span>
+              </label>
+            </div>
+            <div class="form-group">
+              <label style="display:flex;align-items:center;gap:8px;font-weight:600;cursor:pointer;">
+                <input type="checkbox" id="routeFormIsMedicalSpot">
+                <span>🏥 Pos Medis</span>
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="admin-modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="closeAdminModal('modalRoutePointBackdrop')">Batal</button>
+          <button type="submit" class="btn btn-primary btn-sm btn-glow" id="btnSaveRouteSubmit">
+            <i class="fa-solid fa-floppy-disk"></i> Simpan Checkpoint
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 5: CUSTOM ACTION CONFIRMATION DIALOG -->
+  <div class="confirm-modal-backdrop" id="confirmModalBackdrop">
+    <div class="confirm-modal-card">
+      <div class="confirm-modal-icon warning" id="confirmModalIcon">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+      <h4 class="confirm-modal-title" id="confirmModalTitle">Konfirmasi Tindakan</h4>
+      <p class="confirm-modal-desc" id="confirmModalMessage">Apakah Anda yakin ingin melanjutkan tindakan ini?</p>
+      <div class="confirm-modal-actions">
+        <button type="button" class="btn btn-secondary btn-sm" id="btnConfirmCancel">Batal</button>
+        <button type="button" class="btn btn-primary btn-sm btn-glow" id="btnConfirmOk">Ya, Lanjutkan</button>
+      </div>
+    </div>
+  </div>

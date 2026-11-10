@@ -1,0 +1,166 @@
+<div class="admin-tab-pane active" id="pane-dashboard">
+          <!-- Top KPI Grid: Pemisahan Jelas Total Biaya Layanan & Hasil Akhir Murni Bersih -->
+          <div class="admin-kpi-grid">
+            <div class="kpi-card">
+              <div class="kpi-icon orange"><i class="fa-solid fa-users"></i></div>
+              <div class="kpi-details">
+                <span class="kpi-label">Peserta Terdaftar</span>
+                <h3 class="kpi-val" id="kpiTotalParticipants">0</h3>
+                <span class="kpi-sub">Total Pelari di Database</span>
+              </div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-icon blue"><i class="fa-solid fa-receipt"></i></div>
+              <div class="kpi-details">
+                <span class="kpi-label">Total Omzet Kotor</span>
+                <h3 class="kpi-val" id="kpiTotalRevenue">Rp 0</h3>
+                <span class="kpi-sub">Total Masuk Sebelum Potongan</span>
+              </div>
+            </div>
+
+            <div class="kpi-card" style="border: 2px solid #FCD34D; background: #FFFBEB;">
+              <div class="kpi-icon purple" style="background: #F59E0B; color: #FFFFFF;"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+              <div class="kpi-details">
+                <span class="kpi-label" style="color: #92400E; font-weight: 700;">TOTAL BIAYA LAYANAN</span>
+                <h3 class="kpi-val" id="kpiTotalServiceFee" style="color: #B45309;">Rp 0</h3>
+                <span class="kpi-sub" style="color: #92400E;">Akumulasi Fee Sistem & Gateway</span>
+              </div>
+            </div>
+
+            <div class="kpi-card" style="border: 2px solid #86EFAC; background: #F0FDF4;">
+              <div class="kpi-icon green" style="background: #22C55E; color: #FFFFFF;"><i class="fa-solid fa-vault"></i></div>
+              <div class="kpi-details">
+                <span class="kpi-label" style="color: #166534; font-weight: 700;">HASIL AKHIR MURNI (BERSIH)</span>
+                <h3 class="kpi-val" id="kpiNetRevenue" style="color: #15803D;">Rp 0</h3>
+                <span class="kpi-sub" style="color: #166534;">Omzet Bersih (Setelah Potong Biaya Layanan)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- SECTION: REKONSILIASI KEUANGAN & RINCIAN TRANSAKSI (HANYA LUNAS, PENDING, BATAL, BIAYA LAYANAN) -->
+          <div class="admin-section" style="margin-top: 20px; border: 1px solid #E2E8F0; background: #FFFFFF; border-radius: var(--radius-xl);">
+            <div class="admin-section-header" style="flex-wrap: wrap; gap: 12px;">
+              <div>
+                <h3 style="display: flex; align-items: center; gap: 8px;">
+                  <i class="fa-solid fa-scale-balanced" style="color: var(--color-primary);"></i>
+                  Rekonsiliasi Keuangan &amp; Rincian Transaksi
+                </h3>
+                <p>Data keuangan terpisah rapi: Lunas, Menunggu Pembayaran, Dibatalkan, dan Akumulasi Biaya Layanan.</p>
+              </div>
+              <button type="button" class="btn btn-outline btn-sm btn-glow" id="btnSyncMidtransDashboard" title="Cek &amp; perbarui seluruh status transaksi dari server Midtrans">
+                <i class="fa-solid fa-arrows-rotate"></i> Sinkronkan Status Midtrans
+              </button>
+            </div>
+
+            <!-- Financial Breakdown Grid (4 Item: Lunas, Pending, Batal, Biaya Layanan) -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-bottom: 20px;">
+              <!-- 1. LUNAS -->
+              <div class="glass-card" style="padding: 16px; border: 1px solid #BBF7D0; background: #F0FDF4; border-radius: var(--radius-lg);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                  <span style="font-size: 0.78rem; font-weight: 700; color: #166534; text-transform: uppercase;">
+                    <i class="fa-solid fa-circle-check"></i> 1. Lunas (Settlement)
+                  </span>
+                  <span class="badge" style="background: #DCFCE7; color: #15803D; font-weight: 800; font-size: 0.7rem;" id="finSettledCount">0 Order</span>
+                </div>
+                <h3 style="font-size: 1.45rem; font-weight: 800; color: #15803D; margin: 0 0 4px 0;" id="finSettledAmount">Rp 0</h3>
+                <small style="color: #166534; font-size: 0.72rem;">Transaksi terverifikasi &amp; dana masuk</small>
+              </div>
+
+              <!-- 2. PENDING -->
+              <div class="glass-card" style="padding: 16px; border: 1px solid #FDE68A; background: #FFFBEB; border-radius: var(--radius-lg);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                  <span style="font-size: 0.78rem; font-weight: 700; color: #92400E; text-transform: uppercase;">
+                    <i class="fa-solid fa-clock"></i> 2. Pending (Menunggu)
+                  </span>
+                  <span class="badge" style="background: #FEF3C7; color: #B45309; font-weight: 800; font-size: 0.7rem;" id="finPendingCount">0 Order</span>
+                </div>
+                <h3 style="font-size: 1.45rem; font-weight: 800; color: #B45309; margin: 0 0 4px 0;" id="finPendingAmount">Rp 0</h3>
+                <small style="color: #92400E; font-size: 0.72rem;">Belum dibayarkan oleh calon peserta</small>
+              </div>
+
+              <!-- 3. BATAL -->
+              <div class="glass-card" style="padding: 16px; border: 1px solid #FECACA; background: #FEF2F2; border-radius: var(--radius-lg);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                  <span style="font-size: 0.78rem; font-weight: 700; color: #991B1B; text-transform: uppercase;">
+                    <i class="fa-solid fa-ban"></i> 3. Batal / Expired
+                  </span>
+                  <span class="badge" style="background: #FEE2E2; color: #B91C1C; font-weight: 800; font-size: 0.7rem;" id="finCancelledCount">0 Order</span>
+                </div>
+                <h3 style="font-size: 1.45rem; font-weight: 800; color: #B91C1C; margin: 0 0 4px 0;" id="finCancelledAmount">Rp 0</h3>
+                <small style="color: #991B1B; font-size: 0.72rem;">Kadaluarsa atau dibatalkan sistem</small>
+              </div>
+
+              <!-- 4. BIAYA LAYANAN -->
+              <div class="glass-card" style="padding: 16px; border: 1px solid #E9D5FF; background: #FAF5FF; border-radius: var(--radius-lg);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                  <span style="font-size: 0.78rem; font-weight: 700; color: #6B21A8; text-transform: uppercase;">
+                    <i class="fa-solid fa-hand-holding-dollar"></i> 4. Biaya Layanan
+                  </span>
+                  <span class="badge" style="background: #F3E8FF; color: #7E22CE; font-weight: 800; font-size: 0.7rem;" id="finServiceFeeCount">0 Transaksi</span>
+                </div>
+                <h3 style="font-size: 1.45rem; font-weight: 800; color: #7E22CE; margin: 0 0 4px 0;" id="finServiceFeeAmount">Rp 0</h3>
+                <small style="color: #6B21A8; font-size: 0.72rem;">Total akumulasi biaya layanan</small>
+              </div>
+            </div>
+
+            <!-- Reconciliation Formula Summary Banner -->
+            <div style="padding: 14px 20px; background: #F8FAFC; border: 1px dashed #CBD5E1; border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <span class="badge" style="background: #0F172A; color: #FFFFFF; font-weight: 700; padding: 6px 12px;">
+                  <i class="fa-solid fa-calculator"></i> REKONSILIASI AKHIR
+                </span>
+                <span style="font-size: 0.88rem; color: #334155; font-weight: 600;">
+                  Total Lunas (<span id="calcGross" style="color: #15803D;">Rp 0</span>) − Total Biaya Layanan (<span id="calcFee" style="color: #7E22CE;">Rp 0</span>) = HASIL AKHIR MURNI
+                </span>
+              </div>
+              <div style="font-size: 0.85rem; font-weight: 700; color: #059669;">
+                Bersih Diterima: <span id="calcNetResult" style="font-size: 1.15rem; font-weight: 800;">Rp 0</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Overview Section -->
+          <div class="admin-section">
+            <div class="admin-section-header">
+              <div>
+                <h3><i class="fa-solid fa-bolt" style="color: var(--color-primary);"></i> Pintasan Cepat & Ringkasan Operasional</h3>
+                <p>Navigasi cepat untuk mengelola event, peserta, dan transaksi secara real-time.</p>
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px;">
+              <div class="kpi-card" style="cursor: pointer;" onclick="switchAdminTab('events')">
+                <div class="kpi-icon orange"><i class="fa-solid fa-calendar-days"></i></div>
+                <div>
+                  <h4 style="font-size: 0.95rem; margin: 0 0 4px 0;">Kelola Event & Tiket</h4>
+                  <p style="font-size: 0.78rem; color: #64748B; margin: 0;">Atur kuota, harga, dan buka/tutup kategori.</p>
+                </div>
+              </div>
+
+              <div class="kpi-card" style="cursor: pointer;" onclick="switchAdminTab('participants')">
+                <div class="kpi-icon blue"><i class="fa-solid fa-users"></i></div>
+                <div>
+                  <h4 style="font-size: 0.95rem; margin: 0 0 4px 0;">Database Peserta</h4>
+                  <p style="font-size: 0.78rem; color: #64748B; margin: 0;">Lihat NIK, nomor BIB, dan ekspor CSV.</p>
+                </div>
+              </div>
+
+              <div class="kpi-card" style="cursor: pointer;" onclick="switchAdminTab('orders')">
+                <div class="kpi-icon green"><i class="fa-solid fa-receipt"></i></div>
+                <div>
+                  <h4 style="font-size: 0.95rem; margin: 0 0 4px 0;">Transaksi & Pembayaran</h4>
+                  <p style="font-size: 0.78rem; color: #64748B; margin: 0;">Konfirmasi pembayaran dan status order.</p>
+                </div>
+              </div>
+
+              <div class="kpi-card" style="cursor: pointer;" onclick="switchAdminTab('countdown')">
+                <div class="kpi-icon purple"><i class="fa-solid fa-stopwatch-20"></i></div>
+                <div>
+                  <h4 style="font-size: 0.95rem; margin: 0 0 4px 0;">Target Countdown Event</h4>
+                  <p style="font-size: 0.78rem; color: #64748B; margin: 0;">Atur tanggal race day dan status registrasi global.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>

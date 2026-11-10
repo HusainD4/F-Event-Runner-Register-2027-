@@ -1,0 +1,33 @@
+<div class="admin-tab-pane" id="pane-routes">
+          <div class="admin-section">
+            <div class="admin-section-header">
+              <div>
+                <h3><i class="fa-solid fa-map-pin" style="color: var(--color-primary);"></i> Manajemen Rute &amp; Checkpoint</h3>
+                <p>Kelola titik-titik checkpoint, water station, dan pos medis pada rute lari.</p>
+              </div>
+              <button class="btn btn-primary btn-sm btn-glow" id="btnOpenCreateRouteModal" data-permission="events:update">
+                <i class="fa-solid fa-plus"></i> Tambah Checkpoint
+              </button>
+            </div>
+
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th style="width:50px;">No</th>
+                    <th>Nama Checkpoint</th>
+                    <th>Jarak (Km)</th>
+                    <th>Kategori</th>
+                    <th>Water Station</th>
+                    <th>Pos Medis</th>
+                    <th>Deskripsi</th>
+                    <th style="width:120px; text-align:center;">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="routePointsTableBody">
+                  <tr><td colspan="8" style="text-align:center;padding:30px;color:var(--color-text-muted);">Memuat data checkpoint...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>

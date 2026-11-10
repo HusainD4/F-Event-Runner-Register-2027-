@@ -1,0 +1,117 @@
+<div class="admin-tab-pane" id="pane-admins" data-role="SUPERADMIN">
+          <!-- Sub-nav Tabs RBAC -->
+          <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
+            <button type="button" class="btn btn-primary btn-sm" id="btnRbacTabUsers" onclick="switchRbacSubTab('users')">
+              <i class="fa-solid fa-users-gear"></i> Daftar Akun Staf Admin
+            </button>
+            <button type="button" class="btn btn-outline btn-sm" id="btnRbacTabRoles" onclick="switchRbacSubTab('roles')">
+              <i class="fa-solid fa-key"></i> Pengaturan Hak Akses 12 Role
+            </button>
+            <button type="button" class="btn btn-outline btn-sm" id="btnRbacTabMatrix" onclick="switchRbacSubTab('matrix')">
+              <i class="fa-solid fa-table-list"></i> Direktori &amp; Arti 12 Role
+            </button>
+          </div>
+
+          <!-- SUB-SECTION 1: AKUN ADMIN -->
+          <div id="rbacSectionUsers" class="admin-section">
+            <div class="admin-section-header">
+              <div>
+                <h3><i class="fa-solid fa-shield-halved" style="color: var(--color-primary);"></i> Manajemen Akun Petugas Admin</h3>
+                <p>Kelola akun login staf operasional, divisi keuangan, dan staf lapangan.</p>
+              </div>
+              <button class="btn btn-primary btn-sm btn-glow" id="btnOpenCreateAdminModal" data-role="SUPERADMIN">
+                <i class="fa-solid fa-user-shield"></i> Tambah Akun Admin
+              </button>
+            </div>
+
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>No</th>
+                    <th>Nama Lengkap</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Role / Peran</th>
+                    <th>Status</th>
+                    <th>Tanggal Dibuat</th>
+                    <th>Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="adminUsersTableBody">
+                  <tr>
+                    <td colspan="8" style="text-align: center; padding: 30px; color: var(--color-text-muted);">
+                      Memuat daftar admin...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- SUB-SECTION 2: MANAJEMEN ROLE & HAK AKSES HALAMAN -->
+          <div id="rbacSectionRoles" class="admin-section" style="display: none;">
+            <div class="admin-section-header">
+              <div>
+                <h3><i class="fa-solid fa-key" style="color: var(--color-primary);"></i> Pengaturan Hak Akses Halaman Role</h3>
+                <p>Superadmin dapat menentukan secara fleksibel modul dan halaman apa saja yang boleh diakses oleh setiap role di database.</p>
+              </div>
+              <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <button type="button" class="btn btn-outline btn-sm" id="btnResetDefaultRoles" style="color: #64748B; border-color: #CBD5E1;">
+                  <i class="fa-solid fa-rotate-left"></i> Reset ke 12 Role Default
+                </button>
+                <button type="button" class="btn btn-primary btn-sm btn-glow" id="btnOpenCreateRoleModal">
+                  <i class="fa-solid fa-plus"></i> Tambah Role Baru
+                </button>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>No</th>
+                    <th>Nama Role</th>
+                    <th>Deskripsi Tanggung Jawab</th>
+                    <th>Halaman yang Diizinkan</th>
+                    <th>Jumlah Petugas</th>
+                    <th>Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="adminRolesTableBody">
+                  <tr>
+                    <td colspan="6" style="text-align: center; padding: 30px; color: var(--color-text-muted);">
+                      Memuat daftar role...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- SUB-SECTION 3: DIREKTORI & PENJELASAN ARTI 12 ROLE -->
+          <div id="rbacSectionMatrix" class="admin-section" style="display: none;">
+            <div class="admin-section-header">
+              <div>
+                <h3><i class="fa-solid fa-book-open-reader" style="color: var(--color-primary);"></i> Direktori &amp; Arti Tanggung Jawab 12 Role Resmi</h3>
+                <p>Panduan lengkap fungsi operasional dan pembagian wewenang halaman admin untuk setiap divisi kepanitiaan Tegal Run 2027.</p>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr style="background: #F8FAFC;">
+                    <th style="width: 170px;">Role / Peran</th>
+                    <th style="min-width: 250px;">Tugas &amp; Tanggung Jawab Operasional</th>
+                    <th style="min-width: 280px;">Akses Halaman yang Diberikan Superadmin</th>
+                    <th style="min-width: 140px;">Tingkat Otoritas</th>
+                  </tr>
+                </thead>
+                <tbody id="roleDirectoryTableBody">
+                  <!-- Rendered dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>

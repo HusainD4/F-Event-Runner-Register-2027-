@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Metode Pembayaran &amp; Status Pesanan - Tegal Run 2027</title>
+
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23FF6B00'><path d='M13.5 5.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM9.8 8.9L7 23h2.1l1.8-8 2.1 2v6h2v-7.5l-2.1-2 .6-3C14.8 12 16.8 13 19 13v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1L6 8.3V13h2V9.6l1.8-.7z'/></svg>">
+
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Midtrans Snap Sandbox JS SDK -->
+  <script type="text/javascript" src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="SB-Mid-client-hc3TYjTLt4VL13se4GMywi4H"></script>
+  <script type="module" crossorigin src="/assets/payment-BcXKqh7g.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-B5Qt9EMX.js">
+  <link rel="stylesheet" crossorigin href="/assets/payment-C1jmq_VS.css">
+  <link rel="stylesheet" crossorigin href="/assets/style-Dol5N27E.css">
+</head>
+<body class="td-page">
+
+  <div class="toast-container" id="paymentToastContainer"></div>
+
+  <!-- Header Navigation -->
+  <header class="td-header-bar">
+    <div class="container td-header-inner">
+      <a href="/" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 8px;">
+        <i class="fa-solid fa-arrow-left"></i> Kembali ke Beranda
+      </a>
+      <div class="brand" style="font-size: 1.1rem;">
+        <div class="brand-icon" style="width: 32px; height: 32px; font-size: 0.95rem;">
+          <i class="fa-solid fa-person-running"></i>
+        </div>
+        <div class="brand-text">TEGAL RUN <span>2027</span></div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container" style="padding: 40px 16px 80px 16px; max-width: 720px;">
+    <div id="paymentContentMount">
+      <div style="text-align: center; padding: 60px 20px; color: #64748B;">
+        <i class="fa-solid fa-spinner fa-spin" style="font-size: 2.5rem; color: var(--color-primary); margin-bottom: 16px;"></i>
+        <h3>Memuat Rincian Pembayaran...</h3>
+        <p>Menghubungkan ke gateway Midtrans...</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal Pembatalan Pesanan -->
+  <div class="cancel-dialog-backdrop" id="modalCancelBackdrop">
+    <div class="cancel-dialog">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+        <h4 style="margin: 0; color: #DC2626; font-size: 1.2rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+          <i class="fa-solid fa-triangle-exclamation"></i> Batalkan Pesanan Tiket
+        </h4>
+        <button type="button" class="admin-modal-close" id="btnCloseCancelModal"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div style="background: #FEF2F2; border: 1px solid #FECACA; border-radius: var(--radius-md); padding: 12px 16px; margin-bottom: 16px; font-size: 0.85rem; color: #991B1B;">
+        <i class="fa-solid fa-circle-exclamation"></i> <strong>Perhatian:</strong> Pembatalan mandiri <strong>HANYA</strong> dapat dilakukan untuk tiket yang berstatus <strong>BELUM DIBAYARKAN (PENDING)</strong>. Tiket yang sudah terbayar lunas tidak dapat dibatalkan mandiri dan wajib menghubungi panitia.
+      </div>
+
+      <form id="formCancelOrder">
+        <div class="form-group">
+          <label class="form-label">Pilih Alasan Pembatalan <span class="req">*</span></label>
+          <select class="form-input" id="cancelReasonSelect" required>
+            <option value="">-- Pilih Alasan --</option>
+            <option value="Salah memilih kategori jarak lomba">Salah memilih kategori jarak lomba (5K/10K)</option>
+            <option value="Ingin mengganti ukuran jersey / data peserta">Ingin mengganti ukuran jersey / data peserta</option>
+            <option value="Berhalangan hadir pada tanggal pelaksanaan">Berhalangan hadir pada tanggal pelaksanaan (28 Feb 2027)</option>
+            <option value="Kendala pada metode pembayaran">Kendala pada metode pembayaran</option>
+            <option value="Lainnya">Alasan lainnya</option>
+          </select>
+        </div>
+
+        <div class="form-group" id="groupCancelCustomReason" style="display: none;">
+          <label class="form-label">Tuliskan Alasan Anda <span class="req">*</span></label>
+          <textarea class="form-input" id="cancelCustomReason" rows="2" placeholder="Jelaskan alasan pembatalan Anda..."></textarea>
+        </div>
+
+        <div class="form-group" style="margin-top: 14px;">
+          <label style="display: flex; gap: 8px; font-size: 0.84rem; cursor: pointer; color: #475569; margin-bottom: 8px;">
+            <input type="checkbox" id="checkCancelConfirm1" required>
+            <span>Saya mengonfirmasi bahwa transaksi ini <strong>belum dibayarkan</strong> melalui Midtrans.</span>
+          </label>
+          <label style="display: flex; gap: 8px; font-size: 0.84rem; cursor: pointer; color: #475569;">
+            <input type="checkbox" id="checkCancelConfirm2" required>
+            <span>Saya memahami bahwa kuota tiket akan segera dilepaskan kembali ke publik setelah dibatalkan.</span>
+          </label>
+        </div>
+
+        <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+          <button type="button" class="btn btn-secondary btn-sm" id="btnDismissCancelModal">Batal</button>
+          <button type="submit" class="btn btn-sm btn-glow" style="background: #DC2626; color: #FFF; border-color: #DC2626;" id="btnSubmitCancelOrder">
+            <i class="fa-solid fa-ban"></i> Ya, Batalkan Pesanan
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</body>
+</html>
+

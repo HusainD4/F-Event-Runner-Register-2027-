@@ -1,0 +1,123 @@
+<!-- =========================================================================
+     TOP FLOATING GLASS NAVBAR (MINIMALIST & LEGA)
+     ========================================================================= -->
+<div class="top-navbar-container">
+  <style>
+    :root { --nav-bg: rgba(255, 255, 255, 0.75); --nav-border: rgba(226, 232, 240, 0.8); --nav-text: #334155; --nav-text-active: #FF6B00; --nav-hover-bg: rgba(255, 107, 0, 0.08); --shadow-glass: 0 10px 30px -10px rgba(15, 23, 42, 0.08), 0 4px 12px rgba(0, 0, 0, 0.03); --shadow-dropdown: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.04); --radius-nav: 99px; --radius-menu: 16px; }
+    .top-navbar-container { position: fixed; top: 16px; left: 0; right: 0; z-index: 1000; display: flex; justify-content: center; padding: 0 16px; pointer-events: none; }
+    .top-navbar { pointer-events: auto; width: 100%; max-width: 1080px; background: var(--nav-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid var(--nav-border); border-radius: var(--radius-nav); padding: 8px 14px 8px 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--shadow-glass); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    .nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: #0F172A; font-weight: 800; font-size: 0.95rem; letter-spacing: -0.2px; transition: transform 0.2s ease; }
+    .nav-brand:hover { transform: scale(1.02); }
+    .brand-icon { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, #FF6B00 0%, #FF852D 100%); color: #FFF; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; box-shadow: 0 4px 10px rgba(255, 107, 0, 0.3); }
+    .brand-text span { color: #FF6B00; }
+    .nav-links { display: flex; align-items: center; gap: 4px; list-style: none; margin: 0; padding: 0; }
+    .nav-links > li { position: relative; }
+    .nav-link { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 99px; font-size: 0.85rem; font-weight: 600; color: var(--nav-text); text-decoration: none; background: transparent; border: none; cursor: pointer; font-family: inherit; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
+    .nav-link:hover { color: var(--nav-text-active); background: var(--nav-hover-bg); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(255, 107, 0, 0.12); }
+    .nav-link:active { transform: translateY(0); }
+    .nav-link.active { color: var(--nav-text-active); background: rgba(255, 107, 0, 0.1); }
+    .nav-dropdown-toggle .chevron { font-size: 0.7rem; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); margin-left: 2px; }
+    .nav-dropdown:hover .nav-dropdown-toggle .chevron, .nav-dropdown.active .nav-dropdown-toggle .chevron { transform: rotate(180deg); }
+    .nav-dropdown-menu { position: absolute; top: calc(100% + 12px); left: 50%; transform: translateX(-50%) translateY(8px) scale(0.96); width: 240px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--nav-border); border-radius: var(--radius-menu); padding: 8px; box-shadow: var(--shadow-dropdown); opacity: 0; visibility: hidden; pointer-events: none; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
+    .nav-dropdown-menu::before { content: ''; position: absolute; top: -6px; left: 50%; transform: translateX(-50%) rotate(45deg); width: 10px; height: 10px; background: #FFF; border-left: 1px solid var(--nav-border); border-top: 1px solid var(--nav-border); }
+    .nav-dropdown:hover .nav-dropdown-menu, .nav-dropdown.active .nav-dropdown-menu { opacity: 1; visibility: visible; pointer-events: auto; transform: translateX(-50%) translateY(0) scale(1); }
+    .nav-dropdown-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 10px; text-decoration: none; color: #334155; transition: all 0.2s ease; }
+    .nav-dropdown-item i { font-size: 1rem; color: #FF6B00; width: 24px; height: 24px; border-radius: 6px; background: rgba(255, 107, 0, 0.08); display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; }
+    .nav-dropdown-item:hover { background: #F8FAFC; transform: translateX(4px); }
+    .nav-dropdown-item:hover i { background: #FF6B00; color: #FFF; transform: scale(1.08); }
+    .nav-dropdown-item strong { display: block; font-size: 0.825rem; color: #0F172A; font-weight: 700; }
+    .btn-glow { box-shadow: 0 4px 14px rgba(255, 107, 0, 0.35); transition: all 0.25s ease; }
+    .btn-glow:hover { box-shadow: 0 6px 20px rgba(255, 107, 0, 0.45); transform: translateY(-2px); }
+    .nav-mobile-toggle { display: none; background: transparent; border: none; font-size: 1.2rem; color: #0F172A; cursor: pointer; padding: 6px 10px; }
+    @media (max-width: 868px) {
+      .top-navbar-container { top: 10px; padding: 0 10px; }
+      .nav-mobile-toggle { display: block; }
+      .nav-links { position: absolute; top: calc(100% + 10px); left: 0; right: 0; background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--nav-border); border-radius: 20px; padding: 14px; flex-direction: column; align-items: stretch; gap: 6px; box-shadow: var(--shadow-dropdown); opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+      .nav-links.mobile-open { opacity: 1; visibility: visible; transform: translateY(0); }
+      .nav-link { width: 100%; justify-content: space-between; padding: 10px 16px; border-radius: 12px; }
+      .nav-dropdown-menu { position: static; transform: none !important; width: 100%; box-shadow: none; border: none; background: #F8FAFC; margin-top: 4px; display: none; opacity: 1; visibility: visible; pointer-events: auto; }
+      .nav-dropdown-menu::before { display: none; }
+      .nav-dropdown.active .nav-dropdown-menu { display: block; }
+    }
+  </style>
+
+  <nav class="top-navbar">
+    <a href="#beranda" class="nav-brand">
+      <div class="brand-icon"><i class="fa-solid fa-person-running"></i></div>
+      <div class="brand-text">TEGAL RUN <span>2027</span></div>
+    </a>
+
+    <ul class="nav-links" id="navMenu">
+      <li>
+        <a href="#kategori" class="nav-link">
+          <span><i class="fa-solid fa-ticket" style="font-size: 0.85rem; margin-right: 4px;"></i> Kategori Tiket</span>
+        </a>
+      </li>
+      <li>
+        <a href="/cek-tiket.html" class="nav-link">
+          <span><i class="fa-solid fa-magnifying-glass" style="font-size: 0.85rem; margin-right: 4px;"></i> Cek Tiket</span>
+        </a>
+      </li>
+      <li class="nav-dropdown">
+        <button type="button" class="nav-link nav-dropdown-toggle">
+          <span><i class="fa-solid fa-circle-info" style="font-size: 0.85rem; margin-right: 4px;"></i> Informasi Event</span>
+          <i class="fa-solid fa-chevron-down chevron"></i>
+        </button>
+        <div class="nav-dropdown-menu">
+          <a href="#rute" class="nav-dropdown-item">
+            <i class="fa-solid fa-route"></i>
+            <div><strong>Rute &amp; Google Maps</strong><small style="display: block; color: #94A3B8; font-size: 0.72rem;">Jalur lomba &amp; titik flag-off</small></div>
+          </a>
+          <a href="#fasilitas" class="nav-dropdown-item">
+            <i class="fa-solid fa-gift"></i>
+            <div><strong>Fasilitas &amp; Race Pack</strong><small style="display: block; color: #94A3B8; font-size: 0.72rem;">Jersey, medali &amp; asuransi</small></div>
+          </a>
+        </div>
+      </li>
+      <li class="nav-dropdown">
+        <button type="button" class="nav-link nav-dropdown-toggle">
+          <span><i class="fa-solid fa-hand-holding-hand" style="font-size: 0.85rem; margin-right: 4px;"></i> Bantuan &amp; Legal</span>
+          <i class="fa-solid fa-chevron-down chevron"></i>
+        </button>
+        <div class="nav-dropdown-menu">
+          <a href="#faq" class="nav-dropdown-item">
+            <i class="fa-solid fa-circle-question"></i>
+            <div><strong>Tanya Jawab (FAQ)</strong><small style="display: block; color: #94A3B8; font-size: 0.72rem;">Seputar race pack &amp; aturan</small></div>
+          </a>
+          <a href="#legal" class="nav-dropdown-item">
+            <i class="fa-solid fa-shield-halved"></i>
+            <div><strong>Privasi Data (UU PDP)</strong><small style="display: block; color: #94A3B8; font-size: 0.72rem;">Keamanan data pribadi pelari</small></div>
+          </a>
+        </div>
+      </li>
+    </ul>
+
+    <div class="nav-actions" style="display: flex; align-items: center; gap: 8px;">
+      <button class="btn btn-primary btn-sm btn-glow" id="navDaftarBtn"><i class="fa-solid fa-bolt"></i> Daftar Tiket</button>
+      <button type="button" class="nav-mobile-toggle" id="navMobileToggle" aria-label="Toggle Menu"><i class="fa-solid fa-bars"></i></button>
+    </div>
+  </nav>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const mobileToggle = document.getElementById('navMobileToggle'), navMenu = document.getElementById('navMenu'), dropdowns = document.querySelectorAll('.nav-dropdown');
+      if (mobileToggle && navMenu) {
+        mobileToggle.addEventListener('click', (e) => {
+          e.stopPropagation(); navMenu.classList.toggle('mobile-open');
+          mobileToggle.querySelector('i').className = navMenu.classList.contains('mobile-open') ? 'fa-solid fa-xmark' : 'fa-solid fa-bars';
+        });
+      }
+      dropdowns.forEach(dropdown => {
+        dropdown.querySelector('.nav-dropdown-toggle').addEventListener('click', (e) => {
+          e.stopPropagation(); dropdowns.forEach(other => { if (other !== dropdown) other.classList.remove('active'); });
+          dropdown.classList.toggle('active');
+        });
+      });
+      document.addEventListener('click', () => {
+        if (navMenu) navMenu.classList.remove('mobile-open');
+        dropdowns.forEach(dropdown => dropdown.classList.remove('active'));
+        if (mobileToggle) mobileToggle.querySelector('i').className = 'fa-solid fa-bars';
+      });
+    });
+  </script>
+</div>
