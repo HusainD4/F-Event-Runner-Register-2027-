@@ -1,6 +1,7 @@
-const API_BASE_URL = typeof window !== 'undefined' && window.location.port === '5173'
-  ? '/api'
-  : 'http://localhost:3000/api';
+const isLocalFrontend = typeof window !== 'undefined'
+  && ['localhost', '127.0.0.1'].includes(window.location.hostname)
+  && ['3000', '4173', '5173', '5174', '5175'].includes(window.location.port);
+const API_BASE_URL = isLocalFrontend ? '/api' : 'https://api.haisen.my.id/api';
 
 function showToast(type = 'success', message = '') {
   const container = document.getElementById('ticketToastContainer');
@@ -142,13 +143,24 @@ function renderTicketData(event, feeSettings = {}) {
 
   // Ticket Cover Image
   const coverImg = document.getElementById('tdTicketCoverImg');
+  const cover = document.getElementById('tdTicketCover');
   if (coverImg) {
-    if (event.ticketImage) {
-      coverImg.src = event.ticketImage;
+    const coverUrl = event.ticketImage || event.medalImage;
+    if (coverUrl) {
+      coverImg.onerror = () => {
+        coverImg.hidden = true;
+        if (cover) cover.classList.add('td-ticket-cover-empty');
+      };
+      coverImg.onload = () => {
+        coverImg.hidden = false;
+        if (cover) cover.classList.remove('td-ticket-cover-empty');
+      };
+      coverImg.src = coverUrl;
       coverImg.style.display = 'block';
     } else {
       coverImg.style.display = 'none';
-      if (coverImg.parentElement) coverImg.parentElement.style.height = '140px';
+      coverImg.hidden = true;
+      if (cover) cover.classList.add('td-ticket-cover-empty');
     }
   }
 
@@ -350,4 +362,3 @@ document.addEventListener('DOMContentLoaded', () => {
     showToast('success', 'Tautan tiket berhasil disalin ke papan klip!');
   });
 });
-

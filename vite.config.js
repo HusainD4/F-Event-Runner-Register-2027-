@@ -17,6 +17,14 @@ export default defineConfig({
   },
   server: {
     port: 5173,
+    allowedHosts: [
+      'api.haisen.my.id',
+      'haisen.my.id',
+      'www.haisen.my.id',
+      'pendaftaran-running.haisen.my.id',
+      'tegalrun2027.com',
+      'www.tegalrun2027.com'
+    ],
     proxy: {
       '/api': {
         target: 'http://localhost:3000',
@@ -25,4 +33,3 @@ export default defineConfig({
     }
   }
 });
-

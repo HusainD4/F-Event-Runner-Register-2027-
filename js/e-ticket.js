@@ -1,6 +1,7 @@
-const API_BASE_URL = typeof window !== 'undefined' && (window.location.port === '5173' || window.location.port === '3000' || !window.location.port)
-  ? '/api'
-  : `${window.location.protocol}//${window.location.hostname}:3000/api`;
+const isLocalFrontend = typeof window !== 'undefined'
+  && ['localhost', '127.0.0.1'].includes(window.location.hostname)
+  && ['3000', '4173', '5173', '5174', '5175'].includes(window.location.port);
+const API_BASE_URL = isLocalFrontend ? '/api' : 'https://api.haisen.my.id/api';
 
 function escapeHtml(str) {
   if (!str) return '';

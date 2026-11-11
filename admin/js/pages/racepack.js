@@ -201,8 +201,17 @@ export function renderRacepackDetails(data) {
   } else {
     if (alreadyBox) alreadyBox.style.display = 'none';
     if (confirmBtn) {
-      confirmBtn.innerHTML = '<i class="fa-solid fa-box-check" style="font-size: 1.25rem;"></i> Konfirmasi & Serahkan Racepack Sekarang';
-      confirmBtn.className = 'btn btn-primary btn-glow';
+      if (rpc?.queued) {
+        confirmBtn.innerHTML = '<i class="fa-solid fa-check"></i> Data Sudah Dikirim ke Antrean';
+        confirmBtn.className = 'btn btn-secondary btn-sm';
+        confirmBtn.disabled = true;
+        confirmBtn.style.opacity = '0.7';
+        confirmBtn.style.cursor = 'not-allowed';
+      } else {
+        confirmBtn.innerHTML = '<i class="fa-solid fa-paper-plane" style="font-size: 1.1rem;"></i> Kirim Data ke Live View Antrean';
+        confirmBtn.className = 'btn btn-primary btn-glow';
+        confirmBtn.disabled = !isPaid;
+      }
     }
   }
 }
@@ -282,10 +291,10 @@ function renderMasterRacepackView(data, mountEl) {
         </div>
       ` : `
         <button type="button" class="btn btn-primary btn-glow" id="btnBatchCheckinAll" style="width: 100%; padding: 14px; font-size: 1rem; font-weight: 800;" ${!isPaid ? 'disabled style="opacity: 0.5;"' : ''}>
-          <i class="fa-solid fa-box-open" style="font-size: 1.2rem;"></i> Check-in Seluruh ${participants.length} Peserta Sekaligus
+          <i class="fa-solid fa-paper-plane" style="font-size: 1.2rem;"></i> Kirim Peserta Belum Diambil ke Antrean
         </button>
         <span style="font-size: 0.75rem; color: #64748B; margin-top: 8px; display: block;">
-          Semua nomor BIB yang belum terbit akan otomatis digenerate dan dicatat oleh sistem.
+          Konfirmasi serah terima setiap peserta dilakukan pada halaman Live View Antrean Racepack.
         </span>
       `}
     </div>
@@ -314,41 +323,35 @@ function renderMasterRacepackView(data, mountEl) {
 }
 
 /**
- * Eksekusi Batch Check-in Seluruh Peserta dalam 1 Pesanan
+ * Kirim peserta dalam QR Master ke antrean konfirmasi.
  */
 async function handleBatchRacepackCheckin(data) {
   const participants = data.participants || [];
-  const order = data.order;
-  const orderRef = order.midtransOrderId || order.id;
+  const pendingParticipants = participants.filter(pt => !pt.racepack?.checkedIn);
 
   const btn = document.getElementById('btnBatchCheckinAll');
   const origHtml = btn ? btn.innerHTML : '';
   if (btn) {
     btn.disabled = true;
-    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Memproses Check-in Massal...';
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Mengirim peserta ke antrean...';
   }
 
   try {
-    const res = await fetchAdmin('/admin/racepack/batch-checkin', {
-      method: 'POST',
-      body: JSON.stringify({
-        orderId: orderRef,
-        participantIds: participants.map(p => p.id),
-        notes: `Check-in massal QR Master oleh petugas`,
-      }),
-    });
-
-    if (res && res.status === 'success') {
-      showAdminToast('success', 'Check-in Massal Berhasil!', res.message);
-      // Reload verification via orderRef
-      verifyRacepackByCode(orderRef);
-      loadRacepackStats();
-      loadParticipants();
-    } else {
-      showAdminToast('error', 'Gagal', res?.message || 'Terjadi kesalahan');
+    let queuedCount = 0;
+    for (const participant of pendingParticipants) {
+      const res = await fetchAdmin('/admin/racepack/queue', {
+        method: 'POST',
+        body: JSON.stringify({ participantId: participant.id }),
+      });
+      if (!res || res.status !== 'success') {
+        throw new Error(`${res?.message || 'Gagal mengirim peserta ke antrean.'} (${queuedCount} peserta sudah terkirim)`);
+      }
+      queuedCount += 1;
     }
+    showAdminToast('success', 'Peserta Dikirim ke Antrean', `${queuedCount} peserta dikirim ke Live View Antrean Racepack.`);
+    verifyRacepackByCode(data.order.midtransOrderId || data.order.id);
   } catch (err) {
-    showAdminToast('error', 'Kesalahan', err.message);
+    showAdminToast('error', 'Pengiriman Antrean Gagal', err.message);
   } finally {
     if (btn) {
       btn.disabled = false;
@@ -371,41 +374,30 @@ export async function handleConfirmRacepackCheckin() {
     return;
   }
 
-  const items = [];
-  if (document.getElementById('chkItemBib')?.checked) items.push(`Nomor BIB (${p.bibNumber || '-'})`);
-  if (document.getElementById('chkItemJersey')?.checked) items.push(`Jersey Resmi (${p.selectedSize || 'M'})`);
-  if (document.getElementById('chkItemChip')?.checked) items.push('Timing Chip PASI');
-  if (document.getElementById('chkItemBag')?.checked) items.push('Drawstring Bag & Panduan');
-  if (document.getElementById('chkItemRefreshment')?.checked) items.push('Refreshment & Sponsor');
-
   const btn = document.getElementById('btnConfirmRpcCheckin');
   const origHtml = btn ? btn.innerHTML : '';
   if (btn) {
     btn.disabled = true;
-    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan Check-in...';
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Mengirim ke antrean...';
   }
 
   try {
-    const res = await fetchAdmin('/admin/racepack/checkin', {
+    const res = await fetchAdmin('/admin/racepack/queue', {
       method: 'POST',
       body: JSON.stringify({
         participantId: p.id,
-        items,
-        notes: `Check-in di meja RPC oleh petugas resmi`
       })
     });
 
     if (res && res.status === 'success') {
-      showAdminToast('success', 'Berhasil Diserahkan!', `Racepack peserta ${p.fullNameKtp} berhasil diserahterimakan.`);
-      currentRacepackData.racepack = res.data;
+      showAdminToast('success', 'Dikirim ke Antrean', `Data peserta ${p.fullNameKtp} dikirim. Konfirmasi serah terima di Live View Antrean.`);
+      currentRacepackData.racepack = { ...currentRacepackData.racepack, queued: true };
       renderRacepackDetails(currentRacepackData);
-      loadRacepackStats();
-      loadParticipants();
     } else {
-      showAdminToast('error', 'Gagal Check-in', res?.message || 'Terjadi kesalahan');
+      showAdminToast('error', 'Gagal Mengirim', res?.message || 'Terjadi kesalahan');
     }
   } catch (err) {
-    showAdminToast('error', 'Kesalahan', err.message);
+    showAdminToast('error', 'Kesalahan Pengiriman', err.message);
   } finally {
     if (btn) {
       btn.disabled = false;

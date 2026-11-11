@@ -3450,3 +3450,153 @@ h1, h2, h3, h4, h5, h6 {
     font-size: 0.6rem;
   }
 }
+
+.hero-split-grid > *,
+.countdown-box,
+.stats-banner,
+.ticket-card-banner,
+.route-visual-card {
+  min-width: 0;
+}
+
+.hero-col-content .countdown-box {
+  display: block;
+  margin-top: 4px;
+}
+
+.countdown-header {
+  row-gap: 10px;
+}
+
+.countdown-title-wrap,
+.event-date-pill {
+  max-width: 100%;
+}
+
+.countdown-grid {
+  gap: 12px;
+}
+
+.countdown-card {
+  min-width: 0;
+  padding: 14px 6px;
+}
+
+.stats-banner {
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 14px;
+}
+
+.stats-banner .stat-item {
+  min-width: 0;
+  padding: 12px 8px;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+}
+
+.stats-banner .stat-num {
+  overflow-wrap: anywhere;
+}
+
+.ticket-card-banner {
+  height: 190px;
+}
+
+.ticket-pass-card .ticket-card-banner {
+  height: 180px;
+}
+
+.ticket-pass-card {
+  padding: 0 !important;
+}
+
+.ticket-card-banner img {
+  object-position: center center !important;
+}
+
+.ticket-card-banner img[hidden],
+.td-ticket-cover img[hidden] {
+  display: none !important;
+}
+
+.ticket-card-banner-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFFFFF;
+  background: linear-gradient(135deg, #0F172A, #334155);
+  font-size: 2rem;
+}
+
+.facilities-media,
+.tickets-cms-media {
+  display: block;
+  width: min(100%, 760px);
+  max-height: 340px;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 16px;
+  margin: 20px auto;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.1);
+}
+
+.facilities-media[hidden],
+.tickets-cms-media[hidden],
+.section-title[hidden],
+.section-desc[hidden],
+.route-spec-item[hidden],
+#routeSpecsGrid[hidden],
+#btnDownloadGpx[hidden],
+#legalGridContainer[hidden],
+#statsBanner[hidden] {
+  display: none !important;
+}
+
+.route-visual-card .gmaps-responsive-wrapper {
+  min-height: 380px;
+}
+
+.route-visual-card .gmaps-responsive-wrapper iframe {
+  min-height: 380px;
+}
+
+.route-map-image {
+  display: block;
+  width: 100%;
+  min-height: 300px;
+  max-height: 420px;
+  object-fit: cover;
+  border-radius: 16px;
+}
+
+.route-map-empty {
+  min-height: 280px;
+  display: grid;
+  place-items: center;
+  color: #64748B;
+}
+
+@media (max-width: 600px) {
+  .countdown-grid {
+    gap: 7px;
+  }
+
+  .countdown-card {
+    padding: 12px 3px;
+  }
+
+  .stats-banner {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+    padding: 12px;
+  }
+
+  .ticket-pass-card .ticket-card-banner {
+    height: 165px;
+  }
+
+  .facilities-media,
+  .tickets-cms-media {
+    max-height: 240px;
+  }
+}

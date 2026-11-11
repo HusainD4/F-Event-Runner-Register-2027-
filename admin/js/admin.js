@@ -7,6 +7,7 @@ import dashboardPane from '../pages/dashboard.html?raw';
 import eventsPane from '../pages/events.html?raw';
 import participantsPane from '../pages/participants.html?raw';
 import racepackPane from '../pages/racepack.html?raw';
+import racepackViewPane from '../pages/racepack-view.html?raw';
 import ordersPane from '../pages/orders.html?raw';
 import countdownPane from '../pages/countdown.html?raw';
 import bibSettingsPane from '../pages/bib-settings.html?raw';
@@ -28,6 +29,7 @@ import { openMobileSidebar, closeMobileSidebar, switchAdminTab } from './core/si
 import { loadEvents, openCreateEventModal, handleEventFormSubmit, resetBenefitForm, handleBenefitFormSubmit } from './pages/events.js';
 import { loadParticipants, renderParticipantsTable, openCreateParticipantModal, handleParticipantFormSubmit, exportParticipantsCsv, switchParticipantFilterTab, applyParticipantFilters } from './pages/participants.js';
 import { loadRacepackStats, startRpcCamera, stopRpcCamera, handleConfirmRacepackCheckin, handleRevertRacepackCheckin, verifyRacepackByCode } from './pages/racepack.js';
+import { loadRacepackQueue } from './pages/racepack-view.js';
 import { loadOrders, handleOrderStatusSubmit } from './pages/orders.js';
 import { handleSaveGlobalCountdown, handleResetGlobalCountdown, handleToggleGlobalClosed } from './pages/countdown.js';
 import { initBibSettingsListeners } from './pages/bib-settings.js';
@@ -54,6 +56,7 @@ function mountModularContent() {
       eventsPane,
       participantsPane,
       racepackPane,
+      racepackViewPane,
       ordersPane,
       countdownPane,
       bibSettingsPane,
@@ -194,6 +197,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btnStartRpcCamera')?.addEventListener('click', startRpcCamera);
   document.getElementById('btnStopRpcCamera')?.addEventListener('click', stopRpcCamera);
   document.getElementById('btnConfirmRpcCheckin')?.addEventListener('click', handleConfirmRacepackCheckin);
+  document.getElementById('btnRefreshRacepackQueue')?.addEventListener('click', loadRacepackQueue);
   document.getElementById('btnRevertRpcCheckin')?.addEventListener('click', handleRevertRacepackCheckin);
   document.getElementById('formRpcManualSearch')?.addEventListener('submit', (e) => {
     e.preventDefault();

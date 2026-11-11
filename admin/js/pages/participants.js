@@ -156,11 +156,15 @@ function renderParticipantsTable(participants) {
     const isPaid = p.order?.status === 'SETTLEMENT' || p.order?.status === 'CAPTURE' || p.order?.status === 'PAID';
     const isCancel = p.order?.status === 'CANCEL' || p.order?.status === 'EXPIRE' || p.order?.status === 'DENY' || p.order?.status === 'REFUND';
     const statusPillClass = isPaid ? 'success' : (isCancel ? 'danger' : 'pending');
+    const paymentStatusLabel = p.order?.status === 'EXPIRE' ? 'EXPIRE (expired time)' : (p.order?.status || 'PENDING');
 
     // Status Racepack Badge
     const isRpcDone = p.racepack && p.racepack.checkedIn;
+    const rpcActor = isRpcDone
+      ? `<small style="display:block; margin-top:4px; color:#475569;">Diserahkan oleh: <strong>${escapeHtml(p.racepack.checkedInBy || 'Admin')}</strong><br>${escapeHtml(p.racepack.checkedInAt ? new Date(p.racepack.checkedInAt).toLocaleString('id-ID') : '-')}</small>`
+      : '';
     const rpcBadge = isRpcDone
-      ? `<span class="badge" style="background:#DCFCE7; color:#15803D; font-weight:800; font-size:0.75rem; border:1px solid #BBF7D0; display:inline-flex; align-items:center; gap:4px;" title="Diserahkan: ${p.racepack.checkedInAt || '-'} WIB"><i class="fa-solid fa-circle-check"></i> Sudah Check-in</span>`
+      ? `<span class="badge" style="background:#DCFCE7; color:#15803D; font-weight:800; font-size:0.75rem; border:1px solid #BBF7D0; display:inline-flex; align-items:center; gap:4px;"><i class="fa-solid fa-circle-check"></i> Sudah Check-in</span>${rpcActor}`
       : `<span class="badge" style="background:#FFEDD5; color:#C2410C; font-weight:700; font-size:0.75rem; border:1px solid #FED7AA; display:inline-flex; align-items:center; gap:4px;"><i class="fa-solid fa-box-open"></i> Belum Check-in</span>`;
 
     const bibDisplay = p.bibNumber 
@@ -198,7 +202,7 @@ function renderParticipantsTable(participants) {
         </td>
         <td>
           <span class="status-pill ${statusPillClass}">
-            ${p.order?.status || 'PENDING'}
+            ${escapeHtml(paymentStatusLabel)}
           </span>
         </td>
         <td>

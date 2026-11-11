@@ -40,6 +40,7 @@
                 <label class="form-label">Subjudul Hero / Deskripsi Singkat</label>
                 <textarea class="form-input" id="cmsHeroSubtitle" rows="2" placeholder="Kompetisi lari terbesar di Kota Bahari dengan standar race profesional..."></textarea>
               </div>
+              <label class="form-label"><input type="checkbox" id="cmsShowHero" checked> Tampilkan section Hero di website</label>
             </div>
 
             <!-- 1.5. Live Event Stats Grid (Bebas Tambah & Bisa Otomatis dari Data) -->
@@ -58,6 +59,7 @@
               <div id="cmsStatsItemsContainer" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px;">
                 <!-- Di-render oleh cms.js -->
               </div>
+              <label class="form-label" style="margin-top: 14px;"><input type="checkbox" id="cmsShowStats" checked> Tampilkan banner statistik</label>
             </div>
 
             <!-- 2. Rute Lari & Google Maps Embed -->
@@ -95,36 +97,11 @@
                 </div>
               </div>
 
-              <!-- Route Specifications (Start Time & COT) -->
-              <div style="margin-top: 16px; padding: 16px; background: rgba(15, 23, 42, 0.4); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px;">
-                <div style="font-weight: 700; margin-bottom: 12px; color: var(--color-primary); font-size: 0.95rem;">
-                  <i class="fa-solid fa-stopwatch"></i> Spesifikasi Waktu Flag-Off & Cut Off Time (COT)
-                </div>
-                <div class="form-row">
-                  <div class="form-group">
-                    <label class="form-label">Flag-Off 10K (Waktu Mulai)</label>
-                    <input type="text" class="form-input" id="cmsRouteStart10k" placeholder="05:45 WIB">
-                  </div>
-                  <div class="form-group">
-                    <label class="form-label">Cut Off Time (COT) 10K</label>
-                    <input type="text" class="form-input" id="cmsRouteCot10k" placeholder="2 Jam 30 Menit">
-                  </div>
-                </div>
-                <div class="form-row">
-                  <div class="form-group">
-                    <label class="form-label">Flag-Off 5K (Waktu Mulai)</label>
-                    <input type="text" class="form-input" id="cmsRouteStart5k" placeholder="06:15 WIB">
-                  </div>
-                  <div class="form-group">
-                    <label class="form-label">Cut Off Time (COT) 5K</label>
-                    <input type="text" class="form-input" id="cmsRouteCot5k" placeholder="1 Jam 30 Menit">
-                  </div>
-                </div>
-                <div class="form-group" style="margin-bottom: 0;">
-                  <label class="form-label">Link Unduh File GPX Rute Resmi</label>
-                  <input type="text" class="form-input" id="cmsRouteGpxUrl" placeholder="https://... atau /assets/rute-tegal-run.gpx">
-                </div>
+              <div class="form-group">
+                <label class="form-label">Link Unduh File GPX Rute Resmi</label>
+                <input type="text" class="form-input" id="cmsRouteGpxUrl" placeholder="https://... atau /assets/rute-tegal-run.gpx">
               </div>
+              <label class="form-label"><input type="checkbox" id="cmsShowRoute" checked> Tampilkan section rute</label>
             </div>
 
             <!-- 3. Fasilitas, Kategori & Gambar Media -->
@@ -161,6 +138,7 @@
                 <div id="cmsFacilitiesItemsContainer" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px;">
                   <!-- Di-render oleh cms.js -->
                 </div>
+                <label class="form-label"><input type="checkbox" id="cmsShowFacilities" checked> Tampilkan section fasilitas</label>
               </div>
 
               <div class="form-row">
@@ -178,6 +156,7 @@
                 <label class="form-label">Deskripsi Section Tiket</label>
                 <textarea class="form-input" id="cmsTicketsDesc" rows="2" placeholder="Tersedia kategori kompetitif bagi atlet dan fun run santai..."></textarea>
               </div>
+              <label class="form-label"><input type="checkbox" id="cmsShowTickets" checked> Tampilkan section kategori tiket</label>
             </div>
 
             <!-- 3.5. Perizinan & Kepatuhan Hukum (Legal) -->
@@ -208,6 +187,7 @@
                 <div id="cmsLegalItemsContainer" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px;">
                   <!-- Di-render oleh cms.js -->
                 </div>
+                <label class="form-label" style="margin-top: 14px;"><input type="checkbox" id="cmsShowLegal" checked> Tampilkan section perizinan &amp; kepatuhan</label>
               </div>
             </div>
 
@@ -240,6 +220,7 @@
                 <label class="form-label">Teks Hak Cipta Footer</label>
                 <input type="text" class="form-input" id="cmsFooterCopyright" placeholder="Hak Cipta Terpelihara © 2027 Panitia Resmi Tegal Run.">
               </div>
+              <label class="form-label"><input type="checkbox" id="cmsShowFooter" checked> Tampilkan footer website</label>
 
               <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--color-border-subtle);">
                 <a href="/" target="_blank" class="btn btn-secondary btn-sm">

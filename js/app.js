@@ -48,6 +48,11 @@ const state = {
   isGlobalClosed: false,
   countdownTarget: null,
   countdownInterval: null,
+  countdownSettingsLoaded: false,
+  cmsStatsItems: null,
+  cmsVisibility: {},
+  cmsRouteMapUrl: '',
+  cmsRouteMapImage: '',
   feeSettings: {
     feeEnabled: false,
     feeType: 'PER_TRANSACTION',
@@ -152,7 +157,7 @@ function initCountdown(targetTimestamp = null) {
   const mEl = document.getElementById('minutes');
   const sEl = document.getElementById('seconds');
 
-  if (!state.countdownTarget) {
+  if (!state.countdownTarget || !Number.isFinite(Number(state.countdownTarget))) {
     if (dEl) dEl.textContent = '--';
     if (hEl) hEl.textContent = '--';
     if (mEl) mEl.textContent = '--';
@@ -200,6 +205,7 @@ async function loadCountdownSettings() {
   const displayEl = document.getElementById('eventDateDisplay');
   try {
     const settings = await apiClient.getCountdownSettings();
+    state.countdownSettingsLoaded = Boolean(settings);
     if (settings && settings.eventCountdownDate) {
       const d = new Date(settings.eventCountdownDate);
       if (!isNaN(d.getTime())) {
@@ -215,19 +221,13 @@ async function loadCountdownSettings() {
           displayEl.textContent = `${dateStr.toUpperCase()} • ${timeStr} WIB`;
           displayEl.classList.remove('badge-pending-date');
         }
-      } else {
-        initCountdown(null);
-        if (displayEl) {
-          displayEl.textContent = 'TANGGAL BELUM DITENTUKAN';
-          displayEl.classList.add('badge-pending-date');
-        }
-      }
-    } else {
-      initCountdown(null);
-      if (displayEl) {
+      } else if (displayEl) {
         displayEl.textContent = 'TANGGAL BELUM DITENTUKAN';
         displayEl.classList.add('badge-pending-date');
       }
+    } else if (displayEl) {
+      displayEl.textContent = 'TANGGAL BELUM DITENTUKAN';
+      displayEl.classList.add('badge-pending-date');
     }
 
     if (settings && settings.isRegistrationClosed) {
@@ -259,7 +259,6 @@ async function loadCountdownSettings() {
     }
   } catch (err) {
     console.warn('Gagal memuat pengaturan countdown dari backend:', err);
-    initCountdown(null);
     if (displayEl) {
       displayEl.textContent = 'TANGGAL BELUM DITENTUKAN';
       displayEl.classList.add('badge-pending-date');
@@ -274,6 +273,15 @@ async function loadEvents() {
     const events = await apiClient.getEvents();
     state.events = events;
     renderTickets(events);
+    renderStatsBanner(state.cmsStatsItems);
+
+    if (!state.countdownTarget && !state.countdownSettingsLoaded && Array.isArray(events)) {
+      const eventDates = events
+        .map(event => new Date(event.eventDate).getTime())
+        .filter(timestamp => Number.isFinite(timestamp) && timestamp > Date.now())
+        .sort((a, b) => a - b);
+      if (eventDates.length > 0) initCountdown(eventDates[0]);
+    }
 
     // Ambil konfigurasi batas waktu pembayaran & biaya layanan
     try {
@@ -343,15 +351,18 @@ function renderTickets(events) {
         `).join('')
       : `<li class="benefit-item" style="color: var(--color-text-muted); font-style: italic;">Belum ada benefit tercantum</li>`;
 
-    const bannerHtml = ev.ticketImage ? `
-      <div class="ticket-card-banner">
-        <img src="${escapeHtml(ev.ticketImage)}" alt="${escapeHtml(ev.ticketName)}" loading="lazy">
+    const ticketImage = ev.ticketImage || ev.medalImage;
+    const bannerHtml = `
+      <div class="ticket-card-banner${ticketImage ? '' : ' ticket-card-banner-empty'}">
+        ${ticketImage
+          ? `<img src="${escapeHtml(ticketImage)}" alt="${escapeHtml(ev.ticketName)}" loading="lazy" onerror="this.hidden=true;this.parentElement.classList.add('ticket-card-banner-empty')">`
+          : '<i class="fa-solid fa-person-running" aria-hidden="true"></i>'}
         <div class="ticket-card-banner-overlay">
           <span class="ticket-banner-badge"><i class="fa-solid fa-person-running"></i> ${escapeHtml(ev.category)} Marathon</span>
           ${ev.medalImage ? `<span class="ticket-banner-medal-badge"><i class="fa-solid fa-medal"></i> Medali Finisher</span>` : ''}
         </div>
       </div>
-    ` : '';
+    `;
 
     card.innerHTML = `
       <!-- E-Tiket Stub Header -->
@@ -1193,10 +1204,138 @@ function closeModal(modalId) {
 // =============================================================================
 // 7. LOAD DYNAMIC CMS WEBSITE SETTINGS, MAPS & MEDIA GAMBAR
 // =============================================================================
+function renderStatsBanner(items) {
+  const banner = document.getElementById('statsBanner');
+  if (!banner || !Array.isArray(items)) return;
+  items = items.filter(item => item && typeof item === 'object' && item.visible !== false);
+
+  banner.replaceChildren();
+  banner.hidden = items.length === 0 || state.cmsVisibility.stats === false;
+
+  const events = Array.isArray(state.events) ? state.events : [];
+  const totals = events.reduce((result, event) => {
+    result.participants += Number(event.registeredCount || 0);
+    result.capacity += Number(event.stock || 0);
+    result.available += Number(event.remainingStock ?? Math.max(0, Number(event.stock || 0) - Number(event.registeredCount || 0)));
+    return result;
+  }, { participants: 0, capacity: 0, available: 0 });
+
+  const autoValues = {
+    TOTAL_PARTICIPANTS: totals.participants,
+    TOTAL_CATEGORIES: events.length,
+    TOTAL_CAPACITY: totals.capacity,
+    AVAILABLE_SLOTS: totals.available
+  };
+
+  items.forEach((item, index) => {
+    const isAuto = item.type === 'AUTO' && Object.hasOwn(autoValues, item.autoKey);
+    const rawValue = isAuto ? autoValues[item.autoKey] : item.val;
+    const value = isAuto ? Number(rawValue || 0).toLocaleString('id-ID') : rawValue;
+    const card = document.createElement('div');
+    card.className = 'stat-item';
+    const number = document.createElement('div');
+    number.className = 'stat-num';
+    if (index < 4) number.id = `statVal${index + 1}`;
+
+    const valueEl = document.createElement('span');
+    valueEl.textContent = value === undefined || value === null ? '' : String(value);
+    const unitEl = document.createElement('small');
+    unitEl.textContent = item.unit || '';
+    if (index < 4) unitEl.id = `statUnit${index + 1}`;
+    number.append(valueEl, document.createTextNode(' '), unitEl);
+
+    const descEl = document.createElement('div');
+    descEl.className = 'stat-desc';
+    descEl.textContent = item.desc || '';
+    if (index < 4) descEl.id = `statDesc${index + 1}`;
+    card.append(number, descEl);
+    banner.append(card);
+  });
+}
+
+function renderRouteVisual(mapUrl, mapImage) {
+  const visualCard = document.querySelector('#rute .route-visual-card');
+  if (!visualCard) return;
+
+  const source = String(mapUrl || '').trim();
+  let embedUrl = '';
+  if (source) {
+    const srcMatch = source.match(/src=["']([^"']+)["']/i);
+    const candidate = srcMatch?.[1] || source;
+    try {
+      const parsed = new URL(candidate);
+      const host = parsed.hostname.toLowerCase();
+      const allowedHost = host === 'google.com' || host.endsWith('.google.com') ||
+        host === 'maps.app.goo.gl' || host === 'goo.gl';
+      if (parsed.protocol === 'https:' && allowedHost) {
+        embedUrl = host.endsWith('google.com') && parsed.pathname.startsWith('/maps/embed')
+          ? parsed.href
+          : `https://www.google.com/maps?q=${encodeURIComponent(candidate)}&output=embed`;
+      }
+    } catch (error) {
+      console.warn('Link Google Maps CMS tidak valid:', error);
+    }
+  }
+
+  visualCard.replaceChildren();
+  const badge = document.createElement('div');
+  badge.className = 'route-badge-float';
+  badge.innerHTML = '<i class="fa-solid fa-location-dot"></i> Rute & Lokasi Google Maps';
+  visualCard.append(badge);
+
+  if (embedUrl) {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'gmaps-responsive-wrapper';
+    const iframe = document.createElement('iframe');
+    iframe.src = embedUrl;
+    iframe.title = 'Peta rute lari';
+    iframe.allowFullscreen = true;
+    iframe.loading = 'lazy';
+    iframe.referrerPolicy = 'no-referrer-when-downgrade';
+    wrapper.append(iframe);
+    visualCard.append(wrapper);
+  } else if (mapImage) {
+    const image = document.createElement('img');
+    image.className = 'route-map-image';
+    image.src = mapImage;
+    image.alt = 'Gambar peta rute lari';
+    image.loading = 'lazy';
+    visualCard.append(image);
+  } else {
+    const emptyState = document.createElement('p');
+    emptyState.className = 'route-map-empty';
+    emptyState.textContent = 'Peta rute belum tersedia.';
+    visualCard.append(emptyState);
+  }
+}
+
 async function loadWebsiteSettings() {
   try {
     const cms = await apiClient.getWebsiteSettings();
     if (!cms) return;
+    let visibility = {};
+    try {
+      visibility = cms.cms_visibility ? JSON.parse(cms.cms_visibility) : {};
+    } catch (error) {
+      console.warn('Pengaturan visibilitas CMS tidak valid:', error);
+    }
+    state.cmsVisibility = visibility;
+    const sectionVisibility = [
+      ['beranda', 'hero'],
+      ['rute', 'route'],
+      ['fasilitas', 'facilities'],
+      ['kategori', 'tickets'],
+      ['legal', 'legal'],
+    ];
+    sectionVisibility.forEach(([elementId, key]) => {
+      const element = document.getElementById(elementId);
+      if (element && visibility[key] === false) element.hidden = true;
+    });
+    const statsBanner = document.getElementById('statsBanner');
+    if (statsBanner && visibility.stats === false) statsBanner.hidden = true;
+    document.querySelectorAll('.glass-footer').forEach(element => {
+      if (visibility.footer === false) element.hidden = true;
+    });
 
     // 1. Judul Website (Title Browser Tab)
     if (cms.site_title) {
@@ -1224,24 +1363,25 @@ async function loadWebsiteSettings() {
       heroDisplayImg.src = cms.hero_bg_image;
     }
 
-    const helperSetText = (id, text) => {
-      const el = document.getElementById(id);
-      if (el && text !== undefined && text !== null && text !== '') el.textContent = text;
-    };
-
     // Live Event Stats Banner
-    helperSetText('statVal1', cms.stat_1_val);
-    helperSetText('statUnit1', cms.stat_1_unit);
-    helperSetText('statDesc1', cms.stat_1_desc);
-    helperSetText('statVal2', cms.stat_2_val);
-    helperSetText('statUnit2', cms.stat_2_unit);
-    helperSetText('statDesc2', cms.stat_2_desc);
-    helperSetText('statVal3', cms.stat_3_val);
-    helperSetText('statUnit3', cms.stat_3_unit);
-    helperSetText('statDesc3', cms.stat_3_desc);
-    helperSetText('statVal4', cms.stat_4_val);
-    helperSetText('statUnit4', cms.stat_4_unit);
-    helperSetText('statDesc4', cms.stat_4_desc);
+    let statsItems;
+    try {
+      statsItems = cms.stats_banner_items ? JSON.parse(cms.stats_banner_items) : null;
+      if (!Array.isArray(statsItems)) statsItems = null;
+    } catch (error) {
+      console.warn('Data kartu statistik CMS tidak valid:', error);
+      statsItems = null;
+    }
+    if (!statsItems) {
+      statsItems = [1, 2, 3, 4].map((number) => ({
+        type: 'CUSTOM',
+        val: cms[`stat_${number}_val`] || '',
+        unit: cms[`stat_${number}_unit`] || '',
+        desc: cms[`stat_${number}_desc`] || ''
+      })).filter(item => item.val || item.unit || item.desc);
+    }
+    state.cmsStatsItems = statsItems;
+    renderStatsBanner(statsItems);
 
     const heroSection = document.getElementById('beranda');
     if (heroSection && cms.hero_bg_image) {
@@ -1254,57 +1394,66 @@ async function loadWebsiteSettings() {
     const routeSection = document.getElementById('rute');
     if (routeSection) {
       const routeTitle = document.getElementById('routeSectionTitle') || routeSection.querySelector('.section-title');
-      if (routeTitle && cms.route_title) routeTitle.textContent = cms.route_title;
+      if (routeTitle && typeof cms.route_title === 'string') {
+        routeTitle.textContent = cms.route_title;
+        routeTitle.hidden = !cms.route_title.trim();
+      }
 
       const routeDesc = document.getElementById('routeSectionDesc') || routeSection.querySelector('.route-info-card > p');
-      if (routeDesc && cms.route_desc) routeDesc.textContent = cms.route_desc;
-
-      // Route Specs & GPX
-      helperSetText('routeStart10k', cms.route_start_10k);
-      helperSetText('routeStart5k', cms.route_start_5k);
-      helperSetText('routeCot10k', cms.route_cot_10k);
-      helperSetText('routeCot5k', cms.route_cot_5k);
+      if (routeDesc && typeof cms.route_desc === 'string') {
+        routeDesc.textContent = cms.route_desc;
+        routeDesc.hidden = !cms.route_desc.trim();
+      }
 
       const gpxBtn = document.getElementById('btnDownloadGpx');
+      if (gpxBtn) {
+        gpxBtn.hidden = !cms.route_gpx_url || cms.route_gpx_url === '#';
+      }
       if (gpxBtn && cms.route_gpx_url) {
         gpxBtn.href = cms.route_gpx_url;
-        if (cms.route_gpx_url === '#' || !cms.route_gpx_url.startsWith('http')) {
+        if (cms.route_gpx_url === '#') {
           gpxBtn.onclick = (e) => {
             e.preventDefault();
             alert('File GPX Rute Tegal Run 2027 akan dapat diunduh pada H-14 perlombaan.');
           };
-        } else {
+        } else if (/^https?:\/\//i.test(cms.route_gpx_url)) {
           gpxBtn.setAttribute('target', '_blank');
+          gpxBtn.setAttribute('rel', 'noopener noreferrer');
+          gpxBtn.onclick = null;
+        } else {
+          gpxBtn.removeAttribute('target');
+          gpxBtn.removeAttribute('rel');
           gpxBtn.onclick = null;
         }
       }
 
-      const visualCard = routeSection.querySelector('.route-visual-card');
-      const mapEmbedSource = cms.route_gmaps_url || cms.gmaps_embed_url;
-      if (visualCard && mapEmbedSource) {
-        let cleanMapUrl = mapEmbedSource.trim();
-        const srcMatch = cleanMapUrl.match(/src=["'](.*?)["']/);
-        if (srcMatch && srcMatch[1]) cleanMapUrl = srcMatch[1];
-
-        visualCard.innerHTML = `
-          <div class="route-badge-float">
-            <i class="fa-solid fa-location-dot"></i> Rute & Lokasi Google Maps
-          </div>
-          <div class="gmaps-responsive-wrapper">
-            <iframe src="${cleanMapUrl}" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" style="width: 100%; height: 100%; min-height: 380px; border: 0; border-radius: 16px;"></iframe>
-          </div>
-        `;
-      }
+      state.cmsRouteMapUrl = Object.hasOwn(cms, 'route_gmaps_url')
+        ? cms.route_gmaps_url
+        : (cms.gmaps_embed_url || '');
+      state.cmsRouteMapImage = cms.route_map_image || '';
+      renderRouteVisual(state.cmsRouteMapUrl, state.cmsRouteMapImage);
     }
 
     // 4. Fasilitas Section
     const facSection = document.getElementById('fasilitas');
     if (facSection) {
       const facTitle = facSection.querySelector('.section-title');
-      if (facTitle && cms.facilities_title) facTitle.textContent = cms.facilities_title;
+      if (facTitle && typeof cms.facilities_title === 'string') {
+        facTitle.textContent = cms.facilities_title;
+        facTitle.hidden = !cms.facilities_title.trim();
+      }
 
       const facDesc = facSection.querySelector('.section-desc');
-      if (facDesc && cms.facilities_desc) facDesc.textContent = cms.facilities_desc;
+      if (facDesc && typeof cms.facilities_desc === 'string') {
+        facDesc.textContent = cms.facilities_desc;
+        facDesc.hidden = !cms.facilities_desc.trim();
+      }
+    }
+
+    const facMedia = document.getElementById('facilitiesMedia');
+    if (facMedia) {
+      facMedia.hidden = !cms.facilities_image;
+      if (cms.facilities_image) facMedia.src = cms.facilities_image;
     }
 
     const facContainer = document.getElementById('facilitiesContainer');
@@ -1318,15 +1467,23 @@ async function loadWebsiteSettings() {
         { icon: 'fa-utensils', title: 'Refreshment & Finisher Feast', desc: 'Paket nutrisi pemulihan pasca finis berisi susu protein, kudapan sehat khas Tegal, dan buah segar.' }
       ];
 
-      facContainer.innerHTML = defaultFacilities.map(f => `
+      let configuredFacilities;
+      try {
+        configuredFacilities = cms.facilities_items ? JSON.parse(cms.facilities_items) : defaultFacilities;
+      } catch (error) {
+        console.warn('Data fasilitas CMS tidak valid:', error);
+        configuredFacilities = defaultFacilities;
+      }
+      if (!Array.isArray(configuredFacilities)) configuredFacilities = defaultFacilities;
+      facContainer.innerHTML = configuredFacilities.filter(f => f && typeof f === 'object' && f.visible !== false).map(f => `
         <div class="facility-card">
           <div class="facility-card-head">
             <div class="facility-icon-wrap">
-              <i class="fa-solid ${f.icon}"></i>
+              <i class="fa-solid ${escapeHtml(f.icon || 'fa-gift')}"></i>
             </div>
-            <h4 class="facility-title">${f.title}</h4>
+            <h4 class="facility-title">${escapeHtml(f.title || '')}</h4>
           </div>
-          <p class="facility-desc">${f.desc}</p>
+          <p class="facility-desc">${escapeHtml(f.desc || '')}</p>
         </div>
       `).join('');
     }
@@ -1335,23 +1492,61 @@ async function loadWebsiteSettings() {
     const ticketSection = document.getElementById('kategori');
     if (ticketSection) {
       const tTitle = ticketSection.querySelector('.section-title');
-      if (tTitle && cms.tickets_title) tTitle.textContent = cms.tickets_title;
+      if (tTitle && typeof cms.tickets_title === 'string') {
+        tTitle.textContent = cms.tickets_title;
+        tTitle.hidden = !cms.tickets_title.trim();
+      }
 
       const tDesc = ticketSection.querySelector('.section-desc');
-      if (tDesc && cms.tickets_desc) tDesc.textContent = cms.tickets_desc;
+      if (tDesc && typeof cms.tickets_desc === 'string') {
+        tDesc.textContent = cms.tickets_desc;
+        tDesc.hidden = !cms.tickets_desc.trim();
+      }
+    }
+    const ticketMedia = document.getElementById('ticketsCmsMedia');
+    if (ticketMedia) {
+      ticketMedia.hidden = !cms.medal_image;
+      if (cms.medal_image) ticketMedia.src = cms.medal_image;
     }
 
     // 5.5. Legal Section
-    helperSetText('legalSectionTitle', cms.legal_title);
-    helperSetText('legalSectionDesc', cms.legal_desc);
-    helperSetText('legalItem1Title', cms.legal_item_1_title);
-    helperSetText('legalItem1Desc', cms.legal_item_1_desc);
-    helperSetText('legalItem2Title', cms.legal_item_2_title);
-    helperSetText('legalItem2Desc', cms.legal_item_2_desc);
-    helperSetText('legalItem3Title', cms.legal_item_3_title);
-    helperSetText('legalItem3Desc', cms.legal_item_3_desc);
-    helperSetText('legalItem4Title', cms.legal_item_4_title);
-    helperSetText('legalItem4Desc', cms.legal_item_4_desc);
+    const legalTitle = document.getElementById('legalSectionTitle');
+    if (legalTitle && typeof cms.legal_title === 'string') {
+      legalTitle.textContent = cms.legal_title;
+      legalTitle.hidden = !cms.legal_title.trim();
+    }
+    const legalDesc = document.getElementById('legalSectionDesc');
+    if (legalDesc && typeof cms.legal_desc === 'string') {
+      legalDesc.textContent = cms.legal_desc;
+      legalDesc.hidden = !cms.legal_desc.trim();
+    }
+    const legalGrid = document.getElementById('legalGridContainer');
+    if (legalGrid) {
+      let configuredLegal;
+      try {
+        configuredLegal = cms.legal_items ? JSON.parse(cms.legal_items) : null;
+        if (!Array.isArray(configuredLegal)) configuredLegal = null;
+      } catch (error) {
+        console.warn('Data legalitas CMS tidak valid:', error);
+        configuredLegal = null;
+      }
+      if (!configuredLegal) {
+        configuredLegal = [1, 2, 3, 4].map((number, index) => ({
+          icon: ['fa-certificate', 'fa-road-barrier', 'fa-shield-heart', 'fa-user-lock'][index],
+          title: cms[`legal_item_${number}_title`] || '',
+          desc: cms[`legal_item_${number}_desc`] || ''
+        })).filter(item => item.title || item.desc);
+      }
+      configuredLegal = configuredLegal.filter(item => item && typeof item === 'object' && item.visible !== false);
+      legalGrid.innerHTML = configuredLegal.map(item => `
+        <div class="legal-item">
+          <i class="fa-solid ${escapeHtml(item.icon || 'fa-certificate')}"></i>
+          <h4>${escapeHtml(item.title || '')}</h4>
+          <p>${escapeHtml(item.desc || '')}</p>
+        </div>
+      `).join('');
+      legalGrid.hidden = configuredLegal.length === 0;
+    }
 
     // 6. Footer & Kontak
     if (cms.contact_email) {
@@ -1385,12 +1580,9 @@ async function loadRouteData() {
       return;
     }
 
-    // Update title & desc if provided
-    const titleEl = document.getElementById('routeSectionTitle');
-    if (titleEl && data.title) titleEl.textContent = data.title;
-
-    const descEl = document.getElementById('routeSectionDesc');
-    if (descEl && data.description) descEl.textContent = data.description;
+    if (!state.cmsRouteMapUrl) state.cmsRouteMapUrl = data.gmapsUrl || '';
+    if (!state.cmsRouteMapImage) state.cmsRouteMapImage = data.routeMapImage || '';
+    renderRouteVisual(state.cmsRouteMapUrl, state.cmsRouteMapImage);
 
     // Render checkpoint list
     if (container) {

@@ -27,10 +27,24 @@ const DEFAULT_LEGAL = [
   { icon: 'fa-shield-heart', title: 'Asuransi Medis Peserta', desc: 'Seluruh pelari terdaftar dilindungi asuransi kecelakaan diri selama perlombaan berlangsung.' },
   { icon: 'fa-user-lock', title: 'Perlindungan Data Pribadi (UU PDP)', desc: 'Enkripsi data pendaftaran dan kepatuhan penuh undang-undang perlindungan data konsumen.' }
 ];
+const CMS_VISIBILITY_IDS = {
+  hero: 'cmsShowHero',
+  stats: 'cmsShowStats',
+  route: 'cmsShowRoute',
+  facilities: 'cmsShowFacilities',
+  tickets: 'cmsShowTickets',
+  legal: 'cmsShowLegal',
+  footer: 'cmsShowFooter'
+};
 
 function escapeAttr(str) {
   if (typeof str !== 'string') return '';
-  return str.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
 function renderStatsRepeater() {
@@ -51,6 +65,7 @@ function renderStatsRepeater() {
         <button type="button" class="btn btn-outline btn-sm btn-delete-stat" data-idx="${idx}" style="color: #ef4444; border-color: rgba(239,68,68,0.3); padding: 4px 8px;" title="Hapus kartu ini">
           <i class="fa-solid fa-trash"></i>
         </button>
+        <label style="font-size:0.76rem;"><input type="checkbox" class="stat-input-visible" data-idx="${idx}" ${item.visible !== false ? 'checked' : ''}> Tampilkan</label>
       </div>
 
       <div class="form-group" style="margin-bottom: 10px;">
@@ -59,12 +74,14 @@ function renderStatsRepeater() {
           <option value="CUSTOM" ${item.type === 'CUSTOM' ? 'selected' : ''}>Manual / Kustom Sendiri</option>
           <option value="AUTO_PARTICIPANTS" ${item.autoKey === 'TOTAL_PARTICIPANTS' ? 'selected' : ''}>Otomatis: Total Peserta Terdaftar</option>
           <option value="AUTO_CATEGORIES" ${item.autoKey === 'TOTAL_CATEGORIES' ? 'selected' : ''}>Otomatis: Jumlah Kategori Lomba</option>
+          <option value="AUTO_CAPACITY" ${item.autoKey === 'TOTAL_CAPACITY' ? 'selected' : ''}>Otomatis: Total Kuota</option>
+          <option value="AUTO_AVAILABLE" ${item.autoKey === 'AVAILABLE_SLOTS' ? 'selected' : ''}>Otomatis: Sisa Kuota</option>
         </select>
       </div>
 
       <div class="form-group" style="margin-bottom: 10px;">
-        <label class="form-label" style="font-size: 0.78rem;">Angka / Nilai Highlight</label>
-        <input type="text" class="form-input stat-input-val" data-idx="${idx}" value="${escapeAttr(item.val || '')}" placeholder="2,500+ / 100% / Rp 75Jt" style="padding: 6px 10px; font-size: 0.88rem; font-weight: 700;">
+        <label class="form-label" style="font-size: 0.78rem;">Angka / Nilai Highlight ${item.type === 'AUTO' ? '(otomatis)' : '(manual)'}</label>
+        <input type="text" class="form-input stat-input-val" data-idx="${idx}" value="${escapeAttr(item.val || '')}" placeholder="2,500+ / 100% / Rp 75Jt" ${item.type === 'AUTO' ? 'disabled' : ''} style="padding: 6px 10px; font-size: 0.88rem; font-weight: 700;">
       </div>
 
       <div class="form-group" style="margin-bottom: 10px;">
@@ -100,7 +117,17 @@ function renderStatsRepeater() {
         statsItems[idx].type = 'AUTO';
         statsItems[idx].autoKey = 'TOTAL_CATEGORIES';
         statsItems[idx].unit = 'Kategori Lomba';
-        statsItems[idx].desc = 'Pilihan jarak kompetitif & fun run';
+        statsItems[idx].desc = 'Jumlah kategori lomba yang tersedia';
+      } else if (val === 'AUTO_CAPACITY') {
+        statsItems[idx].type = 'AUTO';
+        statsItems[idx].autoKey = 'TOTAL_CAPACITY';
+        statsItems[idx].unit = 'Total Kuota';
+        statsItems[idx].desc = 'Kapasitas seluruh kategori lomba';
+      } else if (val === 'AUTO_AVAILABLE') {
+        statsItems[idx].type = 'AUTO';
+        statsItems[idx].autoKey = 'AVAILABLE_SLOTS';
+        statsItems[idx].unit = 'Slot Tersedia';
+        statsItems[idx].desc = 'Sisa kuota seluruh kategori lomba';
       } else {
         statsItems[idx].type = 'CUSTOM';
         statsItems[idx].autoKey = '';
@@ -129,6 +156,12 @@ function renderStatsRepeater() {
       statsItems[idx].desc = input.value;
     });
   });
+
+  container.querySelectorAll('.stat-input-visible').forEach(input => {
+    input.addEventListener('change', () => {
+      statsItems[Number(input.getAttribute('data-idx'))].visible = input.checked;
+    });
+  });
 }
 
 function renderFacilitiesRepeater() {
@@ -149,6 +182,7 @@ function renderFacilitiesRepeater() {
         <button type="button" class="btn btn-outline btn-sm btn-delete-facility" data-idx="${idx}" style="color: #ef4444; border-color: rgba(239,68,68,0.3); padding: 4px 8px;" title="Hapus kartu ini">
           <i class="fa-solid fa-trash"></i>
         </button>
+        <label style="font-size:0.76rem;"><input type="checkbox" class="fac-input-visible" data-idx="${idx}" ${item.visible !== false ? 'checked' : ''}> Tampilkan</label>
       </div>
 
       <div class="form-group" style="margin-bottom: 8px;">
@@ -196,6 +230,12 @@ function renderFacilitiesRepeater() {
       facilitiesItems[idx].desc = input.value;
     });
   });
+
+  container.querySelectorAll('.fac-input-visible').forEach(input => {
+    input.addEventListener('change', () => {
+      facilitiesItems[Number(input.getAttribute('data-idx'))].visible = input.checked;
+    });
+  });
 }
 
 function renderLegalRepeater() {
@@ -216,6 +256,7 @@ function renderLegalRepeater() {
         <button type="button" class="btn btn-outline btn-sm btn-delete-legal" data-idx="${idx}" style="color: #ef4444; border-color: rgba(239,68,68,0.3); padding: 4px 8px;" title="Hapus poin ini">
           <i class="fa-solid fa-trash"></i>
         </button>
+        <label style="font-size:0.76rem;"><input type="checkbox" class="legal-input-visible" data-idx="${idx}" ${item.visible !== false ? 'checked' : ''}> Tampilkan</label>
       </div>
 
       <div class="form-group" style="margin-bottom: 8px;">
@@ -261,6 +302,12 @@ function renderLegalRepeater() {
     input.addEventListener('input', () => {
       const idx = Number(input.getAttribute('data-idx'));
       legalItems[idx].desc = input.value;
+    });
+
+    container.querySelectorAll('.legal-input-visible').forEach(input => {
+      input.addEventListener('change', () => {
+        legalItems[Number(input.getAttribute('data-idx'))].visible = input.checked;
+      });
     });
   });
 }
@@ -330,11 +377,17 @@ async function loadCmsSettings() {
       setVal('cmsRouteDesc', s.route_desc);
       setVal('cmsRouteMapImage', s.route_map_image);
       setVal('cmsGmapsUrl', s.route_gmaps_url);
-      setVal('cmsRouteStart10k', s.route_start_10k);
-      setVal('cmsRouteStart5k', s.route_start_5k);
-      setVal('cmsRouteCot10k', s.route_cot_10k);
-      setVal('cmsRouteCot5k', s.route_cot_5k);
       setVal('cmsRouteGpxUrl', s.route_gpx_url);
+      let visibility = {};
+      try {
+        visibility = s.cms_visibility ? JSON.parse(s.cms_visibility) : {};
+      } catch (error) {
+        console.warn('Pengaturan visibilitas CMS tidak valid:', error);
+      }
+      Object.entries(CMS_VISIBILITY_IDS).forEach(([key, id]) => {
+        const toggle = document.getElementById(id);
+        if (toggle) toggle.checked = visibility[key] !== false;
+      });
 
       // Fasilitas
       setVal('cmsFacilitiesTitle', s.facilities_title);
@@ -411,6 +464,9 @@ async function handleCmsSubmit(e) {
     stats_banner_items: JSON.stringify(statsItems),
     facilities_items: JSON.stringify(facilitiesItems),
     legal_items: JSON.stringify(legalItems),
+    cms_visibility: JSON.stringify(Object.fromEntries(
+      Object.entries(CMS_VISIBILITY_IDS).map(([key, id]) => [key, document.getElementById(id)?.checked !== false])
+    )),
 
     // Backward Compatibility Values
     stat_1_val: statsItems[0]?.val || '',
@@ -431,10 +487,6 @@ async function handleCmsSubmit(e) {
     route_desc: getVal('cmsRouteDesc'),
     route_map_image: getVal('cmsRouteMapImage'),
     route_gmaps_url: getVal('cmsGmapsUrl'),
-    route_start_10k: getVal('cmsRouteStart10k'),
-    route_start_5k: getVal('cmsRouteStart5k'),
-    route_cot_10k: getVal('cmsRouteCot10k'),
-    route_cot_5k: getVal('cmsRouteCot5k'),
     route_gpx_url: getVal('cmsRouteGpxUrl'),
 
     // Fasilitas & Tiket

@@ -1,5 +1,5 @@
-import"./modulepreload-polyfill-B5Qt9EMX.js";/* empty css              */const L=typeof window<"u"&&["5173","5174","5175","4173","3000"].includes(window.location.port)?"/api":"http://localhost:3000/api",F={async getWebsiteSettings(){try{const a=await fetch(`${L}/settings/website`,{method:"GET",headers:{Accept:"application/json"}});if(!a.ok)throw new Error("HTTP error "+a.status);return(await a.json()).data}catch(a){return console.warn("⚠️ Gagal mengambil pengaturan website CMS dari backend:",a),null}},async getCountdownSettings(){try{const a=await fetch(`${L}/settings/countdown`,{method:"GET",headers:{Accept:"application/json"}});if(!a.ok)throw new Error("HTTP error "+a.status);return(await a.json()).data}catch(a){return console.warn("⚠️ Gagal mengambil pengaturan countdown dari backend:",a),null}},async getCheckoutConfig(){try{const a=await fetch(`${L}/settings/checkout-config`,{method:"GET",headers:{Accept:"application/json"}});if(!a.ok)throw new Error("HTTP error "+a.status);return(await a.json()).data}catch(a){return console.warn("⚠️ Gagal mengambil pengaturan biaya layanan dari backend:",a),null}},async getEvents(){try{const a=await fetch(`${L}/events`,{method:"GET",headers:{Accept:"application/json"}});if(!a.ok)throw new Error(`HTTP error! status: ${a.status}`);const e=await a.json();return e.status==="success"&&Array.isArray(e.data)?e.data:[]}catch(a){return console.warn("⚠️ Gagal mengambil event langsung dari backend:",a),[]}},async getEventDetail(a){try{const e=await fetch(`${L}/events/${a}`,{headers:{Accept:"application/json"}});if(!e.ok)throw new Error("HTTP error "+e.status);return(await e.json()).data}catch(e){return console.warn("⚠️ Gagal mengambil detail event dari backend:",e),null}},async getRouteOverview(){try{const a=await fetch(`${L}/routes`,{headers:{Accept:"application/json"}});if(!a.ok)throw new Error("HTTP error "+a.status);return(await a.json()).data}catch(a){return console.warn("⚠️ Gagal mengambil data rute dari backend:",a),null}},async registerOrder(a){try{const e=await fetch(`${L}/register`,{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},body:JSON.stringify(a)}),t=await e.json().catch(()=>({}));if(e.status===429)return{success:!1,isRateLimited:!0,message:t.message||"🚨 Terlalu banyak percobaan war tiket. Mohon tunggu 1 menit sebelum mencoba lagi."};if(e.status===400){let s=t.message||"Data pendaftaran tidak valid.";return Array.isArray(t.errors)&&t.errors.length>0&&(s=t.errors.map(n=>`• ${n.field}: ${n.message}`).join(`
-`)),{success:!1,message:s,rawErrors:t.errors}}return e.status===403?{success:!1,message:"🚨 Akses diblokir oleh sistem anti-bot. Pastikan tidak menggunakan script/ekstensi otomatis."}:e.status===201&&t.status==="success"?{success:!0,message:t.message,data:t.data}:{success:!1,message:t.message||"Terjadi kesalahan sistem saat memproses tiket."}}catch(e){return console.error("❌ API Request Error:",e),{success:!1,message:"Koneksi ke backend gagal. Pastikan server backend sedang aktif di http://localhost:3000"}}}},ha=`<!-- =========================================================================
+import"./modulepreload-polyfill-B5Qt9EMX.js";/* empty css              */const xe=typeof window<"u"&&["localhost","127.0.0.1"].includes(window.location.hostname)&&["3000","4173","5173","5174","5175"].includes(window.location.port),L=xe?"/api":"https://api.haisen.my.id/api",D={async getWebsiteSettings(){try{const e=await fetch(`${L}/settings/website`,{method:"GET",headers:{Accept:"application/json"}});if(!e.ok)throw new Error("HTTP error "+e.status);return(await e.json()).data}catch(e){return console.warn("⚠️ Gagal mengambil pengaturan website CMS dari backend:",e),null}},async getCountdownSettings(){try{const e=await fetch(`${L}/settings/countdown`,{method:"GET",headers:{Accept:"application/json"}});if(!e.ok)throw new Error("HTTP error "+e.status);return(await e.json()).data}catch(e){return console.warn("⚠️ Gagal mengambil pengaturan countdown dari backend:",e),null}},async getCheckoutConfig(){try{const e=await fetch(`${L}/settings/checkout-config`,{method:"GET",headers:{Accept:"application/json"}});if(!e.ok)throw new Error("HTTP error "+e.status);return(await e.json()).data}catch(e){return console.warn("⚠️ Gagal mengambil pengaturan biaya layanan dari backend:",e),null}},async getEvents(){try{const e=await fetch(`${L}/events`,{method:"GET",headers:{Accept:"application/json"}});if(!e.ok)throw new Error(`HTTP error! status: ${e.status}`);const a=await e.json();return a.status==="success"&&Array.isArray(a.data)?a.data:[]}catch(e){return console.warn("⚠️ Gagal mengambil event langsung dari backend:",e),[]}},async getEventDetail(e){try{const a=await fetch(`${L}/events/${e}`,{headers:{Accept:"application/json"}});if(!a.ok)throw new Error("HTTP error "+a.status);return(await a.json()).data}catch(a){return console.warn("⚠️ Gagal mengambil detail event dari backend:",a),null}},async getRouteOverview(){try{const e=await fetch(`${L}/routes`,{headers:{Accept:"application/json"}});if(!e.ok)throw new Error("HTTP error "+e.status);return(await e.json()).data}catch(e){return console.warn("⚠️ Gagal mengambil data rute dari backend:",e),null}},async registerOrder(e){try{const a=await fetch(`${L}/register`,{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},body:JSON.stringify(e)}),t=await a.json().catch(()=>({}));if(a.status===429)return{success:!1,isRateLimited:!0,message:t.message||"🚨 Terlalu banyak percobaan war tiket. Mohon tunggu 1 menit sebelum mencoba lagi."};if(a.status===400){let o=t.message||"Data pendaftaran tidak valid.";return Array.isArray(t.errors)&&t.errors.length>0&&(o=t.errors.map(n=>`• ${n.field}: ${n.message}`).join(`
+`)),{success:!1,message:o,rawErrors:t.errors}}return a.status===403?{success:!1,message:"🚨 Akses diblokir oleh sistem anti-bot. Pastikan tidak menggunakan script/ekstensi otomatis."}:a.status===201&&t.status==="success"?{success:!0,message:t.message,data:t.data}:{success:!1,message:t.message||"Terjadi kesalahan sistem saat memproses tiket."}}catch(a){return console.error("❌ API Request Error:",a),{success:!1,message:"Koneksi ke backend gagal. Pastikan server backend sedang aktif di http://localhost:3000"}}}},we=`<!-- =========================================================================
      PAGE SKELETON LOADER (MINIMALIST & ANIMATED)
      ========================================================================= -->
 <div class="page-skeleton" id="pageSkeleton">
@@ -28,7 +28,7 @@ import"./modulepreload-polyfill-B5Qt9EMX.js";/* empty css              */const L
       <div class="sk page-skeleton-card"></div>
     </div>
   </div>
-</div>`,ya=`<!-- =========================================================================
+</div>`,Ee=`<!-- =========================================================================
      TOP FLOATING GLASS NAVBAR (MINIMALIST & LEGA)
      ========================================================================= -->
 <div class="top-navbar-container">
@@ -150,7 +150,7 @@ import"./modulepreload-polyfill-B5Qt9EMX.js";/* empty css              */const L
       });
     });
   <\/script>
-</div>`,xa=`<!-- =========================================================================
+</div>`,Te=`<!-- =========================================================================
      FOOTER (LIGHT THEME ELEGANT)
      ========================================================================= -->
 <footer class="glass-footer">
@@ -219,7 +219,7 @@ import"./modulepreload-polyfill-B5Qt9EMX.js";/* empty css              */const L
   </div>
 </footer>
 
-`,wa=`<!-- =========================================================================
+`,Se=`<!-- =========================================================================
      FLOATING BOTTOM MOBILE DOCK NAVBAR (MODERN GLASS STYLE)
      ========================================================================= -->
 <div class="mobile-bottom-dock">
@@ -270,17 +270,19 @@ import"./modulepreload-polyfill-B5Qt9EMX.js";/* empty css              */const L
       </a>
     </li>
   </ul>
-</div>`,Ea=`<!-- =========================================================================
-     HERO SECTION (2-COLUMN SPLIT ATHLETIC SPORT DESIGN - ANTI AI SLOP)
+</div>`,Ie=`<!-- =========================================================================
+     HERO SECTION (2-COLUMN SPLIT ATHLETIC SPORT DESIGN)
+     File: template/sections/hero.html
      ========================================================================= -->
 <section class="hero-section" id="beranda">
   <div class="container">
     <div class="hero-split-grid">
+      
       <!-- SISI KIRI: Judul, Deskripsi, Tombol Aksi & Hitung Mundur Race Day -->
       <div class="hero-col-content">
         <div class="hero-pill-badge" id="heroStatusBadge">
           <span class="status-dot"></span>
-          <i class="fa-solid fa-bolt badge-icon"></i>
+          <i class="fa-solid fa-bolt badge-icon" aria-hidden="true"></i>
           <span id="heroStatusText">PENDAFTARAN RESMI DIBUKA</span>
         </div>
 
@@ -294,20 +296,20 @@ import"./modulepreload-polyfill-B5Qt9EMX.js";/* empty css              */const L
         </p>
 
         <div class="hero-actions">
-          <button class="btn btn-sport-primary btn-glow" id="heroCtaBtn">
-            <i class="fa-solid fa-ticket"></i> Amankan Slot Lari Sekarang
+          <button class="btn btn-primary btn-glow" id="heroCtaBtn">
+            <i class="fa-solid fa-ticket" aria-hidden="true"></i> Amankan Slot Lari Sekarang
           </button>
 
-          <button class="btn btn-sport-outline" id="btnOpenTerms">
-            <i class="fa-solid fa-file-contract"></i> Syarat &amp; Ketentuan
+          <button class="btn btn-secondary" id="btnOpenTerms">
+            <i class="fa-solid fa-file-contract" aria-hidden="true"></i> Syarat &amp; Ketentuan
           </button>
         </div>
 
-        <!-- Clean Countdown Box -->
+        <!-- Countdown Box (Hitung Mundur Race Day) -->
         <div class="countdown-box">
           <div class="countdown-header">
             <div class="countdown-title-wrap">
-              <i class="fa-solid fa-stopwatch" style="color: #FF6B00;"></i>
+              <i class="fa-solid fa-stopwatch" aria-hidden="true"></i>
               <span>HITUNG MUNDUR MENUJU RACE DAY:</span>
             </div>
             <div class="event-date-pill badge-pending-date" id="eventDateDisplay">TANGGAL BELUM DITENTUKAN</div>
@@ -333,18 +335,18 @@ import"./modulepreload-polyfill-B5Qt9EMX.js";/* empty css              */const L
         </div>
       </div>
 
-      <!-- SISI KANAN: Visual Hero Sport Card dengan Gambar & Badges Atletik -->
+      <!-- SISI KANAN: Visual Hero Sport Card dengan Gambar & Floating Badges -->
       <div class="hero-col-visual">
         <div class="athletic-hero-card">
           <div class="athletic-hero-img-wrap">
-            <img src="https://images.unsplash.com/photo-1530549387789-4c1017266635?auto=format&fit=crop&w=1200&q=80" alt="Pelari Tegal Run" class="athletic-hero-img" id="heroDisplayImg" loading="eager">
+            <img src="https://images.unsplash.com/photo-1530549387789-4c1017266635?auto=format&fit=crop&w=1200&q=80" alt="Pelari Tegal Run 2027" class="athletic-hero-img" id="heroDisplayImg" loading="eager">
             <div class="athletic-card-overlay"></div>
           </div>
 
-          <!-- Floating Badges Atletik Sport -->
+          <!-- Floating Sport Badges -->
           <div class="sport-badge-float sport-badge-top-left">
             <div class="sport-badge-icon" style="background: rgba(34, 197, 94, 0.15); color: #16a34a;">
-              <i class="fa-solid fa-certificate"></i>
+              <i class="fa-solid fa-certificate" aria-hidden="true"></i>
             </div>
             <div>
               <div class="sport-badge-title">Standar PB PASI</div>
@@ -352,34 +354,35 @@ import"./modulepreload-polyfill-B5Qt9EMX.js";/* empty css              */const L
             </div>
           </div>
 
-          <div class="sport-badge-float sport-badge-bottom-right">
-            <div class="sport-badge-icon" style="background: rgba(255, 107, 0, 0.15); color: #FF6B00;">
-              <i class="fa-solid fa-microchip"></i>
-            </div>
-            <div>
-              <div class="sport-badge-title">RFID Chip Timing</div>
-              <div class="sport-badge-sub">Pencatatan Waktu Akurat</div>
-            </div>
-          </div>
-
           <div class="sport-badge-float sport-badge-mid-right">
             <div class="sport-badge-icon" style="background: rgba(59, 130, 246, 0.15); color: #2563eb;">
-              <i class="fa-solid fa-medal"></i>
+              <i class="fa-solid fa-medal" aria-hidden="true"></i>
             </div>
             <div>
               <div class="sport-badge-title">Medali Finisher</div>
               <div class="sport-badge-sub">Logam Cor Eksklusif</div>
             </div>
           </div>
+
+          <div class="sport-badge-float sport-badge-bottom-right">
+            <div class="sport-badge-icon" style="background: rgba(255, 107, 0, 0.15); color: #FF6B00;">
+              <i class="fa-solid fa-microchip" aria-hidden="true"></i>
+            </div>
+            <div>
+              <div class="sport-badge-title">RFID Chip Timing</div>
+              <div class="sport-badge-sub">Pencatatan Waktu Akurat</div>
+            </div>
+          </div>
         </div>
       </div>
+
     </div>
 
-    <!-- Live Event Stats Grid (Editable dari Admin CMS & Backend) -->
+    <!-- Live Event Stats Grid (Dinamis dari Backend / CMS) -->
     <div class="stats-banner" id="statsBanner">
       <div class="stat-item">
-        <div class="stat-num"><span id="statVal1">2,500+</span> <small id="statUnit1">Pelari Terdaftar</small></div>
-        <div class="stat-desc" id="statDesc1">Antusiasme komunitas nasional</div>
+        <div class="stat-num"><span id="statVal1">2,500+</span> <small id="statUnit1">Pelari</small></div>
+        <div class="stat-desc" id="statDesc1">Terdaftar</div>
       </div>
       <div class="stat-item">
         <div class="stat-num"><span id="statVal2">2</span> <small id="statUnit2">Kategori Utama</small></div>
@@ -390,50 +393,90 @@ import"./modulepreload-polyfill-B5Qt9EMX.js";/* empty css              */const L
         <div class="stat-desc" id="statDesc3">Pengawalan Dishub & Polresta</div>
       </div>
       <div class="stat-item">
-        <div class="stat-num"><span id="statVal4">Rp 75Jt</span> <small id="statUnit4">Total Hadiah & Doorprize</small></div>
-        <div class="stat-desc" id="statDesc4">Podium juara & ratusan hadiah menarik</div>
+        <div class="stat-num"><span id="statVal4">Rp 75Jt</span> <small id="statUnit4">Total Hadiah</small></div>
+        <div class="stat-desc" id="statDesc4">&amp; Doorprize</div>
       </div>
     </div>
   </div>
-</section>
-`,Ta=`<!-- =========================================================================
+</section>`,Pe=`<!-- =========================================================================
      KATEGORI EVENT & TIKET
      ========================================================================= -->
 <section class="tickets-section" id="kategori">
   <div class="container">
-    <div class="section-header">
+    <div class="section-header text-center">
       <div class="section-tag">
-        <i class="fa-solid fa-tags"></i> Tiket yang tersedia
+        <i class="fa-solid fa-tags" aria-hidden="true"></i> Tiket yang Tersedia
       </div>
       <h2 class="section-title">Pilih Tantangan Jarak Lari Anda</h2>
       <p class="section-desc">
         Tersedia kategori kompetitif bagi atlet dan fun run santai bagi keluarga & komunitas. 
         Seluruh peserta yang finis sebelum batas waktu (Cut-Off Time) berhak atas Medali Finisher resmi.
       </p>
+      <img id="ticketsCmsMedia" class="tickets-cms-media" alt="Preview medali finisher" loading="lazy" hidden>
     </div>
 
-    <!-- Container Tiket Dinamis -->
-    <div class="tickets-grid" id="ticketsGrid">
-      <!-- Loading Skeleton Cards -->
+    <!-- Container Tiket Dinamis (Di-render via JavaScript) -->
+    <div 
+      class="tickets-grid" 
+      id="ticketsGrid" 
+      aria-live="polite" 
+      aria-busy="true"
+    >
+      <!-- Loading Skeleton Card 1 -->
       <div class="glass-card ticket-card sk-card">
-        <div class="sk" style="width: 120px; height: 24px; margin-bottom: 16px;"></div>
-        <div class="sk" style="width: 80%; height: 36px; margin-bottom: 12px;"></div>
-        <div class="sk" style="width: 50%; height: 48px; margin-bottom: 24px;"></div>
-        <div class="sk" style="width: 100%; height: 180px; margin-bottom: 24px;"></div>
-        <div class="sk" style="width: 100%; height: 50px; border-radius: 30px;"></div>
+        <div class="sk" style="width: 100px; height: 24px; border-radius: 12px; margin-bottom: 16px;"></div>
+        <div class="sk" style="width: 75%; height: 32px; border-radius: 8px; margin-bottom: 12px;"></div>
+        <div class="sk" style="width: 50%; height: 44px; border-radius: 8px; margin-bottom: 24px;"></div>
+        <div class="ticket-features-sk" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px;">
+          <div class="sk" style="width: 100%; height: 20px; border-radius: 4px;"></div>
+          <div class="sk" style="width: 90%; height: 20px; border-radius: 4px;"></div>
+          <div class="sk" style="width: 95%; height: 20px; border-radius: 4px;"></div>
+          <div class="sk" style="width: 80%; height: 20px; border-radius: 4px;"></div>
+        </div>
+        <div class="sk" style="width: 100%; height: 48px; border-radius: 30px;"></div>
       </div>
+
+      <!-- Loading Skeleton Card 2 -->
       <div class="glass-card ticket-card sk-card">
-        <div class="sk" style="width: 120px; height: 24px; margin-bottom: 16px;"></div>
-        <div class="sk" style="width: 80%; height: 36px; margin-bottom: 12px;"></div>
-        <div class="sk" style="width: 50%; height: 48px; margin-bottom: 24px;"></div>
-        <div class="sk" style="width: 100%; height: 180px; margin-bottom: 24px;"></div>
-        <div class="sk" style="width: 100%; height: 50px; border-radius: 30px;"></div>
+        <div class="sk" style="width: 100px; height: 24px; border-radius: 12px; margin-bottom: 16px;"></div>
+        <div class="sk" style="width: 75%; height: 32px; border-radius: 8px; margin-bottom: 12px;"></div>
+        <div class="sk" style="width: 50%; height: 44px; border-radius: 8px; margin-bottom: 24px;"></div>
+        <div class="ticket-features-sk" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px;">
+          <div class="sk" style="width: 100%; height: 20px; border-radius: 4px;"></div>
+          <div class="sk" style="width: 90%; height: 20px; border-radius: 4px;"></div>
+          <div class="sk" style="width: 95%; height: 20px; border-radius: 4px;"></div>
+          <div class="sk" style="width: 80%; height: 20px; border-radius: 4px;"></div>
+        </div>
+        <div class="sk" style="width: 100%; height: 48px; border-radius: 30px;"></div>
+      </div>
+
+      <!-- Loading Skeleton Card 3 -->
+      <div class="glass-card ticket-card sk-card">
+        <div class="sk" style="width: 100px; height: 24px; border-radius: 12px; margin-bottom: 16px;"></div>
+        <div class="sk" style="width: 75%; height: 32px; border-radius: 8px; margin-bottom: 12px;"></div>
+        <div class="sk" style="width: 50%; height: 44px; border-radius: 8px; margin-bottom: 24px;"></div>
+        <div class="ticket-features-sk" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px;">
+          <div class="sk" style="width: 100%; height: 20px; border-radius: 4px;"></div>
+          <div class="sk" style="width: 90%; height: 20px; border-radius: 4px;"></div>
+          <div class="sk" style="width: 95%; height: 20px; border-radius: 4px;"></div>
+          <div class="sk" style="width: 80%; height: 20px; border-radius: 4px;"></div>
+        </div>
+        <div class="sk" style="width: 100%; height: 48px; border-radius: 30px;"></div>
       </div>
     </div>
+
+    <!-- Template State Kosong / Pendaftaran Ditutup (Hidden by default) -->
+    <template id="ticketClosedTemplate">
+      <div class="empty-tickets-notice text-center p-8 bg-white/5 rounded-xl border border-white/10">
+        <i class="fa-solid fa-lock text-4xl text-yellow-500 mb-3" aria-hidden="true"></i>
+        <h3 class="text-xl font-bold text-white mb-2">Pendaftaran Resmi Ditutup</h3>
+        <p class="text-gray-400 max-w-md mx-auto">
+          Kuota pendaftaran untuk seluruh kategori lari telah terpenuhi atau masa pendaftaran telah berakhir.
+        </p>
+      </div>
+    </template>
   </div>
-</section>
-
-`,Sa=`<!-- =========================================================================
+</section>`,Be=`<!-- =========================================================================
      RUTE & MAP CHECKPOINTS
      ========================================================================= -->
 <section class="route-section" id="rute">
@@ -450,25 +493,6 @@ import"./modulepreload-polyfill-B5Qt9EMX.js";/* empty css              */const L
           Jalur lari disterilkan bekerja sama dengan Satlantas Polres Tegal Kota dan Dishub, 
           menjamin keamanan pelari dari polusi dan kendaraan bermotor.
         </p>
-
-        <div class="route-specs-grid">
-          <div class="route-spec-item">
-            <span class="spec-label">Start / Flag-Off 10K</span>
-            <span class="spec-val" id="routeStart10k">05:45 WIB</span>
-          </div>
-          <div class="route-spec-item">
-            <span class="spec-label">Start / Flag-Off 5K</span>
-            <span class="spec-val" id="routeStart5k">06:15 WIB</span>
-          </div>
-          <div class="route-spec-item">
-            <span class="spec-label">Cut-Off Time (COT) 10K</span>
-            <span class="spec-val" id="routeCot10k">2 Jam 30 Menit</span>
-          </div>
-          <div class="route-spec-item">
-            <span class="spec-label">Cut-Off Time (COT) 5K</span>
-            <span class="spec-val" id="routeCot5k">1 Jam 30 Menit</span>
-          </div>
-        </div>
 
         <div class="route-checklist" id="routeChecklistContainer">
           <!-- Loaded dynamically from /api/routes -->
@@ -508,7 +532,7 @@ import"./modulepreload-polyfill-B5Qt9EMX.js";/* empty css              */const L
     </div>
   </div>
 </section>
-`,Pa=`<!-- =========================================================================
+`,Ae=`<!-- =========================================================================
      FASILITAS & RACEPACK SHOWCASE (DYNAMIC FROM BACKEND)
      ========================================================================= -->
 <section class="facilities-section" id="fasilitas">
@@ -551,6 +575,8 @@ import"./modulepreload-polyfill-B5Qt9EMX.js";/* empty css              */const L
       </p>
     </div>
 
+    <img id="facilitiesMedia" class="facilities-media" alt="Fasilitas dan race village" loading="lazy" hidden>
+
     <!-- Container Grid yang diisi secara dinamis dari Backend -->
     <div class="facilities-grid" id="facilitiesContainer">
       <!-- Loading State Skeleton / Fallback -->
@@ -560,8 +586,7 @@ import"./modulepreload-polyfill-B5Qt9EMX.js";/* empty css              */const L
     </div>
   </div>
 </section>
-
-`,Ba=`<!-- =========================================================================
+`,Ce=`<!-- =========================================================================
      KEPATUHAN HUKUM & PERLINDUNGAN DATA (UU PDP & UU ITE INDONESIA)
      ========================================================================= -->
 <section class="legal-section" id="legal">
@@ -577,7 +602,7 @@ import"./modulepreload-polyfill-B5Qt9EMX.js";/* empty css              */const L
         </p>
       </div>
 
-      <div class="legal-grid">
+      <div class="legal-grid" id="legalGridContainer">
         <div class="legal-item">
           <i class="fa-solid fa-certificate"></i>
           <h4 id="legalItem1Title">Rekomendasi Resmi PB PASI</h4>
@@ -611,7 +636,7 @@ import"./modulepreload-polyfill-B5Qt9EMX.js";/* empty css              */const L
     </div>
   </div>
 </section>
-`,Ia=`<!-- =========================================================================
+`,Le=`<!-- =========================================================================
      FAQ SECTION (GENERAL & EXCLUSIVE ACCORDION)
      ========================================================================= -->
 <section class="faq-section" id="faq">
@@ -730,7 +755,7 @@ import"./modulepreload-polyfill-B5Qt9EMX.js";/* empty css              */const L
       });
     });
   <\/script>
-</section>`,Aa=`<!-- =========================================================================
+</section>`,Me=`<!-- =========================================================================
      MODAL 1: CHECKOUT & WAR TIKET FORM (3-STEP WITH UU PDP CONSENT)
      ========================================================================= -->
 <div class="modal-overlay" id="regModal">
@@ -1112,60 +1137,60 @@ import"./modulepreload-polyfill-B5Qt9EMX.js";/* empty css              */const L
   </div>
 </div>
 
-`,aa=document.getElementById("app");aa&&(aa.innerHTML=`
+`,ee=document.getElementById("app");ee&&(ee.innerHTML=`
     <div class="ambient-glow ambient-1"></div>
     <div class="ambient-glow ambient-2"></div>
     <div class="toast-container" id="toastContainer"></div>
-    ${ha}
-    ${ya}
-    ${Ea}
-    ${Ta}
-    ${Sa}
-    ${Pa}
-    ${Ba}
-    ${Ia}
-    ${xa}
-    ${wa}
-    ${Aa}
-  `);const o={events:[],selectedEvent:null,currentStep:1,participantCount:1,isGlobalClosed:!1,countdownTarget:null,countdownInterval:null,feeSettings:{feeEnabled:!1,feeType:"PER_TRANSACTION",feeAmount:0,paymentTimerMinutes:30}};function ea(a){if(!a)return"";let e=String(a).trim().replace(/[\s\-()]/g,"");return e.startsWith("08")?"+628"+e.slice(2):e.startsWith("628")?"+"+e:e}function Y(a){!a||a._phoneFormatted||(a._phoneFormatted=!0,a.addEventListener("input",e=>{let t=e.target.value;t.startsWith("08")?e.target.value="+628"+t.substring(2):t.startsWith("628")&&(e.target.value="+628"+t.substring(3))}))}function u(a="success",e="",t=""){const s=document.getElementById("toastContainer");if(!s)return;const n=document.createElement("div");n.className=`toast toast-${a}`;const i={success:"fa-solid fa-circle-check",error:"fa-solid fa-triangle-exclamation",warning:"fa-solid fa-circle-exclamation"};n.innerHTML=`
+    ${we}
+    ${Ee}
+    ${Ie}
+    ${Pe}
+    ${Be}
+    ${Ae}
+    ${Ce}
+    ${Le}
+    ${Te}
+    ${Se}
+    ${Me}
+  `);const s={events:[],selectedEvent:null,currentStep:1,participantCount:1,isGlobalClosed:!1,countdownTarget:null,countdownInterval:null,countdownSettingsLoaded:!1,cmsStatsItems:null,cmsVisibility:{},cmsRouteMapUrl:"",cmsRouteMapImage:"",feeSettings:{feeEnabled:!1,feeType:"PER_TRANSACTION",feeAmount:0,paymentTimerMinutes:30}};function ae(e){if(!e)return"";let a=String(e).trim().replace(/[\s\-()]/g,"");return a.startsWith("08")?"+628"+a.slice(2):a.startsWith("628")?"+"+a:a}function X(e){!e||e._phoneFormatted||(e._phoneFormatted=!0,e.addEventListener("input",a=>{let t=a.target.value;t.startsWith("08")?a.target.value="+628"+t.substring(2):t.startsWith("628")&&(a.target.value="+628"+t.substring(3))}))}function v(e="success",a="",t=""){const o=document.getElementById("toastContainer");if(!o)return;const n=document.createElement("div");n.className=`toast toast-${e}`;const r={success:"fa-solid fa-circle-check",error:"fa-solid fa-triangle-exclamation",warning:"fa-solid fa-circle-exclamation"};n.innerHTML=`
     <div class="toast-icon">
-      <i class="${i[a]||i.success}"></i>
+      <i class="${r[e]||r.success}"></i>
     </div>
     <div class="toast-content">
-      <h5>${x(e)}</h5>
+      <h5>${x(a)}</h5>
       <p>${x(t)}</p>
     </div>
-  `,s.appendChild(n),setTimeout(()=>{n.style.opacity="0",n.style.transform="translateX(40px)",setTimeout(()=>n.remove(),300)},4500)}function x(a){return a?a.toString().replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;"):""}function I(a){return new Intl.NumberFormat("id-ID",{style:"currency",currency:"IDR",maximumFractionDigits:0}).format(a)}function U(a=null){a!==void 0&&(o.countdownTarget=a),o.countdownInterval&&(clearInterval(o.countdownInterval),o.countdownInterval=null);const e=document.getElementById("days"),t=document.getElementById("hours"),s=document.getElementById("minutes"),n=document.getElementById("seconds");if(!o.countdownTarget){e&&(e.textContent="--"),t&&(t.textContent="--"),s&&(s.textContent="--"),n&&(n.textContent="--");return}function i(){const r=new Date().getTime(),l=o.countdownTarget-r;if(l<=0){e&&(e.textContent="00"),t&&(t.textContent="00"),s&&(s.textContent="00"),n&&(n.textContent="00"),o.countdownInterval&&(clearInterval(o.countdownInterval),o.countdownInterval=null);return}const m=Math.floor(l/(1e3*60*60*24)),g=Math.floor(l%(1e3*60*60*24)/(1e3*60*60)),v=Math.floor(l%(1e3*60*60)/(1e3*60)),c=Math.floor(l%(1e3*60)/1e3),p=d=>String(d).padStart(2,"0");e&&(e.textContent=p(m)),t&&(t.textContent=p(g)),s&&(s.textContent=p(v)),n&&(n.textContent=p(c))}i(),o.countdownInterval=setInterval(i,1e3)}async function Ca(){const a=document.getElementById("eventDateDisplay");try{const e=await F.getCountdownSettings();if(e&&e.eventCountdownDate){const t=new Date(e.eventCountdownDate);if(isNaN(t.getTime()))U(null),a&&(a.textContent="TANGGAL BELUM DITENTUKAN",a.classList.add("badge-pending-date"));else{U(t.getTime());const s=t.toLocaleDateString("id-ID",{day:"numeric",month:"long",year:"numeric"}),n=t.toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"});a&&(a.textContent=`${s.toUpperCase()} • ${n} WIB`,a.classList.remove("badge-pending-date"))}}else U(null),a&&(a.textContent="TANGGAL BELUM DITENTUKAN",a.classList.add("badge-pending-date"));if(e&&e.isRegistrationClosed){o.isGlobalClosed=!0;const t=document.getElementById("heroStatusBadge"),s=document.getElementById("heroStatusText");t&&(t.style.borderColor="#EF4444"),s&&(s.innerHTML='<span style="color:#EF4444; font-weight:800;">🚨 PENDAFTARAN RESMI TELAH RESMI DITUTUP PANITIA</span>');const n=document.getElementById("heroCtaBtn");n&&(n.disabled=!0,n.classList.remove("btn-glow"),n.innerHTML='<i class="fa-solid fa-lock"></i> Pendaftaran Ditutup');const i=document.getElementById("navDaftarBtn");i&&(i.disabled=!0,i.classList.remove("btn-glow"),i.innerHTML='<i class="fa-solid fa-lock"></i> Ditutup');const r=document.getElementById("dockDaftarBtn");r&&(r.style.opacity="0.6",r.style.pointerEvents="none")}}catch(e){console.warn("Gagal memuat pengaturan countdown dari backend:",e),U(null),a&&(a.textContent="TANGGAL BELUM DITENTUKAN",a.classList.add("badge-pending-date"))}}async function na(){const a=document.getElementById("pageSkeleton");try{const e=await F.getEvents();o.events=e,ia(e);try{const n=await(await fetch(`${L}/settings/checkout-config`)).json();n.status==="success"&&n.data&&(o.feeSettings=n.data)}catch{}const t=new URLSearchParams(window.location.search).get("register");if(t){const s=e.find(n=>n.id===t);s&&!s.isClosed&&!o.isGlobalClosed&&setTimeout(()=>W(s),400)}}catch(e){console.error("Failed to render events:",e)}finally{a&&setTimeout(()=>{a.classList.add("hide")},350)}}function ia(a){const e=document.getElementById("ticketsGrid");if(e){if(e.innerHTML="",!Array.isArray(a)||a.length===0){e.innerHTML=`
+  `,o.appendChild(n),setTimeout(()=>{n.style.opacity="0",n.style.transform="translateX(40px)",setTimeout(()=>n.remove(),300)},4500)}function x(e){return e?e.toString().replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;"):""}function C(e){return new Intl.NumberFormat("id-ID",{style:"currency",currency:"IDR",maximumFractionDigits:0}).format(e)}function Z(e=null){e!==void 0&&(s.countdownTarget=e),s.countdownInterval&&(clearInterval(s.countdownInterval),s.countdownInterval=null);const a=document.getElementById("days"),t=document.getElementById("hours"),o=document.getElementById("minutes"),n=document.getElementById("seconds");if(!s.countdownTarget||!Number.isFinite(Number(s.countdownTarget))){a&&(a.textContent="--"),t&&(t.textContent="--"),o&&(o.textContent="--"),n&&(n.textContent="--");return}function r(){const i=new Date().getTime(),d=s.countdownTarget-i;if(d<=0){a&&(a.textContent="00"),t&&(t.textContent="00"),o&&(o.textContent="00"),n&&(n.textContent="00"),s.countdownInterval&&(clearInterval(s.countdownInterval),s.countdownInterval=null);return}const c=Math.floor(d/(1e3*60*60*24)),u=Math.floor(d%(1e3*60*60*24)/(1e3*60*60)),f=Math.floor(d%(1e3*60*60)/(1e3*60)),b=Math.floor(d%(1e3*60)/1e3),h=p=>String(p).padStart(2,"0");a&&(a.textContent=h(c)),t&&(t.textContent=h(u)),o&&(o.textContent=h(f)),n&&(n.textContent=h(b))}r(),s.countdownInterval=setInterval(r,1e3)}async function De(){const e=document.getElementById("eventDateDisplay");try{const a=await D.getCountdownSettings();if(s.countdownSettingsLoaded=!!a,a&&a.eventCountdownDate){const t=new Date(a.eventCountdownDate);if(isNaN(t.getTime()))e&&(e.textContent="TANGGAL BELUM DITENTUKAN",e.classList.add("badge-pending-date"));else{Z(t.getTime());const o=t.toLocaleDateString("id-ID",{day:"numeric",month:"long",year:"numeric"}),n=t.toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"});e&&(e.textContent=`${o.toUpperCase()} • ${n} WIB`,e.classList.remove("badge-pending-date"))}}else e&&(e.textContent="TANGGAL BELUM DITENTUKAN",e.classList.add("badge-pending-date"));if(a&&a.isRegistrationClosed){s.isGlobalClosed=!0;const t=document.getElementById("heroStatusBadge"),o=document.getElementById("heroStatusText");t&&(t.style.borderColor="#EF4444"),o&&(o.innerHTML='<span style="color:#EF4444; font-weight:800;">🚨 PENDAFTARAN RESMI TELAH RESMI DITUTUP PANITIA</span>');const n=document.getElementById("heroCtaBtn");n&&(n.disabled=!0,n.classList.remove("btn-glow"),n.innerHTML='<i class="fa-solid fa-lock"></i> Pendaftaran Ditutup');const r=document.getElementById("navDaftarBtn");r&&(r.disabled=!0,r.classList.remove("btn-glow"),r.innerHTML='<i class="fa-solid fa-lock"></i> Ditutup');const i=document.getElementById("dockDaftarBtn");i&&(i.style.opacity="0.6",i.style.pointerEvents="none")}}catch(a){console.warn("Gagal memuat pengaturan countdown dari backend:",a),e&&(e.textContent="TANGGAL BELUM DITENTUKAN",e.classList.add("badge-pending-date"))}}async function ne(){const e=document.getElementById("pageSkeleton");try{const a=await D.getEvents();if(s.events=a,ie(a),oe(s.cmsStatsItems),!s.countdownTarget&&!s.countdownSettingsLoaded&&Array.isArray(a)){const o=a.map(n=>new Date(n.eventDate).getTime()).filter(n=>Number.isFinite(n)&&n>Date.now()).sort((n,r)=>n-r);o.length>0&&Z(o[0])}try{const n=await(await fetch(`${L}/settings/checkout-config`)).json();n.status==="success"&&n.data&&(s.feeSettings=n.data)}catch{}const t=new URLSearchParams(window.location.search).get("register");if(t){const o=a.find(n=>n.id===t);o&&!o.isClosed&&!s.isGlobalClosed&&setTimeout(()=>H(o),400)}}catch(a){console.error("Failed to render events:",a)}finally{e&&setTimeout(()=>{e.classList.add("hide")},350)}}function ie(e){const a=document.getElementById("ticketsGrid");if(a){if(a.innerHTML="",!Array.isArray(e)||e.length===0){a.innerHTML=`
       <div style="text-align: center; grid-column: 1 / -1; padding: 60px 20px;">
         <i class="fa-solid fa-ticket-simple" style="font-size: 3rem; color: #94A3B8; margin-bottom: 16px;"></i>
         <h3 style="color: var(--color-text-title); font-size: 1.25rem; margin-bottom: 6px;">Tidak Ada Kategori Tiket</h3>
         <p style="color: var(--color-text-muted); font-size: 0.9rem;">Belum ada kategori lomba yang dibuka di database.</p>
       </div>
-    `;return}a.forEach(t=>{const s=t.category==="10K",n=t.stock||0,i=typeof t.stock=="number"?t.stock:0,r=n>0?Math.max(0,Math.min(100,Math.round(i/n*100))):0,l=!!t.isClosed,m=document.createElement("div");m.className=`glass-card ticket-card ticket-pass-card ${s?"featured":""} ${l?"event-closed-card":""}`;const g=Array.isArray(t.benefits)&&t.benefits.length>0?t.benefits.map(p=>p.name):[],v=g.length>0?g.map(p=>`
+    `;return}e.forEach(t=>{const o=t.category==="10K",n=t.stock||0,r=typeof t.stock=="number"?t.stock:0,i=n>0?Math.max(0,Math.min(100,Math.round(r/n*100))):0,d=!!t.isClosed,c=document.createElement("div");c.className=`glass-card ticket-card ticket-pass-card ${o?"featured":""} ${d?"event-closed-card":""}`;const u=Array.isArray(t.benefits)&&t.benefits.length>0?t.benefits.map(p=>p.name):[],f=u.length>0?u.map(p=>`
           <li class="benefit-item">
             <div class="benefit-icon"><i class="fa-solid fa-check"></i></div>
             <span>${x(p)}</span>
           </li>
-        `).join(""):'<li class="benefit-item" style="color: var(--color-text-muted); font-style: italic;">Belum ada benefit tercantum</li>',c=t.ticketImage?`
-      <div class="ticket-card-banner">
-        <img src="${x(t.ticketImage)}" alt="${x(t.ticketName)}" loading="lazy">
+        `).join(""):'<li class="benefit-item" style="color: var(--color-text-muted); font-style: italic;">Belum ada benefit tercantum</li>',b=t.ticketImage||t.medalImage,h=`
+      <div class="ticket-card-banner${b?"":" ticket-card-banner-empty"}">
+        ${b?`<img src="${x(b)}" alt="${x(t.ticketName)}" loading="lazy" onerror="this.hidden=true;this.parentElement.classList.add('ticket-card-banner-empty')">`:'<i class="fa-solid fa-person-running" aria-hidden="true"></i>'}
         <div class="ticket-card-banner-overlay">
           <span class="ticket-banner-badge"><i class="fa-solid fa-person-running"></i> ${x(t.category)} Marathon</span>
           ${t.medalImage?'<span class="ticket-banner-medal-badge"><i class="fa-solid fa-medal"></i> Medali Finisher</span>':""}
         </div>
       </div>
-    `:"";m.innerHTML=`
+    `;c.innerHTML=`
       <!-- E-Tiket Stub Header -->
       <div class="ticket-stub-header">
         <div class="ticket-stub-brand">
           <i class="fa-solid fa-bolt" style="color: var(--color-primary);"></i> TEGAL RUN 2027
         </div>
         <div class="ticket-stub-tag">
-          ${l?'<span style="color:#ef4444;"><i class="fa-solid fa-lock"></i> CLOSED</span>':s?'<span style="color:#ff6b00;"><i class="fa-solid fa-fire"></i> POPULAR</span>':"<span>OFFICIAL PASS</span>"}
+          ${d?'<span style="color:#ef4444;"><i class="fa-solid fa-lock"></i> CLOSED</span>':o?'<span style="color:#ff6b00;"><i class="fa-solid fa-fire"></i> POPULAR</span>':"<span>OFFICIAL PASS</span>"}
         </div>
       </div>
 
-      ${c}
+      ${h}
 
       <div class="ticket-header">
         <span class="ticket-category-tag">${x(t.category)} MARATHON PASS</span>
@@ -1187,18 +1212,18 @@ import"./modulepreload-polyfill-B5Qt9EMX.js";/* empty css              */const L
       <div class="stock-wrapper">
         <div class="stock-info">
           <span>Status Kuota</span>
-          <span class="stock-status" style="color: ${l?"#EF4444":"#10B981"};">
-            <i class="${l?"fa-solid fa-lock":"fa-solid fa-fire"}"></i> 
-            ${l?"Pendaftaran Ditutup":`${i} Tiket Tersedia`}
+          <span class="stock-status" style="color: ${d?"#EF4444":"#10B981"};">
+            <i class="${d?"fa-solid fa-lock":"fa-solid fa-fire"}"></i> 
+            ${d?"Pendaftaran Ditutup":`${r} Tiket Tersedia`}
           </span>
         </div>
         <div class="stock-bar-bg">
-          <div class="stock-bar-fill" style="width: ${l?100:r}%; background: ${l?"#EF4444":""};"></div>
+          <div class="stock-bar-fill" style="width: ${d?100:i}%; background: ${d?"#EF4444":""};"></div>
         </div>
       </div>
 
       <ul class="ticket-benefits">
-        ${v}
+        ${f}
       </ul>
 
       <!-- Aesthetic Barcode Strip for Authentic Athletic Pass -->
@@ -1211,28 +1236,28 @@ import"./modulepreload-polyfill-B5Qt9EMX.js";/* empty css              */const L
         <button class="btn btn-secondary btn-sm btn-view-ticket-detail" data-id="${t.id}" style="flex: 1;" title="Lihat Fasilitas & Rincian Lengkap">
           <i class="fa-solid fa-circle-info"></i> Detail Tiket
         </button>
-        <button class="btn ${l?"btn-secondary":"btn-primary btn-glow"} btn-sm btn-select-ticket" data-id="${t.id}" ${l?"disabled":""} style="flex: 1.3;">
-          <i class="${l?"fa-solid fa-lock":"fa-solid fa-ticket"}"></i> 
-          ${l?"Ditutup":"Daftar Sekarang"}
+        <button class="btn ${d?"btn-secondary":"btn-primary btn-glow"} btn-sm btn-select-ticket" data-id="${t.id}" ${d?"disabled":""} style="flex: 1.3;">
+          <i class="${d?"fa-solid fa-lock":"fa-solid fa-ticket"}"></i> 
+          ${d?"Ditutup":"Daftar Sekarang"}
         </button>
       </div>
-    `,e.appendChild(m)}),document.querySelectorAll(".ticket-card").forEach(t=>{t.style.cursor="pointer",t.addEventListener("click",s=>{if(s.target.closest(".btn-select-ticket"))return;const n=t.querySelector(".btn-view-ticket-detail");if(n){const i=n.getAttribute("data-id");window.location.href=`/ticket-detail.html?id=${i}`}})}),document.querySelectorAll(".btn-view-ticket-detail").forEach(t=>{t.addEventListener("click",s=>{s.stopPropagation();const n=t.getAttribute("data-id");window.location.href=`/ticket-detail.html?id=${n}`})}),document.querySelectorAll(".btn-select-ticket").forEach(t=>{t.addEventListener("click",s=>{s.preventDefault(),s.stopPropagation();const n=t.getAttribute("data-id"),i=o.events.find(r=>r.id===n);i&&!i.isClosed&&W(i)})})}}function W(a=null){if(o.isGlobalClosed){u("error","Pendaftaran Ditutup","Mohon maaf, seluruh pendaftaran Tegal Run 2027 telah resmi ditutup oleh panitia.");return}const e=o.events.filter(n=>!n.isClosed);if(e.length===0){u("error","Pendaftaran Ditutup","Seluruh pendaftaran kategori event telah resmi ditutup oleh panitia.");return}o.selectedEvent=a&&!a.isClosed?a:e[0],o.currentStep=1,o.participantCount=1;const t=document.getElementById("regModal");if(!t)return;const s=document.getElementById("modalEventSelect");s&&(s.innerHTML=e.map(n=>`
-      <option value="${n.id}" ${o.selectedEvent&&o.selectedEvent.id===n.id?"selected":""}>
-        ${n.ticketName} - ${I(n.price)}
+    `,a.appendChild(c)}),document.querySelectorAll(".ticket-card").forEach(t=>{t.style.cursor="pointer",t.addEventListener("click",o=>{if(o.target.closest(".btn-select-ticket"))return;const n=t.querySelector(".btn-view-ticket-detail");if(n){const r=n.getAttribute("data-id");window.location.href=`/ticket-detail.html?id=${r}`}})}),document.querySelectorAll(".btn-view-ticket-detail").forEach(t=>{t.addEventListener("click",o=>{o.stopPropagation();const n=t.getAttribute("data-id");window.location.href=`/ticket-detail.html?id=${n}`})}),document.querySelectorAll(".btn-select-ticket").forEach(t=>{t.addEventListener("click",o=>{o.preventDefault(),o.stopPropagation();const n=t.getAttribute("data-id"),r=s.events.find(i=>i.id===n);r&&!r.isClosed&&H(r)})})}}function H(e=null){if(s.isGlobalClosed){v("error","Pendaftaran Ditutup","Mohon maaf, seluruh pendaftaran Tegal Run 2027 telah resmi ditutup oleh panitia.");return}const a=s.events.filter(n=>!n.isClosed);if(a.length===0){v("error","Pendaftaran Ditutup","Seluruh pendaftaran kategori event telah resmi ditutup oleh panitia.");return}s.selectedEvent=e&&!e.isClosed?e:a[0],s.currentStep=1,s.participantCount=1;const t=document.getElementById("regModal");if(!t)return;const o=document.getElementById("modalEventSelect");o&&(o.innerHTML=a.map(n=>`
+      <option value="${n.id}" ${s.selectedEvent&&s.selectedEvent.id===n.id?"selected":""}>
+        ${n.ticketName} - ${C(n.price)}
       </option>
-    `).join("")),Q(),Z(),H(),t.classList.add("active"),document.body.style.overflow="hidden",F.getCheckoutConfig().then(n=>{n&&(o.feeSettings=n,H())}).catch(()=>{})}function J(){const a=document.getElementById("regModal");a&&(a.classList.remove("active"),document.body.style.overflow="auto")}function Q(){[1,2,3].forEach(n=>{const i=document.getElementById(`stepIndicator${n}`),r=document.getElementById(`stepSection${n}`);i&&(i.classList.remove("active","done"),n===o.currentStep&&i.classList.add("active"),n<o.currentStep&&i.classList.add("done")),r&&(r.style.display=n===o.currentStep?"block":"none")});const e=document.getElementById("btnModalPrev"),t=document.getElementById("btnModalNext"),s=document.getElementById("btnModalSubmit");e&&(e.style.display=o.currentStep>1?"inline-flex":"none"),t&&(t.style.display=o.currentStep<3?"inline-flex":"none"),s&&(s.style.display=o.currentStep===3?"inline-flex":"none")}function sa(){var n,i;const a=new Map(o.events.map(r=>[r.id,r]));let e=0;for(let r=0;r<o.participantCount;r++){const l=document.querySelector(`.p-event-select[data-index="${r}"]`),m=l?l.value:(n=o.selectedEvent)==null?void 0:n.id,g=a.get(m)||o.selectedEvent;g&&(e+=Number(g.price))}let t=0;(i=o.feeSettings)!=null&&i.feeEnabled&&o.feeSettings.feeAmount>0&&(o.feeSettings.feeType==="PER_TICKET"?t=o.feeSettings.feeAmount*o.participantCount:t=o.feeSettings.feeAmount);const s=e+t;return{ticketsSubtotal:e,serviceFee:t,grandTotal:s}}function H(){var m;if(!o.selectedEvent)return;const{ticketsSubtotal:a,serviceFee:e,grandTotal:t}=sa(),s=document.getElementById("modalTotalAmount");s&&(s.textContent=I(t));const n=document.getElementById("step1TicketsSubtotal"),i=document.getElementById("step1FeeLabel"),r=document.getElementById("step1FeeAmount"),l=document.getElementById("step1GrandTotal");if(n&&(n.textContent=I(a)),r)if(e>0){if(r.textContent=`+ ${I(e)}`,r.style.color="#EA580C",i){const g=((m=o.feeSettings)==null?void 0:m.feeType)||"PER_TRANSACTION";i.textContent=`Biaya Layanan (${g==="PER_TICKET"?"Per Tiket":"Per Transaksi"}):`}}else r.textContent="Gratis (Rp 0)",r.style.color="#10B981",i&&(i.textContent="Biaya Layanan:");l&&(l.textContent=I(t))}function O(){var r,l,m;if(!((r=document.getElementById("checkSameAsBooker"))==null?void 0:r.checked))return;const e=((l=document.getElementById("bookerName"))==null?void 0:l.value.trim())||"",t=((m=document.getElementById("bookerPhone"))==null?void 0:m.value.trim())||"",s=document.querySelector('.p-fullname[data-index="0"]'),n=document.querySelector('.p-phone[data-index="0"]'),i=document.querySelector('.p-bibname[data-index="0"]');s&&e&&(s.value=e),i&&e&&!i.value&&(i.value=e.substring(0,15).toUpperCase()),n&&t&&(n.value=t)}function Z(){var s,n,i;const a=document.getElementById("participantsContainer");if(!a)return;a.innerHTML="";const e=o.events.filter(r=>!r.isClosed),t=((s=o.selectedEvent)==null?void 0:s.id)||(((n=e[0])==null?void 0:n.id)??"");for(let r=0;r<o.participantCount;r++){const l=document.createElement("div");l.className="participant-box",l.innerHTML=`
+    `).join("")),Y(),Q(),O(),t.classList.add("active"),document.body.style.overflow="hidden",D.getCheckoutConfig().then(n=>{n&&(s.feeSettings=n,O())}).catch(()=>{})}function J(){const e=document.getElementById("regModal");e&&(e.classList.remove("active"),document.body.style.overflow="auto")}function Y(){[1,2,3].forEach(n=>{const r=document.getElementById(`stepIndicator${n}`),i=document.getElementById(`stepSection${n}`);r&&(r.classList.remove("active","done"),n===s.currentStep&&r.classList.add("active"),n<s.currentStep&&r.classList.add("done")),i&&(i.style.display=n===s.currentStep?"block":"none")});const a=document.getElementById("btnModalPrev"),t=document.getElementById("btnModalNext"),o=document.getElementById("btnModalSubmit");a&&(a.style.display=s.currentStep>1?"inline-flex":"none"),t&&(t.style.display=s.currentStep<3?"inline-flex":"none"),o&&(o.style.display=s.currentStep===3?"inline-flex":"none")}function se(){var n,r;const e=new Map(s.events.map(i=>[i.id,i]));let a=0;for(let i=0;i<s.participantCount;i++){const d=document.querySelector(`.p-event-select[data-index="${i}"]`),c=d?d.value:(n=s.selectedEvent)==null?void 0:n.id,u=e.get(c)||s.selectedEvent;u&&(a+=Number(u.price))}let t=0;(r=s.feeSettings)!=null&&r.feeEnabled&&s.feeSettings.feeAmount>0&&(s.feeSettings.feeType==="PER_TICKET"?t=s.feeSettings.feeAmount*s.participantCount:t=s.feeSettings.feeAmount);const o=a+t;return{ticketsSubtotal:a,serviceFee:t,grandTotal:o}}function O(){var c;if(!s.selectedEvent)return;const{ticketsSubtotal:e,serviceFee:a,grandTotal:t}=se(),o=document.getElementById("modalTotalAmount");o&&(o.textContent=C(t));const n=document.getElementById("step1TicketsSubtotal"),r=document.getElementById("step1FeeLabel"),i=document.getElementById("step1FeeAmount"),d=document.getElementById("step1GrandTotal");if(n&&(n.textContent=C(e)),i)if(a>0){if(i.textContent=`+ ${C(a)}`,i.style.color="#EA580C",r){const u=((c=s.feeSettings)==null?void 0:c.feeType)||"PER_TRANSACTION";r.textContent=`Biaya Layanan (${u==="PER_TICKET"?"Per Tiket":"Per Transaksi"}):`}}else i.textContent="Gratis (Rp 0)",i.style.color="#10B981",r&&(r.textContent="Biaya Layanan:");d&&(d.textContent=C(t))}function z(){var i,d,c;if(!((i=document.getElementById("checkSameAsBooker"))==null?void 0:i.checked))return;const a=((d=document.getElementById("bookerName"))==null?void 0:d.value.trim())||"",t=((c=document.getElementById("bookerPhone"))==null?void 0:c.value.trim())||"",o=document.querySelector('.p-fullname[data-index="0"]'),n=document.querySelector('.p-phone[data-index="0"]'),r=document.querySelector('.p-bibname[data-index="0"]');o&&a&&(o.value=a),r&&a&&!r.value&&(r.value=a.substring(0,15).toUpperCase()),n&&t&&(n.value=t)}function Q(){var o,n,r;const e=document.getElementById("participantsContainer");if(!e)return;e.innerHTML="";const a=s.events.filter(i=>!i.isClosed),t=((o=s.selectedEvent)==null?void 0:o.id)||(((n=a[0])==null?void 0:n.id)??"");for(let i=0;i<s.participantCount;i++){const d=document.createElement("div");d.className="participant-box",d.innerHTML=`
       <div class="participant-box-header">
-        <h4><i class="fa-solid fa-user-tag"></i> Data Peserta #${r+1}</h4>
-        ${o.participantCount>1?`<span class="badge">Peserta ${r+1}</span>`:""}
+        <h4><i class="fa-solid fa-user-tag"></i> Data Peserta #${i+1}</h4>
+        ${s.participantCount>1?`<span class="badge">Peserta ${i+1}</span>`:""}
       </div>
 
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">Kategori Lari / Tiket <span class="req">*</span></label>
-          <select class="form-select p-event-select" required data-index="${r}">
-            ${e.map(v=>`
-              <option value="${v.id}" ${v.id===t?"selected":""}>
-                ${x(v.ticketName)} - ${I(v.price)}
+          <select class="form-select p-event-select" required data-index="${i}">
+            ${a.map(f=>`
+              <option value="${f.id}" ${f.id===t?"selected":""}>
+                ${x(f.ticketName)} - ${C(f.price)}
               </option>
             `).join("")}
           </select>
@@ -1241,7 +1266,7 @@ import"./modulepreload-polyfill-B5Qt9EMX.js";/* empty css              */const L
 
         <div class="form-group">
           <label class="form-label">Nomor WhatsApp Peserta (Aktif) <span class="req">*</span></label>
-          <input type="tel" class="form-input p-phone" required placeholder="Contoh: 081234567890" data-index="${r}">
+          <input type="tel" class="form-input p-phone" required placeholder="Contoh: 081234567890" data-index="${i}">
           <div class="form-hint">Wajib nomor aktif untuk pengiriman QR E-Tiket pelari.</div>
         </div>
       </div>
@@ -1249,11 +1274,11 @@ import"./modulepreload-polyfill-B5Qt9EMX.js";/* empty css              */const L
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">Nama Lengkap (Sesuai KTP) <span class="req">*</span></label>
-          <input type="text" class="form-input p-fullname" required placeholder="Contoh: Budi Santoso" data-index="${r}">
+          <input type="text" class="form-input p-fullname" required placeholder="Contoh: Budi Santoso" data-index="${i}">
         </div>
         <div class="form-group">
           <label class="form-label">Nama BIB (Maks. 15 Karakter) <span class="req">*</span></label>
-          <input type="text" maxlength="15" class="form-input p-bibname" required placeholder="Contoh: BUDI S" data-index="${r}">
+          <input type="text" maxlength="15" class="form-input p-bibname" required placeholder="Contoh: BUDI S" data-index="${i}">
           <div class="form-hint">Akan dicetak pada nomor dada Anda.</div>
         </div>
       </div>
@@ -1261,12 +1286,12 @@ import"./modulepreload-polyfill-B5Qt9EMX.js";/* empty css              */const L
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">NIK (16 Digit Angka) <span class="req">*</span></label>
-          <input type="text" maxlength="16" class="form-input p-nik" required placeholder="3328xxxxxxxxxxxx" data-index="${r}">
+          <input type="text" maxlength="16" class="form-input p-nik" required placeholder="3328xxxxxxxxxxxx" data-index="${i}">
           <div class="form-hint">Validasi KTP format resmi Disdukcapil (UU PDP).</div>
         </div>
         <div class="form-group">
           <label class="form-label">Jenis Kelamin <span class="req">*</span></label>
-          <select class="form-select p-gender" required data-index="${r}">
+          <select class="form-select p-gender" required data-index="${i}">
             <option value="MALE">Laki-Laki</option>
             <option value="FEMALE">Perempuan</option>
           </select>
@@ -1276,23 +1301,23 @@ import"./modulepreload-polyfill-B5Qt9EMX.js";/* empty css              */const L
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">Tempat Lahir <span class="req">*</span></label>
-          <input type="text" class="form-input p-birthplace" required placeholder="Contoh: Tegal" data-index="${r}">
+          <input type="text" class="form-input p-birthplace" required placeholder="Contoh: Tegal" data-index="${i}">
         </div>
         <div class="form-group">
           <label class="form-label">Tanggal Lahir <span class="req">*</span></label>
-          <input type="date" class="form-input p-birthdate" required data-index="${r}">
+          <input type="date" class="form-input p-birthdate" required data-index="${i}">
         </div>
       </div>
 
       <div class="form-group">
         <label class="form-label">Alamat Lengkap (Domisili KTP) <span class="req">*</span></label>
-        <textarea rows="2" class="form-textarea p-address" required placeholder="Jalan, RT/RW, Kelurahan, Kecamatan, Kota" data-index="${r}"></textarea>
+        <textarea rows="2" class="form-textarea p-address" required placeholder="Jalan, RT/RW, Kelurahan, Kecamatan, Kota" data-index="${i}"></textarea>
       </div>
 
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">Golongan Darah (Untuk Medis) <span class="req">*</span></label>
-          <select class="form-select p-blood" required data-index="${r}">
+          <select class="form-select p-blood" required data-index="${i}">
             <option value="A">A</option>
             <option value="B">B</option>
             <option value="AB">AB</option>
@@ -1301,7 +1326,7 @@ import"./modulepreload-polyfill-B5Qt9EMX.js";/* empty css              */const L
         </div>
         <div class="form-group">
           <label class="form-label">Ukuran Jersey Resmi</label>
-          <select class="form-select p-size" data-index="${r}">
+          <select class="form-select p-size" data-index="${i}">
             <option value="XS">XS (46 x 66 cm)</option>
             <option value="S">S (48 x 68 cm)</option>
             <option value="M" selected>M (50 x 70 cm)</option>
@@ -1315,83 +1340,82 @@ import"./modulepreload-polyfill-B5Qt9EMX.js";/* empty css              */const L
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">Nama Kontak Darurat <span class="req">*</span></label>
-          <input type="text" class="form-input p-emg-name" required placeholder="Nama Keluarga / Kerabat" data-index="${r}">
+          <input type="text" class="form-input p-emg-name" required placeholder="Nama Keluarga / Kerabat" data-index="${i}">
         </div>
         <div class="form-group">
           <label class="form-label">No. HP Kontak Darurat (Format +628) <span class="req">*</span></label>
-          <input type="text" class="form-input p-emg-phone" required placeholder="+628123456789" data-index="${r}">
+          <input type="text" class="form-input p-emg-phone" required placeholder="+628123456789" data-index="${i}">
         </div>
       </div>
 
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">Nama Komunitas Lari (Opsional)</label>
-          <input type="text" class="form-input p-community" placeholder="Contoh: Tegal Runners Club" data-index="${r}">
+          <input type="text" class="form-input p-community" placeholder="Contoh: Tegal Runners Club" data-index="${i}">
         </div>
         <div class="form-group">
           <label class="form-label">Riwayat Penyakit / Alergi (Opsional)</label>
-          <input type="text" class="form-input p-medical" placeholder="Asma, Alergi, dsb (Jika ada)" data-index="${r}">
+          <input type="text" class="form-input p-medical" placeholder="Asma, Alergi, dsb (Jika ada)" data-index="${i}">
         </div>
       </div>
-    `,a.appendChild(l);const m=l.querySelector(".p-phone"),g=l.querySelector(".p-emg-phone");Y(m),Y(g),(i=l.querySelector(".p-event-select"))==null||i.addEventListener("change",()=>{H()})}O()}function La(a){var e,t,s,n,i,r,l,m,g,v,c,p;if(a===1){const d=(e=document.getElementById("bookerName"))==null?void 0:e.value.trim(),k=(t=document.getElementById("bookerEmail"))==null?void 0:t.value.trim(),h=(s=document.getElementById("bookerPhone"))==null?void 0:s.value.trim();return!d||d.length<3?(u("error","Validasi Gagal","Nama pemesan minimal 3 karakter."),!1):!k||!k.includes("@")?(u("error","Validasi Gagal","Email pemesan tidak valid."),!1):!h||!/^(\+62|62|08)\d{8,13}$/.test(h.replace(/\s+/g,""))?(u("error","Validasi Gagal","Nomor WhatsApp tidak valid (gunakan awalan 08 atau +628, min 10 digit)."),!1):(O(),!0)}if(a===2){for(let d=0;d<o.participantCount;d++){const k=(n=document.querySelector(`.p-fullname[data-index="${d}"]`))==null?void 0:n.value.trim(),h=(i=document.querySelector(`.p-phone[data-index="${d}"]`))==null?void 0:i.value.trim(),f=(r=document.querySelector(`.p-bibname[data-index="${d}"]`))==null?void 0:r.value.trim(),T=(l=document.querySelector(`.p-nik[data-index="${d}"]`))==null?void 0:l.value.trim(),S=(m=document.querySelector(`.p-birthplace[data-index="${d}"]`))==null?void 0:m.value.trim(),P=(g=document.querySelector(`.p-birthdate[data-index="${d}"]`))==null?void 0:g.value.trim(),B=(v=document.querySelector(`.p-address[data-index="${d}"]`))==null?void 0:v.value.trim(),A=(c=document.querySelector(`.p-emg-name[data-index="${d}"]`))==null?void 0:c.value.trim(),C=(p=document.querySelector(`.p-emg-phone[data-index="${d}"]`))==null?void 0:p.value.trim();if(!k||k.length<3)return u("error",`Peserta #${d+1}`,"Nama lengkap KTP minimal 3 karakter."),!1;if(!h||!/^(\+62|62|08)\d{7,12}$/.test(h.replace(/\s+/g,"")))return u("error",`Peserta #${d+1}`,"Nomor WhatsApp peserta wajib diisi (contoh: 08123456789 atau +628123456789)."),!1;if(!f||f.length>15)return u("error",`Peserta #${d+1}`,"Nama BIB maksimal 15 karakter."),!1;if(!T||!/^\d{16}$/.test(T))return u("error",`Peserta #${d+1}`,"NIK harus tepat 16 digit angka sesuai KTP."),!1;if(!S||S.length<3)return u("error",`Peserta #${d+1}`,"Tempat lahir wajib diisi."),!1;if(!P)return u("error",`Peserta #${d+1}`,"Tanggal lahir wajib diisi."),!1;if(!B||B.length<10)return u("error",`Peserta #${d+1}`,"Alamat lengkap wajib diisi minimal 10 karakter."),!1;if(!A||A.length<3)return u("error",`Peserta #${d+1}`,"Nama kontak darurat wajib diisi."),!1;if(!C||!/^(\+62|62|08)\d{7,12}$/.test(C.replace(/\s+/g,"")))return u("error",`Peserta #${d+1}`,"Nomor kontak darurat harus diawali 08 atau +628."),!1}return!0}return!0}function Da(){var g,v,c,p,d,k,h;const a=document.getElementById("summaryReviewBox");if(!a||!o.selectedEvent)return;const e=(g=document.getElementById("bookerName"))==null?void 0:g.value.trim(),t=(v=document.getElementById("bookerEmail"))==null?void 0:v.value.trim(),s=(c=document.getElementById("bookerPhone"))==null?void 0:c.value.trim(),{ticketsSubtotal:n,serviceFee:i,grandTotal:r}=sa(),l=new Map(o.events.map(f=>[f.id,f]));let m="";for(let f=0;f<o.participantCount;f++){const T=((p=document.querySelector(`.p-fullname[data-index="${f}"]`))==null?void 0:p.value.trim())||`Peserta #${f+1}`,S=((d=document.querySelector(`.p-event-select[data-index="${f}"]`))==null?void 0:d.value)||o.selectedEvent.id,P=l.get(S)||o.selectedEvent,B=((k=document.querySelector(`.p-phone[data-index="${f}"]`))==null?void 0:k.value.trim())||"-";m+=`
+    `,e.appendChild(d);const c=d.querySelector(".p-phone"),u=d.querySelector(".p-emg-phone");X(c),X(u),(r=d.querySelector(".p-event-select"))==null||r.addEventListener("change",()=>{O()})}z()}function Fe(e){var a,t,o,n,r,i,d,c,u,f,b,h;if(e===1){const p=(a=document.getElementById("bookerName"))==null?void 0:a.value.trim(),k=(t=document.getElementById("bookerEmail"))==null?void 0:t.value.trim(),E=(o=document.getElementById("bookerPhone"))==null?void 0:o.value.trim();return!p||p.length<3?(v("error","Validasi Gagal","Nama pemesan minimal 3 karakter."),!1):!k||!k.includes("@")?(v("error","Validasi Gagal","Email pemesan tidak valid."),!1):!E||!/^(\+62|62|08)\d{8,13}$/.test(E.replace(/\s+/g,""))?(v("error","Validasi Gagal","Nomor WhatsApp tidak valid (gunakan awalan 08 atau +628, min 10 digit)."),!1):(z(),!0)}if(e===2){for(let p=0;p<s.participantCount;p++){const k=(n=document.querySelector(`.p-fullname[data-index="${p}"]`))==null?void 0:n.value.trim(),E=(r=document.querySelector(`.p-phone[data-index="${p}"]`))==null?void 0:r.value.trim(),y=(i=document.querySelector(`.p-bibname[data-index="${p}"]`))==null?void 0:i.value.trim(),P=(d=document.querySelector(`.p-nik[data-index="${p}"]`))==null?void 0:d.value.trim(),B=(c=document.querySelector(`.p-birthplace[data-index="${p}"]`))==null?void 0:c.value.trim(),l=(u=document.querySelector(`.p-birthdate[data-index="${p}"]`))==null?void 0:u.value.trim(),m=(f=document.querySelector(`.p-address[data-index="${p}"]`))==null?void 0:f.value.trim(),g=(b=document.querySelector(`.p-emg-name[data-index="${p}"]`))==null?void 0:b.value.trim(),A=(h=document.querySelector(`.p-emg-phone[data-index="${p}"]`))==null?void 0:h.value.trim();if(!k||k.length<3)return v("error",`Peserta #${p+1}`,"Nama lengkap KTP minimal 3 karakter."),!1;if(!E||!/^(\+62|62|08)\d{7,12}$/.test(E.replace(/\s+/g,"")))return v("error",`Peserta #${p+1}`,"Nomor WhatsApp peserta wajib diisi (contoh: 08123456789 atau +628123456789)."),!1;if(!y||y.length>15)return v("error",`Peserta #${p+1}`,"Nama BIB maksimal 15 karakter."),!1;if(!P||!/^\d{16}$/.test(P))return v("error",`Peserta #${p+1}`,"NIK harus tepat 16 digit angka sesuai KTP."),!1;if(!B||B.length<3)return v("error",`Peserta #${p+1}`,"Tempat lahir wajib diisi."),!1;if(!l)return v("error",`Peserta #${p+1}`,"Tanggal lahir wajib diisi."),!1;if(!m||m.length<10)return v("error",`Peserta #${p+1}`,"Alamat lengkap wajib diisi minimal 10 karakter."),!1;if(!g||g.length<3)return v("error",`Peserta #${p+1}`,"Nama kontak darurat wajib diisi."),!1;if(!A||!/^(\+62|62|08)\d{7,12}$/.test(A.replace(/\s+/g,"")))return v("error",`Peserta #${p+1}`,"Nomor kontak darurat harus diawali 08 atau +628."),!1}return!0}return!0}function qe(){var u,f,b,h,p,k,E;const e=document.getElementById("summaryReviewBox");if(!e||!s.selectedEvent)return;const a=(u=document.getElementById("bookerName"))==null?void 0:u.value.trim(),t=(f=document.getElementById("bookerEmail"))==null?void 0:f.value.trim(),o=(b=document.getElementById("bookerPhone"))==null?void 0:b.value.trim(),{ticketsSubtotal:n,serviceFee:r,grandTotal:i}=se(),d=new Map(s.events.map(y=>[y.id,y]));let c="";for(let y=0;y<s.participantCount;y++){const P=((h=document.querySelector(`.p-fullname[data-index="${y}"]`))==null?void 0:h.value.trim())||`Peserta #${y+1}`,B=((p=document.querySelector(`.p-event-select[data-index="${y}"]`))==null?void 0:p.value)||s.selectedEvent.id,l=d.get(B)||s.selectedEvent,m=((k=document.querySelector(`.p-phone[data-index="${y}"]`))==null?void 0:k.value.trim())||"-";c+=`
       <div style="display: flex; justify-content: space-between; font-size: 0.85rem; padding: 6px 0; border-bottom: 1px dotted #CBD5E1;">
         <div>
-          <strong>#${f+1} ${x(T)}</strong> (${x(B)})<br>
-          <span style="color: #64748B; font-size: 0.78rem;">Kategori: ${x(P.ticketName)}</span>
+          <strong>#${y+1} ${x(P)}</strong> (${x(m)})<br>
+          <span style="color: #64748B; font-size: 0.78rem;">Kategori: ${x(l.ticketName)}</span>
         </div>
-        <span style="font-weight: 700; color: #0F172A;">${I(P.price)}</span>
+        <span style="font-weight: 700; color: #0F172A;">${C(l.price)}</span>
       </div>
-    `}a.innerHTML=`
+    `}e.innerHTML=`
     <div style="background: #F8FAFC; border: 1px solid var(--color-border-subtle); border-radius: var(--radius-md); padding: 18px; margin-bottom: 18px;">
       <h4 style="color: var(--color-primary); font-size: 1rem; margin-bottom: 12px;"><i class="fa-solid fa-receipt"></i> Ringkasan Tiket & Pemesan</h4>
-      <p style="font-size: 0.88rem; margin-bottom: 4px;"><strong>Penanggung Jawab:</strong> ${x(e)}</p>
-      <p style="font-size: 0.82rem; color: #64748B; margin-bottom: 12px;">${x(t)} | ${x(s)}</p>
+      <p style="font-size: 0.88rem; margin-bottom: 4px;"><strong>Penanggung Jawab:</strong> ${x(a)}</p>
+      <p style="font-size: 0.82rem; color: #64748B; margin-bottom: 12px;">${x(t)} | ${x(o)}</p>
 
       <div style="margin-bottom: 14px;">
         <span style="font-size: 0.8rem; font-weight: 800; color: #475569; text-transform: uppercase;">Rincian Peserta:</span>
         <div style="margin-top: 6px;">
-          ${m}
+          ${c}
         </div>
       </div>
 
       <div style="display: flex; justify-content: space-between; font-size: 0.9rem; margin-top: 8px;">
         <span style="color: #64748B;">Subtotal Tiket:</span>
-        <strong>${I(n)}</strong>
+        <strong>${C(n)}</strong>
       </div>
-      <div style="display: flex; justify-content: space-between; font-size: 0.9rem; margin-top: 4px; ${i>0?"color: #EA580C;":"color: #10B981;"}">
-        <span>Biaya Layanan (${((h=o.feeSettings)==null?void 0:h.feeType)==="PER_TICKET"?"Per Tiket":"Per Transaksi"}):</span>
-        <strong>${i>0?`+ ${I(i)}`:"Gratis (Rp 0)"}</strong>
+      <div style="display: flex; justify-content: space-between; font-size: 0.9rem; margin-top: 4px; ${r>0?"color: #EA580C;":"color: #10B981;"}">
+        <span>Biaya Layanan (${((E=s.feeSettings)==null?void 0:E.feeType)==="PER_TICKET"?"Per Tiket":"Per Transaksi"}):</span>
+        <strong>${r>0?`+ ${C(r)}`:"Gratis (Rp 0)"}</strong>
       </div>
       <div style="border-top: 1px solid var(--color-border-subtle); margin-top: 10px; padding-top: 10px; display: flex; justify-content: space-between; font-weight: 800; font-size: 1.15rem; color: var(--color-text-title);">
         <span>Total Pembayaran:</span>
-        <span style="color: var(--color-primary);">${I(r)}</span>
+        <span style="color: var(--color-primary);">${C(i)}</span>
       </div>
     </div>
-  `}async function Fa(){var k,h,f,T,S,P,B,A,C,q,$,N,R,_,K,j,z,y,E,w,D;if((k=o.selectedEvent)!=null&&k.isClosed){u("error","Pendaftaran Ditutup","Pendaftaran untuk kategori ini telah resmi ditutup.");return}const a=(h=document.getElementById("checkConsentPDP"))==null?void 0:h.checked,e=(f=document.getElementById("checkConsentWaiver"))==null?void 0:f.checked;if(!a){u("warning","Persetujuan Diperlukan","Harap setujui Pemrosesan Data Pribadi sesuai UU PDP No. 27/2022.");return}if(!e){u("warning","Persetujuan Diperlukan","Harap setujui Pelepasan Tanggung Jawab Medis (Liability Waiver).");return}const t=document.getElementById("btnModalSubmit");t&&(t.disabled=!0,t.innerHTML='<i class="fa-solid fa-circle-notch fa-spin"></i> Memproses Pesanan...');const s=[];for(let b=0;b<o.participantCount;b++){const G=((T=document.querySelector(`.p-event-select[data-index="${b}"]`))==null?void 0:T.value)||o.selectedEvent.id,V=(S=document.querySelector(`.p-fullname[data-index="${b}"]`))==null?void 0:S.value.trim(),oa=ea((P=document.querySelector(`.p-phone[data-index="${b}"]`))==null?void 0:P.value.trim()),ra=(B=document.querySelector(`.p-bibname[data-index="${b}"]`))==null?void 0:B.value.trim().toUpperCase(),la=(A=document.querySelector(`.p-nik[data-index="${b}"]`))==null?void 0:A.value.trim(),da=(C=document.querySelector(`.p-gender[data-index="${b}"]`))==null?void 0:C.value,ca=(q=document.querySelector(`.p-birthplace[data-index="${b}"]`))==null?void 0:q.value.trim(),pa=($=document.querySelector(`.p-birthdate[data-index="${b}"]`))==null?void 0:$.value.trim(),ma=(N=document.querySelector(`.p-address[data-index="${b}"]`))==null?void 0:N.value.trim(),ua=(R=document.querySelector(`.p-blood[data-index="${b}"]`))==null?void 0:R.value,ga=(_=document.querySelector(`.p-size[data-index="${b}"]`))==null?void 0:_.value,fa=(K=document.querySelector(`.p-emg-name[data-index="${b}"]`))==null?void 0:K.value.trim(),va=ea((j=document.querySelector(`.p-emg-phone[data-index="${b}"]`))==null?void 0:j.value.trim()),ba=((z=document.querySelector(`.p-community[data-index="${b}"]`))==null?void 0:z.value.trim())||null,ka=((y=document.querySelector(`.p-medical[data-index="${b}"]`))==null?void 0:y.value.trim())||null;s.push({eventId:G,fullNameKtp:V,phoneNumber:oa,bibName:ra,nik:la,gender:da,birthPlace:ca,birthDate:pa,fullAddress:ma,bloodType:ua,selectedSize:ga,emergencyContactName:fa,emergencyContactPhone:va,communityName:ba,medicalHistory:ka})}const n=((E=document.getElementById("bookerName"))==null?void 0:E.value.trim())||"",i=((w=document.getElementById("bookerEmail"))==null?void 0:w.value.trim())||"",r=((D=document.getElementById("bookerPhone"))==null?void 0:D.value.trim())||"";if(!i||!r){u("warning","Data Pemesan Kurang","Harap lengkapi Nama, Email aktif, dan Nomor WhatsApp penanggung jawab.");return}const l={bookerName:n,bookerEmail:i,bookerPhone:r,eventId:o.selectedEvent.id,participants:s};u("warning","Menghubungkan Server","Mengamankan slot tiket Anda ke sistem database...");const m=await F.registerOrder(l);if(t&&(t.disabled=!1,t.innerHTML='<i class="fa-solid fa-credit-card"></i> Bayar Sekarang (Midtrans)'),!m.success){u("error","Gagal Memesan Tiket",m.message);return}u("success","Slot Tiket Diamankan!","Membuka gerbang pembayaran resmi Midtrans Snap...");const{paymentToken:g,paymentUrl:v,orderId:c,midtransOrderId:p}=m.data,d=c||p;window.snap&&typeof window.snap.pay=="function"?window.snap.pay(g,{onSuccess:function(){u("success","Pembayaran Berhasil!","Selamat! Membuka E-Tiket resmi Anda..."),J(),na(),setTimeout(()=>{window.location.href=`/e-ticket.html?orderId=${d}`},1200)},onPending:function(){u("warning","Menunggu Pembayaran","Mengarahkan ke halaman rincian instruksi pembayaran..."),J(),setTimeout(()=>{window.location.href=`/payment.html?orderId=${d}`},1200)},onError:function(){u("error","Pembayaran Gagal","Transaksi dibatalkan atau kedaluwarsa.")},onClose:function(){u("warning","Transaksi Tertunda","Mengarahkan ke halaman instruksi pembayaran & pembatalan..."),setTimeout(()=>{window.location.href=`/payment.html?orderId=${d}`},1e3)}}):v&&window.open(v,"_blank")}function X(a){const e=document.getElementById(a);e&&(e.classList.add("active"),document.body.style.overflow="hidden")}function M(a){const e=document.getElementById(a);e&&(e.classList.remove("active"),document.body.style.overflow="auto")}async function Ma(){try{const a=await F.getWebsiteSettings();if(!a)return;a.site_title&&(document.title=a.site_title);const e=document.getElementById("heroStatusText")||document.querySelector(".hero-pill-badge span:not(.status-dot)");e&&a.hero_badge&&(e.textContent=a.hero_badge);const t=document.querySelector(".hero-title");t&&a.hero_title&&(t.innerHTML=a.hero_title.replace(/\n/g,"<br>"));const s=document.querySelector(".hero-desc");s&&a.hero_subtitle&&(s.textContent=a.hero_subtitle);const n=document.getElementById("heroDisplayImg");n&&a.hero_bg_image&&(n.src=a.hero_bg_image);const i=(c,p)=>{const d=document.getElementById(c);d&&p!==void 0&&p!==null&&p!==""&&(d.textContent=p)};i("statVal1",a.stat_1_val),i("statUnit1",a.stat_1_unit),i("statDesc1",a.stat_1_desc),i("statVal2",a.stat_2_val),i("statUnit2",a.stat_2_unit),i("statDesc2",a.stat_2_desc),i("statVal3",a.stat_3_val),i("statUnit3",a.stat_3_unit),i("statDesc3",a.stat_3_desc),i("statVal4",a.stat_4_val),i("statUnit4",a.stat_4_unit),i("statDesc4",a.stat_4_desc);const r=document.getElementById("beranda");r&&a.hero_bg_image&&(r.style.backgroundImage=`radial-gradient(circle at 10% 20%, rgba(255, 107, 0, 0.08) 0%, transparent 40%), radial-gradient(circle at 90% 80%, rgba(255, 107, 0, 0.05) 0%, transparent 40%), linear-gradient(180deg, rgba(255, 255, 255, 0.88) 0%, rgba(255, 255, 255, 0.98) 100%), url('${a.hero_bg_image}')`,r.style.backgroundSize="cover",r.style.backgroundPosition="center");const l=document.getElementById("rute");if(l){const c=document.getElementById("routeSectionTitle")||l.querySelector(".section-title");c&&a.route_title&&(c.textContent=a.route_title);const p=document.getElementById("routeSectionDesc")||l.querySelector(".route-info-card > p");p&&a.route_desc&&(p.textContent=a.route_desc),i("routeStart10k",a.route_start_10k),i("routeStart5k",a.route_start_5k),i("routeCot10k",a.route_cot_10k),i("routeCot5k",a.route_cot_5k);const d=document.getElementById("btnDownloadGpx");d&&a.route_gpx_url&&(d.href=a.route_gpx_url,a.route_gpx_url==="#"||!a.route_gpx_url.startsWith("http")?d.onclick=f=>{f.preventDefault(),alert("File GPX Rute Tegal Run 2027 akan dapat diunduh pada H-14 perlombaan.")}:(d.setAttribute("target","_blank"),d.onclick=null));const k=l.querySelector(".route-visual-card"),h=a.route_gmaps_url||a.gmaps_embed_url;if(k&&h){let f=h.trim();const T=f.match(/src=["'](.*?)["']/);T&&T[1]&&(f=T[1]),k.innerHTML=`
-          <div class="route-badge-float">
-            <i class="fa-solid fa-location-dot"></i> Rute & Lokasi Google Maps
-          </div>
-          <div class="gmaps-responsive-wrapper">
-            <iframe src="${f}" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" style="width: 100%; height: 100%; min-height: 380px; border: 0; border-radius: 16px;"></iframe>
-          </div>
-        `}}const m=document.getElementById("fasilitas");if(m){const c=m.querySelector(".section-title");c&&a.facilities_title&&(c.textContent=a.facilities_title);const p=m.querySelector(".section-desc");p&&a.facilities_desc&&(p.textContent=a.facilities_desc)}const g=document.getElementById("facilitiesContainer");if(g){const c=[{icon:"fa-shirt",title:"Jersey Running Dry-Fit",desc:"Bahan mikro-pori cepat kering dengan sablon sublimasi awet dan nyaman untuk jarak jauh."},{icon:"fa-microchip",title:"Nomor Dada (BIB) & Timing Chip",desc:"Pencatatan waktu akurat berteknologi RFID transponder yang tersinkronisasi online."},{icon:"fa-medal",title:"Medali Finisher Logam Cor",desc:"Medali eksklusif cor tebal berlapis anti-karat untuk seluruh pelari yang finis sebelum COT."},{icon:"fa-bottle-water",title:"Water & Isotonic Station",desc:"Pos hidrasi setiap 2.5 KM dilengkapi air mineral steril, minuman isotonik, dan buah segar."},{icon:"fa-truck-medical",title:"Tim Medis & Ambulans Mobile",desc:"Standar medis PASI dengan pos pertolongan pertama terpadu dan ambulans standby di rute."},{icon:"fa-utensils",title:"Refreshment & Finisher Feast",desc:"Paket nutrisi pemulihan pasca finis berisi susu protein, kudapan sehat khas Tegal, dan buah segar."}];g.innerHTML=c.map(p=>`
+  `}async function Ne(){var k,E,y,P,B,l,m,g,A,q,N,$,R,_,j,K,U,T,I,S,M;if((k=s.selectedEvent)!=null&&k.isClosed){v("error","Pendaftaran Ditutup","Pendaftaran untuk kategori ini telah resmi ditutup.");return}const e=(E=document.getElementById("checkConsentPDP"))==null?void 0:E.checked,a=(y=document.getElementById("checkConsentWaiver"))==null?void 0:y.checked;if(!e){v("warning","Persetujuan Diperlukan","Harap setujui Pemrosesan Data Pribadi sesuai UU PDP No. 27/2022.");return}if(!a){v("warning","Persetujuan Diperlukan","Harap setujui Pelepasan Tanggung Jawab Medis (Liability Waiver).");return}const t=document.getElementById("btnModalSubmit");t&&(t.disabled=!0,t.innerHTML='<i class="fa-solid fa-circle-notch fa-spin"></i> Memproses Pesanan...');const o=[];for(let w=0;w<s.participantCount;w++){const G=((P=document.querySelector(`.p-event-select[data-index="${w}"]`))==null?void 0:P.value)||s.selectedEvent.id,W=(B=document.querySelector(`.p-fullname[data-index="${w}"]`))==null?void 0:B.value.trim(),le=ae((l=document.querySelector(`.p-phone[data-index="${w}"]`))==null?void 0:l.value.trim()),de=(m=document.querySelector(`.p-bibname[data-index="${w}"]`))==null?void 0:m.value.trim().toUpperCase(),ce=(g=document.querySelector(`.p-nik[data-index="${w}"]`))==null?void 0:g.value.trim(),pe=(A=document.querySelector(`.p-gender[data-index="${w}"]`))==null?void 0:A.value,me=(q=document.querySelector(`.p-birthplace[data-index="${w}"]`))==null?void 0:q.value.trim(),ue=(N=document.querySelector(`.p-birthdate[data-index="${w}"]`))==null?void 0:N.value.trim(),ge=($=document.querySelector(`.p-address[data-index="${w}"]`))==null?void 0:$.value.trim(),fe=(R=document.querySelector(`.p-blood[data-index="${w}"]`))==null?void 0:R.value,ve=(_=document.querySelector(`.p-size[data-index="${w}"]`))==null?void 0:_.value,be=(j=document.querySelector(`.p-emg-name[data-index="${w}"]`))==null?void 0:j.value.trim(),he=ae((K=document.querySelector(`.p-emg-phone[data-index="${w}"]`))==null?void 0:K.value.trim()),ke=((U=document.querySelector(`.p-community[data-index="${w}"]`))==null?void 0:U.value.trim())||null,ye=((T=document.querySelector(`.p-medical[data-index="${w}"]`))==null?void 0:T.value.trim())||null;o.push({eventId:G,fullNameKtp:W,phoneNumber:le,bibName:de,nik:ce,gender:pe,birthPlace:me,birthDate:ue,fullAddress:ge,bloodType:fe,selectedSize:ve,emergencyContactName:be,emergencyContactPhone:he,communityName:ke,medicalHistory:ye})}const n=((I=document.getElementById("bookerName"))==null?void 0:I.value.trim())||"",r=((S=document.getElementById("bookerEmail"))==null?void 0:S.value.trim())||"",i=((M=document.getElementById("bookerPhone"))==null?void 0:M.value.trim())||"";if(!r||!i){v("warning","Data Pemesan Kurang","Harap lengkapi Nama, Email aktif, dan Nomor WhatsApp penanggung jawab.");return}const d={bookerName:n,bookerEmail:r,bookerPhone:i,eventId:s.selectedEvent.id,participants:o};v("warning","Menghubungkan Server","Mengamankan slot tiket Anda ke sistem database...");const c=await D.registerOrder(d);if(t&&(t.disabled=!1,t.innerHTML='<i class="fa-solid fa-credit-card"></i> Bayar Sekarang (Midtrans)'),!c.success){v("error","Gagal Memesan Tiket",c.message);return}v("success","Slot Tiket Diamankan!","Membuka gerbang pembayaran resmi Midtrans Snap...");const{paymentToken:u,paymentUrl:f,orderId:b,midtransOrderId:h}=c.data,p=b||h;window.snap&&typeof window.snap.pay=="function"?window.snap.pay(u,{onSuccess:function(){v("success","Pembayaran Berhasil!","Selamat! Membuka E-Tiket resmi Anda..."),J(),ne(),setTimeout(()=>{window.location.href=`/e-ticket.html?orderId=${p}`},1200)},onPending:function(){v("warning","Menunggu Pembayaran","Mengarahkan ke halaman rincian instruksi pembayaran..."),J(),setTimeout(()=>{window.location.href=`/payment.html?orderId=${p}`},1200)},onError:function(){v("error","Pembayaran Gagal","Transaksi dibatalkan atau kedaluwarsa.")},onClose:function(){v("warning","Transaksi Tertunda","Mengarahkan ke halaman instruksi pembayaran & pembatalan..."),setTimeout(()=>{window.location.href=`/payment.html?orderId=${p}`},1e3)}}):f&&window.open(f,"_blank")}function V(e){const a=document.getElementById(e);a&&(a.classList.add("active"),document.body.style.overflow="hidden")}function F(e){const a=document.getElementById(e);a&&(a.classList.remove("active"),document.body.style.overflow="auto")}function oe(e){const a=document.getElementById("statsBanner");if(!a||!Array.isArray(e))return;e=e.filter(r=>r&&typeof r=="object"&&r.visible!==!1),a.replaceChildren(),a.hidden=e.length===0||s.cmsVisibility.stats===!1;const t=Array.isArray(s.events)?s.events:[],o=t.reduce((r,i)=>(r.participants+=Number(i.registeredCount||0),r.capacity+=Number(i.stock||0),r.available+=Number(i.remainingStock??Math.max(0,Number(i.stock||0)-Number(i.registeredCount||0))),r),{participants:0,capacity:0,available:0}),n={TOTAL_PARTICIPANTS:o.participants,TOTAL_CATEGORIES:t.length,TOTAL_CAPACITY:o.capacity,AVAILABLE_SLOTS:o.available};e.forEach((r,i)=>{const d=r.type==="AUTO"&&Object.hasOwn(n,r.autoKey),c=d?n[r.autoKey]:r.val,u=d?Number(c||0).toLocaleString("id-ID"):c,f=document.createElement("div");f.className="stat-item";const b=document.createElement("div");b.className="stat-num",i<4&&(b.id=`statVal${i+1}`);const h=document.createElement("span");h.textContent=u==null?"":String(u);const p=document.createElement("small");p.textContent=r.unit||"",i<4&&(p.id=`statUnit${i+1}`),b.append(h,document.createTextNode(" "),p);const k=document.createElement("div");k.className="stat-desc",k.textContent=r.desc||"",i<4&&(k.id=`statDesc${i+1}`),f.append(b,k),a.append(f)})}function re(e,a){const t=document.querySelector("#rute .route-visual-card");if(!t)return;const o=String(e||"").trim();let n="";if(o){const i=o.match(/src=["']([^"']+)["']/i),d=(i==null?void 0:i[1])||o;try{const c=new URL(d),u=c.hostname.toLowerCase(),f=u==="google.com"||u.endsWith(".google.com")||u==="maps.app.goo.gl"||u==="goo.gl";c.protocol==="https:"&&f&&(n=u.endsWith("google.com")&&c.pathname.startsWith("/maps/embed")?c.href:`https://www.google.com/maps?q=${encodeURIComponent(d)}&output=embed`)}catch(c){console.warn("Link Google Maps CMS tidak valid:",c)}}t.replaceChildren();const r=document.createElement("div");if(r.className="route-badge-float",r.innerHTML='<i class="fa-solid fa-location-dot"></i> Rute & Lokasi Google Maps',t.append(r),n){const i=document.createElement("div");i.className="gmaps-responsive-wrapper";const d=document.createElement("iframe");d.src=n,d.title="Peta rute lari",d.allowFullscreen=!0,d.loading="lazy",d.referrerPolicy="no-referrer-when-downgrade",i.append(d),t.append(i)}else if(a){const i=document.createElement("img");i.className="route-map-image",i.src=a,i.alt="Gambar peta rute lari",i.loading="lazy",t.append(i)}else{const i=document.createElement("p");i.className="route-map-empty",i.textContent="Peta rute belum tersedia.",t.append(i)}}async function $e(){try{const e=await D.getWebsiteSettings();if(!e)return;let a={};try{a=e.cms_visibility?JSON.parse(e.cms_visibility):{}}catch(l){console.warn("Pengaturan visibilitas CMS tidak valid:",l)}s.cmsVisibility=a,[["beranda","hero"],["rute","route"],["fasilitas","facilities"],["kategori","tickets"],["legal","legal"]].forEach(([l,m])=>{const g=document.getElementById(l);g&&a[m]===!1&&(g.hidden=!0)});const o=document.getElementById("statsBanner");o&&a.stats===!1&&(o.hidden=!0),document.querySelectorAll(".glass-footer").forEach(l=>{a.footer===!1&&(l.hidden=!0)}),e.site_title&&(document.title=e.site_title);const n=document.getElementById("heroStatusText")||document.querySelector(".hero-pill-badge span:not(.status-dot)");n&&e.hero_badge&&(n.textContent=e.hero_badge);const r=document.querySelector(".hero-title");r&&e.hero_title&&(r.innerHTML=e.hero_title.replace(/\n/g,"<br>"));const i=document.querySelector(".hero-desc");i&&e.hero_subtitle&&(i.textContent=e.hero_subtitle);const d=document.getElementById("heroDisplayImg");d&&e.hero_bg_image&&(d.src=e.hero_bg_image);let c;try{c=e.stats_banner_items?JSON.parse(e.stats_banner_items):null,Array.isArray(c)||(c=null)}catch(l){console.warn("Data kartu statistik CMS tidak valid:",l),c=null}c||(c=[1,2,3,4].map(l=>({type:"CUSTOM",val:e[`stat_${l}_val`]||"",unit:e[`stat_${l}_unit`]||"",desc:e[`stat_${l}_desc`]||""})).filter(l=>l.val||l.unit||l.desc)),s.cmsStatsItems=c,oe(c);const u=document.getElementById("beranda");u&&e.hero_bg_image&&(u.style.backgroundImage=`radial-gradient(circle at 10% 20%, rgba(255, 107, 0, 0.08) 0%, transparent 40%), radial-gradient(circle at 90% 80%, rgba(255, 107, 0, 0.05) 0%, transparent 40%), linear-gradient(180deg, rgba(255, 255, 255, 0.88) 0%, rgba(255, 255, 255, 0.98) 100%), url('${e.hero_bg_image}')`,u.style.backgroundSize="cover",u.style.backgroundPosition="center");const f=document.getElementById("rute");if(f){const l=document.getElementById("routeSectionTitle")||f.querySelector(".section-title");l&&typeof e.route_title=="string"&&(l.textContent=e.route_title,l.hidden=!e.route_title.trim());const m=document.getElementById("routeSectionDesc")||f.querySelector(".route-info-card > p");m&&typeof e.route_desc=="string"&&(m.textContent=e.route_desc,m.hidden=!e.route_desc.trim());const g=document.getElementById("btnDownloadGpx");g&&(g.hidden=!e.route_gpx_url||e.route_gpx_url==="#"),g&&e.route_gpx_url&&(g.href=e.route_gpx_url,e.route_gpx_url==="#"?g.onclick=A=>{A.preventDefault(),alert("File GPX Rute Tegal Run 2027 akan dapat diunduh pada H-14 perlombaan.")}:/^https?:\/\//i.test(e.route_gpx_url)?(g.setAttribute("target","_blank"),g.setAttribute("rel","noopener noreferrer"),g.onclick=null):(g.removeAttribute("target"),g.removeAttribute("rel"),g.onclick=null)),s.cmsRouteMapUrl=Object.hasOwn(e,"route_gmaps_url")?e.route_gmaps_url:e.gmaps_embed_url||"",s.cmsRouteMapImage=e.route_map_image||"",re(s.cmsRouteMapUrl,s.cmsRouteMapImage)}const b=document.getElementById("fasilitas");if(b){const l=b.querySelector(".section-title");l&&typeof e.facilities_title=="string"&&(l.textContent=e.facilities_title,l.hidden=!e.facilities_title.trim());const m=b.querySelector(".section-desc");m&&typeof e.facilities_desc=="string"&&(m.textContent=e.facilities_desc,m.hidden=!e.facilities_desc.trim())}const h=document.getElementById("facilitiesMedia");h&&(h.hidden=!e.facilities_image,e.facilities_image&&(h.src=e.facilities_image));const p=document.getElementById("facilitiesContainer");if(p){const l=[{icon:"fa-shirt",title:"Jersey Running Dry-Fit",desc:"Bahan mikro-pori cepat kering dengan sablon sublimasi awet dan nyaman untuk jarak jauh."},{icon:"fa-microchip",title:"Nomor Dada (BIB) & Timing Chip",desc:"Pencatatan waktu akurat berteknologi RFID transponder yang tersinkronisasi online."},{icon:"fa-medal",title:"Medali Finisher Logam Cor",desc:"Medali eksklusif cor tebal berlapis anti-karat untuk seluruh pelari yang finis sebelum COT."},{icon:"fa-bottle-water",title:"Water & Isotonic Station",desc:"Pos hidrasi setiap 2.5 KM dilengkapi air mineral steril, minuman isotonik, dan buah segar."},{icon:"fa-truck-medical",title:"Tim Medis & Ambulans Mobile",desc:"Standar medis PASI dengan pos pertolongan pertama terpadu dan ambulans standby di rute."},{icon:"fa-utensils",title:"Refreshment & Finisher Feast",desc:"Paket nutrisi pemulihan pasca finis berisi susu protein, kudapan sehat khas Tegal, dan buah segar."}];let m;try{m=e.facilities_items?JSON.parse(e.facilities_items):l}catch(g){console.warn("Data fasilitas CMS tidak valid:",g),m=l}Array.isArray(m)||(m=l),p.innerHTML=m.filter(g=>g&&typeof g=="object"&&g.visible!==!1).map(g=>`
         <div class="facility-card">
           <div class="facility-card-head">
             <div class="facility-icon-wrap">
-              <i class="fa-solid ${p.icon}"></i>
+              <i class="fa-solid ${x(g.icon||"fa-gift")}"></i>
             </div>
-            <h4 class="facility-title">${p.title}</h4>
+            <h4 class="facility-title">${x(g.title||"")}</h4>
           </div>
-          <p class="facility-desc">${p.desc}</p>
+          <p class="facility-desc">${x(g.desc||"")}</p>
         </div>
-      `).join("")}const v=document.getElementById("kategori");if(v){const c=v.querySelector(".section-title");c&&a.tickets_title&&(c.textContent=a.tickets_title);const p=v.querySelector(".section-desc");p&&a.tickets_desc&&(p.textContent=a.tickets_desc)}if(i("legalSectionTitle",a.legal_title),i("legalSectionDesc",a.legal_desc),i("legalItem1Title",a.legal_item_1_title),i("legalItem1Desc",a.legal_item_1_desc),i("legalItem2Title",a.legal_item_2_title),i("legalItem2Desc",a.legal_item_2_desc),i("legalItem3Title",a.legal_item_3_title),i("legalItem3Desc",a.legal_item_3_desc),i("legalItem4Title",a.legal_item_4_title),i("legalItem4Desc",a.legal_item_4_desc),a.contact_email&&document.querySelectorAll(".footer-email").forEach(c=>c.textContent=a.contact_email),a.contact_phone&&document.querySelectorAll(".footer-phone").forEach(c=>c.textContent=a.contact_phone),a.contact_address){const c=document.querySelector(".footer-address");c&&(c.textContent=a.contact_address)}if(a.footer_copyright){const c=document.querySelector(".footer-copyright-text")||document.querySelector(".footer-bottom > div:first-child");c&&(c.textContent=a.footer_copyright)}}catch(a){console.warn("Failed to apply website settings:",a)}}async function qa(){const a=document.getElementById("routeChecklistContainer");try{const e=await F.getRouteOverview();if(!e){a&&(a.innerHTML='<p style="color:var(--color-text-muted);font-size:0.9rem;padding:12px 0;">Belum ada titik checkpoint rute yang tersimpan.</p>');return}const t=document.getElementById("routeSectionTitle");t&&e.title&&(t.textContent=e.title);const s=document.getElementById("routeSectionDesc");s&&e.description&&(s.textContent=e.description),a&&(Array.isArray(e.points)&&e.points.length>0?a.innerHTML=e.points.map((n,i)=>`
+      `).join("")}const k=document.getElementById("kategori");if(k){const l=k.querySelector(".section-title");l&&typeof e.tickets_title=="string"&&(l.textContent=e.tickets_title,l.hidden=!e.tickets_title.trim());const m=k.querySelector(".section-desc");m&&typeof e.tickets_desc=="string"&&(m.textContent=e.tickets_desc,m.hidden=!e.tickets_desc.trim())}const E=document.getElementById("ticketsCmsMedia");E&&(E.hidden=!e.medal_image,e.medal_image&&(E.src=e.medal_image));const y=document.getElementById("legalSectionTitle");y&&typeof e.legal_title=="string"&&(y.textContent=e.legal_title,y.hidden=!e.legal_title.trim());const P=document.getElementById("legalSectionDesc");P&&typeof e.legal_desc=="string"&&(P.textContent=e.legal_desc,P.hidden=!e.legal_desc.trim());const B=document.getElementById("legalGridContainer");if(B){let l;try{l=e.legal_items?JSON.parse(e.legal_items):null,Array.isArray(l)||(l=null)}catch(m){console.warn("Data legalitas CMS tidak valid:",m),l=null}l||(l=[1,2,3,4].map((m,g)=>({icon:["fa-certificate","fa-road-barrier","fa-shield-heart","fa-user-lock"][g],title:e[`legal_item_${m}_title`]||"",desc:e[`legal_item_${m}_desc`]||""})).filter(m=>m.title||m.desc)),l=l.filter(m=>m&&typeof m=="object"&&m.visible!==!1),B.innerHTML=l.map(m=>`
+        <div class="legal-item">
+          <i class="fa-solid ${x(m.icon||"fa-certificate")}"></i>
+          <h4>${x(m.title||"")}</h4>
+          <p>${x(m.desc||"")}</p>
+        </div>
+      `).join(""),B.hidden=l.length===0}if(e.contact_email&&document.querySelectorAll(".footer-email").forEach(l=>l.textContent=e.contact_email),e.contact_phone&&document.querySelectorAll(".footer-phone").forEach(l=>l.textContent=e.contact_phone),e.contact_address){const l=document.querySelector(".footer-address");l&&(l.textContent=e.contact_address)}if(e.footer_copyright){const l=document.querySelector(".footer-copyright-text")||document.querySelector(".footer-bottom > div:first-child");l&&(l.textContent=e.footer_copyright)}}catch(e){console.warn("Failed to apply website settings:",e)}}async function Re(){const e=document.getElementById("routeChecklistContainer");try{const a=await D.getRouteOverview();if(!a){e&&(e.innerHTML='<p style="color:var(--color-text-muted);font-size:0.9rem;padding:12px 0;">Belum ada titik checkpoint rute yang tersimpan.</p>');return}s.cmsRouteMapUrl||(s.cmsRouteMapUrl=a.gmapsUrl||""),s.cmsRouteMapImage||(s.cmsRouteMapImage=a.routeMapImage||""),re(s.cmsRouteMapUrl,s.cmsRouteMapImage),e&&(Array.isArray(a.points)&&a.points.length>0?e.innerHTML=a.points.map((t,o)=>`
           <div class="route-point">
-            <div class="route-point-marker">${String(i+1).padStart(2,"0")}</div>
+            <div class="route-point-marker">${String(o+1).padStart(2,"0")}</div>
             <div class="route-point-content">
-              <h4>${x(n.name)}${n.distanceKm>0?` <small style="font-weight:500;color:#64748B;">— Km ${n.distanceKm}</small>`:""}</h4>
-              <p>${x(n.description||"")}</p>
-              ${n.isWaterStation?'<span class="route-tag" style="display:inline-block;margin-top:4px;font-size:0.75rem;padding:2px 8px;border-radius:20px;background:#EFF6FF;color:#3B82F6;font-weight:600;">💧 Water Station</span>':""}
-              ${n.isMedicalSpot?'<span class="route-tag" style="display:inline-block;margin-top:4px;margin-left:4px;font-size:0.75rem;padding:2px 8px;border-radius:20px;background:#F0FDF4;color:#16A34A;font-weight:600;">🏥 Pos Medis</span>':""}
+              <h4>${x(t.name)}${t.distanceKm>0?` <small style="font-weight:500;color:#64748B;">— Km ${t.distanceKm}</small>`:""}</h4>
+              <p>${x(t.description||"")}</p>
+              ${t.isWaterStation?'<span class="route-tag" style="display:inline-block;margin-top:4px;font-size:0.75rem;padding:2px 8px;border-radius:20px;background:#EFF6FF;color:#3B82F6;font-weight:600;">💧 Water Station</span>':""}
+              ${t.isMedicalSpot?'<span class="route-tag" style="display:inline-block;margin-top:4px;margin-left:4px;font-size:0.75rem;padding:2px 8px;border-radius:20px;background:#F0FDF4;color:#16A34A;font-weight:600;">🏥 Pos Medis</span>':""}
             </div>
           </div>
-        `).join(""):a.innerHTML='<p style="color:var(--color-text-muted);font-size:0.9rem;padding:12px 0;">Belum ada titik checkpoint rute yang tersimpan.</p>')}catch{a&&(a.innerHTML='<p style="color:var(--color-text-muted);font-size:0.9rem;padding:12px 0;">Belum ada titik checkpoint rute yang tersimpan.</p>')}}function $a(){document.querySelectorAll(".nav-dropdown-toggle").forEach(a=>{a.addEventListener("click",e=>{e.preventDefault(),e.stopPropagation();const t=a.closest(".nav-dropdown"),s=t.classList.contains("active");document.querySelectorAll(".nav-dropdown").forEach(n=>n.classList.remove("active")),s||t.classList.add("active")})}),document.addEventListener("click",()=>{document.querySelectorAll(".nav-dropdown").forEach(a=>a.classList.remove("active"))})}function ta(){var i,r,l,m,g,v,c,p,d,k,h,f,T,S,P,B,A,C,q,$,N,R,_,K,j,z;U(),Ca(),Ma(),qa(),na(),$a();const a=async y=>{if(y&&y.preventDefault(),o.isGlobalClosed){u("error","Pendaftaran Ditutup","Mohon maaf, seluruh pendaftaran Tegal Run 2027 telah resmi ditutup oleh panitia.");return}if(o.events.length>0){const E=o.events.find(w=>!w.isClosed)||o.events[0];W(E)}else{const E=document.getElementById("kategori")||document.getElementById("ticketsSection");E&&E.scrollIntoView({behavior:"smooth"});try{const w=await F.getEvents();if(w&&w.length>0){o.events=w,ia(w);const D=w.find(b=>!b.isClosed)||w[0];W(D)}}catch{u("error","Gagal Memuat Kategori","Gagal memuat kategori tiket. Pastikan server backend aktif.")}}};(i=document.getElementById("heroCtaBtn"))==null||i.addEventListener("click",a),(r=document.getElementById("navDaftarBtn"))==null||r.addEventListener("click",a),(l=document.getElementById("dockDaftarBtn"))==null||l.addEventListener("click",a),(m=document.getElementById("modalCloseBtn"))==null||m.addEventListener("click",J),(g=document.getElementById("regModal"))==null||g.addEventListener("click",y=>{y.target.id==="regModal"&&J()}),(v=document.getElementById("modalEventSelect"))==null||v.addEventListener("change",y=>{const E=o.events.find(w=>w.id===y.target.value);E&&(o.selectedEvent=E,Z(),H())}),(c=document.getElementById("modalParticipantCount"))==null||c.addEventListener("change",y=>{o.participantCount=parseInt(y.target.value,10)||1,Z(),H()});const e=document.getElementById("bookerPhone");e&&Y(e),(p=document.getElementById("checkSameAsBooker"))==null||p.addEventListener("change",()=>{O()}),(d=document.getElementById("bookerName"))==null||d.addEventListener("input",()=>{O()}),(k=document.getElementById("bookerPhone"))==null||k.addEventListener("input",()=>{O()}),(h=document.getElementById("btnModalNext"))==null||h.addEventListener("click",()=>{La(o.currentStep)&&(o.currentStep++,o.currentStep===3&&Da(),Q())}),(f=document.getElementById("btnModalPrev"))==null||f.addEventListener("click",()=>{o.currentStep>1&&(o.currentStep--,Q())}),(T=document.getElementById("btnModalSubmit"))==null||T.addEventListener("click",Fa);const t=()=>X("privacyModal");(S=document.getElementById("btnOpenPrivacyModal"))==null||S.addEventListener("click",t),(P=document.getElementById("footerPrivacyLink"))==null||P.addEventListener("click",t),(B=document.getElementById("privacyCloseBtn"))==null||B.addEventListener("click",()=>M("privacyModal")),(A=document.getElementById("privacyOkBtn"))==null||A.addEventListener("click",()=>M("privacyModal"));const s=()=>X("termsModal");(C=document.getElementById("btnOpenTerms"))==null||C.addEventListener("click",s),(q=document.getElementById("btnOpenTermsModal"))==null||q.addEventListener("click",s),($=document.getElementById("footerTermsLink"))==null||$.addEventListener("click",s),(N=document.getElementById("footerWaiverLink"))==null||N.addEventListener("click",s),(R=document.getElementById("termsCloseBtn"))==null||R.addEventListener("click",()=>M("termsModal")),(_=document.getElementById("termsOkBtn"))==null||_.addEventListener("click",()=>M("termsModal")),(K=document.getElementById("btnOpenSizeChart"))==null||K.addEventListener("click",()=>X("sizeChartModal")),(j=document.getElementById("sizeChartCloseBtn"))==null||j.addEventListener("click",()=>M("sizeChartModal")),(z=document.getElementById("sizeChartOkBtn"))==null||z.addEventListener("click",()=>M("sizeChartModal")),document.querySelectorAll(".faq-question").forEach(y=>{y.addEventListener("click",()=>{y.parentElement.classList.toggle("active")})});const n=document.querySelectorAll("section[id]");window.addEventListener("scroll",()=>{const y=window.pageYOffset;n.forEach(E=>{const w=E.offsetHeight,D=E.offsetTop-120,b=E.getAttribute("id"),G=document.querySelector(`.mobile-bottom-dock a[href*="${b}"]`);G&&y>D&&y<=D+w&&(document.querySelectorAll(".mobile-bottom-dock a").forEach(V=>V.classList.remove("active")),G.classList.add("active"))})})}document.readyState==="loading"?document.addEventListener("DOMContentLoaded",ta):ta();
+        `).join(""):e.innerHTML='<p style="color:var(--color-text-muted);font-size:0.9rem;padding:12px 0;">Belum ada titik checkpoint rute yang tersimpan.</p>')}catch{e&&(e.innerHTML='<p style="color:var(--color-text-muted);font-size:0.9rem;padding:12px 0;">Belum ada titik checkpoint rute yang tersimpan.</p>')}}function _e(){document.querySelectorAll(".nav-dropdown-toggle").forEach(e=>{e.addEventListener("click",a=>{a.preventDefault(),a.stopPropagation();const t=e.closest(".nav-dropdown"),o=t.classList.contains("active");document.querySelectorAll(".nav-dropdown").forEach(n=>n.classList.remove("active")),o||t.classList.add("active")})}),document.addEventListener("click",()=>{document.querySelectorAll(".nav-dropdown").forEach(e=>e.classList.remove("active"))})}function te(){var r,i,d,c,u,f,b,h,p,k,E,y,P,B,l,m,g,A,q,N,$,R,_,j,K,U;Z(),De(),$e(),Re(),ne(),_e();const e=async T=>{if(T&&T.preventDefault(),s.isGlobalClosed){v("error","Pendaftaran Ditutup","Mohon maaf, seluruh pendaftaran Tegal Run 2027 telah resmi ditutup oleh panitia.");return}if(s.events.length>0){const I=s.events.find(S=>!S.isClosed)||s.events[0];H(I)}else{const I=document.getElementById("kategori")||document.getElementById("ticketsSection");I&&I.scrollIntoView({behavior:"smooth"});try{const S=await D.getEvents();if(S&&S.length>0){s.events=S,ie(S);const M=S.find(w=>!w.isClosed)||S[0];H(M)}}catch{v("error","Gagal Memuat Kategori","Gagal memuat kategori tiket. Pastikan server backend aktif.")}}};(r=document.getElementById("heroCtaBtn"))==null||r.addEventListener("click",e),(i=document.getElementById("navDaftarBtn"))==null||i.addEventListener("click",e),(d=document.getElementById("dockDaftarBtn"))==null||d.addEventListener("click",e),(c=document.getElementById("modalCloseBtn"))==null||c.addEventListener("click",J),(u=document.getElementById("regModal"))==null||u.addEventListener("click",T=>{T.target.id==="regModal"&&J()}),(f=document.getElementById("modalEventSelect"))==null||f.addEventListener("change",T=>{const I=s.events.find(S=>S.id===T.target.value);I&&(s.selectedEvent=I,Q(),O())}),(b=document.getElementById("modalParticipantCount"))==null||b.addEventListener("change",T=>{s.participantCount=parseInt(T.target.value,10)||1,Q(),O()});const a=document.getElementById("bookerPhone");a&&X(a),(h=document.getElementById("checkSameAsBooker"))==null||h.addEventListener("change",()=>{z()}),(p=document.getElementById("bookerName"))==null||p.addEventListener("input",()=>{z()}),(k=document.getElementById("bookerPhone"))==null||k.addEventListener("input",()=>{z()}),(E=document.getElementById("btnModalNext"))==null||E.addEventListener("click",()=>{Fe(s.currentStep)&&(s.currentStep++,s.currentStep===3&&qe(),Y())}),(y=document.getElementById("btnModalPrev"))==null||y.addEventListener("click",()=>{s.currentStep>1&&(s.currentStep--,Y())}),(P=document.getElementById("btnModalSubmit"))==null||P.addEventListener("click",Ne);const t=()=>V("privacyModal");(B=document.getElementById("btnOpenPrivacyModal"))==null||B.addEventListener("click",t),(l=document.getElementById("footerPrivacyLink"))==null||l.addEventListener("click",t),(m=document.getElementById("privacyCloseBtn"))==null||m.addEventListener("click",()=>F("privacyModal")),(g=document.getElementById("privacyOkBtn"))==null||g.addEventListener("click",()=>F("privacyModal"));const o=()=>V("termsModal");(A=document.getElementById("btnOpenTerms"))==null||A.addEventListener("click",o),(q=document.getElementById("btnOpenTermsModal"))==null||q.addEventListener("click",o),(N=document.getElementById("footerTermsLink"))==null||N.addEventListener("click",o),($=document.getElementById("footerWaiverLink"))==null||$.addEventListener("click",o),(R=document.getElementById("termsCloseBtn"))==null||R.addEventListener("click",()=>F("termsModal")),(_=document.getElementById("termsOkBtn"))==null||_.addEventListener("click",()=>F("termsModal")),(j=document.getElementById("btnOpenSizeChart"))==null||j.addEventListener("click",()=>V("sizeChartModal")),(K=document.getElementById("sizeChartCloseBtn"))==null||K.addEventListener("click",()=>F("sizeChartModal")),(U=document.getElementById("sizeChartOkBtn"))==null||U.addEventListener("click",()=>F("sizeChartModal")),document.querySelectorAll(".faq-question").forEach(T=>{T.addEventListener("click",()=>{T.parentElement.classList.toggle("active")})});const n=document.querySelectorAll("section[id]");window.addEventListener("scroll",()=>{const T=window.pageYOffset;n.forEach(I=>{const S=I.offsetHeight,M=I.offsetTop-120,w=I.getAttribute("id"),G=document.querySelector(`.mobile-bottom-dock a[href*="${w}"]`);G&&T>M&&T<=M+S&&(document.querySelectorAll(".mobile-bottom-dock a").forEach(W=>W.classList.remove("active")),G.classList.add("active"))})})}document.readyState==="loading"?document.addEventListener("DOMContentLoaded",te):te();

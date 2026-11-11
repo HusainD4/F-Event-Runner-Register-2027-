@@ -197,6 +197,21 @@
     </div>
   </div>
 
+  <div class="admin-modal-backdrop" id="modalOrderDetailsBackdrop">
+    <div class="admin-modal-dialog" style="max-width: 900px; max-height: 90vh; overflow:auto;">
+      <div class="admin-modal-header">
+        <h4><i class="fa-solid fa-ticket" style="color:var(--color-primary);"></i> Detail Transaksi &amp; Tiket</h4>
+        <button class="admin-modal-close" onclick="closeAdminModal('modalOrderDetailsBackdrop')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="admin-modal-body" id="orderDetailsContent">
+        <div style="text-align:center; color:#64748B; padding:24px;">Memuat detail tiket...</div>
+      </div>
+      <div class="admin-modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="closeAdminModal('modalOrderDetailsBackdrop')">Tutup</button>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL 4: ADMIN USER CREATE / EDIT (SUPERADMIN ONLY) -->
   <div class="admin-modal-backdrop" id="modalAdminUserBackdrop">
     <div class="admin-modal-dialog" style="max-width: 520px;">

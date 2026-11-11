@@ -9,6 +9,7 @@ import { loadNotificationSettings, startWaAutoDetector, stopWaAutoDetector } fro
 import { loadWhatsAppWebConsole } from '../pages/whatsapp-web.js';
 import { loadNotificationLogs } from '../pages/notif-logs.js';
 import { loadRacepackStats, stopRpcCamera } from '../pages/racepack.js';
+import { startRacepackQueueRefresh, stopRacepackQueueRefresh } from '../pages/racepack-view.js';
 import { loadBibSettings } from '../pages/bib-settings.js';
 import { loadGlobalSettings } from '../pages/countdown.js';
 
@@ -57,7 +58,8 @@ export function switchAdminTab(tabKey) {
     const isSuper = roleName === 'SUPERADMIN' || permissions.includes('*');
 
     if (!isSuper && tabKey !== 'dashboard') {
-      const pageKey = `page:${tabKey}`;
+      const navButton = document.querySelector(`.sidebar-nav .nav-item[data-nav="${tabKey}"]`);
+      const pageKey = navButton?.getAttribute('data-page') || `page:${tabKey}`;
       if (!permissions.includes(pageKey)) {
         showAdminToast('warning', 'Akses Dibatasi', `Role Anda (${roleName}) tidak memiliki izin mengakses modul ini.`);
         return;
@@ -89,6 +91,7 @@ export function switchAdminTab(tabKey) {
     events: { title: 'Manajemen Event & Kategori', sub: 'Portal Admin / Manajemen Tiket Lomba' },
     participants: { title: 'Manajemen Peserta', sub: 'Portal Admin / Database Pelari & BIB' },
     racepack: { title: 'Pengambilan Racepack & Check-in', sub: 'Portal Admin / Validasi E-Tiket & Serah Terima RPC' },
+    'racepack-view': { title: 'Live View Antrean Racepack', sub: 'Portal Admin / Pemantauan Antrean & Konfirmasi Serah Terima' },
     orders: { title: 'Transaksi & Order', sub: 'Portal Admin / Status Pembayaran Tiket' },
     countdown: { title: 'Countdown & Status Event', sub: 'Portal Admin / Konfigurasi Race Day' },
     'bib-settings': { title: 'Pengaturan BIB & E-Tiket', sub: 'Portal Admin / Aturan BIB, Format QR & Petunjuk' },
@@ -123,6 +126,11 @@ export function switchAdminTab(tabKey) {
     loadRacepackStats();
   } else {
     stopRpcCamera();
+  }
+  if (tabKey === 'racepack-view') {
+    startRacepackQueueRefresh();
+  } else {
+    stopRacepackQueueRefresh();
   }
   if (tabKey === 'notifications') {
     loadNotificationSettings();

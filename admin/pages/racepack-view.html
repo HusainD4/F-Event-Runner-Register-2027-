@@ -1,0 +1,17 @@
+<div class="admin-tab-pane" id="pane-racepack-view">
+  <div class="admin-section">
+    <div class="admin-section-header" style="align-items:center; gap:12px; flex-wrap:wrap;">
+      <div>
+        <h3><i class="fa-solid fa-list-check" style="color:var(--color-primary);"></i> Antrean Pengambilan Racepack</h3>
+        <p>Data peserta masuk setelah petugas mengirimkannya dari halaman verifikasi. Konfirmasi serah terima dilakukan di sini.</p>
+        <small id="racepackQueueLastUpdated" style="color:#64748B;">Menunggu pembaruan...</small>
+      </div>
+      <button type="button" class="btn btn-secondary btn-sm" id="btnRefreshRacepackQueue">
+        <i class="fa-solid fa-rotate"></i> Segarkan
+      </button>
+    </div>
+    <div id="racepackQueueContainer" style="display:grid; gap:14px;">
+      <div class="glass-card" style="padding:24px; text-align:center; color:#64748B;">Memuat antrean peserta...</div>
+    </div>
+  </div>
+</div>

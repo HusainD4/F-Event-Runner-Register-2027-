@@ -43,6 +43,7 @@ function renderOrdersTable(orders) {
     const isPaid = o.status === 'SETTLEMENT' || o.status === 'CAPTURE';
     const isCancel = o.status === 'CANCEL' || o.status === 'EXPIRE' || o.status === 'DENY';
     const statusClass = isPaid ? 'success' : (isCancel ? 'danger' : 'pending');
+    const statusLabel = o.status === 'EXPIRE' ? 'EXPIRE (expired time)' : o.status;
 
     const isManual = !o.midtransOrderId || o.midtransOrderId.startsWith('OFFLINE-');
     const typeBadge = isManual
@@ -60,12 +61,15 @@ function renderOrdersTable(orders) {
         <td><strong style="color: var(--color-primary);">${formatRupiah(o.totalAmount)}</strong></td>
         <td>
           <span class="status-pill ${statusClass}">
-            ${o.status}
+            ${escapeHtml(statusLabel)}
           </span>
         </td>
         <td><small style="color: #64748B;">${dateStr}</small></td>
         <td>
           <div class="table-actions">
+            <button class="btn-icon btn-view-order-details" data-id="${escapeHtml(o.id)}" title="Lihat detail tiket">
+              <i class="fa-solid fa-ticket"></i>
+            </button>
             <button class="btn-icon edit btn-update-order-status" data-id="${o.id}" data-display="${escapeHtml(o.midtransOrderId || o.id)}" data-status="${o.status}" title="Ubah Status Order" data-permission="orders:update">
               <i class="fa-solid fa-file-pen"></i>
             </button>
@@ -79,6 +83,10 @@ function renderOrdersTable(orders) {
   }).join('');
 
   // Attach Listeners
+  tbody.querySelectorAll('.btn-view-order-details').forEach(btn => {
+    btn.addEventListener('click', () => openOrderDetails(btn.dataset.id));
+  });
+
   document.querySelectorAll('.btn-update-order-status').forEach(btn => {
     btn.addEventListener('click', () => {
       const id = btn.getAttribute('data-id');
@@ -106,6 +114,63 @@ function renderOrdersTable(orders) {
   });
 
   applyRbacUi(adminState.profile);
+}
+
+async function openOrderDetails(id) {
+  const content = document.getElementById('orderDetailsContent');
+  const backdrop = document.getElementById('modalOrderDetailsBackdrop');
+  if (!content || !backdrop) return;
+
+  backdrop.classList.add('open');
+  content.innerHTML = '<div style="text-align:center; color:#64748B; padding:24px;">Memuat detail tiket...</div>';
+  try {
+    const res = await fetchAdmin(`/admin/orders/${encodeURIComponent(id)}`);
+    if (!res || res.status !== 'success' || !res.data) {
+      throw new Error(res?.message || 'Detail transaksi tidak dapat dimuat.');
+    }
+
+    const order = res.data;
+    const displayValue = (value) => escapeHtml(value === null || value === undefined || value === '' ? '-' : String(value));
+    const dateValue = (value) => value ? new Date(value).toLocaleString('id-ID') : '-';
+    const statusLabel = order.status === 'EXPIRE' ? 'EXPIRE (expired time)' : order.status;
+    const detailRow = (label, value) => `<div style="padding:8px 0; border-bottom:1px solid #E2E8F0;"><strong>${label}:</strong> ${value}</div>`;
+    const participants = Array.isArray(order.participants) ? order.participants : [];
+
+    content.innerHTML = `
+      <section style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:0 20px; margin-bottom:18px;">
+        ${detailRow('Order ID', displayValue(order.midtransOrderId || order.id))}
+        ${detailRow('Status pembayaran', displayValue(statusLabel))}
+        ${detailRow('Total transaksi', formatRupiah(order.totalAmount))}
+        ${detailRow('Waktu transaksi', displayValue(dateValue(order.createdAt)))}
+        ${detailRow('Nama pemesan', displayValue(order.user?.fullName))}
+        ${detailRow('Email / telepon', `${displayValue(order.user?.email)} / ${displayValue(order.user?.phoneNumber)}`)}
+      </section>
+      <h5 style="margin:12px 0;">Data Tiket &amp; Peserta (${participants.length})</h5>
+      <div style="display:grid; gap:12px;">
+        ${participants.length ? participants.map((participant, index) => `
+          <article style="border:1px solid #E2E8F0; border-radius:12px; padding:14px;">
+            <h6 style="margin:0 0 8px; color:#0F172A;">${index + 1}. ${displayValue(participant.fullNameKtp)}</h6>
+            <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:0 18px; font-size:.88rem;">
+              ${detailRow('Kategori tiket', displayValue(participant.event?.ticketName || participant.event?.category))}
+              ${detailRow('BIB', displayValue(participant.bibNumber))}
+              ${detailRow('NIK', displayValue(participant.nik))}
+              ${detailRow('Tanggal / tempat lahir', `${displayValue(participant.birthDate ? new Date(participant.birthDate).toLocaleDateString('id-ID') : '-')} / ${displayValue(participant.birthPlace)}`)}
+              ${detailRow('Jenis kelamin / golongan darah', `${displayValue(participant.gender)} / ${displayValue(participant.bloodType)}`)}
+              ${detailRow('Ukuran jersey', displayValue(participant.selectedSize))}
+              ${detailRow('Nama jersey / jenis', `${displayValue(participant.jersey?.name)} / ${displayValue(participant.jersey?.type)}`)}
+              ${detailRow('Komunitas', displayValue(participant.communityName))}
+              ${detailRow('Kontak darurat', `${displayValue(participant.emergencyContactName)} / ${displayValue(participant.emergencyContactPhone)}`)}
+              ${detailRow('Alamat', displayValue(participant.fullAddress))}
+              ${detailRow('Riwayat medis', displayValue(participant.medicalHistory))}
+            </div>
+          </article>
+        `).join('') : '<div style="color:#64748B;">Belum ada data peserta pada transaksi ini.</div>'}
+      </div>
+    `;
+  } catch (error) {
+    content.innerHTML = `<div style="color:#B91C1C;">${escapeHtml(error.message || 'Detail transaksi gagal dimuat.')}</div>`;
+    showAdminToast('error', 'Gagal Memuat Detail', error.message || 'Detail transaksi gagal dimuat.');
+  }
 }
 
 function openOrderStatusModal(id, displayId, currentStatus) {
@@ -163,6 +228,7 @@ async function deleteOrderApi(id) {
 export {
   loadOrders,
   renderOrdersTable,
+  openOrderDetails,
   openOrderStatusModal,
   handleOrderStatusSubmit,
   deleteOrderApi
