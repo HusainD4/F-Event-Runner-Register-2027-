@@ -27,7 +27,7 @@ export default defineConfig(({ mode }) => {
       allowedHosts: ['siexa.haisen.my.id'],
       proxy: {
         '/api': {
-          target: env.VITE_DEV_API_PROXY_TARGET || 'https://api.haisen.my.id',
+          target: env.VITE_DEV_API_PROXY_TARGET || 'http://localhost:3000',
           changeOrigin: true
         }
       }

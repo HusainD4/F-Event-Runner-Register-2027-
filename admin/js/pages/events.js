@@ -51,10 +51,10 @@ function renderEvents(events) {
     card.innerHTML = `
       <div class="admin-event-card-header">
         <div>
-          <h4 style="font-size: 1.15rem; font-weight: 800; color: #0F172A; margin: 0 0 4px 0;">
+          <h4 class="admin-event-title">
             ${escapeHtml(ev.ticketName)}
           </h4>
-          <span style="font-size: 0.8rem; color: #64748B;">
+          <span class="admin-event-meta">
             Kategori: <strong>${escapeHtml(ev.category)}</strong> • Pelaksanaan: <strong>${eventDateStr}</strong>
           </span>
         </div>
@@ -76,8 +76,8 @@ function renderEvents(events) {
           </div>
         </div>
 
-        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--color-border-subtle); padding-top: 16px; margin-top: 8px; flex-wrap: wrap; gap: 8px;">
-          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <div class="admin-event-actions">
+          <div class="admin-event-actions-primary">
             <button class="btn btn-primary btn-sm btn-quick-save-event" data-id="${ev.id}" data-permission="events:update">
               <i class="fa-solid fa-check"></i> Simpan
             </button>
