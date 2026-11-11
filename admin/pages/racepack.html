@@ -6,11 +6,14 @@
           <i class="fa-solid fa-box-open" style="color: var(--color-primary);"></i>
           Pengambilan Racepack &amp; Validasi E-Tiket (RPC)
         </h3>
-        <p>Pindai QR Code E-Tiket via kamera HP atau cari data peserta secara instan untuk verifikasi status bayar, ukuran jersey, dan serah terima paket lomba.</p>
+        <p class="rpc-page-description">Pindai QR Code E-Tiket via kamera HP atau cari data peserta secara instan untuk verifikasi status bayar, ukuran jersey, dan serah terima paket lomba.</p>
       </div>
-      <div class="admin-action-bar">
-        <button type="button" class="btn btn-secondary btn-sm" id="btnRefreshRacepackStats">
-          <i class="fa-solid fa-rotate"></i> Segarkan Data
+      <div class="admin-action-bar rpc-header-actions">
+        <button type="button" class="btn btn-outline btn-sm rpc-info-trigger" id="btnRpcInfo" aria-label="Lihat informasi racepack" aria-haspopup="dialog">
+          <i class="fa-solid fa-circle-info" aria-hidden="true"></i><span> Info</span>
+        </button>
+        <button type="button" class="btn btn-secondary btn-sm" id="btnRefreshRacepackStats" aria-label="Segarkan statistik racepack">
+          <i class="fa-solid fa-rotate"></i><span> Segarkan</span>
         </button>
       </div>
     </div>
@@ -34,6 +37,21 @@
           <span class="kpi-sub" style="color: #9A3412;">Paket lomba siap diserahkan</span>
         </div>
       </div>
+
+      <dialog class="rpc-info-dialog" id="rpcInfoDialog" aria-labelledby="rpcInfoTitle">
+        <div class="rpc-info-dialog-header">
+          <h4 id="rpcInfoTitle"><i class="fa-solid fa-circle-info"></i> Informasi Racepack</h4>
+          <button type="button" class="rpc-info-close" id="btnCloseRpcInfo" aria-label="Tutup informasi">
+            <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+          </button>
+        </div>
+        <p class="rpc-info-description">Pastikan pembayaran peserta lunas. Pindai QR atau cari peserta, kirim ke Live View, lalu konfirmasi check-in setelah racepack diserahkan.</p>
+        <div class="rpc-info-stats">
+          <div><span>Sudah check-in</span><strong id="rpcInfoCheckedIn">0</strong><small id="rpcInfoPercentage">0% dari peserta lunas</small></div>
+          <div><span>Belum diambil</span><strong id="rpcInfoRemaining">0</strong><small>Paket siap diserahkan</small></div>
+          <div><span>Total peserta lunas</span><strong id="rpcInfoPaidTotal">0</strong><small>Pembayaran terverifikasi</small></div>
+        </div>
+      </dialog>
 
       <div class="kpi-card">
         <div class="kpi-icon blue"><i class="fa-solid fa-users"></i></div>
@@ -86,15 +104,15 @@
           <input type="file" id="rpcNativeCameraInput" accept="image/*" capture="environment" style="display: none;">
 
           <!-- Camera Buttons -->
-          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <div class="rpc-camera-actions" style="display: flex; gap: 10px; flex-wrap: wrap;">
             <button type="button" class="btn btn-primary btn-glow" id="btnStartRpcCamera" style="flex: 1; min-width: 150px; display: flex; align-items: center; justify-content: center; gap: 8px;">
-              <i class="fa-solid fa-video"></i> Aktifkan Live Scanner
+              <i class="fa-solid fa-video"></i> Live Scanner
             </button>
             <button type="button" class="btn btn-secondary" id="btnTriggerNativeCamera" style="flex: 1; min-width: 150px; display: flex; align-items: center; justify-content: center; gap: 8px;">
-              <i class="fa-solid fa-camera"></i> Foto E-Tiket (Kamera HP)
+              <i class="fa-solid fa-camera"></i> Foto E-Tiket
             </button>
             <button type="button" class="btn btn-outline btn-sm" id="btnStopRpcCamera" style="display: none; color: #EF4444; border-color: #FECACA;">
-              <i class="fa-solid fa-video-slash"></i> Matikan Kamera
+              <i class="fa-solid fa-video-slash"></i> Matikan
             </button>
           </div>
         </div>
@@ -109,10 +127,10 @@
             Masukkan Nomor BIB, Order ID, Invoice, NIK 16 digit, atau Nama lengkap pelari:
           </p>
 
-          <form id="formRpcManualSearch" style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <form id="formRpcManualSearch" class="rpc-manual-search-form" style="display: flex; gap: 8px; flex-wrap: wrap;">
             <input type="text" class="form-input" id="rpcSearchInput" placeholder="Contoh: 05-0012, ORDER-..., atau NIK" style="flex: 1; min-width: 180px; font-weight: 700;">
-            <button type="submit" class="btn btn-secondary" id="btnRpcSearchSubmit">
-              <i class="fa-solid fa-magnifying-glass"></i> Cari
+            <button type="submit" class="btn btn-secondary" id="btnRpcSearchSubmit" aria-label="Cari peserta">
+              <i class="fa-solid fa-magnifying-glass"></i><span> Cari</span>
             </button>
           </form>
         </div>
@@ -270,4 +288,3 @@
     </div>
   </div>
 </div>
-

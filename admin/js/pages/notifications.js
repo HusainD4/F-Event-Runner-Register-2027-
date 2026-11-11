@@ -1,6 +1,6 @@
-import { adminState } from '../core/state.js';
 import { fetchAdmin } from '../core/api.js';
 import { showAdminToast, showConfirmDialog, escapeHtml } from '../core/utils.js';
+import { renderWhatsAppWebConsoleHeader } from './whatsapp-web.js';
 
 // =============================================================================
 // NOTIFICATION & GATEWAY SETTINGS + WHATSAPP WEB QR
@@ -36,6 +36,7 @@ async function loadNotificationSettings() {
       setVal('notifSettingTemplateCancel', d.template_msg_cancel);
 
       // Render WhatsApp Web session info
+      lastKnownWaStatus = d.wa_session?.status || null;
       renderWhatsAppSession(d.wa_session);
     }
   } catch (err) {
@@ -139,7 +140,6 @@ async function handleGenerateWaQr() {
     if (res && res.status === 'success' && res.data) {
       renderWhatsAppSession(res.data);
       renderWhatsAppWebConsoleHeader(res.data);
-      startWaAutoDetector(2500);
       showAdminToast('success', 'QR Code Siap', 'Silakan buka WhatsApp di ponsel dan scan QR Code di layar.');
     } else {
       showAdminToast('error', 'Gagal', res?.message || 'Gagal menghasilkan QR code.');
@@ -179,42 +179,16 @@ async function handleDisconnectWa() {
 // ==============================================================
 // WHATSAPP AUTO DETECTOR (POLLING DETEKSI OTOMATIS SAAT SCAN)
 // ==============================================================
-let waPollTimer = null;
 let lastKnownWaStatus = null;
 
-function startWaAutoDetector(intervalMs = 3000) {
-  if (waPollTimer) clearInterval(waPollTimer);
-  waPollTimer = setInterval(async () => {
-    if (adminState.activeTab !== 'notifications' && adminState.activeTab !== 'whatsapp-web') {
-      stopWaAutoDetector();
-      return;
-    }
+function handleRealtimeWhatsAppSession(session) {
+  const previousStatus = lastKnownWaStatus;
+  lastKnownWaStatus = session.status;
+  renderWhatsAppSession(session);
+  renderWhatsAppWebConsoleHeader(session);
 
-    try {
-      const res = await fetchAdmin('/admin/notifications/whatsapp/session');
-      if (res && res.status === 'success' && res.data) {
-        const s = res.data;
-        if (s.status !== lastKnownWaStatus) {
-          const oldStatus = lastKnownWaStatus;
-          lastKnownWaStatus = s.status;
-          renderWhatsAppSession(s);
-          renderWhatsAppWebConsoleHeader(s);
-
-          if (oldStatus === 'SCAN_QR' && s.status === 'CONNECTED') {
-            showAdminToast('success', 'WhatsApp Terhubung Otomatis!', `Perangkat ${s.connectedNumber || ''} berhasil diverifikasi dan siap kirim.`);
-          }
-        }
-      }
-    } catch {
-      // Abaikan error polling background
-    }
-  }, intervalMs);
-}
-
-function stopWaAutoDetector() {
-  if (waPollTimer) {
-    clearInterval(waPollTimer);
-    waPollTimer = null;
+  if (previousStatus === 'SCAN_QR' && session.status === 'CONNECTED') {
+    showAdminToast('success', 'WhatsApp Terhubung Otomatis!', `Perangkat ${session.connectedNumber || ''} berhasil diverifikasi dan siap kirim.`);
   }
 }
 
@@ -306,8 +280,7 @@ export {
   renderWhatsAppSession,
   handleGenerateWaQr,
   handleDisconnectWa,
-  startWaAutoDetector,
-  stopWaAutoDetector,
+  handleRealtimeWhatsAppSession,
   handleNotificationSettingsSubmit,
   handleSendTestNotif
 };

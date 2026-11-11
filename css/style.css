@@ -1092,6 +1092,50 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: 0 12px 35px -10px rgba(255, 107, 0, 0.15);
 }
 
+.ticket-card.global-registration-closed {
+  border-color: #FCA5A5;
+  cursor: default !important;
+}
+
+.ticket-card.global-registration-closed:hover {
+  transform: none;
+  border-color: #FCA5A5;
+  box-shadow: 0 10px 30px -10px rgba(127, 29, 29, 0.12);
+}
+
+.ticket-card.global-registration-closed::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background:
+    linear-gradient(135deg, transparent calc(50% - 2px), rgba(220, 38, 38, 0.42) 50%, transparent calc(50% + 2px)),
+    linear-gradient(45deg, transparent calc(50% - 2px), rgba(220, 38, 38, 0.42) 50%, transparent calc(50% + 2px));
+}
+
+.ticket-card.global-registration-closed .global-sold-stamp {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 4;
+  padding: 8px 18px;
+  border: 3px solid #DC2626;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.94);
+  color: #B91C1C;
+  font-size: 1.1rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  transform: translate(-50%, -50%) rotate(-12deg);
+  box-shadow: 0 4px 14px rgba(127, 29, 29, 0.2);
+}
+
+.ticket-card.global-registration-closed .btn-select-ticket {
+  position: relative;
+  z-index: 5;
+}
+
 /* 2. Top Header Utility Bar (Di atas Gambar Banner) */
 .ticket-card-topbar {
   display: flex;
@@ -2301,18 +2345,18 @@ h1, h2, h3, h4, h5, h6 {
 .mobile-bottom-dock {
   display: none;
   position: fixed;
-  bottom: 18px;
+  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
   left: 50%;
   transform: translateX(-50%);
   z-index: 2000;
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.94);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(226, 232, 240, 0.95);
-  border-radius: var(--radius-full, 9999px);
-  padding: 6px 14px;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12), 0 0 15px rgba(255, 107, 0, 0.15);
-  width: calc(100% - 32px);
+  border-radius: 22px;
+  padding: 5px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+  width: min(420px, calc(100% - 24px));
   max-width: 420px;
 }
 
@@ -2324,24 +2368,34 @@ h1, h2, h3, h4, h5, h6 {
   margin: 0;
   padding: 0;
   width: 100%;
+  gap: 2px;
+}
+
+.dock-item {
+  flex: 1 1 0;
+  min-width: 0;
+  text-align: center;
 }
 
 .dock-item a {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 3px;
   color: var(--color-text-muted, #64748B);
   text-decoration: none;
-  font-size: 0.72rem;
+  font-size: 0.66rem;
   font-weight: 600;
-  padding: 6px 12px;
-  border-radius: var(--radius-full, 9999px);
+  line-height: 1;
+  min-height: 48px;
+  padding: 5px 2px;
+  border-radius: 16px;
   transition: var(--transition-smooth, all 0.25s cubic-bezier(0.16, 1, 0.3, 1));
 }
 
 .dock-item a i {
-  font-size: 1.1rem;
+  font-size: 1rem;
 }
 
 .dock-item a.active, 
@@ -2354,6 +2408,10 @@ h1, h2, h3, h4, h5, h6 {
   background: linear-gradient(135deg, #FF7B1A, #FF6B00);
   color: #FFFFFF;
   box-shadow: 0 4px 12px rgba(255, 107, 0, 0.35);
+}
+
+.dock-item.dock-cta a:hover {
+  color: #FFFFFF;
 }
 
 .dock-item.dock-cta a:hover {
@@ -2713,10 +2771,6 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 @media (max-width: 768px) {
-  .mobile-bottom-dock {
-    display: block;
-  }
-
   body {
     padding-bottom: 80px; /* Tambahkan ruang aman agar konten tidak terhalang Mobile Dock */
   }
@@ -3215,6 +3269,9 @@ h1, h2, h3, h4, h5, h6 {
   .hero-section {
     padding-top: 85px;
   }
+  .mobile-bottom-dock {
+    display: block;
+  }
   .hero-title {
     font-size: 2.1rem;
   }
@@ -3410,16 +3467,17 @@ h1, h2, h3, h4, h5, h6 {
 
   .mobile-bottom-dock {
     width: calc(100% - 16px);
-    padding: 4px 8px;
-    border-radius: 24px;
+    padding: 4px;
+    border-radius: 19px;
   }
   .mobile-bottom-dock .dock-item a {
-    padding: 4px 6px;
-    font-size: 0.65rem;
+    min-height: 44px;
+    padding: 4px 1px;
+    font-size: 0.62rem;
     gap: 2px;
   }
   .mobile-bottom-dock .dock-item i {
-    font-size: 0.95rem;
+    font-size: 0.9rem;
   }
 }
 

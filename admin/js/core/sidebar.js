@@ -5,11 +5,11 @@ import { handleLogout } from './auth.js';
 import { showAdminToast } from './utils.js';
 import { loadCmsSettings } from '../pages/cms.js';
 import { loadRoutePoints } from '../pages/routes.js';
-import { loadNotificationSettings, startWaAutoDetector, stopWaAutoDetector } from '../pages/notifications.js';
+import { loadNotificationSettings } from '../pages/notifications.js';
 import { loadWhatsAppWebConsole } from '../pages/whatsapp-web.js';
 import { loadNotificationLogs } from '../pages/notif-logs.js';
 import { loadRacepackStats, stopRpcCamera } from '../pages/racepack.js';
-import { startRacepackQueueRefresh, stopRacepackQueueRefresh } from '../pages/racepack-view.js';
+import { loadRacepackQueue } from '../pages/racepack-view.js';
 import { loadBibSettings } from '../pages/bib-settings.js';
 import { loadGlobalSettings } from '../pages/countdown.js';
 
@@ -91,7 +91,7 @@ export function switchAdminTab(tabKey) {
     events: { title: 'Manajemen Event & Kategori', sub: 'Portal Admin / Manajemen Tiket Lomba' },
     participants: { title: 'Manajemen Peserta', sub: 'Portal Admin / Database Pelari & BIB' },
     racepack: { title: 'Pengambilan Racepack & Check-in', sub: 'Portal Admin / Validasi E-Tiket & Serah Terima RPC' },
-    'racepack-view': { title: 'Live View Antrean Racepack', sub: 'Portal Admin / Pemantauan Antrean & Konfirmasi Serah Terima' },
+    'racepack-view': { title: 'Live View Antrean Racepack', sub: 'Portal Admin / Pemantauan Antrean Real-Time' },
     orders: { title: 'Transaksi & Order', sub: 'Portal Admin / Status Pembayaran Tiket' },
     countdown: { title: 'Countdown & Status Event', sub: 'Portal Admin / Konfigurasi Race Day' },
     'bib-settings': { title: 'Pengaturan BIB & E-Tiket', sub: 'Portal Admin / Aturan BIB, Format QR & Petunjuk' },
@@ -128,22 +128,18 @@ export function switchAdminTab(tabKey) {
     stopRpcCamera();
   }
   if (tabKey === 'racepack-view') {
-    startRacepackQueueRefresh();
-  } else {
-    stopRacepackQueueRefresh();
+    loadRacepackQueue();
   }
   if (tabKey === 'notifications') {
     loadNotificationSettings();
-    startWaAutoDetector();
   } else if (tabKey === 'whatsapp-web') {
     loadWhatsAppWebConsole();
-    startWaAutoDetector();
-  } else {
-    stopWaAutoDetector();
   }
   if (tabKey === 'notif-logs') {
     loadNotificationLogs();
   }
+
+  window.dispatchEvent(new CustomEvent('admin:tab-changed', { detail: { tabKey } }));
 }
 
 export function openMobileSidebar() {

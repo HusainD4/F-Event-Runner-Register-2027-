@@ -4,6 +4,7 @@ import { showAdminToast } from './utils.js';
 import { applyRbacUi } from './rbac.js';
 import { loadDashboardData } from '../pages/dashboard.js';
 import { loadSidebar } from './sidebar.js';
+import { connectRealtimeSocket, disconnectRealtimeSocket } from '../../../js/realtime.js';
 
 export async function handleLogin(e) {
   e.preventDefault();
@@ -55,6 +56,7 @@ export async function handleLogin(e) {
 }
 
 export function handleLogout() {
+  disconnectRealtimeSocket();
   adminState.token = null;
   adminState.profile = null;
   localStorage.removeItem('tegal_admin_token');
@@ -103,6 +105,7 @@ export async function checkAuthAndInit() {
     await loadSidebar();
     applyRbacUi(adminState.profile);
     await loadDashboardData();
+    connectRealtimeSocket(adminState.token);
   } catch (err) {
     console.error('Failed to authenticate:', err);
     handleLogout();

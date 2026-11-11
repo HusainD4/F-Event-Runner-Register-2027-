@@ -10,9 +10,9 @@ let notifLogsState = {
   stats: {},
 };
 
-async function loadNotificationLogs() {
+async function loadNotificationLogs({ showLoading = true } = {}) {
   const tbody = document.getElementById('notifLogsTableBody');
-  if (tbody) {
+  if (tbody && showLoading) {
     tbody.innerHTML = `
       <tr>
         <td colspan="10" style="text-align: center; padding: 30px; color: var(--color-text-muted);">
@@ -61,9 +61,15 @@ async function loadNotificationLogs() {
       }
 
       renderNotifLogsTable(notifLogsState.items);
+    } else if (res) {
+      console.error('Failed to load notification logs:', res.message || 'Unexpected response');
+      if (tbody && showLoading) {
+        tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:25px;color:#EF4444;">Gagal memuat log notifikasi.</td></tr>';
+      }
     }
   } catch (err) {
-    if (tbody) {
+    console.error('Failed to load notification logs:', err);
+    if (tbody && showLoading) {
       tbody.innerHTML = `
         <tr>
           <td colspan="10" style="text-align: center; padding: 25px; color: #EF4444;">

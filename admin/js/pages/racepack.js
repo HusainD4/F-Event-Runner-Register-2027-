@@ -30,10 +30,18 @@ export async function loadRacepackStats() {
       const elPaid = document.getElementById('rpcKpiPaidTotal');
       const elPct = document.getElementById('rpcKpiPercentage');
 
-      if (elChecked) elChecked.textContent = d.checkedInCount;
-      if (elRemaining) elRemaining.textContent = d.remainingToCollect;
-      if (elPaid) elPaid.textContent = d.paidParticipants;
-      if (elPct) elPct.textContent = `${d.percentage}% dari peserta lunas`;
+      const setText = (element, value) => {
+        if (element) element.textContent = value;
+      };
+
+      setText(elChecked, d.checkedInCount);
+      setText(elRemaining, d.remainingToCollect);
+      setText(elPaid, d.paidParticipants);
+      setText(elPct, `${d.percentage}% dari peserta lunas`);
+      setText(document.getElementById('rpcInfoCheckedIn'), d.checkedInCount);
+      setText(document.getElementById('rpcInfoRemaining'), d.remainingToCollect);
+      setText(document.getElementById('rpcInfoPaidTotal'), d.paidParticipants);
+      setText(document.getElementById('rpcInfoPercentage'), `${d.percentage}% dari peserta lunas`);
     }
   } catch (err) {
     console.warn('Gagal memuat statistik racepack:', err);
@@ -118,6 +126,7 @@ export function renderRacepackDetails(data) {
   const paySub = document.getElementById('rpcPaymentSub');
   const payBadge = document.getElementById('rpcPaymentBadge');
   const confirmBtn = document.getElementById('btnConfirmRpcCheckin');
+  const actionWrapper = document.getElementById('rpcActionBtnWrapper');
 
   if (banner && payIcon && payTitle && payBadge) {
     if (isPaid) {
@@ -190,6 +199,7 @@ export function renderRacepackDetails(data) {
 
   if (rpc && rpc.checkedIn) {
     if (alreadyBox) alreadyBox.style.display = 'block';
+    if (actionWrapper) actionWrapper.style.display = 'none';
     if (alreadyText) {
       const dtStr = new Date(rpc.checkedInAt).toLocaleString('id-ID');
       alreadyText.textContent = `Diserahkan pada: ${dtStr} WIB oleh Petugas: ${rpc.checkedInBy || 'Admin'}`;
@@ -200,15 +210,16 @@ export function renderRacepackDetails(data) {
     }
   } else {
     if (alreadyBox) alreadyBox.style.display = 'none';
+    if (actionWrapper) actionWrapper.style.display = 'block';
     if (confirmBtn) {
       if (rpc?.queued) {
-        confirmBtn.innerHTML = '<i class="fa-solid fa-check"></i> Data Sudah Dikirim ke Antrean';
-        confirmBtn.className = 'btn btn-secondary btn-sm';
-        confirmBtn.disabled = true;
-        confirmBtn.style.opacity = '0.7';
-        confirmBtn.style.cursor = 'not-allowed';
+        confirmBtn.innerHTML = '<i class="fa-solid fa-box-check"></i> Konfirmasi Check-in';
+        confirmBtn.className = 'btn btn-primary btn-glow';
+        confirmBtn.disabled = false;
+        confirmBtn.style.opacity = '1';
+        confirmBtn.style.cursor = 'pointer';
       } else {
-        confirmBtn.innerHTML = '<i class="fa-solid fa-paper-plane" style="font-size: 1.1rem;"></i> Kirim Data ke Live View Antrean';
+        confirmBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Kirim ke Antrean';
         confirmBtn.className = 'btn btn-primary btn-glow';
         confirmBtn.disabled = !isPaid;
       }
@@ -291,10 +302,10 @@ function renderMasterRacepackView(data, mountEl) {
         </div>
       ` : `
         <button type="button" class="btn btn-primary btn-glow" id="btnBatchCheckinAll" style="width: 100%; padding: 14px; font-size: 1rem; font-weight: 800;" ${!isPaid ? 'disabled style="opacity: 0.5;"' : ''}>
-          <i class="fa-solid fa-paper-plane" style="font-size: 1.2rem;"></i> Kirim Peserta Belum Diambil ke Antrean
+          <i class="fa-solid fa-paper-plane"></i> Kirim Semua ke Antrean
         </button>
         <span style="font-size: 0.75rem; color: #64748B; margin-top: 8px; display: block;">
-          Konfirmasi serah terima setiap peserta dilakukan pada halaman Live View Antrean Racepack.
+          Pilih detail peserta untuk konfirmasi check-in setelah racepack diserahkan.
         </span>
       `}
     </div>
@@ -306,12 +317,13 @@ function renderMasterRacepackView(data, mountEl) {
       const pId = btn.getAttribute('data-participant-id');
       const selected = participants.find(p => p.id === pId);
       if (selected) {
-        renderRacepackDetails({
+        currentRacepackData = {
           isMaster: false,
           participant: selected,
           isPaid,
           racepack: selected.racepack || { checkedIn: false }
-        });
+        };
+        renderRacepackDetails(currentRacepackData);
       }
     });
   });
@@ -375,33 +387,74 @@ export async function handleConfirmRacepackCheckin() {
   }
 
   const btn = document.getElementById('btnConfirmRpcCheckin');
-  const origHtml = btn ? btn.innerHTML : '';
+  const queued = Boolean(currentRacepackData.racepack?.queued);
+
+  if (queued) {
+    const confirmed = await showConfirmDialog({
+      title: 'Konfirmasi Check-in Racepack',
+      message: `Pastikan racepack sudah diserahkan kepada ${p.fullNameKtp}. Konfirmasi check-in sekarang?`,
+      confirmText: 'Ya, Konfirmasi Check-in',
+      type: 'warning',
+    });
+    if (!confirmed) return;
+  }
+
   if (btn) {
     btn.disabled = true;
-    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Mengirim ke antrean...';
+    btn.innerHTML = queued
+      ? '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan check-in...'
+      : '<i class="fa-solid fa-spinner fa-spin"></i> Mengirim ke antrean...';
   }
 
   try {
-    const res = await fetchAdmin('/admin/racepack/queue', {
-      method: 'POST',
-      body: JSON.stringify({
-        participantId: p.id,
-      })
-    });
+    if (!queued) {
+      const res = await fetchAdmin('/admin/racepack/queue', {
+        method: 'POST',
+        body: JSON.stringify({ participantId: p.id }),
+      });
+      if (!res || res.status !== 'success') {
+        throw new Error(res?.message || 'Gagal mengirim peserta ke antrean.');
+      }
 
-    if (res && res.status === 'success') {
-      showAdminToast('success', 'Dikirim ke Antrean', `Data peserta ${p.fullNameKtp} dikirim. Konfirmasi serah terima di Live View Antrean.`);
       currentRacepackData.racepack = { ...currentRacepackData.racepack, queued: true };
       renderRacepackDetails(currentRacepackData);
+      showAdminToast('success', 'Dikirim ke Antrean', `${p.fullNameKtp} siap dikonfirmasi di halaman ini.`);
     } else {
-      showAdminToast('error', 'Gagal Mengirim', res?.message || 'Terjadi kesalahan');
+      const items = [
+        ['chkItemBib', 'Nomor BIB'],
+        ['chkItemJersey', 'Jersey'],
+        ['chkItemChip', 'Timing Chip'],
+        ['chkItemBag', 'Drawstring Bag & Race Guide'],
+        ['chkItemRefreshment', 'Suplemen & Refreshment'],
+      ]
+        .filter(([id]) => document.getElementById(id)?.checked)
+        .map(([, item]) => item);
+      const res = await fetchAdmin('/admin/racepack/checkin', {
+        method: 'POST',
+        body: JSON.stringify({
+          participantId: p.id,
+          items,
+          notes: 'Serah terima dikonfirmasi melalui halaman Pengambilan Racepack & Check-in.',
+        }),
+      });
+      if (!res || res.status !== 'success') {
+        throw new Error(res?.message || 'Gagal menyimpan check-in racepack.');
+      }
+
+      currentRacepackData.racepack = res.data;
+      if (res.data?.bibNumber) p.bibNumber = res.data.bibNumber;
+      renderRacepackDetails(currentRacepackData);
+      showAdminToast('success', 'Racepack Diserahkan', res.message);
+      await Promise.all([loadRacepackStats(), loadParticipants()]);
     }
   } catch (err) {
-    showAdminToast('error', 'Kesalahan Pengiriman', err.message);
+    showAdminToast('error', queued ? 'Gagal Check-in' : 'Gagal Mengirim', err.message);
   } finally {
-    if (btn) {
+    if (btn && !currentRacepackData.racepack?.checkedIn) {
       btn.disabled = false;
-      btn.innerHTML = origHtml;
+      btn.innerHTML = currentRacepackData.racepack?.queued
+        ? '<i class="fa-solid fa-box-check"></i> Konfirmasi Check-in'
+        : '<i class="fa-solid fa-paper-plane"></i> Kirim ke Antrean';
     }
   }
 }
@@ -466,8 +519,11 @@ export async function startRpcCamera() {
 
       html5QrScannerInstance = new window.Html5Qrcode('rpcCameraContainer');
       const config = {
-        fps: 10,
-        qrbox: { width: 220, height: 220 },
+        fps: 15,
+        qrbox: (viewfinderWidth, viewfinderHeight) => {
+          const size = Math.min(320, Math.floor(Math.min(viewfinderWidth, viewfinderHeight) * 0.82));
+          return { width: size, height: size };
+        },
         aspectRatio: 1.0,
       };
 
@@ -540,7 +596,7 @@ export async function startRpcCamera() {
     scanCameraFrame();
   } catch (err) {
     console.error('Camera access error:', err);
-    showAdminToast('error', 'Izin Kamera Ditolak / Gagal', 'Tidak dapat mengakses live stream kamera. Silakan gunakan tombol "Foto E-Tiket (Kamera HP)".');
+    showAdminToast('error', 'Izin Kamera Ditolak / Gagal', 'Tidak dapat mengakses live stream kamera. Silakan gunakan tombol "Foto E-Tiket".');
     triggerNativeCamera();
   }
 }
@@ -567,7 +623,7 @@ async function scanCameraFrame() {
     }
   }
 
-  rawCameraLoopTimer = setTimeout(scanCameraFrame, 200);
+  rawCameraLoopTimer = setTimeout(scanCameraFrame, 100);
 }
 
 /**

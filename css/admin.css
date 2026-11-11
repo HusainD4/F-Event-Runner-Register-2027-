@@ -549,6 +549,59 @@
   margin: 0;
 }
 
+.countdown-settings-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 0.85fr);
+  gap: 20px;
+  align-items: end;
+}
+
+.countdown-date-field .form-label {
+  font-size: 0.9rem;
+}
+
+.countdown-date-field .form-input {
+  min-height: 46px;
+  padding: 10px 12px;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.countdown-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.countdown-actions .btn {
+  min-height: 38px;
+}
+
+.countdown-live-preview {
+  margin-top: 20px;
+  padding: 16px 18px;
+  border: 1px solid #E2E8F0;
+  border-radius: 14px;
+  background: #F8FAFC;
+}
+
+.countdown-live-preview-label {
+  margin-bottom: 8px;
+  color: #64748B;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+#adminCountdownLivePreview {
+  color: #0F172A;
+  font-size: 0.94rem;
+  font-weight: 700;
+  line-height: 1.6;
+}
+
 /* Action Bars */
 .admin-action-bar {
   display: flex;
@@ -620,6 +673,93 @@
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
+}
+
+.rpc-info-trigger {
+  display: none;
+}
+
+.rpc-info-dialog {
+  width: min(440px, calc(100vw - 24px));
+  max-width: none;
+  max-height: min(80vh, 620px);
+  margin: auto;
+  padding: 18px;
+  border: 1px solid #E2E8F0;
+  border-radius: 16px;
+  color: #0F172A;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.22);
+}
+
+.rpc-info-dialog::backdrop {
+  background: rgba(15, 23, 42, 0.48);
+  backdrop-filter: blur(3px);
+}
+
+.rpc-info-dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.rpc-info-dialog-header h4 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 1rem;
+}
+
+.rpc-info-dialog-header h4 i {
+  color: var(--color-primary);
+}
+
+.rpc-info-close {
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 8px;
+  background: #F1F5F9;
+  color: #475569;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.rpc-info-description {
+  margin: 10px 0 14px;
+  color: #64748B;
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.rpc-info-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.rpc-info-stats > div {
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid #E2E8F0;
+  border-radius: 10px;
+  background: #F8FAFC;
+}
+
+.rpc-info-stats span,
+.rpc-info-stats small {
+  display: block;
+  color: #64748B;
+  font-size: 0.65rem;
+  line-height: 1.35;
+}
+
+.rpc-info-stats strong {
+  display: block;
+  margin: 4px 0;
+  font-size: 1.15rem;
+  line-height: 1.2;
 }
 
 .event-status-tag {
@@ -1391,6 +1531,87 @@
 }
 
 @media screen and (max-width: 640px) {
+  .admin-topbar {
+    height: 56px;
+    min-height: 56px;
+    padding: 0 10px;
+    flex-wrap: nowrap;
+    gap: 8px;
+  }
+
+  .topbar-left {
+    flex: 1;
+    min-width: 0;
+    gap: 8px;
+  }
+
+  .btn-sidebar-toggle {
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+    border-radius: 9px;
+    font-size: 0.9rem;
+  }
+
+  .page-heading {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .admin-topbar .page-title {
+    overflow: hidden;
+    font-size: 0.92rem;
+    line-height: 1.2;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .page-breadcrumb {
+    display: none;
+  }
+
+  .topbar-right {
+    width: auto;
+    flex: 0 0 auto;
+    justify-content: flex-end;
+    gap: 6px;
+  }
+
+  .system-pill {
+    width: 24px;
+    height: 24px;
+    flex: 0 0 24px;
+    justify-content: center;
+    gap: 0;
+    padding: 0;
+  }
+
+  .system-pill span:not(.system-pill-dot) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .topbar-right .admin-badge-role {
+    padding: 3px 6px;
+    border-radius: 6px;
+    background: #F1F5F9;
+    color: #475569;
+    font-size: 0.62rem;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .admin-info-text {
+    display: none !important;
+  }
+
   .admin-content-body,
   .admin-section,
   .admin-tab-pane {
@@ -1423,6 +1644,36 @@
   .admin-section-header p {
     font-size: 0.76rem;
     line-height: 1.45;
+  }
+
+  .countdown-settings-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+  }
+
+  .countdown-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    justify-content: stretch;
+  }
+
+  .countdown-actions #btnSaveGlobalCountdown {
+    grid-column: 1 / -1;
+  }
+
+  .countdown-actions .btn {
+    justify-content: center;
+    min-width: 0;
+    padding: 8px 10px;
+    font-size: 0.76rem;
+  }
+
+  .countdown-live-preview {
+    padding: 13px;
+  }
+
+  #adminCountdownLivePreview {
+    font-size: 0.82rem;
   }
 
   .admin-action-bar {
@@ -1613,6 +1864,123 @@
   .admin-modal-dialog {
     width: 100%;
     max-height: calc(100dvh - 16px);
+  }
+
+  #pane-racepack .rpc-page-description,
+  #pane-racepack > .admin-section > .admin-kpi-grid {
+    display: none;
+  }
+
+  #pane-racepack .rpc-info-trigger {
+    display: inline-flex;
+    min-width: 40px;
+    min-height: 36px;
+    padding: 7px 10px;
+  }
+
+  #pane-racepack .rpc-header-actions {
+    width: auto;
+    grid-template-columns: repeat(2, 34px);
+    align-self: flex-end;
+    gap: 6px;
+  }
+
+  #pane-racepack .rpc-header-actions > .btn {
+    width: 34px;
+    min-width: 34px;
+    min-height: 34px;
+    height: 34px;
+    padding: 0;
+    border-radius: 9px;
+    font-size: 0.78rem;
+    white-space: nowrap;
+  }
+
+  #pane-racepack .rpc-header-actions > .btn span {
+    display: none;
+  }
+
+  #pane-racepack .rpc-camera-actions {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 7px !important;
+  }
+
+  #pane-racepack .rpc-camera-actions > .btn {
+    flex: initial !important;
+    min-width: 0 !important;
+    min-height: 34px;
+    padding: 7px 6px;
+    border-radius: 9px;
+    font-size: 0.69rem;
+    line-height: 1.2;
+    gap: 5px !important;
+    white-space: normal;
+  }
+
+  #pane-racepack #btnStopRpcCamera {
+    grid-column: 1 / -1;
+  }
+
+  #pane-racepack .rpc-manual-search-form {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) 38px;
+    gap: 6px !important;
+  }
+
+  #pane-racepack .rpc-manual-search-form .form-input {
+    min-width: 0 !important;
+    min-height: 36px;
+    padding: 7px 10px;
+    font-size: 0.75rem;
+  }
+
+  #pane-racepack .rpc-manual-search-form .btn {
+    width: 38px;
+    min-width: 38px;
+    min-height: 36px;
+    height: 36px;
+    padding: 0;
+    justify-content: center;
+    font-size: 0.78rem;
+  }
+
+  #pane-racepack .rpc-manual-search-form .btn span {
+    display: none;
+  }
+
+  #pane-racepack #btnConfirmRpcCheckin,
+  #pane-racepack #btnBatchCheckinAll {
+    min-height: 38px;
+    padding: 8px 10px !important;
+    border-radius: 10px;
+    font-size: 0.78rem !important;
+    line-height: 1.25;
+    gap: 6px !important;
+  }
+
+  #pane-racepack #rpcCameraContainer {
+    min-height: 220px !important;
+  }
+
+  #pane-racepack #rpcVerificationContainer {
+    min-height: 0 !important;
+    padding: 14px !important;
+  }
+
+  #pane-racepack #rpcEmptyState {
+    padding: 28px 10px !important;
+  }
+
+  #pane-racepack #rpcEmptyState > div:first-child {
+    width: 56px !important;
+    height: 56px !important;
+    margin-bottom: 10px !important;
+    font-size: 1.5rem !important;
+  }
+
+  .rpc-info-dialog {
+    padding: 14px;
   }
 }
 

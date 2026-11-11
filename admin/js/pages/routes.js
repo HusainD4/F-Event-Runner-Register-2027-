@@ -7,20 +7,27 @@ import { showAdminToast, showConfirmDialog, escapeHtml } from '../core/utils.js'
 // =============================================================================
 let currentEditingRoutePointId = null;
 
-async function loadRoutePoints() {
+async function loadRoutePoints({ showLoading = true } = {}) {
   const tbody = document.getElementById('routePointsTableBody');
   if (!tbody) return;
-  tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:20px;color:var(--color-text-muted);">Memuat data...</td></tr>';
+  if (showLoading) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:20px;color:var(--color-text-muted);">Memuat data...</td></tr>';
+  }
   try {
     const res = await fetchAdmin('/admin/routes/points');
     if (res.status === 'success') {
       adminState.routePoints = res.data;
       renderRoutePointsTable(res.data);
-    } else {
+    } else if (showLoading) {
       tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:20px;color:#EF4444;">Gagal memuat data checkpoint.</td></tr>';
+    } else {
+      console.error('Failed to refresh route points:', res.message || 'Unexpected response');
     }
   } catch (err) {
-    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:20px;color:#EF4444;">${err.message}</td></tr>`;
+    console.error('Failed to load route points:', err);
+    if (showLoading) {
+      tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:20px;color:#EF4444;">${err.message}</td></tr>`;
+    }
   }
 }
 

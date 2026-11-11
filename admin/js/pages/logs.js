@@ -5,7 +5,7 @@ import { escapeHtml } from '../core/utils.js';
 // --- AUDIT LOGS ---
 async function loadAuditLogs() {
   try {
-    const res = await fetchAdmin('/admin/logs?limit=25').catch(() => null);
+    const res = await fetchAdmin('/admin/logs?limit=25');
     if (res && res.status === 'success') {
       renderAuditLogs(res.data.logs || res.data || []);
     }

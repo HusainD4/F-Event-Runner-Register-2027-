@@ -1,8 +1,6 @@
 import { fetchAdmin } from '../core/api.js';
-import { showAdminToast, showConfirmDialog, escapeHtml } from '../core/utils.js';
-import { loadRacepackStats } from './racepack.js';
+import { escapeHtml } from '../core/utils.js';
 
-let refreshTimer = null;
 let queueRequestInProgress = false;
 
 function renderQueue(queue) {
@@ -27,9 +25,6 @@ function renderQueue(queue) {
               ${escapeHtml(eventName)} · BIB ${escapeHtml(participant.bibNumber || 'Belum diterbitkan')} · Jersey ${escapeHtml(participant.selectedSize || '-')}
             </div>
           </div>
-          <button type="button" class="btn btn-primary btn-glow btn-confirm-queued-racepack" data-id="${escapeHtml(participant.id)}" data-name="${escapeHtml(participant.fullNameKtp)}">
-            <i class="fa-solid fa-box-check"></i> Konfirmasi &amp; Serahkan Racepack
-          </button>
         </div>
         <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:8px; margin-top:14px; font-size:.82rem; color:#475569;">
           <div><strong>NIK:</strong> ${escapeHtml(participant.nik || '-')}</div>
@@ -59,9 +54,6 @@ function renderQueue(queue) {
     `;
   }).join('');
 
-  container.querySelectorAll('.btn-confirm-queued-racepack').forEach(button => {
-    button.addEventListener('click', () => confirmQueuedRacepack(button));
-  });
 }
 
 export async function loadRacepackQueue() {
@@ -77,55 +69,11 @@ export async function loadRacepackQueue() {
     if (updated) updated.textContent = `Diperbarui ${new Date().toLocaleTimeString('id-ID')}`;
   } catch (error) {
     const container = document.getElementById('racepackQueueContainer');
-    if (container && !container.querySelector('.btn-confirm-queued-racepack')) {
+    if (container) {
       container.innerHTML = `<div class="glass-card" style="padding:20px; color:#B91C1C;">${escapeHtml(error.message)}</div>`;
     }
     console.error('Gagal memuat antrean racepack:', error);
   } finally {
     queueRequestInProgress = false;
   }
-}
-
-async function confirmQueuedRacepack(button) {
-  const participantId = button.dataset.id;
-  const fullName = button.dataset.name || 'peserta ini';
-  const confirmed = await showConfirmDialog({
-    title: 'Konfirmasi Serah Terima Racepack',
-    message: `Pastikan racepack sudah diserahkan kepada ${fullName}. Lanjutkan check-in?`,
-    confirmText: 'Ya, Serahkan Racepack',
-    type: 'warning',
-  });
-  if (!confirmed) return;
-
-  if (button) {
-    button.disabled = true;
-    button.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
-  }
-  try {
-    const res = await fetchAdmin('/admin/racepack/checkin', {
-      method: 'POST',
-      body: JSON.stringify({
-        participantId,
-        items: ['Nomor BIB', 'Jersey', 'Timing Chip', 'Drawstring Bag & Race Guide', 'Suplemen & Refreshment'],
-        notes: 'Serah terima dikonfirmasi melalui tampilan antrean racepack.',
-      }),
-    });
-    if (!res || res.status !== 'success') throw new Error(res?.message || 'Check-in gagal.');
-    showAdminToast('success', 'Racepack Diserahkan', res.message);
-    await Promise.all([loadRacepackQueue(), loadRacepackStats()]);
-  } catch (error) {
-    showAdminToast('error', 'Gagal Check-in', error.message);
-    await loadRacepackQueue();
-  }
-}
-
-export function startRacepackQueueRefresh() {
-  stopRacepackQueueRefresh();
-  loadRacepackQueue();
-  refreshTimer = setInterval(loadRacepackQueue, 5000);
-}
-
-export function stopRacepackQueueRefresh() {
-  if (refreshTimer) clearInterval(refreshTimer);
-  refreshTimer = null;
 }

@@ -92,9 +92,10 @@ async function loadTicketDetail() {
   }
 
   try {
-    const [res, cfgRes] = await Promise.all([
+    const [res, cfgRes, countdownRes] = await Promise.all([
       apiFetch(`/events/${eventId}`),
-      apiFetch('/settings/checkout-config').catch(() => null)
+      apiFetch('/settings/checkout-config').catch(() => null),
+      apiFetch('/settings/countdown').catch(() => null)
     ]);
 
     const text = await res.text();
@@ -122,8 +123,28 @@ async function loadTicketDetail() {
       } catch {}
     }
 
+    let isGlobalClosed = false;
+    if (countdownRes?.ok) {
+      try {
+        const countdownJson = await countdownRes.json();
+        isGlobalClosed = countdownJson.data?.isRegistrationClosed === true
+          || String(countdownJson.data?.isRegistrationClosed).toLowerCase() === 'true';
+      } catch (error) {
+        console.warn('Gagal membaca status pendaftaran global:', error);
+      }
+    }
+
+    if (isGlobalClosed) {
+      loadingEl.style.display = 'none';
+      errorEl.style.display = 'block';
+      const errorTitle = document.querySelector('#tdErrorState h3');
+      if (errorTitle) errorTitle.textContent = 'Pendaftaran Sedang Ditutup';
+      document.getElementById('tdErrorMessage').textContent = 'Detail tiket tidak tersedia karena seluruh pendaftaran telah ditutup oleh panitia.';
+      return;
+    }
+
     const event = result.data;
-    renderTicketData(event, feeSettings);
+    renderTicketData(event, feeSettings, isGlobalClosed);
 
     loadingEl.style.display = 'none';
     contentEl.style.display = 'block';
@@ -134,7 +155,8 @@ async function loadTicketDetail() {
   }
 }
 
-function renderTicketData(event, feeSettings = {}) {
+function renderTicketData(event, feeSettings = {}, isGlobalClosed = false) {
+  const isClosed = Boolean(event.isClosed) || isGlobalClosed;
   // Page Title
   document.title = `${event.ticketName} - Tegal Run 2027`;
 
@@ -168,9 +190,11 @@ function renderTicketData(event, feeSettings = {}) {
 
   // Status Badge
   const statusBadge = document.getElementById('tdStatusBadge');
-  if (event.isClosed) {
+  if (isClosed) {
     statusBadge.className = 'td-badge closed';
-    statusBadge.innerHTML = '<i class="fa-solid fa-lock"></i> Pendaftaran Resmi Ditutup';
+    statusBadge.innerHTML = isGlobalClosed
+      ? '<i class="fa-solid fa-lock"></i> Seluruh Pendaftaran Resmi Ditutup'
+      : '<i class="fa-solid fa-lock"></i> Pendaftaran Resmi Ditutup';
   } else {
     statusBadge.className = 'td-badge open';
     statusBadge.innerHTML = '<i class="fa-solid fa-lock-open"></i> Pendaftaran Sedang Buka';
@@ -339,12 +363,19 @@ function renderTicketData(event, feeSettings = {}) {
 
   // Register Button Link
   const regBtn = document.getElementById('tdBtnRegisterNow');
-  if (event.isClosed) {
+  if (isClosed) {
     regBtn.classList.remove('btn-glow');
     regBtn.style.opacity = '0.6';
     regBtn.style.pointerEvents = 'none';
-    regBtn.innerHTML = '<i class="fa-solid fa-lock"></i> Pendaftaran Ditutup';
+    regBtn.setAttribute('aria-disabled', 'true');
+    regBtn.removeAttribute('href');
+    regBtn.innerHTML = isGlobalClosed
+      ? '<i class="fa-solid fa-ban"></i> SOLD — Pendaftaran Ditutup'
+      : '<i class="fa-solid fa-lock"></i> Pendaftaran Ditutup';
   } else {
+    regBtn.removeAttribute('aria-disabled');
+    regBtn.style.opacity = '';
+    regBtn.style.pointerEvents = '';
     regBtn.href = `/?register=${event.id}#kategori`;
     regBtn.innerHTML = `<i class="fa-solid fa-ticket"></i> Daftar Kategori ${escapeHtml(event.category)} Sekarang`;
   }

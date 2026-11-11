@@ -143,7 +143,18 @@ async function handleSaveGlobalCountdown() {
     return;
   }
 
-  const isoDate = new Date(input.value).toISOString();
+  const parsedDate = new Date(input.value);
+  if (Number.isNaN(parsedDate.getTime())) {
+    showAdminToast('warning', 'Tanggal Tidak Valid', 'Periksa kembali tanggal dan waktu Race Day.');
+    return;
+  }
+  const isoDate = parsedDate.toISOString();
+  const button = document.getElementById('btnSaveGlobalCountdown');
+  const originalButtonHtml = button?.innerHTML;
+  if (button) {
+    button.disabled = true;
+    button.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
+  }
 
   try {
     const isClosed = adminState.globalSettings?.isRegistrationClosed || false;
@@ -158,15 +169,20 @@ async function handleSaveGlobalCountdown() {
 
     if (res && (res.status === 'success' || res.success)) {
       if (!adminState.globalSettings) adminState.globalSettings = {};
-      adminState.globalSettings.eventCountdownDate = isoDate;
+      adminState.globalSettings = { ...adminState.globalSettings, ...res.data };
 
-      updateCountdownPreview(isoDate);
+      renderGlobalSettings(adminState.globalSettings);
       showAdminToast('success', 'Tersimpan', 'Tanggal target race day berhasil diperbarui!');
     } else {
       showAdminToast('error', 'Gagal', res.message || 'Gagal menyimpan pengaturan countdown.');
     }
   } catch (err) {
     showAdminToast('error', 'Kesalahan Server', err.message);
+  } finally {
+    if (button) {
+      button.disabled = false;
+      button.innerHTML = originalButtonHtml;
+    }
   }
 }
 
@@ -196,7 +212,7 @@ async function handleResetGlobalCountdown() {
 
     if (res && (res.status === 'success' || res.success)) {
       if (!adminState.globalSettings) adminState.globalSettings = {};
-      adminState.globalSettings.eventCountdownDate = null;
+      adminState.globalSettings = { ...adminState.globalSettings, ...res.data };
 
       const input = document.getElementById('globalCountdownInput');
       if (input) input.value = '';
@@ -242,7 +258,7 @@ async function handleToggleGlobalClosed() {
 
     if (res && (res.status === 'success' || res.success)) {
       if (!adminState.globalSettings) adminState.globalSettings = {};
-      adminState.globalSettings.isRegistrationClosed = newStatus;
+      adminState.globalSettings = { ...adminState.globalSettings, ...res.data };
 
       renderGlobalSettings(adminState.globalSettings);
       showAdminToast('success', 'Status Berubah', newStatus ? 'Pendaftaran resmi DITUTUP!' : 'Pendaftaran resmi DIBUKA!');
