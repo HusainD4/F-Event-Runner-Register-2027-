@@ -93,8 +93,7 @@ async function loadETicket() {
     // 1. Tampilkan Banner Master QR jika pesanan memiliki lebih dari 1 tiket
     let masterQrHtml = '';
     if (participants.length > 1) {
-      const masterQrPayload = order.masterQrPayload || `TEGALRUN|MASTER_${orderRef}`;
-      const masterQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&margin=6&data=${encodeURIComponent(masterQrPayload)}`;
+      const masterQrUrl = order.masterQrImageDataUrl;
 
       masterQrHtml = `
         <div class="master-qr-banner">
@@ -127,8 +126,7 @@ async function loadETicket() {
         : '06:15 WIB';
 
       // QR Code individual peserta (encrypted payload tanpa mengekspos nomor BIB)
-      const qrPayload = p.qrPayload || `TEGALRUN|${orderRef}|${p.id}|${p.nik}`;
-      const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&margin=6&data=${encodeURIComponent(qrPayload)}`;
+      const qrCodeUrl = p.qrImageDataUrl;
 
       // Hak Paket Lomba mengikuti tiket event yang didaftar
       const benefits = p.event?.benefits || [];

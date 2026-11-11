@@ -545,6 +545,17 @@ function updateFaviconPreview() {
 
 function initCmsButtons() {
   renderNavbarIconPicker();
+  const setAllSectionVisibility = visible => {
+    Object.values(CMS_VISIBILITY_IDS).forEach(id => {
+      const toggle = document.getElementById(id);
+      if (toggle) toggle.checked = visible;
+    });
+  };
+  const enableAllButton = document.getElementById('btnEnableAllCmsSections');
+  if (enableAllButton) enableAllButton.onclick = () => setAllSectionVisibility(true);
+  const disableAllButton = document.getElementById('btnDisableAllCmsSections');
+  if (disableAllButton) disableAllButton.onclick = () => setAllSectionVisibility(false);
+
   if (!cmsIconDismissHandlersBound) {
     document.addEventListener('click', event => {
       if (event.target.closest('.cms-icon-dropdown')) return;
@@ -709,6 +720,7 @@ function initCmsButtons() {
         refreshPreview();
       }
     };
+    setPreviewOpen(window.matchMedia('(min-width: 681px)').matches);
     previewToggle.onclick = () => {
       if (suppressToggleClick) {
         suppressToggleClick = false;
@@ -735,7 +747,10 @@ function initCmsButtons() {
       if (Math.abs(dragDistance) > 8) previewDragMoved = true;
       if (!previewDragMoved) return;
 
-      const maxWidth = Math.min(window.innerWidth - 48, 1100);
+      const isCompactViewport = window.matchMedia('(max-width: 680px)').matches;
+      const maxWidth = isCompactViewport
+        ? Math.min(320, window.innerWidth - 54)
+        : Math.min(window.innerWidth - 48, 1100);
       const hiddenWidth = previewStartHiddenWidth;
       if (previewStartedOpen && dragDistance < 0) {
         const closedOffset = Math.min(hiddenWidth, Math.abs(dragDistance));
@@ -749,7 +764,8 @@ function initCmsButtons() {
       }
 
       const extraDrag = previewStartedOpen ? dragDistance : dragDistance - hiddenWidth;
-      const width = Math.max(360, Math.min(maxWidth, previewStartWidth + extraDrag));
+      const minWidth = isCompactViewport ? Math.min(250, maxWidth) : 360;
+      const width = Math.max(minWidth, Math.min(maxWidth, previewStartWidth + extraDrag));
       previewPanel.style.width = `${width}px`;
       previewPanel.style.transform = 'translateX(0)';
       previewPanel.classList.add('is-open');
@@ -876,8 +892,17 @@ async function loadCmsSettings() {
       setVal('cmsMedalImage', s.medal_image);
 
       // Legal & Perizinan
+      setVal('cmsLegalBadge', s.legal_badge_label);
       setVal('cmsLegalTitle', s.legal_title);
       setVal('cmsLegalDesc', s.legal_desc);
+      setVal('cmsLegalPrivacyButton', s.legal_privacy_button);
+      setVal('cmsLegalTermsButton', s.legal_terms_button);
+      setVal('cmsPrivacyModalTitle', s.privacy_modal_title);
+      setVal('cmsPrivacyModalSubtitle', s.privacy_modal_subtitle);
+      setVal('cmsPrivacyModalContent', s.privacy_modal_content);
+      setVal('cmsTermsModalTitle', s.terms_modal_title);
+      setVal('cmsTermsModalSubtitle', s.terms_modal_subtitle);
+      setVal('cmsTermsModalContent', s.terms_modal_content);
       if (s.legal_items) {
         try {
           legalItems = JSON.parse(s.legal_items);
@@ -969,8 +994,17 @@ async function handleCmsSubmit(e) {
     medal_image: getVal('cmsMedalImage'),
 
     // Legal
+    legal_badge_label: getVal('cmsLegalBadge'),
     legal_title: getVal('cmsLegalTitle'),
     legal_desc: getVal('cmsLegalDesc'),
+    legal_privacy_button: getVal('cmsLegalPrivacyButton'),
+    legal_terms_button: getVal('cmsLegalTermsButton'),
+    privacy_modal_title: getVal('cmsPrivacyModalTitle'),
+    privacy_modal_subtitle: getVal('cmsPrivacyModalSubtitle'),
+    privacy_modal_content: document.getElementById('cmsPrivacyModalContent')?.value || '',
+    terms_modal_title: getVal('cmsTermsModalTitle'),
+    terms_modal_subtitle: getVal('cmsTermsModalSubtitle'),
+    terms_modal_content: document.getElementById('cmsTermsModalContent')?.value || '',
     legal_item_1_title: legalItems[0]?.title || '',
     legal_item_1_desc: legalItems[0]?.desc || '',
     legal_item_2_title: legalItems[1]?.title || '',

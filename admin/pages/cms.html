@@ -13,6 +13,33 @@
         </button>
       </div>
     </div>
+    <section class="cms-quick-actions" aria-labelledby="cmsQuickActionsTitle">
+      <div class="cms-quick-actions-heading">
+        <div>
+          <span class="cms-quick-actions-eyebrow"><i class="fa-solid fa-wand-magic-sparkles"></i> PENGATURAN CEPAT</span>
+          <h3 id="cmsQuickActionsTitle">Tampilan Website</h3>
+          <p>Atur section yang terlihat tanpa mencari pengaturan satu per satu.</p>
+        </div>
+        <div class="cms-quick-actions-buttons">
+          <button type="button" class="btn btn-secondary btn-sm" id="btnEnableAllCmsSections">
+            <i class="fa-solid fa-eye"></i><span>Nyalakan semua</span>
+          </button>
+          <button type="button" class="btn btn-secondary btn-sm" id="btnDisableAllCmsSections">
+            <i class="fa-solid fa-eye-slash"></i><span>Matikan semua</span>
+          </button>
+        </div>
+      </div>
+      <div class="cms-quick-toggle-grid">
+        <label class="cms-quick-toggle"><span class="cms-quick-toggle-icon"><i class="fa-solid fa-panorama"></i></span><span class="cms-quick-toggle-label">Hero</span><input type="checkbox" id="cmsShowHero" checked><span class="cms-toggle-switch" aria-hidden="true"></span></label>
+        <label class="cms-quick-toggle"><span class="cms-quick-toggle-icon"><i class="fa-solid fa-chart-line"></i></span><span class="cms-quick-toggle-label">Statistik</span><input type="checkbox" id="cmsShowStats" checked><span class="cms-toggle-switch" aria-hidden="true"></span></label>
+        <label class="cms-quick-toggle"><span class="cms-quick-toggle-icon"><i class="fa-solid fa-route"></i></span><span class="cms-quick-toggle-label">Rute</span><input type="checkbox" id="cmsShowRoute" checked><span class="cms-toggle-switch" aria-hidden="true"></span></label>
+        <label class="cms-quick-toggle"><span class="cms-quick-toggle-icon"><i class="fa-solid fa-gift"></i></span><span class="cms-quick-toggle-label">Fasilitas</span><input type="checkbox" id="cmsShowFacilities" checked><span class="cms-toggle-switch" aria-hidden="true"></span></label>
+        <label class="cms-quick-toggle"><span class="cms-quick-toggle-icon"><i class="fa-solid fa-ticket"></i></span><span class="cms-quick-toggle-label">Kategori tiket</span><input type="checkbox" id="cmsShowTickets" checked><span class="cms-toggle-switch" aria-hidden="true"></span></label>
+        <label class="cms-quick-toggle"><span class="cms-quick-toggle-icon"><i class="fa-solid fa-shield-halved"></i></span><span class="cms-quick-toggle-label">Legalitas</span><input type="checkbox" id="cmsShowLegal" checked><span class="cms-toggle-switch" aria-hidden="true"></span></label>
+        <label class="cms-quick-toggle"><span class="cms-quick-toggle-icon"><i class="fa-solid fa-circle-question"></i></span><span class="cms-quick-toggle-label">FAQ</span><input type="checkbox" id="cmsShowFaq" checked><span class="cms-toggle-switch" aria-hidden="true"></span></label>
+        <label class="cms-quick-toggle"><span class="cms-quick-toggle-icon"><i class="fa-solid fa-shoe-prints"></i></span><span class="cms-quick-toggle-label">Footer</span><input type="checkbox" id="cmsShowFooter" checked><span class="cms-toggle-switch" aria-hidden="true"></span></label>
+      </div>
+    </section>
     <!-- 1. Identitas & Hero Section -->
             <div class="admin-section">
               <div class="admin-section-header">
@@ -131,11 +158,6 @@
                 <label class="form-label">Subjudul Hero / Deskripsi Singkat</label>
                 <textarea class="form-input" id="cmsHeroSubtitle" rows="2" placeholder="Kompetisi lari terbesar di Kota Bahari dengan standar race profesional..."></textarea>
               </div>
-              <label class="cms-toggle">
-                <input type="checkbox" id="cmsShowHero" checked>
-                <span class="cms-toggle-switch" aria-hidden="true"></span>
-                <span class="cms-toggle-label">Tampilkan section Hero di website</span>
-              </label>
             </div>
 
             <!-- 1.5. Live Event Stats Grid (Bebas Tambah & Bisa Otomatis dari Data) -->
@@ -158,11 +180,6 @@
               <div id="cmsStatsItemsContainer" class="cms-repeater-grid">
                 <!-- Di-render oleh cms.js -->
               </div>
-              <label class="cms-toggle cms-toggle-spaced">
-                <input type="checkbox" id="cmsShowStats" checked>
-                <span class="cms-toggle-switch" aria-hidden="true"></span>
-                <span class="cms-toggle-label">Tampilkan banner statistik</span>
-              </label>
             </div>
 
             <!-- 2. Rute Lari & Google Maps Embed -->
@@ -174,11 +191,6 @@
                 </div>
               </div>
               <p class="form-hint">Gunakan tab <strong>Manajemen Rute &amp; Checkpoint</strong> untuk memilih Google Maps atau gambar peta, mengatur mode checkpoint, dan mengelola media pratinjau.</p>
-              <label class="cms-toggle">
-                <input type="checkbox" id="cmsShowRoute" checked>
-                <span class="cms-toggle-switch" aria-hidden="true"></span>
-                <span class="cms-toggle-label">Tampilkan section rute</span>
-              </label>
             </div>
 
             <!-- 3. Fasilitas, Kategori & Gambar Media -->
@@ -193,11 +205,6 @@
                 </button>
               </div>
               <div id="cmsFaqItemsContainer" class="cms-repeater-grid"></div>
-              <label class="cms-toggle cms-toggle-spaced">
-                <input type="checkbox" id="cmsShowFaq" checked>
-                <span class="cms-toggle-switch" aria-hidden="true"></span>
-                <span class="cms-toggle-label">Tampilkan section FAQ</span>
-              </label>
             </div>
 
             <div class="admin-section">
@@ -269,11 +276,6 @@
                 <div id="cmsFacilitiesItemsContainer" class="cms-repeater-grid">
                   <!-- Di-render oleh cms.js -->
                 </div>
-                <label class="cms-toggle">
-                  <input type="checkbox" id="cmsShowFacilities" checked>
-                  <span class="cms-toggle-switch" aria-hidden="true"></span>
-                  <span class="cms-toggle-label">Tampilkan section fasilitas</span>
-                </label>
               </div>
 
               <div class="form-row">
@@ -291,11 +293,6 @@
                 <label class="form-label">Deskripsi Section Tiket</label>
                 <textarea class="form-input" id="cmsTicketsDesc" rows="2" placeholder="Tersedia kategori kompetitif bagi atlet dan fun run santai..."></textarea>
               </div>
-              <label class="cms-toggle">
-                <input type="checkbox" id="cmsShowTickets" checked>
-                <span class="cms-toggle-switch" aria-hidden="true"></span>
-                <span class="cms-toggle-label">Tampilkan section kategori tiket</span>
-              </label>
             </div>
 
             <!-- 3.5. Perizinan & Kepatuhan Hukum (Legal) -->
@@ -308,6 +305,11 @@
                 <button type="button" class="btn btn-secondary btn-sm" id="btnAddCmsLegalItem">
                   <i class="fa-solid fa-plus"></i> Tambah Poin Legalitas
                 </button>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Label Badge Legalitas</label>
+                <input type="text" class="form-input" id="cmsLegalBadge" placeholder="Kepatuhan Regulasi Indonesia">
               </div>
 
               <div class="form-group">
@@ -326,11 +328,53 @@
                 <div id="cmsLegalItemsContainer" class="cms-repeater-grid">
                   <!-- Di-render oleh cms.js -->
                 </div>
-                <label class="cms-toggle cms-toggle-spaced">
-                  <input type="checkbox" id="cmsShowLegal" checked>
-                  <span class="cms-toggle-switch" aria-hidden="true"></span>
-                  <span class="cms-toggle-label">Tampilkan section perizinan &amp; kepatuhan</span>
-                </label>
+                <div class="form-row" style="margin-top: 16px;">
+                  <div class="form-group">
+                    <label class="form-label">Tombol Kebijakan Privasi</label>
+                    <input type="text" class="form-input" id="cmsLegalPrivacyButton" placeholder="Baca Kebijakan Privasi Lengkap (UU PDP)">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Tombol Syarat &amp; Ketentuan</label>
+                    <input type="text" class="form-input" id="cmsLegalTermsButton" placeholder="Ketentuan Perlombaan & Pelepasan Tanggung Jawab">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="admin-section">
+              <div class="admin-section-header">
+                <div>
+                  <h3><i class="fa-solid fa-file-shield" style="color: var(--color-primary);"></i> Dokumen Modal Legal</h3>
+                  <p>Atur judul dan isi Kebijakan Privasi serta Syarat &amp; Ketentuan. Pisahkan paragraf dengan baris kosong, awali subjudul dengan angka (contoh: 1.), dan awali butir daftar dengan tanda -.</p>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Judul Kebijakan Privasi</label>
+                  <input type="text" class="form-input" id="cmsPrivacyModalTitle" maxlength="160">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Subjudul Kebijakan Privasi</label>
+                  <input type="text" class="form-input" id="cmsPrivacyModalSubtitle" maxlength="240">
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Isi Kebijakan Privasi</label>
+                <textarea class="form-input" id="cmsPrivacyModalContent" rows="12" maxlength="12000"></textarea>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Judul Syarat &amp; Ketentuan</label>
+                  <input type="text" class="form-input" id="cmsTermsModalTitle" maxlength="160">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Subjudul Syarat &amp; Ketentuan</label>
+                  <input type="text" class="form-input" id="cmsTermsModalSubtitle" maxlength="240">
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Isi Syarat &amp; Ketentuan</label>
+                <textarea class="form-input" id="cmsTermsModalContent" rows="10" maxlength="12000"></textarea>
               </div>
             </div>
 
@@ -363,12 +407,6 @@
                 <label class="form-label">Teks Hak Cipta Footer</label>
                 <input type="text" class="form-input" id="cmsFooterCopyright" placeholder="Hak Cipta Terpelihara © 2027 Panitia Resmi Tegal Run.">
               </div>
-              <label class="cms-toggle">
-                <input type="checkbox" id="cmsShowFooter" checked>
-                <span class="cms-toggle-switch" aria-hidden="true"></span>
-                <span class="cms-toggle-label">Tampilkan footer website</span>
-              </label>
-
               <aside class="cms-live-preview is-open" id="cmsLivePreview" aria-label="Pratinjau halaman utama">
                 <button type="button" class="cms-preview-handle" id="btnToggleCmsPreview"
                   aria-expanded="true" aria-controls="cmsPreviewPanel" aria-label="Lipat pratinjau halaman utama"

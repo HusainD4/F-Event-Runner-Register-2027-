@@ -148,18 +148,20 @@ body {
 
 .master-qr-code-box {
   background: #FFFFFF;
-  padding: 12px;
+  padding: 14px;
   border-radius: 16px;
   text-align: center;
   flex-shrink: 0;
+  min-width: 220px;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 
 .master-qr-img {
-  width: 140px;
-  height: 140px;
+  width: 190px;
+  height: 190px;
   display: block;
-  border-radius: 6px;
+  border-radius: 2px;
+  image-rendering: pixelated;
 }
 
 .master-qr-ref {
@@ -502,7 +504,7 @@ body {
 /* QR Code Section in Stub */
 .stub-qr-box {
   background: #FFFFFF;
-  padding: 8px;
+  padding: 10px;
   border-radius: 12px;
   border: 1.5px solid #E2E8F0;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
@@ -511,14 +513,17 @@ body {
 }
 
 .stub-qr-image {
-  width: 125px;
-  height: 125px;
+  width: 190px;
+  height: 190px;
   display: block;
-  border-radius: 6px;
+  border-radius: 2px;
+  image-rendering: pixelated;
 }
 
 .stub-scan-hint {
-  font-size: 0.65rem;
+  max-width: 210px;
+  overflow-wrap: anywhere;
+  font-size: 0.68rem;
   color: #64748B;
   font-weight: 700;
   margin-top: 4px;
@@ -737,6 +742,21 @@ body {
   .master-qr-banner {
     padding: 20px 16px;
   }
+
+  .master-qr-code-box {
+    min-width: min(100%, 240px);
+    margin: 0 auto;
+  }
+
+  .master-qr-img {
+    width: min(62vw, 220px);
+    height: min(62vw, 220px);
+  }
+
+  .stub-qr-image {
+    width: min(62vw, 220px);
+    height: min(62vw, 220px);
+  }
 }
 
 /* =========================================================================
@@ -903,8 +923,8 @@ body {
   }
 
   .stub-qr-image {
-    width: 105px !important;
-    height: 105px !important;
+    width: 145px !important;
+    height: 145px !important;
   }
 
   .simulated-barcode {

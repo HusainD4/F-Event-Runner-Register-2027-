@@ -1,6 +1,6 @@
 import { apiClient, apiFetch, loadMidtransSdk } from './api.js';
 import { connectRealtimeSocket } from './realtime.js';
-import { applyWebsiteFavicon } from './branding.js';
+import { applyWebsiteBranding } from './branding.js';
 
 // Import Modular HTML Templates
 // 1. Layout
@@ -1894,6 +1894,37 @@ function updateComingSoonSection(visibility) {
   }
 }
 
+function renderLegalDocument(container, content) {
+  if (!container || typeof content !== 'string') return;
+  const fragment = document.createDocumentFragment();
+  let list = null;
+  content.split(/\r?\n/).forEach(rawLine => {
+    const line = rawLine.trim();
+    if (!line) {
+      list = null;
+      return;
+    }
+
+    if (line.startsWith('- ')) {
+      if (!list) {
+        list = document.createElement('ul');
+        fragment.appendChild(list);
+      }
+      const item = document.createElement('li');
+      item.textContent = line.slice(2).trim();
+      list.appendChild(item);
+      return;
+    }
+
+    list = null;
+    const headingMatch = line.match(/^\d+[.)]\s+/);
+    const paragraph = document.createElement(headingMatch ? 'h4' : 'p');
+    paragraph.textContent = line;
+    fragment.appendChild(paragraph);
+  });
+  container.replaceChildren(fragment);
+}
+
 async function loadWebsiteSettings() {
   try {
     const cms = await apiClient.getWebsiteSettings();
@@ -1943,8 +1974,6 @@ async function loadWebsiteSettings() {
     if (cms.site_title) {
       document.title = cms.site_title;
     }
-    applyWebsiteFavicon(cms.favicon_url);
-
     const navbarBrand = document.querySelector('.top-navbar .nav-brand');
     const navbarText = navbarBrand?.querySelector('.brand-text');
     if (navbarText && typeof cms.navbar_title === 'string') {
@@ -2184,6 +2213,8 @@ async function loadWebsiteSettings() {
     }
 
     // 5.5. Legal Section
+    const legalBadge = document.getElementById('legalSectionBadge');
+    if (legalBadge && typeof cms.legal_badge_label === 'string') legalBadge.textContent = cms.legal_badge_label;
     const legalTitle = document.getElementById('legalSectionTitle');
     if (legalTitle && typeof cms.legal_title === 'string') {
       legalTitle.textContent = cms.legal_title;
@@ -2221,6 +2252,22 @@ async function loadWebsiteSettings() {
       `).join('');
       legalGrid.hidden = configuredLegal.length === 0;
     }
+    const privacyButtonLabel = document.getElementById('legalPrivacyButtonLabel');
+    if (privacyButtonLabel && typeof cms.legal_privacy_button === 'string') privacyButtonLabel.textContent = cms.legal_privacy_button;
+    const termsButtonLabel = document.getElementById('legalTermsButtonLabel');
+    if (termsButtonLabel && typeof cms.legal_terms_button === 'string') termsButtonLabel.textContent = cms.legal_terms_button;
+
+    [
+      ['privacyModalTitle', cms.privacy_modal_title],
+      ['privacyModalSubtitle', cms.privacy_modal_subtitle],
+      ['termsModalTitle', cms.terms_modal_title],
+      ['termsModalSubtitle', cms.terms_modal_subtitle]
+    ].forEach(([id, value]) => {
+      const element = document.getElementById(id);
+      if (element && typeof value === 'string') element.textContent = value;
+    });
+    renderLegalDocument(document.getElementById('privacyModalContent'), cms.privacy_modal_content);
+    renderLegalDocument(document.getElementById('termsModalContent'), cms.terms_modal_content);
 
     // 6. Footer & Kontak
     if (cms.contact_email) {
@@ -2237,6 +2284,7 @@ async function loadWebsiteSettings() {
       const copyEl = document.querySelector('.footer-copyright-text') || document.querySelector('.footer-bottom > div:first-child');
       if (copyEl) copyEl.textContent = cms.footer_copyright;
     }
+    applyWebsiteBranding(cms);
   } catch (err) {
     console.warn('Failed to apply website settings:', err);
   }
