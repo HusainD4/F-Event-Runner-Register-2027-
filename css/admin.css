@@ -860,7 +860,8 @@
   .admin-topbar {
     height: auto;
     padding: 12px;
-    flex-wrap: wrap;
+    flex-wrap: nowrap; /* Mencegah elemen turun ke baris baru */
+    overflow-x: auto;
     gap: 8px;
   }
 
