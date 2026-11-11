@@ -1,4 +1,4 @@
-import{a as Ce}from"./api-Ub7T_Sm5.js";const Ma=`<div class="admin-tab-pane active" id="pane-dashboard">
+import{a as Ce}from"./api-KOLSX-Q2.js";const Ma=`<div class="admin-tab-pane active" id="pane-dashboard">
           <!-- Top KPI Grid: Pemisahan Jelas Total Biaya Layanan & Hasil Akhir Murni Bersih -->
           <div class="admin-kpi-grid">
             <div class="kpi-card">

@@ -8,10 +8,12 @@ const isLocalFrontend = typeof window !== 'undefined'
   && ['3000', '4173', '5173', '5174', '5175'].includes(window.location.port);
 
 const configuredApiUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.haisen.my.id/api';
-const fallbackApiUrl = import.meta.env.VITE_API_FALLBACK_URL || 'https://backend-siexa.haisen.my.id/api';
+const fallbackApiUrl = import.meta.env.VITE_API_FALLBACK_URL;
 const apiBaseUrls = isLocalFrontend
   ? ['/api']
-  : [...new Set([configuredApiUrl, fallbackApiUrl].map(url => url.replace(/\/+$/, '')))];
+  : [...new Set([configuredApiUrl, fallbackApiUrl]
+    .filter(Boolean)
+    .map(url => url.replace(/\/+$/, '')))];
 
 export const API_BASE_URL = apiBaseUrls[0];
 

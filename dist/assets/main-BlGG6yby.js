@@ -1,4 +1,4 @@
-import{b as M,a as ye,l as xe}from"./api-Ub7T_Sm5.js";/* empty css              */const we=`<!-- =========================================================================
+import{b as M,a as ye,l as xe}from"./api-KOLSX-Q2.js";/* empty css              */const we=`<!-- =========================================================================
      PAGE SKELETON LOADER (MINIMALIST & ANIMATED)
      ========================================================================= -->
 <div class="page-skeleton" id="pageSkeleton">
