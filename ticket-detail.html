@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Detail Tiket - Tegal Run 2027</title>
+  <title>Detail Kategori - Tegal Run 2027</title>
   
-  <meta name="description" content="Informasi detail kategori lomba, fasilitas race pack, jersey, medali finisher, dan aturan BIB Tegal Run 2027.">
+  <meta name="description" content="Informasi kategori lomba, fasilitas, jersey, kuota, dan biaya pendaftaran Tegal Run 2027.">
   <meta name="theme-color" content="#FF6B00">
   
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23FF6B00'><path d='M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z'/></svg>">
@@ -26,17 +26,19 @@
   <!-- Header Navigation -->
   <header class="td-header-bar">
     <div class="container td-header-inner">
-      <a href="/" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 8px;">
-        <i class="fa-solid fa-arrow-left"></i> Kembali ke Beranda
+      <a href="/" class="td-header-action td-header-back" aria-label="Kembali ke beranda">
+        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+        <span>Kembali ke Beranda</span>
       </a>
-      <div class="brand" style="font-size: 1.1rem;">
-        <div class="brand-icon" style="width: 32px; height: 32px; font-size: 0.95rem;">
+      <a href="/" class="td-header-brand" aria-label="Tegal Run 2027, beranda">
+        <span class="brand-icon" aria-hidden="true">
           <i class="fa-solid fa-person-running"></i>
-        </div>
-        <div class="brand-text">TEGAL RUN <span>2027</span></div>
-      </div>
-      <button class="btn btn-outline btn-sm" id="btnShareTicket" title="Salin Tautan Tiket">
-        <i class="fa-solid fa-share-nodes"></i> Bagikan
+        </span>
+        <span class="brand-text">TEGAL RUN <span>2027</span></span>
+      </a>
+      <button class="td-header-action td-header-share" id="btnShareTicket" type="button" title="Salin tautan tiket" aria-label="Bagikan tautan tiket">
+        <i class="fa-solid fa-share-nodes" aria-hidden="true"></i>
+        <span>Bagikan</span>
       </button>
     </div>
   </header>
@@ -46,20 +48,20 @@
   <!-- Loading State -->
   <div id="tdLoadingState" style="text-align: center; padding: 80px 20px;">
     <i class="fa-solid fa-spinner fa-spin" style="font-size: 3rem; color: var(--color-primary);"></i>
-    <h3 style="margin-top: 16px; color: var(--color-text-title);">Memuat Data Tiket Resmi dari Backend...</h3>
-    <p style="color: var(--color-text-muted); font-size: 0.9rem;">Menghubungkan ke API database MySQL...</p>
+    <h3 style="margin-top: 16px; color: var(--color-text-title);">Memuat informasi tiket</h3>
+    <p style="color: var(--color-text-muted); font-size: 0.9rem;">Mohon tunggu, informasi kategori sedang disiapkan.</p>
   </div>
 
   <!-- Error State -->
   <div id="tdErrorState" class="container" style="display: none; text-align: center; padding: 60px 20px;">
     <div class="td-card" style="max-width: 500px; margin: 0 auto; text-align: center;">
       <i class="fa-solid fa-triangle-exclamation" style="font-size: 3rem; color: #EF4444; margin-bottom: 16px;"></i>
-      <h3 style="color: var(--color-text-title);">Tiket Tidak Ditemukan</h3>
+      <h3 style="color: var(--color-text-title);">Informasi tiket tidak tersedia</h3>
       <p style="color: var(--color-text-muted); font-size: 0.9rem; margin-bottom: 24px;" id="tdErrorMessage">
-        ID tiket yang Anda cari tidak terdaftar atau telah dinonaktifkan dari database.
+        Kategori tiket ini tidak dapat ditemukan. Silakan kembali ke halaman utama untuk melihat kategori yang tersedia.
       </p>
       <a href="/" class="btn btn-primary btn-glow">
-        <i class="fa-solid fa-house"></i> Kembali ke Halaman Utama
+        <i class="fa-solid fa-house"></i> Kembali ke Beranda
       </a>
     </div>
   </div>
@@ -68,24 +70,21 @@
   <main class="container td-hero" id="tdContentSection" style="display: none;">
     <div class="td-grid">
       
-      <!-- Left Column: Primary Details & Perks -->
+      <!-- Informasi utama tiket -->
       <div class="td-col-main">
         <div class="td-card" style="padding: 0; overflow: hidden;">
-          <!-- Visual Ticket Cover Image Banner -->
+          <!-- Sampul kategori tiket -->
           <div class="td-ticket-cover" id="tdTicketCover">
-            <img id="tdTicketCoverImg" src="" alt="Cover Tiket Lomba">
+            <img id="tdTicketCoverImg" src="" alt="Ilustrasi kategori lomba">
             <div style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(15,23,42,0.85) 100%); display: flex; justify-content: space-between; align-items: flex-end; padding: 24px; flex-wrap: wrap; gap: 12px;">
               <div>
-                <span class="ticket-category-tag" id="tdCategoryTag" style="color: #FFF; background: var(--color-primary); padding: 4px 12px; border-radius: 20px; font-weight: 800; font-size: 0.78rem; display: inline-block; margin-bottom: 8px;">10K MARATHON</span>
+                <span class="ticket-category-tag" id="tdCategoryTag" style="color: #FFF; background: var(--color-primary); padding: 4px 12px; border-radius: 20px; font-weight: 800; font-size: 0.78rem; display: inline-block; margin-bottom: 8px;"></span>
                 <h1 style="font-size: 1.85rem; font-weight: 800; color: #FFFFFF; margin: 0 0 6px 0;" id="tdTicketName">
-                  Nama Tiket
                 </h1>
-                <p style="color: rgba(255, 255, 255, 0.85); font-size: 0.92rem; margin: 0;" id="tdTicketSubtitle">
-                  Kategori Lomba Resmi Tegal Run 2027
-                </p>
+                <p style="color: rgba(255, 255, 255, 0.85); font-size: 0.92rem; margin: 0;" id="tdTicketSubtitle"></p>
               </div>
               <span class="td-badge open" id="tdStatusBadge">
-                <i class="fa-solid fa-lock-open"></i> Pendaftaran Buka
+                <i class="fa-solid fa-lock-open"></i> Pendaftaran Dibuka
               </span>
             </div>
           </div>
@@ -98,23 +97,23 @@
               <div class="td-spec-val" id="tdPrice" style="color: var(--color-primary);">Rp 0</div>
             </div>
             <div class="td-spec-box">
-              <div class="td-spec-label"><i class="fa-solid fa-ticket"></i> Sisa Kuota Real-Time</div>
-              <div class="td-spec-val" id="tdStock">0 Tiket</div>
+              <div class="td-spec-label"><i class="fa-solid fa-ticket"></i> Kuota Tersisa</div>
+              <div class="td-spec-val" id="tdStock">-</div>
             </div>
             <div class="td-spec-box">
-              <div class="td-spec-label"><i class="fa-solid fa-calendar-day"></i> Tanggal Pelaksanaan</div>
+              <div class="td-spec-label"><i class="fa-solid fa-calendar-day"></i> Jadwal Pelaksanaan</div>
               <div class="td-spec-val" id="tdEventDate" style="font-size: 0.95rem;">-</div>
             </div>
             <div class="td-spec-box">
-              <div class="td-spec-label"><i class="fa-solid fa-users"></i> Peserta Terverifikasi</div>
-              <div class="td-spec-val" id="tdRegisteredCount">0 Peserta</div>
+              <div class="td-spec-label"><i class="fa-solid fa-users"></i> Jumlah Peserta Terdaftar</div>
+              <div class="td-spec-val" id="tdRegisteredCount">-</div>
             </div>
           </div>
 
           <!-- Quota Progress Bar -->
           <div style="margin-top: 10px;">
             <div style="display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 700; color: var(--color-text-muted); margin-bottom: 6px;">
-              <span>Ketersediaan Tiket</span>
+              <span>Kuota Tersedia</span>
               <span id="tdStockPercentage">0%</span>
             </div>
             <div class="stock-bar-bg" style="height: 10px;">
@@ -124,50 +123,50 @@
         </div>
       </div>
 
-        <!-- Benefits & Race Pack Section -->
+        <!-- Fasilitas kategori -->
         <div class="td-card">
           <h3 class="td-section-title">
             <i class="fa-solid fa-gift" style="color: var(--color-primary);"></i>
-            Fasilitas & Race Pack Resmi (Tersimpan di Database)
+            Fasilitas dan Benefit Kategori
           </h3>
           <p style="color: var(--color-text-muted); font-size: 0.88rem; margin-bottom: 20px;">
-            Setiap peserta yang terdaftar resmi berhak atas paket fasilitas perlombaan berikut:
+            Berikut fasilitas yang termasuk dalam kategori tiket ini.
           </p>
 
           <div id="tdBenefitsContainer">
-            <!-- Populated from event_benefits -->
+            <!-- Data fasilitas dimuat dari pengaturan kategori -->
           </div>
         </div>
 
-        <!-- Jersey & Sizing Section -->
+        <!-- Informasi jersey -->
         <div class="td-card">
           <h3 class="td-section-title">
             <i class="fa-solid fa-shirt" style="color: var(--color-primary);"></i>
-            Official Race Jersey & Pilihan Ukuran
+            Jersey dan Pilihan Ukuran
           </h3>
           <div id="tdJerseysContainer">
-            <!-- Populated from jerseys -->
+            <!-- Data jersey dimuat dari pengaturan kategori -->
           </div>
         </div>
 
-        <!-- BIB & Timing Chip Section -->
+        <!-- Informasi BIB -->
         <div class="td-card">
           <h3 class="td-section-title">
             <i class="fa-solid fa-id-badge" style="color: var(--color-primary);"></i>
-            Konfigurasi Nomor Dada (BIB) & Timing Chip
+            Nomor Dada Peserta (BIB)
           </h3>
           <div id="tdBibContainer">
-            <!-- Populated from bib_configurations -->
+            <!-- Konfigurasi BIB dimuat dari pengaturan kategori -->
           </div>
         </div>
       </div>
 
-      <!-- Right Column: Countdown Box & Action Card -->
+      <!-- Hitung mundur dan pendaftaran -->
       <div class="td-col-side">
-        <!-- Race Day Countdown -->
+        <!-- Hitung mundur perlombaan -->
         <div class="td-countdown-box">
           <div style="font-size: 0.82rem; font-weight: 700; letter-spacing: 1px; color: #94A3B8;">
-            <i class="fa-solid fa-stopwatch-20" style="color: #FF6B00;"></i> COUNTDOWN MENUJU RACE DAY
+            <i class="fa-solid fa-stopwatch-20" style="color: #FF6B00;"></i> MENUJU HARI PERLOMBAAN
           </div>
           <div class="td-timer-grid">
             <div class="td-timer-item">
@@ -189,50 +188,50 @@
           </div>
         </div>
 
-        <!-- Action Card -->
+        <!-- Rincian biaya dan tindakan -->
         <div class="td-card" style="border: 2px solid var(--border-glass-orange);">
           <div style="margin-bottom: 16px;">
             <div style="font-size: 0.95rem; font-weight: 800; color: var(--color-text-title); margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
-              <i class="fa-solid fa-receipt" style="color: var(--color-primary);"></i> Rincian Biaya Pendaftaran:
+              <i class="fa-solid fa-receipt" style="color: var(--color-primary);"></i> Rincian Biaya
             </div>
 
-            <!-- Harga Tiket Pokok -->
+            <!-- Harga tiket -->
             <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; margin-bottom: 6px;">
               <span style="color: var(--color-text-muted);">Harga Tiket:</span>
               <strong style="color: var(--color-text-title);" id="tdCardBasePrice">Rp 0</strong>
             </div>
 
-            <!-- Biaya Layanan Row -->
+            <!-- Biaya layanan -->
             <div id="tdCardFeeRow" style="display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; margin-bottom: 8px;">
               <span style="color: var(--color-text-muted);" id="tdCardFeeLabel">Biaya Layanan:</span>
               <strong style="color: #EA580C;" id="tdCardFeeAmount">Rp 0</strong>
             </div>
 
-            <!-- Total Tagihan -->
+            <!-- Total pembayaran -->
             <div style="border-top: 1px dashed var(--color-border-subtle); padding-top: 10px; margin-top: 10px;">
               <div style="display: flex; justify-content: space-between; align-items: baseline;">
-                <span style="font-size: 0.9rem; color: var(--color-text-title); font-weight: 800;">Total Tagihan:</span>
+                <span style="font-size: 0.9rem; color: var(--color-text-title); font-weight: 800;">Total Pembayaran:</span>
                 <div style="font-size: 1.85rem; font-weight: 900; color: var(--color-primary);" id="tdCardPrice">
                   Rp 0
                 </div>
               </div>
               <small style="color: #64748B; font-size: 0.74rem; display: block; margin-top: 4px;" id="tdCardFeeNote">
-                *Total sudah termasuk biaya layanan.
+                Total akhir ditampilkan sebelum pembayaran.
               </small>
             </div>
           </div>
 
           <a href="#" id="tdBtnRegisterNow" class="btn btn-primary btn-glow" style="width: 100%; justify-content: center; margin-bottom: 12px; font-size: 1rem; padding: 14px;">
-            <i class="fa-solid fa-ticket"></i> Daftar Kategori Ini
+            <i class="fa-solid fa-ticket"></i> Daftar pada Kategori Ini
           </a>
 
           <a href="/" class="btn btn-secondary" style="width: 100%; justify-content: center; font-size: 0.88rem;">
-            <i class="fa-solid fa-arrow-left"></i> Lihat Kategori Lainnya
+            <i class="fa-solid fa-arrow-left"></i> Lihat Kategori Lain
           </a>
 
           <div style="margin-top: 18px; padding-top: 14px; border-top: 1px dashed var(--color-border-subtle); display: flex; align-items: center; gap: 8px; font-size: 0.76rem; color: #64748B;">
             <i class="fa-solid fa-shield-halved" style="color: #10B981; font-size: 1rem;"></i>
-            <span>Transaksi aman & terenkripsi Midtrans Payment Gateway.</span>
+            <span>Pembayaran diproses melalui Midtrans.</span>
           </div>
         </div>
       </div>

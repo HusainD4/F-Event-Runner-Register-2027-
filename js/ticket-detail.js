@@ -11,7 +11,7 @@ function showToast(type = 'success', message = '') {
       <i class="${type === 'success' ? 'fa-solid fa-circle-check' : 'fa-solid fa-triangle-exclamation'}"></i>
     </div>
     <div class="toast-content">
-      <h5>${type === 'success' ? 'Berhasil' : 'Peringatan'}</h5>
+      <h5>${type === 'success' ? 'Berhasil' : 'Perhatian'}</h5>
       <p>${message}</p>
     </div>
   `;
@@ -87,7 +87,7 @@ async function loadTicketDetail() {
   if (!eventId) {
     loadingEl.style.display = 'none';
     errorEl.style.display = 'block';
-    document.getElementById('tdErrorMessage').textContent = 'ID tiket tidak ditemukan dalam URL. Silakan pilih tiket melalui landing page.';
+    document.getElementById('tdErrorMessage').textContent = 'Tautan kategori tidak lengkap. Silakan kembali ke beranda dan pilih kategori yang tersedia.';
     return;
   }
 
@@ -103,13 +103,13 @@ async function loadTicketDetail() {
     try {
       result = text ? JSON.parse(text) : {};
     } catch {
-      throw new Error('Server backend tidak merespons JSON yang valid.');
+      throw new Error('Respons server tidak dapat dibaca.');
     }
 
     if (!res.ok || result.status !== 'success' || !result.data) {
       loadingEl.style.display = 'none';
       errorEl.style.display = 'block';
-      document.getElementById('tdErrorMessage').textContent = result.message || 'Data tiket tidak ditemukan di database backend.';
+      document.getElementById('tdErrorMessage').textContent = 'Kategori ini tidak ditemukan atau sudah tidak tersedia. Silakan kembali ke beranda untuk melihat pilihan lainnya.';
       return;
     }
 
@@ -138,8 +138,8 @@ async function loadTicketDetail() {
       loadingEl.style.display = 'none';
       errorEl.style.display = 'block';
       const errorTitle = document.querySelector('#tdErrorState h3');
-      if (errorTitle) errorTitle.textContent = 'Pendaftaran Sedang Ditutup';
-      document.getElementById('tdErrorMessage').textContent = 'Detail tiket tidak tersedia karena seluruh pendaftaran telah ditutup oleh panitia.';
+      if (errorTitle) errorTitle.textContent = 'Pendaftaran Telah Ditutup';
+      document.getElementById('tdErrorMessage').textContent = 'Informasi pendaftaran kategori ini tidak tersedia karena pendaftaran telah ditutup.';
       return;
     }
 
@@ -148,10 +148,12 @@ async function loadTicketDetail() {
 
     loadingEl.style.display = 'none';
     contentEl.style.display = 'block';
+    contentEl.classList.add('td-content-enter');
   } catch (err) {
+    console.error('Gagal memuat detail tiket:', err);
     loadingEl.style.display = 'none';
     errorEl.style.display = 'block';
-    document.getElementById('tdErrorMessage').textContent = `Gagal menghubungi server: ${err.message}. Silakan coba beberapa saat lagi.`;
+    document.getElementById('tdErrorMessage').textContent = 'Informasi tiket belum dapat dimuat. Periksa koneksi internet Anda, lalu coba kembali.';
   }
 }
 
@@ -184,24 +186,26 @@ function renderTicketData(event, feeSettings = {}, isGlobalClosed = false) {
   }
 
   // Basic Header Info
-  document.getElementById('tdCategoryTag').textContent = `${escapeHtml(event.category)} MARATHON`;
+  document.getElementById('tdCategoryTag').textContent = event.category || 'Kategori Lomba';
   document.getElementById('tdTicketName').textContent = event.ticketName;
-  document.getElementById('tdTicketSubtitle').textContent = `Kategori Lomba Resmi • Kuota Total ${event.stock.toLocaleString('id-ID')} Peserta`;
+  document.getElementById('tdTicketSubtitle').textContent = `Total kuota: ${Number(event.stock || 0).toLocaleString('id-ID')} peserta`;
 
   // Status Badge
   const statusBadge = document.getElementById('tdStatusBadge');
   if (isClosed) {
     statusBadge.className = 'td-badge closed';
     statusBadge.innerHTML = isGlobalClosed
-      ? '<i class="fa-solid fa-lock"></i> Seluruh Pendaftaran Resmi Ditutup'
-      : '<i class="fa-solid fa-lock"></i> Pendaftaran Resmi Ditutup';
+      ? '<i class="fa-solid fa-lock"></i> Pendaftaran Ditutup'
+      : '<i class="fa-solid fa-lock"></i> Kategori Ditutup';
   } else {
     statusBadge.className = 'td-badge open';
-    statusBadge.innerHTML = '<i class="fa-solid fa-lock-open"></i> Pendaftaran Sedang Buka';
+    statusBadge.innerHTML = '<i class="fa-solid fa-lock-open"></i> Pendaftaran Dibuka';
   }
 
   // Prices & Service Fee Calculation
   const basePrice = Number(event.price) || 0;
+  const remaining = typeof event.remainingStock === 'number' ? event.remainingStock : event.stock;
+  const registered = typeof event.registeredCount === 'number' ? event.registeredCount : 0;
   const isFeeActive = !!(feeSettings.feeEnabled && Number(feeSettings.feeAmount) > 0);
   const feeAmount = isFeeActive ? Number(feeSettings.feeAmount) : 0;
   const feeType = feeSettings.feeType || 'PER_TRANSACTION';
@@ -225,7 +229,7 @@ function renderTicketData(event, feeSettings = {}, isGlobalClosed = false) {
         cardFeeLabel.textContent = `Biaya Layanan (${feeType === 'PER_TICKET' ? 'Per Tiket' : 'Per Transaksi'}):`;
       }
     } else {
-      cardFeeAmount.textContent = 'Gratis (Rp 0)';
+      cardFeeAmount.textContent = 'Tidak dikenakan biaya';
       cardFeeAmount.style.color = '#10B981';
       if (cardFeeLabel) {
         cardFeeLabel.textContent = 'Biaya Layanan:';
@@ -239,14 +243,12 @@ function renderTicketData(event, feeSettings = {}, isGlobalClosed = false) {
   }
 
   // Stocks & Registration counts (strictly from DB)
-  const remaining = typeof event.remainingStock === 'number' ? event.remainingStock : event.stock;
-  const registered = typeof event.registeredCount === 'number' ? event.registeredCount : 0;
-  document.getElementById('tdStock').textContent = `${remaining.toLocaleString('id-ID')} Tiket`;
-  document.getElementById('tdRegisteredCount').textContent = `${registered.toLocaleString('id-ID')} Peserta`;
+  document.getElementById('tdStock').textContent = `${remaining.toLocaleString('id-ID')} tiket`;
+  document.getElementById('tdRegisteredCount').textContent = `${registered.toLocaleString('id-ID')} peserta`;
 
-  const totalCap = event.stock || 1;
-  const pct = Math.max(10, Math.min(100, Math.round((remaining / totalCap) * 100)));
-  document.getElementById('tdStockPercentage').textContent = `${pct}% Kuota Tersedia`;
+  const totalCap = Number(event.stock) || 0;
+  const pct = totalCap > 0 ? Math.max(0, Math.min(100, Math.round((remaining / totalCap) * 100))) : 0;
+  document.getElementById('tdStockPercentage').textContent = `${pct}% tersedia`;
   document.getElementById('tdStockFill').style.width = `${pct}%`;
 
   // Event Date
@@ -263,35 +265,46 @@ function renderTicketData(event, feeSettings = {}, isGlobalClosed = false) {
 
     startCountdown(event.eventDate);
   } else {
-    document.getElementById('tdEventDate').textContent = 'Belum ditentukan';
+    document.getElementById('tdEventDate').textContent = 'Belum diumumkan';
     document.getElementById('tdDays').textContent = '--';
     document.getElementById('tdHours').textContent = '--';
     document.getElementById('tdMinutes').textContent = '--';
     document.getElementById('tdSeconds').textContent = '--';
   }
 
-  // Benefits List (strictly from event_benefits table)
+  // Fasilitas beserta gambar mengikuti data benefit dari backend.
   const benefitsContainer = document.getElementById('tdBenefitsContainer');
   if (Array.isArray(event.benefits) && event.benefits.length > 0) {
     benefitsContainer.innerHTML = event.benefits.map(b => `
       <div class="td-benefit-card">
-        <div class="td-benefit-icon">
-          <i class="fa-solid fa-check"></i>
+        <div class="td-benefit-media">
+          ${b.image
+            ? `<img class="td-benefit-image" src="${escapeHtml(b.image)}" alt="${escapeHtml(b.name)}" loading="lazy">`
+            : '<span class="td-benefit-icon" aria-hidden="true"><i class="fa-solid fa-gift"></i></span>'}
         </div>
-        <div>
-          <strong style="color: var(--color-text-title); font-size: 0.95rem; display: block; margin-bottom: 2px;">
+        <div class="td-benefit-content">
+          <strong class="td-benefit-name">
             ${escapeHtml(b.name)}
           </strong>
-          <p style="font-size: 0.84rem; color: var(--color-text-muted); margin: 0; line-height: 1.5;">
+          <p class="td-benefit-description">
             ${escapeHtml(b.description)}
           </p>
         </div>
       </div>
     `).join('');
+    benefitsContainer.querySelectorAll('.td-benefit-image').forEach(image => {
+      image.addEventListener('error', () => {
+        const fallback = document.createElement('span');
+        fallback.className = 'td-benefit-icon';
+        fallback.setAttribute('aria-hidden', 'true');
+        fallback.innerHTML = '<i class="fa-solid fa-gift"></i>';
+        image.replaceWith(fallback);
+      }, { once: true });
+    });
   } else {
     benefitsContainer.innerHTML = `
-      <p style="font-size: 0.88rem; color: var(--color-text-muted); padding: 12px; background: #F8FAFC; border-radius: 8px;">
-        Belum ada fasilitas / benefit yang tercantum untuk kategori ini.
+      <p class="td-empty-state">
+        Informasi fasilitas untuk kategori ini belum tersedia.
       </p>
     `;
   }
@@ -304,28 +317,27 @@ function renderTicketData(event, feeSettings = {}, isGlobalClosed = false) {
       try {
         sizes = Array.isArray(j.sizes) ? j.sizes : JSON.parse(j.sizes);
       } catch {
-        sizes = ['S', 'M', 'L', 'XL'];
+        sizes = [];
       }
       return `
         <div style="background: #F8FAFC; border: 1px solid var(--color-border-subtle); border-radius: var(--radius-lg); padding: 18px; margin-bottom: 12px;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
             <strong style="font-size: 1rem; color: var(--color-text-title);">${escapeHtml(j.name)}</strong>
-            <span class="badge" style="background: #FFFFFF; font-weight: 700;">Tipe: ${escapeHtml(j.type)}</span>
+            <span class="badge" style="background: #FFFFFF; font-weight: 700;">Jenis: ${escapeHtml(j.type)}</span>
           </div>
-          <p style="font-size: 0.82rem; color: var(--color-text-muted); margin-bottom: 12px;">
-            Bahan Dry-Fit Breathable Micro-fiber, anti-bakteri dan cepat kering.
-          </p>
-          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-            <span style="font-size: 0.78rem; font-weight: 700; color: var(--color-text-muted);">Pilihan Ukuran Resmi:</span>
-            ${sizes.map(s => `<span style="background: #FFFFFF; border: 1px solid var(--color-border-subtle); padding: 4px 10px; border-radius: 6px; font-weight: 800; font-size: 0.8rem; color: var(--color-primary);">${escapeHtml(s)}</span>`).join('')}
-          </div>
+          ${sizes.length ? `
+            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+              <span style="font-size: 0.78rem; font-weight: 700; color: var(--color-text-muted);">Pilihan ukuran:</span>
+              ${sizes.map(s => `<span style="background: #FFFFFF; border: 1px solid var(--color-border-subtle); padding: 4px 10px; border-radius: 6px; font-weight: 800; font-size: 0.8rem; color: var(--color-primary);">${escapeHtml(s)}</span>`).join('')}
+            </div>
+          ` : ''}
         </div>
       `;
     }).join('');
   } else {
     jerseysContainer.innerHTML = `
       <p style="font-size: 0.88rem; color: var(--color-text-muted); padding: 12px; background: #F8FAFC; border-radius: 8px;">
-        Belum ada data jersey resmi untuk kategori ini.
+        Informasi jersey untuk kategori ini belum tersedia.
       </p>
     `;
   }
@@ -342,21 +354,21 @@ function renderTicketData(event, feeSettings = {}, isGlobalClosed = false) {
           </div>
           <div>
             <div style="font-size: 0.95rem; font-weight: 800; color: var(--color-text-title);">
-              Format Nomor Dada: <code>${escapeHtml(cfg.prefix)}${'0'.repeat(Math.max(0, (cfg.digitLength || 4) - 1))}1${escapeHtml(cfg.suffix || '')}</code>
+              Format Nomor Dada: <code>${escapeHtml(cfg.prefix)}${String(cfg.startNumber || 1).padStart(Math.max(1, cfg.digitLength || 4), '0')}${escapeHtml(cfg.suffix || '')}</code>
             </div>
-            <small style="color: #64748B;">Nomor BIB unik di-generate otomatis oleh sistem dan terhubung dengan chip RFID resmi.</small>
+            <small style="color: #64748B;">Nomor dada peserta mengikuti format yang ditetapkan untuk kategori ini.</small>
           </div>
         </div>
         <div style="font-size: 0.8rem; color: var(--color-text-muted); line-height: 1.5; border-top: 1px dashed var(--color-border-subtle); padding-top: 10px; margin-top: 10px;">
           <i class="fa-solid fa-triangle-exclamation" style="color: #F59E0B; margin-right: 4px;"></i>
-          Nomor BIB tidak dapat dipindahtangankan demi keabsahan asuransi dan pencatatan rekor waktu finish.
+          Nomor dada peserta ditetapkan untuk keperluan identifikasi selama perlombaan.
         </div>
       </div>
     `;
   } else {
     bibContainer.innerHTML = `
       <p style="font-size: 0.88rem; color: var(--color-text-muted); padding: 12px; background: #F8FAFC; border-radius: 8px;">
-        Belum ada konfigurasi nomor BIB untuk kategori ini.
+        Informasi nomor dada untuk kategori ini belum tersedia.
       </p>
     `;
   }
@@ -370,14 +382,14 @@ function renderTicketData(event, feeSettings = {}, isGlobalClosed = false) {
     regBtn.setAttribute('aria-disabled', 'true');
     regBtn.removeAttribute('href');
     regBtn.innerHTML = isGlobalClosed
-      ? '<i class="fa-solid fa-ban"></i> SOLD — Pendaftaran Ditutup'
-      : '<i class="fa-solid fa-lock"></i> Pendaftaran Ditutup';
+      ? '<i class="fa-solid fa-ban"></i> Pendaftaran Ditutup'
+      : '<i class="fa-solid fa-lock"></i> Kategori Ditutup';
   } else {
     regBtn.removeAttribute('aria-disabled');
     regBtn.style.opacity = '';
     regBtn.style.pointerEvents = '';
     regBtn.href = `/?register=${event.id}#kategori`;
-    regBtn.innerHTML = `<i class="fa-solid fa-ticket"></i> Daftar Kategori ${escapeHtml(event.category)} Sekarang`;
+    regBtn.innerHTML = `<i class="fa-solid fa-ticket"></i> Daftar Kategori ${escapeHtml(event.category)}`;
   }
 }
 
@@ -385,8 +397,13 @@ document.addEventListener('DOMContentLoaded', () => {
   loadTicketDetail();
 
   // Share button
-  document.getElementById('btnShareTicket')?.addEventListener('click', () => {
-    navigator.clipboard.writeText(window.location.href);
-    showToast('success', 'Tautan tiket berhasil disalin ke papan klip!');
+  document.getElementById('btnShareTicket')?.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      showToast('success', 'Tautan kategori berhasil disalin.');
+    } catch (error) {
+      console.error('Gagal menyalin tautan kategori:', error);
+      showToast('error', 'Tautan tidak dapat disalin. Silakan salin alamat halaman ini secara manual.');
+    }
   });
 });

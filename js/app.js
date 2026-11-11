@@ -149,6 +149,9 @@ function initCountdown(targetTimestamp = null) {
     state.countdownTarget = targetTimestamp;
   }
 
+  const countdownBox = document.getElementById('heroCountdown');
+  if (countdownBox) countdownBox.hidden = !Number.isFinite(state.countdownTarget);
+
   if (state.countdownInterval) {
     clearInterval(state.countdownInterval);
     state.countdownInterval = null;
@@ -205,13 +208,15 @@ function initCountdown(targetTimestamp = null) {
 // =============================================================================
 async function loadCountdownSettings() {
   const displayEl = document.getElementById('eventDateDisplay');
+  const countdownBox = document.getElementById('heroCountdown');
   try {
     const settings = await apiClient.getCountdownSettings();
-    state.countdownSettingsLoaded = Boolean(settings);
+    state.countdownSettingsLoaded = Boolean(settings?.eventCountdownDate);
     if (settings && settings.eventCountdownDate) {
       const d = new Date(settings.eventCountdownDate);
       if (!isNaN(d.getTime())) {
         if (state.countdownTarget !== d.getTime()) initCountdown(d.getTime());
+        if (countdownBox) countdownBox.hidden = false;
 
         const dateStr = d.toLocaleDateString('id-ID', {
           day: 'numeric',
@@ -224,11 +229,23 @@ async function loadCountdownSettings() {
           displayEl.classList.remove('badge-pending-date');
         }
       } else if (displayEl) {
-        displayEl.textContent = 'TANGGAL BELUM DITENTUKAN';
+        if (countdownBox) countdownBox.hidden = true;
+        state.countdownTarget = null;
+        if (state.countdownInterval) {
+          clearInterval(state.countdownInterval);
+          state.countdownInterval = null;
+        }
+        displayEl.textContent = '';
         displayEl.classList.add('badge-pending-date');
       }
     } else if (displayEl) {
-      displayEl.textContent = 'TANGGAL BELUM DITENTUKAN';
+      if (countdownBox) countdownBox.hidden = true;
+      state.countdownTarget = null;
+      if (state.countdownInterval) {
+        clearInterval(state.countdownInterval);
+        state.countdownInterval = null;
+      }
+      displayEl.textContent = '';
       displayEl.classList.add('badge-pending-date');
     }
 
@@ -241,9 +258,23 @@ async function loadCountdownSettings() {
     console.warn('Gagal memuat pengaturan countdown dari backend:', err);
     state.isGlobalClosed = true;
     applyRegistrationStatus();
+    state.countdownTarget = null;
+    if (state.countdownInterval) {
+      clearInterval(state.countdownInterval);
+      state.countdownInterval = null;
+    }
     if (displayEl) {
-      displayEl.textContent = 'TANGGAL BELUM DITENTUKAN';
+      displayEl.textContent = '';
       displayEl.classList.add('badge-pending-date');
+    }
+    if (countdownBox) countdownBox.hidden = true;
+  } finally {
+    if (!state.countdownSettingsLoaded) {
+      const eventDate = state.events
+        .map(event => new Date(event.eventDate).getTime())
+        .filter(timestamp => Number.isFinite(timestamp) && timestamp > Date.now())
+        .sort((a, b) => a - b)[0];
+      if (eventDate) initCountdown(eventDate);
     }
   }
 }
@@ -251,13 +282,24 @@ async function loadCountdownSettings() {
 function applyRegistrationStatus() {
   const statusBadge = document.getElementById('heroStatusBadge');
   const statusText = document.getElementById('heroStatusText');
+  const statusDot = statusBadge?.querySelector('.status-dot');
   const ctaBtn = document.getElementById('heroCtaBtn');
   const navBtn = document.getElementById('navDaftarBtn');
   const dockBtn = document.getElementById('dockDaftarBtn');
 
   if (state.isGlobalClosed) {
-    if (statusBadge) statusBadge.style.borderColor = '#EF4444';
-    if (statusText) statusText.innerHTML = '<span style="color:#EF4444; font-weight:800;">🚨 PENDAFTARAN RESMI TELAH RESMI DITUTUP PANITIA</span>';
+    if (statusBadge) {
+      statusBadge.hidden = false;
+      statusBadge.style.borderColor = '#EF4444';
+    }
+    if (statusText) {
+      statusText.textContent = 'PENDAFTARAN RESMI DITUTUP';
+      statusText.style.color = '#EF4444';
+    }
+    if (statusDot) {
+      statusDot.style.background = '#EF4444';
+      statusDot.style.boxShadow = '0 0 8px #EF4444';
+    }
     if (ctaBtn) {
       ctaBtn.disabled = true;
       ctaBtn.classList.remove('btn-glow');
@@ -276,8 +318,18 @@ function applyRegistrationStatus() {
     return;
   }
 
-  if (statusBadge) statusBadge.style.borderColor = '';
-  if (statusText) statusText.textContent = state.cmsHeroBadge || 'PENDAFTARAN RESMI DIBUKA';
+  if (statusBadge) {
+    statusBadge.hidden = false;
+    statusBadge.style.borderColor = '';
+  }
+  if (statusText) {
+    statusText.textContent = state.cmsHeroBadge || 'PENDAFTARAN RESMI DIBUKA';
+    statusText.style.color = '';
+  }
+  if (statusDot) {
+    statusDot.style.background = '';
+    statusDot.style.boxShadow = '';
+  }
   if (ctaBtn) {
     ctaBtn.disabled = false;
     ctaBtn.classList.add('btn-glow');
@@ -300,12 +352,14 @@ async function loadEvents() {
 
   try {
     const events = await apiClient.getEvents();
-    state.events = events;
-    renderTickets(events);
+    state.events = Array.isArray(events) ? events : [];
+    const heroCta = document.getElementById('heroCtaBtn');
+    if (heroCta) heroCta.hidden = state.events.length === 0;
+    renderTickets(state.events);
     renderStatsBanner(state.cmsStatsItems);
 
-    if (!state.countdownTarget && !state.countdownSettingsLoaded && Array.isArray(events)) {
-      const eventDates = events
+    if (!state.countdownTarget && !state.countdownSettingsLoaded) {
+      const eventDates = state.events
         .map(event => new Date(event.eventDate).getTime())
         .filter(timestamp => Number.isFinite(timestamp) && timestamp > Date.now())
         .sort((a, b) => a - b);
@@ -327,6 +381,8 @@ async function loadEvents() {
 
         if (JSON.stringify(result.data) !== JSON.stringify(state.events)) {
           state.events = result.data;
+          const heroCta = document.getElementById('heroCtaBtn');
+          if (heroCta) heroCta.hidden = result.data.length === 0;
           renderTickets(result.data);
           renderStatsBanner(state.cmsStatsItems);
         }
@@ -1285,12 +1341,21 @@ function closeModal(modalId) {
 function renderStatsBanner(items) {
   const banner = document.getElementById('statsBanner');
   if (!banner || !Array.isArray(items)) return;
-  items = items.filter(item => item && typeof item === 'object' && item.visible !== false);
+  const events = Array.isArray(state.events) ? state.events : [];
+  items = items.filter(item => {
+    if (!item || typeof item !== 'object' || item.visible === false) return false;
+    const hasLabel = Boolean(String(item.unit || item.desc || '').trim());
+    if (!hasLabel) return false;
+    if (item.type === 'AUTO') {
+      return events.length > 0
+        && ['TOTAL_PARTICIPANTS', 'TOTAL_CATEGORIES', 'TOTAL_CAPACITY', 'AVAILABLE_SLOTS'].includes(item.autoKey);
+    }
+    return String(item.val ?? '').trim() !== '';
+  });
 
   banner.replaceChildren();
   banner.hidden = items.length === 0 || state.cmsVisibility.stats === false;
 
-  const events = Array.isArray(state.events) ? state.events : [];
   const totals = events.reduce((result, event) => {
     result.participants += Number(event.registeredCount || 0);
     result.capacity += Number(event.stock || 0);
@@ -1427,18 +1492,44 @@ async function loadWebsiteSettings() {
     applyRegistrationStatus();
 
     const heroTitle = document.querySelector('.hero-title');
-    if (heroTitle && cms.hero_title) {
-      heroTitle.innerHTML = cms.hero_title.replace(/\n/g, '<br>');
+    if (heroTitle) {
+      const titleText = typeof cms.hero_title === 'string' ? cms.hero_title.trim() : '';
+      heroTitle.textContent = titleText;
+      heroTitle.hidden = !titleText;
     }
 
     const heroSubtitle = document.querySelector('.hero-desc');
-    if (heroSubtitle && cms.hero_subtitle) {
-      heroSubtitle.textContent = cms.hero_subtitle;
+    if (heroSubtitle) {
+      const subtitleText = typeof cms.hero_subtitle === 'string' ? cms.hero_subtitle.trim() : '';
+      heroSubtitle.textContent = subtitleText;
+      heroSubtitle.hidden = !subtitleText;
     }
 
     const heroDisplayImg = document.getElementById('heroDisplayImg');
-    if (heroDisplayImg && cms.hero_bg_image) {
-      heroDisplayImg.src = cms.hero_bg_image;
+    const heroVisual = document.getElementById('heroVisual');
+    const heroGrid = document.querySelector('#beranda .hero-split-grid');
+    if (heroDisplayImg && heroVisual) {
+      const imageUrl = typeof cms.hero_bg_image === 'string' ? cms.hero_bg_image.trim() : '';
+      heroVisual.hidden = true;
+      heroGrid?.classList.toggle('hero-no-visual', !imageUrl);
+      heroDisplayImg.onload = () => {
+        heroVisual.hidden = false;
+        heroGrid?.classList.remove('hero-no-visual');
+      };
+      heroDisplayImg.onerror = () => {
+        heroVisual.hidden = true;
+        heroGrid?.classList.add('hero-no-visual');
+      };
+      if (imageUrl) {
+        heroDisplayImg.alt = typeof cms.hero_title === 'string' ? cms.hero_title.trim() : '';
+        heroDisplayImg.src = imageUrl;
+        if (heroDisplayImg.complete && heroDisplayImg.naturalWidth > 0) {
+          heroVisual.hidden = false;
+          heroGrid?.classList.remove('hero-no-visual');
+        }
+      } else {
+        heroDisplayImg.removeAttribute('src');
+      }
     }
 
     // Live Event Stats Banner
@@ -1460,13 +1551,6 @@ async function loadWebsiteSettings() {
     }
     state.cmsStatsItems = statsItems;
     renderStatsBanner(statsItems);
-
-    const heroSection = document.getElementById('beranda');
-    if (heroSection && cms.hero_bg_image) {
-      heroSection.style.backgroundImage = `radial-gradient(circle at 10% 20%, rgba(255, 107, 0, 0.08) 0%, transparent 40%), radial-gradient(circle at 90% 80%, rgba(255, 107, 0, 0.05) 0%, transparent 40%), linear-gradient(180deg, rgba(255, 255, 255, 0.88) 0%, rgba(255, 255, 255, 0.98) 100%), url('${cms.hero_bg_image}')`;
-      heroSection.style.backgroundSize = 'cover';
-      heroSection.style.backgroundPosition = 'center';
-    }
 
     // 3. Rute & Google Maps
     const routeSection = document.getElementById('rute');

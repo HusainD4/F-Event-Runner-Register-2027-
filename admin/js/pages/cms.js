@@ -5,13 +5,6 @@ let statsItems = [];
 let facilitiesItems = [];
 let legalItems = [];
 
-const DEFAULT_STATS = [
-  { type: 'AUTO', autoKey: 'TOTAL_PARTICIPANTS', val: '2,500+', unit: 'Pelari Terdaftar', desc: 'Antusiasme komunitas nasional' },
-  { type: 'AUTO', autoKey: 'TOTAL_CATEGORIES', val: '2', unit: 'Kategori Utama', desc: 'Half Marathon 10K & Fun Run 5K' },
-  { type: 'CUSTOM', autoKey: 'STERIL_ROUTE', val: '100%', unit: 'Steril & Aman', desc: 'Pengawalan Dishub & Polresta' },
-  { type: 'CUSTOM', autoKey: 'TOTAL_PRIZE', val: 'Rp 75Jt', unit: 'Total Hadiah & Doorprize', desc: 'Podium juara & ratusan hadiah menarik' }
-];
-
 const DEFAULT_FACILITIES = [
   { icon: 'fa-shirt', title: 'Jersey Running Dry-Fit', desc: 'Bahan mikro-pori cepat kering dengan sablon sublimasi awet dan nyaman untuk jarak jauh.' },
   { icon: 'fa-microchip', title: 'Nomor Dada (BIB) & Timing Chip', desc: 'Pencatatan waktu akurat berteknologi RFID transponder yang tersinkronisasi online.' },
@@ -360,15 +353,15 @@ async function loadCmsSettings() {
         try {
           statsItems = JSON.parse(s.stats_banner_items);
         } catch {
-          statsItems = [...DEFAULT_STATS];
+          statsItems = [];
         }
       } else {
-        statsItems = [
-          { type: 'AUTO', autoKey: 'TOTAL_PARTICIPANTS', val: s.stat_1_val || '2,500+', unit: s.stat_1_unit || 'Pelari Terdaftar', desc: s.stat_1_desc || 'Antusiasme komunitas nasional' },
-          { type: 'AUTO', autoKey: 'TOTAL_CATEGORIES', val: s.stat_2_val || '2', unit: s.stat_2_unit || 'Kategori Utama', desc: s.stat_2_desc || 'Half Marathon 10K & Fun Run 5K' },
-          { type: 'CUSTOM', autoKey: 'STERIL_ROUTE', val: s.stat_3_val || '100%', unit: s.stat_3_unit || 'Steril & Aman', desc: s.stat_3_desc || 'Pengawalan Dishub & Polresta' },
-          { type: 'CUSTOM', autoKey: 'TOTAL_PRIZE', val: s.stat_4_val || 'Rp 75Jt', unit: s.stat_4_unit || 'Total Hadiah & Doorprize', desc: s.stat_4_desc || 'Podium juara & ratusan hadiah menarik' }
-        ];
+        statsItems = [1, 2, 3, 4].map(number => ({
+          type: 'CUSTOM',
+          val: s[`stat_${number}_val`] || '',
+          unit: s[`stat_${number}_unit`] || '',
+          desc: s[`stat_${number}_desc`] || ''
+        })).filter(item => item.val || item.unit || item.desc);
       }
       renderStatsRepeater();
 

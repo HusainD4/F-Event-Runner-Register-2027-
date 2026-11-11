@@ -3658,3 +3658,348 @@ h1, h2, h3, h4, h5, h6 {
     max-height: 240px;
   }
 }
+
+.hero-section {
+  overflow: hidden;
+  padding: clamp(132px, 14vw, 178px) 0 76px !important;
+  background:
+    radial-gradient(ellipse at 82% 18%, rgba(255, 107, 0, 0.1), transparent 34%),
+    radial-gradient(ellipse at 5% 78%, rgba(251, 146, 60, 0.08), transparent 32%),
+    linear-gradient(180deg, #fff 0%, #fffaf6 100%);
+}
+
+.hero-section .container {
+  position: relative;
+  z-index: 1;
+}
+
+.hero-split-grid {
+  grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.92fr);
+  gap: clamp(34px, 6vw, 82px);
+  margin-bottom: 56px;
+}
+
+.hero-split-grid.hero-no-visual {
+  grid-template-columns: minmax(0, 900px);
+}
+
+.hero-col-content {
+  align-items: flex-start;
+  min-width: 0;
+  text-align: left;
+}
+
+.hero-pill-badge {
+  gap: 9px;
+  max-width: 100%;
+  margin-bottom: 24px;
+  padding: 8px 14px;
+  border-color: rgba(255, 107, 0, 0.18);
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.06);
+  font-size: 0.74rem;
+  letter-spacing: 0.055em;
+  line-height: 1.35;
+}
+
+.hero-pill-badge:hover {
+  transform: none;
+}
+
+.hero-title {
+  max-width: 780px;
+  margin: 0 0 18px;
+  color: #101828;
+  font-size: clamp(2.7rem, 5vw, 4.7rem);
+  font-weight: 850;
+  letter-spacing: -0.055em;
+  line-height: 1.04;
+  overflow-wrap: anywhere;
+  white-space: pre-line;
+}
+
+.hero-title::after {
+  display: block;
+  width: 76px;
+  height: 5px;
+  margin-top: 20px;
+  border-radius: 99px;
+  background: linear-gradient(90deg, #ff6b00, #ffb15e);
+  content: "";
+}
+
+.hero-desc {
+  max-width: 610px;
+  margin: 0 0 28px;
+  color: #5b6472;
+  font-size: clamp(1rem, 1.35vw, 1.15rem);
+  font-weight: 450;
+  line-height: 1.75;
+}
+
+.hero-actions {
+  gap: 12px;
+  margin-bottom: 30px;
+}
+
+.hero-actions .btn {
+  min-height: 48px;
+  border-radius: 14px;
+  padding: 12px 19px;
+  font-weight: 700;
+}
+
+.hero-col-visual {
+  min-width: 0;
+}
+
+.athletic-hero-card {
+  width: min(100%, 500px);
+  max-width: 500px;
+  padding: 9px;
+  overflow: visible;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 30px;
+  background: rgba(255, 255, 255, 0.58);
+  box-shadow: 0 28px 70px -24px rgba(15, 23, 42, 0.3);
+  transform: rotate(1.5deg);
+}
+
+.athletic-hero-card::before {
+  position: absolute;
+  z-index: -1;
+  inset: 12% -8% -7% 14%;
+  border-radius: 34px;
+  background: linear-gradient(145deg, rgba(255, 107, 0, 0.85), rgba(255, 177, 94, 0.55));
+  content: "";
+  filter: blur(1px);
+}
+
+.athletic-hero-img-wrap {
+  height: auto;
+  aspect-ratio: 4 / 4.5;
+  overflow: hidden;
+  border-radius: 23px;
+  background: linear-gradient(145deg, #ffead7, #f8fafc);
+}
+
+.athletic-hero-img {
+  object-position: center 42% !important;
+}
+
+.athletic-card-overlay {
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.02), rgba(15, 23, 42, 0.18));
+}
+
+.hero-col-content .countdown-box {
+  max-width: 620px;
+  border-color: rgba(226, 232, 240, 0.85);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.84);
+  box-shadow: 0 16px 38px -24px rgba(15, 23, 42, 0.28);
+}
+
+.countdown-header {
+  align-items: center;
+}
+
+.countdown-title-wrap {
+  color: #475467;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.055em;
+}
+
+.event-date-pill {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.stats-banner {
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 0;
+  padding: 18px;
+  border-color: rgba(226, 232, 240, 0.8);
+  border-radius: 22px;
+  box-shadow: 0 18px 48px -36px rgba(15, 23, 42, 0.3);
+}
+
+.stats-banner .stat-item {
+  padding: 14px 12px;
+  border: 0;
+}
+
+.stats-banner .stat-num {
+  font-size: clamp(1.35rem, 2.4vw, 1.8rem);
+}
+
+.hero-section [hidden],
+#heroCountdown[hidden],
+#heroVisual[hidden],
+.hero-title[hidden],
+.hero-desc[hidden] {
+  display: none !important;
+}
+
+@media (max-width: 992px) {
+  .hero-section {
+    padding-top: 132px !important;
+  }
+
+  .hero-split-grid,
+  .hero-split-grid.hero-no-visual {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 38px;
+  }
+
+  .hero-col-content {
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .hero-col-content .hero-title,
+  .hero-col-content .hero-desc {
+    margin-left: 0;
+    margin-right: 0;
+    text-align: left;
+  }
+
+  .hero-col-content .hero-actions {
+    justify-content: flex-start;
+  }
+
+  .hero-col-visual {
+    justify-content: flex-start;
+  }
+
+  .athletic-hero-card {
+    width: min(100%, 620px);
+    max-width: 620px;
+  }
+
+  .athletic-hero-img-wrap {
+    aspect-ratio: 16 / 9;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 992px) {
+  .hero-split-grid:not(.hero-no-visual) {
+    grid-template-columns: minmax(0, 1.08fr) minmax(280px, 0.92fr);
+    gap: clamp(24px, 4vw, 40px);
+  }
+
+  .hero-col-content {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .hero-col-visual {
+    grid-column: 2;
+    grid-row: 1;
+    justify-content: flex-end;
+  }
+
+  .athletic-hero-card {
+    width: 100%;
+    max-width: 420px;
+  }
+
+  .athletic-hero-img-wrap {
+    aspect-ratio: 4 / 4.5;
+  }
+}
+
+@media (max-width: 576px) {
+  .hero-section {
+    padding: 112px 0 50px !important;
+  }
+
+  .hero-split-grid,
+  .hero-split-grid.hero-no-visual {
+    gap: 28px;
+    margin-bottom: 34px;
+  }
+
+  .hero-pill-badge {
+    margin-bottom: 18px;
+    padding: 7px 11px;
+    font-size: 0.67rem;
+  }
+
+  .hero-title {
+    margin-bottom: 14px;
+    font-size: clamp(2.25rem, 10.5vw, 3.2rem);
+    letter-spacing: -0.045em;
+    line-height: 1.08;
+  }
+
+  .hero-title::after {
+    width: 56px;
+    height: 4px;
+    margin-top: 15px;
+  }
+
+  .hero-desc {
+    margin-bottom: 22px;
+    font-size: 0.98rem;
+    line-height: 1.65;
+  }
+
+  .hero-actions {
+    width: 100%;
+    gap: 9px;
+    margin-bottom: 22px;
+  }
+
+  .hero-actions .btn {
+    min-height: 44px;
+    padding: 10px 13px;
+    font-size: 0.82rem;
+  }
+
+  .hero-col-content .countdown-box {
+    padding: 16px 12px;
+    border-radius: 16px;
+  }
+
+  .countdown-title-wrap {
+    font-size: 0.68rem;
+  }
+
+  .event-date-pill {
+    font-size: 0.65rem;
+  }
+
+  .athletic-hero-card {
+    padding: 6px;
+    border-radius: 22px;
+    transform: rotate(0.7deg);
+  }
+
+  .athletic-hero-img-wrap {
+    aspect-ratio: 4 / 3;
+    border-radius: 17px;
+  }
+
+  .stats-banner {
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    padding: 10px;
+    border-radius: 17px;
+  }
+
+  .stats-banner .stat-item {
+    padding: 12px 7px;
+  }
+}
+
+@media (max-width: 360px) {
+  .hero-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .hero-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
