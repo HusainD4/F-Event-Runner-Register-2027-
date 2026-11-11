@@ -1,6 +1,3 @@
-import { API_BASE_URL } from '../../../js/api.js';
-export { API_BASE_URL };
-
 export const adminState = {
   token: localStorage.getItem('tegal_admin_token') || null,
   profile: null,

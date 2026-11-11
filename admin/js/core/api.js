@@ -1,4 +1,4 @@
-import { API_BASE_URL, apiFetch } from '../../../js/api.js';
+import { apiFetch } from '../../../js/api.js';
 import { adminState } from './state.js';
 import { handleLogout } from './auth.js';
 

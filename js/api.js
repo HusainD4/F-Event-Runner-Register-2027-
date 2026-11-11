@@ -17,14 +17,21 @@ export const API_BASE_URL = apiBaseUrls[0];
 
 export async function apiFetch(path, options = {}) {
   const endpoint = path.startsWith('/') ? path : `/${path}`;
+  const method = (options.method || 'GET').toUpperCase();
+  const canRetry = ['GET', 'HEAD', 'OPTIONS'].includes(method);
   let lastError;
 
-  for (const baseUrl of apiBaseUrls) {
+  for (const [index, baseUrl] of apiBaseUrls.entries()) {
     try {
-      return await fetch(`${baseUrl}${endpoint}`, options);
+      const response = await fetch(`${baseUrl}${endpoint}`, options);
+      if (canRetry && [502, 503, 504].includes(response.status) && index < apiBaseUrls.length - 1) {
+        continue;
+      }
+      return response;
     } catch (error) {
       lastError = error;
       if (options.signal?.aborted) throw error;
+      if (!canRetry) throw error;
     }
   }
 
