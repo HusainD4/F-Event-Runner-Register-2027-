@@ -7,7 +7,72 @@ const isLocalFrontend = typeof window !== 'undefined'
   && ['localhost', '127.0.0.1'].includes(window.location.hostname)
   && ['3000', '4173', '5173', '5174', '5175'].includes(window.location.port);
 
-export const API_BASE_URL = isLocalFrontend ? '/api' : 'https://api.haisen.my.id/api';
+const configuredApiUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.haisen.my.id/api';
+const fallbackApiUrl = import.meta.env.VITE_API_FALLBACK_URL || 'https://backend-siexa.haisen.my.id/api';
+const apiBaseUrls = isLocalFrontend
+  ? ['/api']
+  : [...new Set([configuredApiUrl, fallbackApiUrl].map(url => url.replace(/\/+$/, '')))];
+
+export const API_BASE_URL = apiBaseUrls[0];
+
+export async function apiFetch(path, options = {}) {
+  const endpoint = path.startsWith('/') ? path : `/${path}`;
+  let lastError;
+
+  for (const baseUrl of apiBaseUrls) {
+    try {
+      return await fetch(`${baseUrl}${endpoint}`, options);
+    } catch (error) {
+      lastError = error;
+      if (options.signal?.aborted) throw error;
+    }
+  }
+
+  throw lastError;
+}
+
+let midtransSdkPromise;
+
+export async function loadMidtransSdk() {
+  if (typeof window !== 'undefined' && window.snap?.pay) return;
+  if (midtransSdkPromise) return midtransSdkPromise;
+
+  midtransSdkPromise = (async () => {
+    const response = await apiFetch('/settings/checkout-config', {
+      headers: { Accept: 'application/json' }
+    });
+    const result = await response.json();
+
+    if (!response.ok || result.status !== 'success') {
+      throw new Error(result.message || 'Konfigurasi pembayaran tidak dapat dimuat.');
+    }
+
+    const { midtransClientKey, midtransIsProduction } = result.data || {};
+    if (!midtransClientKey) {
+      throw new Error('Client key Midtrans belum dikonfigurasi pada backend.');
+    }
+
+    await new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = midtransIsProduction
+        ? 'https://app.midtrans.com/snap/snap.js'
+        : 'https://app.sandbox.midtrans.com/snap/snap.js';
+      script.dataset.clientKey = midtransClientKey;
+      script.onload = () => resolve();
+      script.onerror = () => reject(new Error('Library pembayaran Midtrans gagal dimuat.'));
+      document.head.appendChild(script);
+    });
+
+    if (!window.snap?.pay) {
+      throw new Error('Library pembayaran Midtrans tidak tersedia.');
+    }
+  })().catch(error => {
+    midtransSdkPromise = null;
+    throw error;
+  });
+
+  return midtransSdkPromise;
+}
 
 export const apiClient = {
   /**
@@ -15,7 +80,7 @@ export const apiClient = {
    */
   async getWebsiteSettings() {
     try {
-      const response = await fetch(`${API_BASE_URL}/settings/website`, {
+      const response = await apiFetch('/settings/website', {
         method: 'GET',
         headers: { 'Accept': 'application/json' }
       });
@@ -33,7 +98,7 @@ export const apiClient = {
    */
   async getCountdownSettings() {
     try {
-      const response = await fetch(`${API_BASE_URL}/settings/countdown`, {
+      const response = await apiFetch('/settings/countdown', {
         method: 'GET',
         headers: { 'Accept': 'application/json' }
       });
@@ -51,7 +116,7 @@ export const apiClient = {
    */
   async getCheckoutConfig() {
     try {
-      const response = await fetch(`${API_BASE_URL}/settings/checkout-config`, {
+      const response = await apiFetch('/settings/checkout-config', {
         method: 'GET',
         headers: { 'Accept': 'application/json' }
       });
@@ -69,7 +134,7 @@ export const apiClient = {
    */
   async getEvents() {
     try {
-      const response = await fetch(`${API_BASE_URL}/events`, {
+      const response = await apiFetch('/events', {
         method: 'GET',
         headers: {
           'Accept': 'application/json'
@@ -96,7 +161,7 @@ export const apiClient = {
    */
   async getEventDetail(id) {
     try {
-      const response = await fetch(`${API_BASE_URL}/events/${id}`, {
+      const response = await apiFetch(`/events/${id}`, {
         headers: { 'Accept': 'application/json' }
       });
       if (!response.ok) throw new Error('HTTP error ' + response.status);
@@ -113,7 +178,7 @@ export const apiClient = {
    */
   async getRouteOverview() {
     try {
-      const response = await fetch(`${API_BASE_URL}/routes`, {
+      const response = await apiFetch('/routes', {
         headers: { 'Accept': 'application/json' }
       });
       if (!response.ok) throw new Error('HTTP error ' + response.status);
@@ -130,7 +195,7 @@ export const apiClient = {
    */
   async registerOrder(payload) {
     try {
-      const response = await fetch(`${API_BASE_URL}/register`, {
+      const response = await apiFetch('/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -189,7 +254,7 @@ export const apiClient = {
       console.error('❌ API Request Error:', err);
       return {
         success: false,
-        message: 'Koneksi ke backend gagal. Pastikan server backend sedang aktif di http://localhost:3000'
+        message: 'Koneksi ke server gagal. Silakan coba beberapa saat lagi.'
       };
     }
   }

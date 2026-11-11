@@ -3,10 +3,7 @@
  * Tegal Run 2027
  */
 
-const isLocalFrontend = typeof window !== 'undefined'
-  && ['localhost', '127.0.0.1'].includes(window.location.hostname)
-  && ['3000', '4173', '5173', '5174', '5175'].includes(window.location.port);
-const API_BASE_URL = isLocalFrontend ? '/api' : 'https://api.haisen.my.id/api';
+import { apiFetch } from './api.js';
 
 function showToast(type = 'success', message = '') {
   const container = document.getElementById('cekToastContainer');
@@ -191,7 +188,7 @@ async function handleSearchSubmit(e) {
   `;
 
   try {
-    const res = await fetch(`${API_BASE_URL}/tickets/search?q=${encodeURIComponent(keyword)}&type=${searchType}`);
+    const res = await apiFetch(`/tickets/search?q=${encodeURIComponent(keyword)}&type=${searchType}`);
     const data = await res.json();
 
     if (!res.ok || data.status !== 'success') {
@@ -341,7 +338,7 @@ function attachActionListeners() {
       btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Mengecek...';
 
       try {
-        const res = await fetch(`${API_BASE_URL}/orders/${id}/sync-midtrans`, { method: 'POST' });
+        const res = await apiFetch(`/orders/${id}/sync-midtrans`, { method: 'POST' });
         const result = await res.json();
         if (result.status === 'success') {
           showToast('success', result.message);
@@ -402,7 +399,7 @@ document.getElementById('formCancelOrder')?.addEventListener('submit', async (e)
   btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Membatalkan...';
 
   try {
-    const res = await fetch(`${API_BASE_URL}/orders/${orderId}/cancel`, {
+    const res = await apiFetch(`/orders/${orderId}/cancel`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ reason: finalReason })

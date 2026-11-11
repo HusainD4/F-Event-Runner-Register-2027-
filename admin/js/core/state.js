@@ -1,8 +1,5 @@
-const isLocalFrontend = typeof window !== 'undefined'
-  && ['localhost', '127.0.0.1'].includes(window.location.hostname)
-  && ['3000', '4173', '5173', '5174', '5175'].includes(window.location.port);
-
-export const API_BASE_URL = isLocalFrontend ? '/api' : 'https://api.haisen.my.id/api';
+import { API_BASE_URL } from '../../../js/api.js';
+export { API_BASE_URL };
 
 export const adminState = {
   token: localStorage.getItem('tegal_admin_token') || null,

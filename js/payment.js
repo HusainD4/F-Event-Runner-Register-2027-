@@ -1,7 +1,4 @@
-const isLocalFrontend = typeof window !== 'undefined'
-  && ['localhost', '127.0.0.1'].includes(window.location.hostname)
-  && ['3000', '4173', '5173', '5174', '5175'].includes(window.location.port);
-const API_BASE_URL = isLocalFrontend ? '/api' : 'https://api.haisen.my.id/api';
+import { apiFetch, loadMidtransSdk } from './api.js';
 
 function showToast(type = 'success', message = '') {
   const container = document.getElementById('paymentToastContainer');
@@ -84,7 +81,7 @@ function startPaymentPolling(orderId) {
   // Jalankan polling setiap 3 detik untuk mengecek status pembayaran secara realtime
   realtimePollingTimer = setInterval(async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/orders/${orderId}/sync-midtrans`, { method: 'POST' });
+      const res = await apiFetch(`/orders/${orderId}/sync-midtrans`, { method: 'POST' });
       const json = await res.json();
       if (json.status === 'success' && json.data) {
         if (json.data.status === 'SETTLEMENT' || json.data.isPaid) {
@@ -124,7 +121,7 @@ async function loadPaymentDetails() {
   }
 
   try {
-    const res = await fetch(`${API_BASE_URL}/tickets/search?q=${encodeURIComponent(orderId)}&type=orderId`);
+    const res = await apiFetch(`/tickets/search?q=${encodeURIComponent(orderId)}&type=orderId`);
     const json = await res.json();
 
     if (!res.ok || json.status !== 'success' || !json.data || json.data.length === 0) {
@@ -246,7 +243,7 @@ function renderPaymentUI(order) {
   startPaymentPolling(order.id);
 
   // Ambil timer setting untuk countdown
-  fetch(`${API_BASE_URL}/settings/checkout-config`)
+  apiFetch('/settings/checkout-config')
     .then(r => r.json())
     .then(cfg => {
       const minutes = (cfg && cfg.status === 'success' && cfg.data?.paymentTimerMinutes) ? cfg.data.paymentTimerMinutes : 30;
@@ -338,7 +335,7 @@ function renderPaymentUI(order) {
     btn.disabled = true;
     btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Mengecek Status...';
     try {
-      const res = await fetch(`${API_BASE_URL}/orders/${order.id}/sync-midtrans`, { method: 'POST' });
+      const res = await apiFetch(`/orders/${order.id}/sync-midtrans`, { method: 'POST' });
       const json = await res.json();
       if (json.status === 'success' && json.data) {
         if (json.data.status === 'SETTLEMENT' || json.data.isPaid) {
@@ -377,7 +374,7 @@ function renderPaymentUI(order) {
 
       // Jika snapToken belum tersedia, request ke server untuk generate token
       if (!snapToken) {
-        const res = await fetch(`${API_BASE_URL}/orders/${order.id}/snap-token`, { method: 'POST' });
+        const res = await apiFetch(`/orders/${order.id}/snap-token`, { method: 'POST' });
         const json = await res.json();
         if (json.status === 'success' && json.data?.snapToken) {
           snapToken = json.data.snapToken;
@@ -390,13 +387,14 @@ function renderPaymentUI(order) {
         }
       }
 
+      await loadMidtransSdk();
       if (window.snap && typeof window.snap.pay === 'function') {
         window.snap.pay(snapToken, {
           onSuccess: async () => {
             showToast('success', 'Pembayaran berhasil dikonfirmasi! Memvalidasi...');
             stopPaymentPolling();
             stopCountdownTimer();
-            await fetch(`${API_BASE_URL}/orders/${order.id}/sync-midtrans`, { method: 'POST' });
+            await apiFetch(`/orders/${order.id}/sync-midtrans`, { method: 'POST' });
             window.location.href = `/e-ticket.html?orderId=${order.id}`;
           },
           onPending: async () => {
@@ -454,7 +452,7 @@ document.getElementById('formCancelOrder')?.addEventListener('submit', async (e)
   btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Membatalkan...';
 
   try {
-    const res = await fetch(`${API_BASE_URL}/orders/${activeOrder.id}/cancel`, {
+    const res = await apiFetch(`/orders/${activeOrder.id}/cancel`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ reason: finalReason })

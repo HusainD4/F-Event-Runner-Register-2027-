@@ -1,4 +1,4 @@
-import { apiClient, API_BASE_URL } from './api.js';
+import { apiClient, apiFetch, loadMidtransSdk } from './api.js';
 
 // Import Modular HTML Templates
 // 1. Layout
@@ -285,7 +285,7 @@ async function loadEvents() {
 
     // Ambil konfigurasi batas waktu pembayaran & biaya layanan
     try {
-      const cfgRes = await fetch(`${API_BASE_URL}/settings/checkout-config`);
+      const cfgRes = await apiFetch('/settings/checkout-config');
       const cfgJson = await cfgRes.json();
       if (cfgJson.status === 'success' && cfgJson.data) {
         state.feeSettings = cfgJson.data;
@@ -1149,6 +1149,14 @@ async function handleCheckoutSubmit() {
 
   const { paymentToken, paymentUrl, orderId, midtransOrderId } = result.data;
   const targetId = orderId || midtransOrderId;
+
+  try {
+    await loadMidtransSdk();
+  } catch (error) {
+    showToast('error', 'Gateway Pembayaran Tidak Tersedia', error.message);
+    window.location.href = `/payment.html?orderId=${encodeURIComponent(targetId)}`;
+    return;
+  }
 
   if (window.snap && typeof window.snap.pay === 'function') {
     window.snap.pay(paymentToken, {

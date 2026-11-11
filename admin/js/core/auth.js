@@ -1,4 +1,5 @@
-import { API_BASE_URL, adminState } from './state.js';
+import { apiFetch } from '../../../js/api.js';
+import { adminState } from './state.js';
 import { showAdminToast } from './utils.js';
 import { applyRbacUi } from './rbac.js';
 import { loadDashboardData } from '../pages/dashboard.js';
@@ -14,7 +15,7 @@ export async function handleLogin(e) {
   btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Memverifikasi...';
 
   try {
-    const res = await fetch(`${API_BASE_URL}/admin/auth/login`, {
+    const res = await apiFetch('/admin/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify({ identifier, password })
@@ -28,7 +29,7 @@ export async function handleLogin(e) {
     try {
       data = text ? JSON.parse(text) : {};
     } catch {
-      showAdminToast('error', 'Koneksi Gagal', 'Server backend belum siap atau tidak merespons JSON. Pastikan server backend sedang aktif di Port 3000.');
+      showAdminToast('error', 'Koneksi Gagal', 'Server backend belum siap atau tidak merespons JSON. Silakan coba beberapa saat lagi.');
       return;
     }
 
@@ -47,7 +48,7 @@ export async function handleLogin(e) {
     btn.disabled = false;
     btn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Masuk ke Dashboard Admin';
     const msg = err.message && err.message.includes('Failed to fetch')
-      ? 'Tidak dapat terhubung ke server backend di http://localhost:3000. Pastikan server backend sudah menyala.'
+      ? 'Tidak dapat terhubung ke server backend. Silakan coba beberapa saat lagi.'
       : err.message;
     showAdminToast('error', 'Koneksi Gagal', msg);
   }
@@ -73,7 +74,7 @@ export async function checkAuthAndInit() {
   }
 
   try {
-    const res = await fetch(`${API_BASE_URL}/admin/auth/me`, {
+    const res = await apiFetch('/admin/auth/me', {
       headers: { 'Authorization': `Bearer ${adminState.token}` }
     });
     const data = await res.json();

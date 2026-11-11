@@ -1,7 +1,4 @@
-const isLocalFrontend = typeof window !== 'undefined'
-  && ['localhost', '127.0.0.1'].includes(window.location.hostname)
-  && ['3000', '4173', '5173', '5174', '5175'].includes(window.location.port);
-const API_BASE_URL = isLocalFrontend ? '/api' : 'https://api.haisen.my.id/api';
+import { apiFetch } from './api.js';
 
 function showToast(type = 'success', message = '') {
   const container = document.getElementById('ticketToastContainer');
@@ -96,8 +93,8 @@ async function loadTicketDetail() {
 
   try {
     const [res, cfgRes] = await Promise.all([
-      fetch(`${API_BASE_URL}/events/${eventId}`),
-      fetch(`${API_BASE_URL}/settings/checkout-config`).catch(() => null)
+      apiFetch(`/events/${eventId}`),
+      apiFetch('/settings/checkout-config').catch(() => null)
     ]);
 
     const text = await res.text();
@@ -133,7 +130,7 @@ async function loadTicketDetail() {
   } catch (err) {
     loadingEl.style.display = 'none';
     errorEl.style.display = 'block';
-    document.getElementById('tdErrorMessage').textContent = `Gagal menghubungi server: ${err.message}. Pastikan backend di localhost:3000 aktif.`;
+    document.getElementById('tdErrorMessage').textContent = `Gagal menghubungi server: ${err.message}. Silakan coba beberapa saat lagi.`;
   }
 }
 

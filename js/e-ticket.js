@@ -1,7 +1,4 @@
-const isLocalFrontend = typeof window !== 'undefined'
-  && ['localhost', '127.0.0.1'].includes(window.location.hostname)
-  && ['3000', '4173', '5173', '5174', '5175'].includes(window.location.port);
-const API_BASE_URL = isLocalFrontend ? '/api' : 'https://api.haisen.my.id/api';
+import { apiFetch } from './api.js';
 
 function escapeHtml(str) {
   if (!str) return '';
@@ -52,7 +49,7 @@ async function loadETicket() {
   }
 
   try {
-    const res = await fetch(`${API_BASE_URL}/tickets/e-ticket/${encodeURIComponent(orderId)}`);
+    const res = await apiFetch(`/tickets/e-ticket/${encodeURIComponent(orderId)}`);
     const json = await res.json();
 
     if (!res.ok || json.status !== 'success') {

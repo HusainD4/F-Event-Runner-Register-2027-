@@ -1,4 +1,5 @@
-import { API_BASE_URL, adminState } from './state.js';
+import { API_BASE_URL, apiFetch } from '../../../js/api.js';
+import { adminState } from './state.js';
 import { handleLogout } from './auth.js';
 
 export async function fetchAdmin(endpoint, options = {}, maybeBody = null) {
@@ -23,7 +24,7 @@ export async function fetchAdmin(endpoint, options = {}, maybeBody = null) {
   }
 
   try {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    const response = await apiFetch(endpoint, {
       ...opts,
       headers
     });
@@ -44,7 +45,7 @@ export async function fetchAdmin(endpoint, options = {}, maybeBody = null) {
     return data;
   } catch (err) {
     if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
-      throw new Error('Gagal terhubung ke backend. Pastikan server di localhost:3000 sedang aktif.');
+      throw new Error('Gagal terhubung ke server backend. Silakan coba beberapa saat lagi.');
     }
     throw err;
   }
