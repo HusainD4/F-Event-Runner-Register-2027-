@@ -4,6 +4,25 @@ import { showAdminToast, showConfirmDialog, escapeHtml } from '../core/utils.js'
 import { applyRbacUi } from '../core/rbac.js';
 import { updateKpis } from './dashboard.js';
 
+let globalTimerSettingsLoaded = false;
+
+async function ensureGlobalTimerSettings() {
+  if (globalTimerSettingsLoaded) return;
+  try {
+    const res = await fetchAdmin('/admin/settings/countdown');
+    if (!res || (res.status !== 'success' && !res.success)) {
+      throw new Error(res?.message || 'Gagal memuat tanggal timer global.');
+    }
+    adminState.globalSettings = res.data || res.settings || {};
+    globalTimerSettingsLoaded = true;
+    if (document.getElementById('modalEventBackdrop')?.classList.contains('open')) {
+      setupEventFormDecorations();
+    }
+  } catch (err) {
+    showAdminToast('error', 'Timer Tidak Dapat Dimuat', err.message);
+  }
+}
+
 async function loadEvents() {
   try {
     const res = await fetchAdmin('/admin/events');
@@ -41,26 +60,45 @@ function renderEvents(events) {
   container.innerHTML = '';
 
   events.forEach(ev => {
+    const registrationClosed = typeof ev.registrationClosed === 'boolean'
+      ? ev.registrationClosed
+      : Boolean(ev.isClosed);
+    const registrationClosedByTimer = Boolean(ev.registrationClosedByTimer);
+    const registrationPhase = ev.registrationPhase || (ev.isClosed ? 'CLOSED' : 'UPCOMING');
+    const statusLabel = registrationPhase === 'RACE_DAY'
+      ? 'Acara Telah Dimulai'
+      : registrationPhase === 'COMPLETED'
+        ? 'SOLD'
+        : registrationClosed
+          ? 'Ditutup'
+          : 'Dibuka';
     const card = document.createElement('div');
-    card.className = `admin-event-card ${ev.isClosed ? 'closed-event' : ''}`;
+    card.className = `admin-event-card ${registrationClosed ? 'closed-event' : ''}`;
 
-    const eventDateStr = ev.eventDate ? new Date(ev.eventDate).toLocaleDateString('id-ID', {
-      day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
-    }) + ' WIB' : 'Belum diatur';
+    const eventDateStr = ev.eventDate ? `${new Date(ev.eventDate).toLocaleString('id-ID', {
+      dateStyle: 'long', timeStyle: 'short', timeZone: 'Asia/Jakarta'
+    })} WIB` : 'Belum diatur';
+    const eventImage = ev.ticketImage || ev.medalImage;
 
     card.innerHTML = `
       <div class="admin-event-card-header">
+        <div class="admin-event-image">
+          ${eventImage
+            ? `<img src="${escapeHtml(eventImage)}" alt="${escapeHtml(ev.ticketName)}" loading="lazy" onerror="this.hidden=true;this.parentElement.classList.add('admin-event-image-empty')">`
+            : '<i class="fa-solid fa-person-running" aria-hidden="true"></i>'}
+        </div>
         <div>
           <h4 class="admin-event-title">
             ${escapeHtml(ev.ticketName)}
           </h4>
           <span class="admin-event-meta">
-            Kategori: <strong>${escapeHtml(ev.category)}</strong> • Pelaksanaan: <strong>${eventDateStr}</strong>
+            Kategori: <strong>${escapeHtml(ev.category)}</strong> • Pelaksanaan: <strong>${escapeHtml(eventDateStr)}</strong>
+            ${ev.followGlobalTimer ? '<span class="admin-event-timer-badge"><i class="fa-solid fa-link"></i> Ikuti timer</span>' : ''}
           </span>
         </div>
-        <span class="event-status-tag ${ev.isClosed ? 'closed' : 'open'}">
-          <i class="${ev.isClosed ? 'fa-solid fa-lock' : 'fa-solid fa-lock-open'}"></i>
-          ${ev.isClosed ? 'Ditutup' : 'Dibuka'}
+        <span class="event-status-tag ${registrationClosed ? 'closed' : 'open'}">
+          <i class="${registrationClosed ? 'fa-solid fa-lock' : 'fa-solid fa-lock-open'}"></i>
+          ${statusLabel}
         </span>
       </div>
 
@@ -87,14 +125,17 @@ function renderEvents(events) {
             <button class="btn btn-outline btn-sm btn-manage-benefits" data-id="${ev.id}" data-name="${escapeHtml(ev.ticketName)}" data-permission="benefits:manage" title="Kelola Fasilitas / Benefit Tiket" style="color: #4F46E5; border-color: #C7D2FE;">
               <i class="fa-solid fa-gift"></i> Benefit (${ev.benefits ? ev.benefits.length : (ev._count?.benefits || 0)})
             </button>
+            <button class="btn btn-outline btn-sm btn-manage-jerseys" data-id="${ev.id}" data-name="${escapeHtml(ev.ticketName)}" data-permission="jerseys:manage" title="Kelola tipe dan ukuran jersey">
+              <i class="fa-solid fa-shirt"></i> Jersey (${ev.jerseys?.length || 0})
+            </button>
             <button class="btn btn-outline btn-sm btn-delete-event" data-id="${ev.id}" data-name="${escapeHtml(ev.ticketName)}" data-permission="events:delete" style="color: #EF4444; border-color: #FECACA;">
               <i class="fa-solid fa-trash-can"></i>
             </button>
           </div>
 
-          <button class="btn ${ev.isClosed ? 'btn-secondary' : 'btn-outline'} btn-sm btn-toggle-close-event" data-id="${ev.id}" data-closed="${ev.isClosed}" data-permission="events:update">
-            <i class="${ev.isClosed ? 'fa-solid fa-lock-open' : 'fa-solid fa-lock'}"></i>
-            ${ev.isClosed ? 'Buka Kategori' : 'Tutup Kategori'}
+          <button class="btn ${ev.isClosed ? 'btn-secondary' : 'btn-outline'} btn-sm btn-toggle-close-event" data-id="${ev.id}" data-closed="${ev.isClosed}" data-timer-closed="${registrationClosedByTimer}" data-permission="events:update" ${registrationClosedByTimer ? 'disabled title="Kategori ditutup oleh timer. Perbarui tanggal atau aktifkan Ikuti Timer Global untuk menyinkronkannya."' : ''}>
+            <i class="${registrationClosedByTimer ? 'fa-solid fa-stopwatch' : ev.isClosed ? 'fa-solid fa-lock-open' : 'fa-solid fa-lock'}"></i>
+            ${registrationClosedByTimer ? 'Ditutup oleh Timer' : ev.isClosed ? 'Buka Kategori' : 'Tutup Kategori'}
           </button>
         </div>
       </div>
@@ -138,6 +179,12 @@ function renderEvents(events) {
       const name = btn.getAttribute('data-name');
       openEventBenefitsModal(id, name);
     });
+
+    document.querySelectorAll('.btn-manage-jerseys').forEach(btn => {
+      btn.addEventListener('click', () => {
+        openEventJerseysModal(btn.dataset.id, btn.dataset.name || 'Kategori');
+      });
+    });
   });
 
   document.querySelectorAll('.btn-edit-event').forEach(btn => {
@@ -177,11 +224,14 @@ function openCreateEventModal() {
   document.getElementById('eventFormStock').value = 500;
   document.getElementById('eventFormPrice').value = 250000;
   document.getElementById('eventFormDate').value = '';
+  document.getElementById('eventFormFollowGlobalTimer').checked = false;
   document.getElementById('eventFormTicketImage').value = '';
   document.getElementById('eventFormMedalImage').value = '';
   document.getElementById('eventFormIsClosed').checked = false;
+  setupEventFormDecorations();
 
   document.getElementById('modalEventBackdrop')?.classList.add('open');
+  ensureGlobalTimerSettings();
 }
 
 function openEditEventModal(ev) {
@@ -193,6 +243,7 @@ function openEditEventModal(ev) {
   document.getElementById('eventFormPrice').value = ev.price;
   document.getElementById('eventFormTicketImage').value = ev.ticketImage || '';
   document.getElementById('eventFormMedalImage').value = ev.medalImage || '';
+  document.getElementById('eventFormFollowGlobalTimer').checked = Boolean(ev.followGlobalTimer);
 
   if (ev.eventDate) {
     const d = new Date(ev.eventDate);
@@ -203,7 +254,48 @@ function openEditEventModal(ev) {
   }
 
   document.getElementById('eventFormIsClosed').checked = Boolean(ev.isClosed);
+  setupEventFormDecorations();
   document.getElementById('modalEventBackdrop')?.classList.add('open');
+  ensureGlobalTimerSettings();
+}
+
+function setupEventFormDecorations() {
+  const followTimerInput = document.getElementById('eventFormFollowGlobalTimer');
+  const eventDateInput = document.getElementById('eventFormDate');
+  const timerHint = document.getElementById('eventFollowTimerHint');
+  const updateTimerHint = () => {
+    const date = adminState.globalSettings?.eventCountdownDate;
+    eventDateInput.disabled = followTimerInput.checked;
+    if (followTimerInput.checked && date) {
+      timerHint.textContent = `Kategori ini otomatis memakai ${new Date(date).toLocaleString('id-ID', {
+        dateStyle: 'long',
+        timeStyle: 'short',
+        timeZone: 'Asia/Jakarta'
+      })} WIB dari timer global.`;
+    } else if (followTimerInput.checked) {
+      timerHint.textContent = 'Atur tanggal countdown di halaman Countdown terlebih dahulu.';
+    } else {
+      timerHint.textContent = 'Gunakan tanggal pelaksanaan khusus untuk kategori ini.';
+    }
+  };
+  followTimerInput.onchange = updateTimerHint;
+  updateTimerHint();
+
+  const bindImagePreview = (inputId, previewId) => {
+    const input = document.getElementById(inputId);
+    const preview = document.getElementById(previewId);
+    const image = preview.querySelector('img');
+    const updatePreview = () => {
+      const isValidImageUrl = input.checkValidity() && /^https?:\/\//i.test(input.value.trim());
+      preview.hidden = !isValidImageUrl;
+      if (isValidImageUrl) image.src = input.value;
+      else image.removeAttribute('src');
+    };
+    input.oninput = updatePreview;
+    updatePreview();
+  };
+  bindImagePreview('eventFormTicketImage', 'eventTicketImagePreview');
+  bindImagePreview('eventFormMedalImage', 'eventMedalImagePreview');
 }
 
 async function handleEventFormSubmit(e) {
@@ -217,6 +309,7 @@ async function handleEventFormSubmit(e) {
   const ticketImage = document.getElementById('eventFormTicketImage').value.trim() || null;
   const medalImage = document.getElementById('eventFormMedalImage').value.trim() || null;
   const isClosed = document.getElementById('eventFormIsClosed').checked;
+  const followGlobalTimer = document.getElementById('eventFormFollowGlobalTimer').checked;
 
   const payload = {
     ticketName,
@@ -225,7 +318,8 @@ async function handleEventFormSubmit(e) {
     price,
     ticketImage,
     medalImage,
-    eventDate: dateVal ? new Date(dateVal).toISOString() : null,
+    eventDate: followGlobalTimer ? null : (dateVal ? new Date(dateVal).toISOString() : null),
+    followGlobalTimer,
     isClosed
   };
 
@@ -287,6 +381,163 @@ async function deleteEventApi(id) {
     }
   } catch (err) {
     showAdminToast('error', 'Kesalahan Server', err.message);
+  }
+}
+
+// --- EVENT JERSEY CRUD ---
+let currentJerseyEventId = null;
+let currentEditingJerseyId = null;
+let currentEventJerseys = [];
+
+async function openEventJerseysModal(eventId, eventName) {
+  currentJerseyEventId = eventId;
+  document.getElementById('jerseyModalSubtitle').textContent = `Kategori: ${eventName}. Tambahkan satu atau beberapa tipe jersey beserta ukuran dan gambar masing-masing.`;
+  resetJerseyForm();
+  document.getElementById('modalEventJerseysBackdrop')?.classList.add('open');
+  await loadEventJerseys(eventId);
+}
+
+async function loadEventJerseys(eventId) {
+  const list = document.getElementById('eventJerseysList');
+  if (list) list.innerHTML = '<p class="form-hint">Memuat data jersey...</p>';
+  try {
+    const response = await fetchAdmin('/admin/jerseys');
+    if (response.status !== 'success' || !Array.isArray(response.data)) {
+      throw new Error(response.message || 'Gagal memuat data jersey.');
+    }
+    currentEventJerseys = response.data.filter(jersey => jersey.eventId === eventId);
+    renderEventJerseys(currentEventJerseys);
+  } catch (error) {
+    console.error('Failed to load jerseys:', error);
+    if (list) list.innerHTML = `<p class="jersey-admin-error">${escapeHtml(error.message)}</p>`;
+    showAdminToast('error', 'Gagal Memuat Jersey', error.message);
+  }
+}
+
+function renderEventJerseys(jerseys) {
+  const list = document.getElementById('eventJerseysList');
+  if (!list) return;
+  if (!jerseys.length) {
+    list.innerHTML = '<div class="jersey-admin-empty">Belum ada tipe jersey untuk kategori ini.</div>';
+    return;
+  }
+
+  list.innerHTML = jerseys.map((jersey, index) => {
+    const sizes = Array.isArray(jersey.sizes) ? jersey.sizes : [];
+    return `
+      <article class="jersey-admin-card">
+        <div class="jersey-admin-card-image ${jersey.image ? '' : 'is-empty'}">
+          ${jersey.image
+            ? `<img src="${escapeHtml(jersey.image)}" alt="${escapeHtml(jersey.name)}" loading="lazy" onerror="this.hidden=true;this.parentElement.classList.add('is-empty')">`
+            : ''}
+          <i class="fa-solid fa-shirt" aria-hidden="true"></i>
+        </div>
+        <div class="jersey-admin-card-content">
+          <strong>${escapeHtml(jersey.name)}</strong>
+          <span>${escapeHtml(jersey.type)}</span>
+          <small>Ukuran: ${escapeHtml(sizes.join(', '))}</small>
+        </div>
+        <div class="jersey-admin-card-actions">
+          <button type="button" class="btn btn-secondary btn-sm btn-edit-jersey" data-index="${index}" aria-label="Edit jersey ${escapeHtml(jersey.name)}"><i class="fa-solid fa-pen"></i></button>
+          <button type="button" class="btn btn-outline btn-sm btn-delete-jersey" data-id="${jersey.id}" data-name="${escapeHtml(jersey.name)}" aria-label="Hapus jersey ${escapeHtml(jersey.name)}"><i class="fa-solid fa-trash-can"></i></button>
+        </div>
+      </article>
+    `;
+  }).join('');
+
+  list.querySelectorAll('.btn-edit-jersey').forEach(button => {
+    button.addEventListener('click', () => {
+      const jersey = currentEventJerseys[Number(button.dataset.index)];
+      if (jersey) editJerseyForm(jersey);
+    });
+  });
+  list.querySelectorAll('.btn-delete-jersey').forEach(button => {
+    button.addEventListener('click', async () => {
+      const confirmed = await showConfirmDialog({
+        title: 'Hapus tipe jersey?',
+        message: `Hapus "${button.dataset.name}"? Jersey yang sudah dipilih peserta akan dilindungi dan tidak dapat dihapus.`,
+        confirmText: 'Ya, Hapus',
+        type: 'danger'
+      });
+      if (confirmed) await deleteJersey(button.dataset.id);
+    });
+  });
+}
+
+function updateJerseyImagePreview() {
+  const input = document.getElementById('jerseyFormImage');
+  const preview = document.getElementById('jerseyImagePreview');
+  const image = preview?.querySelector('img');
+  const url = input?.value.trim() || '';
+  const isValid = Boolean(url && input?.checkValidity() && /^https?:\/\//i.test(url));
+  if (preview) preview.hidden = !isValid;
+  if (image) {
+    if (isValid) image.src = url;
+    else image.removeAttribute('src');
+  }
+}
+
+function resetJerseyForm() {
+  currentEditingJerseyId = null;
+  const form = document.getElementById('formEventJersey');
+  form?.reset();
+  document.getElementById('jerseyFormId').value = '';
+  document.getElementById('btnSaveJersey').innerHTML = '<i class="fa-solid fa-plus"></i> Tambah Jersey';
+  document.getElementById('btnCancelJerseyEdit').hidden = true;
+  updateJerseyImagePreview();
+}
+
+function editJerseyForm(jersey) {
+  currentEditingJerseyId = jersey.id;
+  document.getElementById('jerseyFormId').value = jersey.id;
+  document.getElementById('jerseyFormName').value = jersey.name;
+  document.getElementById('jerseyFormType').value = jersey.type;
+  document.getElementById('jerseyFormSizes').value = (Array.isArray(jersey.sizes) ? jersey.sizes : []).join(', ');
+  document.getElementById('jerseyFormImage').value = jersey.image || '';
+  document.getElementById('btnSaveJersey').innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Simpan Perubahan';
+  document.getElementById('btnCancelJerseyEdit').hidden = false;
+  updateJerseyImagePreview();
+}
+
+async function handleJerseyFormSubmit(event) {
+  event.preventDefault();
+  const name = document.getElementById('jerseyFormName').value.trim();
+  const type = document.getElementById('jerseyFormType').value.trim();
+  const sizes = [...new Set(document.getElementById('jerseyFormSizes').value.split(',').map(size => size.trim()).filter(Boolean))];
+  const image = document.getElementById('jerseyFormImage').value.trim() || null;
+  if (!currentJerseyEventId || !name || !type || !sizes.length) {
+    showAdminToast('warning', 'Data Belum Lengkap', 'Nama, tipe, dan minimal satu ukuran jersey wajib diisi.');
+    return;
+  }
+  const button = document.getElementById('btnSaveJersey');
+  const originalHtml = button.innerHTML;
+  button.disabled = true;
+  button.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
+  try {
+    const payload = { eventId: currentJerseyEventId, name, type, sizes, image };
+    const response = currentEditingJerseyId
+      ? await fetchAdmin(`/admin/jerseys/${currentEditingJerseyId}`, { method: 'PUT', body: JSON.stringify(payload) })
+      : await fetchAdmin('/admin/jerseys', { method: 'POST', body: JSON.stringify(payload) });
+    if (response.status !== 'success') throw new Error(response.message || 'Gagal menyimpan jersey.');
+    showAdminToast('success', 'Jersey Tersimpan', response.message);
+    resetJerseyForm();
+    await Promise.all([loadEventJerseys(currentJerseyEventId), loadEvents()]);
+  } catch (error) {
+    showAdminToast('error', 'Gagal Menyimpan Jersey', error.message);
+  } finally {
+    button.disabled = false;
+    button.innerHTML = originalHtml;
+  }
+}
+
+async function deleteJersey(jerseyId) {
+  try {
+    const response = await fetchAdmin(`/admin/jerseys/${jerseyId}`, { method: 'DELETE' });
+    if (response.status !== 'success') throw new Error(response.message || 'Gagal menghapus jersey.');
+    showAdminToast('success', 'Jersey Dihapus', response.message);
+    await Promise.all([loadEventJerseys(currentJerseyEventId), loadEvents()]);
+  } catch (error) {
+    showAdminToast('error', 'Jersey Tidak Dapat Dihapus', error.message);
   }
 }
 
@@ -513,6 +764,7 @@ async function deleteBenefitApi(benefitId) {
 
 
 window.openEventBenefitsModal = openEventBenefitsModal;
+window.openEventJerseysModal = openEventJerseysModal;
 
 export {
   loadEvents,
@@ -527,5 +779,9 @@ export {
   renderEventBenefitsTable,
   resetBenefitForm,
   handleBenefitFormSubmit,
-  deleteBenefitApi
+  deleteBenefitApi,
+  openEventJerseysModal,
+  handleJerseyFormSubmit,
+  resetJerseyForm,
+  updateJerseyImagePreview
 };

@@ -4,6 +4,30 @@ import { showAdminToast, showConfirmDialog } from '../core/utils.js';
 
 let previewInterval = null;
 
+function getWibDateKey(date) {
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Jakarta',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  }).formatToParts(date);
+  return ['year', 'month', 'day']
+    .map(type => parts.find(part => part.type === type)?.value)
+    .join('-');
+}
+
+function getTimerPhase(isoDate) {
+  if (!isoDate) return 'UPCOMING';
+  const target = new Date(isoDate);
+  if (Number.isNaN(target.getTime()) || Date.now() < target.getTime()) return 'UPCOMING';
+  return getWibDateKey(new Date()) === getWibDateKey(target) ? 'RACE_DAY' : 'COMPLETED';
+}
+
+function getRegistrationPhase(settings = adminState.globalSettings || {}) {
+  const timerPhase = getTimerPhase(settings.eventCountdownDate);
+  return timerPhase === 'UPCOMING' && settings.manualRegistrationClosed ? 'CLOSED' : timerPhase;
+}
+
 /**
  * Memuat pengaturan countdown global dari server
  */
@@ -49,9 +73,13 @@ function updateCountdownPreview(isoDate) {
   const tick = () => {
     const now = Date.now();
     const diff = targetTime - now;
+    const phase = getTimerPhase(isoDate);
+    renderGlobalRegistrationStatus();
 
     if (diff <= 0) {
-      previewEl.innerHTML = '<span style="color: #ef4444;"><i class="fa-solid fa-flag-checkered"></i> RACE DAY SUDAH LEWAT / SEDANG BERLANGSUNG</span>';
+      previewEl.innerHTML = phase === 'RACE_DAY'
+        ? '<span style="color: #f97316;"><i class="fa-solid fa-flag-checkered"></i> ACARA TELAH DIMULAI — PENDAFTARAN OTOMATIS DITUTUP</span>'
+        : '<span style="color: #ef4444;"><i class="fa-solid fa-ticket-slash"></i> HARI ACARA TELAH LEWAT — SOLD</span>';
       return;
     }
 
@@ -77,8 +105,6 @@ function updateCountdownPreview(isoDate) {
  */
 function renderGlobalSettings(settings = {}) {
   const input = document.getElementById('globalCountdownInput');
-  const badge = document.getElementById('globalStatusBadge');
-  const toggleBtn = document.getElementById('btnToggleGlobalClosed');
 
   if (input) {
     if (settings.eventCountdownDate) {
@@ -99,9 +125,22 @@ function renderGlobalSettings(settings = {}) {
   }
 
   updateCountdownPreview(settings.eventCountdownDate);
+  renderGlobalRegistrationStatus(settings);
+}
+
+function renderGlobalRegistrationStatus(settings = adminState.globalSettings || {}) {
+  const badge = document.getElementById('globalStatusBadge');
+  const toggleBtn = document.getElementById('btnToggleGlobalClosed');
+  const phase = getRegistrationPhase(settings);
 
   if (badge) {
-    if (settings.isRegistrationClosed) {
+    if (phase === 'RACE_DAY') {
+      badge.className = 'event-status-tag closed';
+      badge.innerHTML = '<i class="fa-solid fa-flag-checkered"></i> Acara Telah Dimulai';
+    } else if (phase === 'COMPLETED') {
+      badge.className = 'event-status-tag closed';
+      badge.innerHTML = '<i class="fa-solid fa-ticket-slash"></i> Event Selesai • SOLD';
+    } else if (phase === 'CLOSED') {
       badge.className = 'event-status-tag closed';
       badge.innerHTML = '<i class="fa-solid fa-lock"></i> Pendaftaran Resmi Ditutup';
     } else {
@@ -111,10 +150,19 @@ function renderGlobalSettings(settings = {}) {
   }
 
   if (toggleBtn) {
-    if (settings.isRegistrationClosed) {
+    if (phase !== 'UPCOMING' && phase !== 'CLOSED') {
+      toggleBtn.className = 'btn btn-secondary btn-sm';
+      toggleBtn.innerHTML = '<i class="fa-solid fa-lock"></i> Ditutup Otomatis oleh Timer';
+      toggleBtn.disabled = true;
+      toggleBtn.title = 'Pendaftaran hanya dapat dibuka kembali dengan mengubah tanggal countdown.';
+    } else if (phase === 'CLOSED') {
+      toggleBtn.disabled = false;
+      toggleBtn.title = '';
       toggleBtn.className = 'btn btn-secondary btn-sm';
       toggleBtn.innerHTML = '<i class="fa-solid fa-lock-open"></i> Buka Kembali Pendaftaran';
     } else {
+      toggleBtn.disabled = false;
+      toggleBtn.title = '';
       toggleBtn.className = 'btn btn-outline btn-sm';
       toggleBtn.innerHTML = '<i class="fa-solid fa-lock"></i> Tutup Seluruh Pendaftaran';
     }
@@ -157,7 +205,7 @@ async function handleSaveGlobalCountdown() {
   }
 
   try {
-    const isClosed = adminState.globalSettings?.isRegistrationClosed || false;
+    const isClosed = adminState.globalSettings?.manualRegistrationClosed || false;
 
     const res = await fetchAdmin('/admin/settings/countdown', {
       method: 'PUT',
@@ -200,7 +248,7 @@ async function handleResetGlobalCountdown() {
   if (!confirmed) return;
 
   try {
-    const isClosed = adminState.globalSettings?.isRegistrationClosed || false;
+    const isClosed = adminState.globalSettings?.manualRegistrationClosed || false;
 
     const res = await fetchAdmin('/admin/settings/countdown', {
       method: 'PUT',
@@ -217,7 +265,7 @@ async function handleResetGlobalCountdown() {
       const input = document.getElementById('globalCountdownInput');
       if (input) input.value = '';
 
-      updateCountdownPreview(null);
+      renderGlobalSettings(adminState.globalSettings);
       showAdminToast('success', 'Dikosongkan', 'Tanggal target race day telah dikosongkan.');
     } else {
       showAdminToast('error', 'Gagal', res.message || 'Gagal mengosongkan tanggal.');
@@ -231,7 +279,12 @@ async function handleResetGlobalCountdown() {
  * Buka / Tutup Pendaftaran Event Secara Global
  */
 async function handleToggleGlobalClosed() {
-  const currentStatus = adminState.globalSettings?.isRegistrationClosed || false;
+  const currentStatus = adminState.globalSettings?.manualRegistrationClosed || false;
+  const timerPhase = getTimerPhase(adminState.globalSettings?.eventCountdownDate);
+  if (timerPhase !== 'UPCOMING') {
+    showAdminToast('warning', 'Timer Event Aktif', 'Pendaftaran ditutup otomatis. Ubah tanggal countdown jika ingin membuka kembali pendaftaran.');
+    return;
+  }
   const newStatus = !currentStatus;
 
   const confirmed = await showConfirmDialog({

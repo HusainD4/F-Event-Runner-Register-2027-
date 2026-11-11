@@ -52,10 +52,10 @@
                   </div>
 
                   <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                    <button type="button" class="btn btn-primary btn-sm btn-glow" id="btnGenerateWaQr">
+                    <button type="button" class="btn btn-primary btn-sm btn-glow" id="btnGenerateWaQr" data-permission="whatsapp:session">
                       <i class="fa-solid fa-qrcode"></i> Generate QR Code WhatsApp Web
                     </button>
-                    <button type="button" class="btn btn-outline btn-sm" id="btnDisconnectWa" style="display: none; border-color: #EF4444; color: #EF4444;">
+                    <button type="button" class="btn btn-outline btn-sm" id="btnDisconnectWa" data-permission="whatsapp:session" style="display: none; border-color: #EF4444; color: #EF4444;">
                       <i class="fa-solid fa-arrow-right-from-bracket"></i> Putuskan Sesi (Logout)
                     </button>
                   </div>
@@ -174,7 +174,7 @@
 
               <!-- Action Bar -->
               <div style="display: flex; gap: 12px; align-items: center; justify-content: flex-end; margin-bottom: 30px;">
-                <button type="submit" class="btn btn-primary btn-glow" id="btnSaveNotifSettings">
+                <button type="submit" class="btn btn-primary btn-glow" id="btnSaveNotifSettings" data-permission="notifications:manage">
                   <i class="fa-solid fa-floppy-disk"></i> Simpan Seluruh Konfigurasi Notifikasi
                 </button>
               </div>
@@ -201,7 +201,7 @@
                   <label class="form-label">Pesan Uji Coba</label>
                   <input type="text" class="form-input" id="testNotifMessage" value="Ini adalah pesan tes notifikasi otomatis dari sistem Tegal Run 2027.">
                 </div>
-                <button type="button" class="btn btn-secondary" id="btnSendTestNotif">
+                <button type="button" class="btn btn-secondary" id="btnSendTestNotif" data-permission="notifications:manage">
                   <i class="fa-solid fa-vial"></i> Kirim Tes
                 </button>
               </div>

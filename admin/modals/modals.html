@@ -31,6 +31,15 @@
               <label class="form-label">Tanggal Pelaksanaan</label>
               <input type="datetime-local" class="form-input" id="eventFormDate">
             </div>
+            <div class="form-group event-follow-timer-group">
+              <label class="form-label">Tanggal Mengikuti Timer Global</label>
+              <label class="event-follow-toggle">
+                <input type="checkbox" id="eventFormFollowGlobalTimer">
+                <span class="event-follow-toggle-track" aria-hidden="true"></span>
+                <span>Ikuti waktu timer acara</span>
+              </label>
+              <small id="eventFollowTimerHint" class="event-follow-timer-hint">Gunakan tanggal pelaksanaan khusus untuk kategori ini.</small>
+            </div>
           </div>
           <div class="form-row">
             <div class="form-group">
@@ -40,6 +49,16 @@
             <div class="form-group">
               <label class="form-label">URL Gambar Medali Finisher</label>
               <input type="url" class="form-input" id="eventFormMedalImage" placeholder="https://images.unsplash.com/...">
+            </div>
+          </div>
+          <div class="form-row event-image-previews">
+            <div class="event-image-preview" id="eventTicketImagePreview" hidden>
+              <img alt="Pratinjau gambar tiket">
+              <span>Pratinjau cover tiket</span>
+            </div>
+            <div class="event-image-preview" id="eventMedalImagePreview" hidden>
+              <img alt="Pratinjau gambar medali">
+              <span>Pratinjau medali finisher</span>
             </div>
           </div>
           <div class="form-group">
@@ -260,7 +279,7 @@
 
   <!-- MODAL: ROLE CREATE / EDIT PERMISSIONS (SUPERADMIN ONLY) -->
   <div class="admin-modal-backdrop" id="modalRoleBackdrop">
-    <div class="admin-modal-dialog" style="max-width: 760px;">
+    <div class="admin-modal-dialog role-editor-dialog">
       <div class="admin-modal-header">
         <h4 id="modalRoleTitle"><i class="fa-solid fa-key" style="color: var(--color-primary);"></i> Atur Hak Akses Halaman Role</h4>
         <button class="admin-modal-close" onclick="closeAdminModal('modalRoleBackdrop')"><i class="fa-solid fa-xmark"></i></button>
@@ -280,22 +299,40 @@
             </div>
           </div>
 
-          <div style="margin-top: 16px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
-            <div>
-              <strong style="font-size: 0.9rem; color: #0F172A;">Pilih Halaman Admin yang Dapat Diakses:</strong>
-              <div style="font-size: 0.76rem; color: #64748B;">Petugas hanya akan melihat menu dan memiliki hak akses sesuai halaman yang dicentang.</div>
+          <section class="role-editor-section">
+            <div class="role-editor-section-heading">
+              <div>
+                <h5>Halaman Admin</h5>
+                <p>Menentukan menu yang terlihat dan dapat dibuka oleh role ini.</p>
+              </div>
+              <div class="role-editor-actions">
+                <button type="button" class="btn btn-outline btn-sm" id="btnSelectAllPages">Pilih Semua</button>
+                <button type="button" class="btn btn-outline btn-sm" id="btnClearAllPages">Bersihkan</button>
+                <button type="button" class="btn btn-outline btn-sm" id="btnPresetDefaultPages">Preset Role</button>
+              </div>
             </div>
-            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
-              <button type="button" class="btn btn-outline btn-sm" id="btnSelectAllPages" style="padding: 2px 8px; font-size: 0.72rem;">Pilih Semua</button>
-              <button type="button" class="btn btn-outline btn-sm" id="btnClearAllPages" style="padding: 2px 8px; font-size: 0.72rem;">Bersihkan</button>
-              <button type="button" class="btn btn-outline btn-sm" id="btnPresetDefaultPages" style="padding: 2px 8px; font-size: 0.72rem;">Preset Standar</button>
-            </div>
-          </div>
+            <div id="roleModulesContainer" class="role-module-grid"></div>
+          </section>
 
-          <!-- Module Checkboxes Grid -->
-          <div id="roleModulesContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; max-height: 380px; overflow-y: auto; padding: 4px;">
-            <!-- Populated dynamically from SYSTEM_MODULES -->
-          </div>
+          <section class="role-editor-section">
+            <div class="role-editor-section-heading">
+              <div>
+                <h5>Izin Aksi API</h5>
+                <p>Atur kemampuan baca, tambah, ubah, dan hapus secara terpisah dari akses halaman.</p>
+              </div>
+            </div>
+            <div id="roleApiPermissionsContainer" class="role-permission-grid"></div>
+          </section>
+
+          <section class="role-editor-section">
+            <div class="role-editor-section-heading">
+              <div>
+                <h5>Widget Dashboard</h5>
+                <p>Pilih ringkasan yang ditampilkan. Data keuangan hanya dikirim untuk widget yang diizinkan.</p>
+              </div>
+            </div>
+            <div id="roleDashboardWidgetsContainer" class="role-widget-grid"></div>
+          </section>
         </div>
         <div class="admin-modal-footer">
           <button type="button" class="btn btn-secondary btn-sm" onclick="closeAdminModal('modalRoleBackdrop')">Batal</button>
@@ -382,6 +419,52 @@
     </div>
   </div>
 
+  <!-- MODAL: JERSEY TYPES, IMAGE PREVIEW & SIZES -->
+  <div class="admin-modal-backdrop" id="modalEventJerseysBackdrop">
+    <div class="admin-modal-dialog" style="max-width: 760px;">
+      <div class="admin-modal-header">
+        <h4><i class="fa-solid fa-shirt" style="color: var(--color-primary);"></i> Kelola Jersey Kategori</h4>
+        <button class="admin-modal-close" type="button" onclick="closeAdminModal('modalEventJerseysBackdrop')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="admin-modal-body">
+        <p id="jerseyModalSubtitle" class="form-hint"></p>
+        <form id="formEventJersey">
+          <input type="hidden" id="jerseyFormId">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="jerseyFormName">Nama / label jersey</label>
+              <input class="form-input" id="jerseyFormName" type="text" maxlength="100" placeholder="Contoh: Jersey Pria" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="jerseyFormType">Tipe jersey</label>
+              <input class="form-input" id="jerseyFormType" type="text" maxlength="100" placeholder="Contoh: Dry-Fit Race Tee" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="jerseyFormSizes">Ukuran tersedia</label>
+            <input class="form-input" id="jerseyFormSizes" type="text" placeholder="XS, S, M, L, XL, XXL" required>
+            <small class="form-hint">Pisahkan dengan koma. Setiap tipe jersey memiliki daftar ukuran sendiri.</small>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="jerseyFormImage">Link gambar jersey (opsional)</label>
+            <input class="form-input" id="jerseyFormImage" type="url" maxlength="2048" placeholder="https://contoh.com/jersey.jpg">
+          </div>
+          <div class="jersey-image-preview" id="jerseyImagePreview" hidden>
+            <img alt="Pratinjau gambar jersey">
+            <span>Pratinjau jersey</span>
+          </div>
+          <div class="admin-modal-footer">
+            <button type="button" class="btn btn-secondary btn-sm" id="btnCancelJerseyEdit" hidden>Batal edit</button>
+            <button type="submit" class="btn btn-primary btn-sm" id="btnSaveJersey">
+              <i class="fa-solid fa-plus"></i> Tambah Jersey
+            </button>
+          </div>
+        </form>
+        <div class="jersey-admin-list" id="eventJerseysList" aria-live="polite"></div>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL: ROUTE POINT CREATE / EDIT -->
   <div class="admin-modal-backdrop" id="modalRoutePointBackdrop">
     <div class="admin-modal-dialog" style="max-width: 640px;">
@@ -450,7 +533,7 @@
         </div>
         <div class="admin-modal-footer">
           <button type="button" class="btn btn-secondary btn-sm" onclick="closeAdminModal('modalRoutePointBackdrop')">Batal</button>
-          <button type="submit" class="btn btn-primary btn-sm btn-glow" id="btnSaveRouteSubmit">
+          <button type="submit" class="btn btn-primary btn-sm btn-glow" id="btnSaveRouteSubmit" data-permission="routes:manage">
             <i class="fa-solid fa-floppy-disk"></i> Simpan Checkpoint
           </button>
         </div>

@@ -1,5 +1,7 @@
 import { fetchAdmin } from '../core/api.js';
 import { showAdminToast, showConfirmDialog, escapeHtml } from '../core/utils.js';
+import { adminState } from '../core/state.js';
+import { applyRbacUi } from '../core/rbac.js';
 
 
 // =============================================================================
@@ -7,9 +9,100 @@ import { showAdminToast, showConfirmDialog, escapeHtml } from '../core/utils.js'
 // =============================================================================
 let currentEditingRoutePointId = null;
 
-async function loadRoutePoints({ showLoading = true } = {}) {
+function updateRouteSettingPreviews() {
+  const mapMode = document.getElementById('routeMapMode');
+  const checkpointMode = document.getElementById('routeCheckpointMode');
+  const mapUrlField = document.getElementById('routeMapUrlField');
+  const mapImageField = document.getElementById('routeMapImageField');
+  const checkpointImageField = document.getElementById('routeCheckpointImageField');
+  const manualPanels = document.querySelectorAll('.route-manual-only');
+  if (!mapMode || !checkpointMode) return;
+
+  mapUrlField.hidden = mapMode.value !== 'GMAPS';
+  mapImageField.hidden = mapMode.value !== 'IMAGE';
+  checkpointImageField.hidden = checkpointMode.value !== 'IMAGE';
+  manualPanels.forEach(panel => { panel.hidden = checkpointMode.value !== 'MANUAL'; });
+
+  const setPreview = (inputId, previewId) => {
+    const url = document.getElementById(inputId)?.value.trim() || '';
+    const preview = document.getElementById(previewId);
+    const image = preview?.querySelector('img');
+    let valid = false;
+    try {
+      valid = ['http:', 'https:'].includes(new URL(url).protocol);
+    } catch {
+      valid = false;
+    }
+    if (preview) preview.hidden = !valid;
+    if (image) {
+      if (valid) image.src = url;
+      else image.removeAttribute('src');
+    }
+  };
+  setPreview('routeSettingsMapImage', 'routeMapImagePreview');
+  setPreview('routeSettingsCheckpointImage', 'routeCheckpointImagePreview');
+}
+
+async function loadRouteSettings() {
+  try {
+    const response = await fetchAdmin('/admin/settings/website');
+    if (response.status !== 'success' || !response.data) {
+      throw new Error(response.message || 'Pengaturan rute tidak dapat dimuat.');
+    }
+    const settings = response.data;
+    document.getElementById('routeSettingsBadgeLabel').value = settings.route_badge_label || '';
+    document.getElementById('routeSettingsTitle').value = settings.route_title || '';
+    document.getElementById('routeSettingsDescription').value = settings.route_desc || '';
+    document.getElementById('routeSettingsGpx').value = settings.route_gpx_url || '';
+    document.getElementById('routeSettingsGmaps').value = settings.route_gmaps_url || settings.gmaps_embed_url || '';
+    document.getElementById('routeSettingsMapImage').value = settings.route_map_image || '';
+    document.getElementById('routeSettingsCheckpointImage').value = settings.route_checkpoint_image || '';
+    document.getElementById('routeMapMode').value = settings.route_map_mode === 'IMAGE' ? 'IMAGE' : 'GMAPS';
+    document.getElementById('routeCheckpointMode').value = settings.route_checkpoint_mode === 'IMAGE' ? 'IMAGE' : 'MANUAL';
+    updateRouteSettingPreviews();
+  } catch (error) {
+    console.error('Failed to load route settings:', error);
+    showAdminToast('error', 'Gagal Memuat Pengaturan Rute', error.message);
+  }
+}
+
+async function handleRouteSettingsSubmit(event) {
+  event.preventDefault();
+  const button = document.getElementById('btnSaveRouteSettings');
+  const originalHtml = button.innerHTML;
+  button.disabled = true;
+  button.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
+  const payload = {
+    route_badge_label: document.getElementById('routeSettingsBadgeLabel').value.trim(),
+    route_title: document.getElementById('routeSettingsTitle').value.trim(),
+    route_desc: document.getElementById('routeSettingsDescription').value.trim(),
+    route_gpx_url: document.getElementById('routeSettingsGpx').value.trim(),
+    route_gmaps_url: document.getElementById('routeSettingsGmaps').value.trim(),
+    route_map_image: document.getElementById('routeSettingsMapImage').value.trim(),
+    route_map_mode: document.getElementById('routeMapMode').value,
+    route_checkpoint_mode: document.getElementById('routeCheckpointMode').value,
+    route_checkpoint_image: document.getElementById('routeSettingsCheckpointImage').value.trim(),
+  };
+  try {
+    const response = await fetchAdmin('/admin/settings/website', {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    });
+    if (response.status !== 'success') throw new Error(response.message || 'Pengaturan rute gagal disimpan.');
+    showAdminToast('success', 'Pengaturan Rute Tersimpan', 'Peta dan mode checkpoint sudah tersinkron ke website.');
+    await loadRoutePoints({ showLoading: false, loadSettings: false });
+  } catch (error) {
+    showAdminToast('error', 'Gagal Menyimpan Rute', error.message);
+  } finally {
+    button.disabled = false;
+    button.innerHTML = originalHtml;
+  }
+}
+
+async function loadRoutePoints({ showLoading = true, loadSettings = true } = {}) {
   const tbody = document.getElementById('routePointsTableBody');
   if (!tbody) return;
+  if (loadSettings) await loadRouteSettings();
   if (showLoading) {
     tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:20px;color:var(--color-text-muted);">Memuat data...</td></tr>';
   }
@@ -49,16 +142,17 @@ function renderRoutePointsTable(points) {
       <td style="color:#64748B;font-size:0.82rem;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${pt.description || '—'}</td>
       <td>
         <div style="display:flex;gap:6px;justify-content:center;">
-          <button class="btn btn-secondary btn-sm" onclick="openEditRoutePoint(${JSON.stringify(JSON.stringify(pt))})" title="Edit">
+          <button class="btn btn-secondary btn-sm" data-permission="routes:manage" onclick="openEditRoutePoint(${JSON.stringify(JSON.stringify(pt))})" title="Edit">
             <i class="fa-solid fa-pen"></i>
           </button>
-          <button class="btn btn-sm" style="background:#FEE2E2;color:#EF4444;border:1px solid #FECACA;" onclick="deleteRoutePointApi('${pt.id}')" title="Hapus">
+          <button class="btn btn-sm" data-permission="routes:manage" style="background:#FEE2E2;color:#EF4444;border:1px solid #FECACA;" onclick="deleteRoutePointApi('${pt.id}')" title="Hapus">
             <i class="fa-solid fa-trash"></i>
           </button>
         </div>
       </td>
     </tr>
   `).join('');
+  applyRbacUi(adminState.profile);
 }
 
 function openCreateRouteModal() {
@@ -162,6 +256,9 @@ window.deleteRoutePointApi = deleteRoutePointApi;
 
 export {
   loadRoutePoints,
+  loadRouteSettings,
+  handleRouteSettingsSubmit,
+  updateRouteSettingPreviews,
   renderRoutePointsTable,
   openCreateRouteModal,
   openEditRoutePoint,

@@ -692,6 +692,25 @@ h1, h2, h3, h4, h5, h6 {
   letter-spacing: -0.02em;
 }
 
+.countdown-grid.countdown-sold .countdown-card {
+  border-color: rgba(185, 28, 28, 0.22);
+  background: linear-gradient(145deg, #FFF7F7, #FFFFFF);
+  box-shadow: inset 0 0 0 1px rgba(185, 28, 28, 0.04);
+}
+
+.countdown-grid.countdown-sold .countdown-num {
+  color: #B91C1C;
+  font-size: clamp(1.7rem, 3.2vw, 2.35rem);
+  font-weight: 950;
+  letter-spacing: 0.02em;
+  text-shadow: 0 2px 10px rgba(185, 28, 28, 0.12);
+}
+
+.countdown-grid.countdown-sold .countdown-text {
+  color: #991B1B;
+  font-weight: 900;
+}
+
 .countdown-text {
   font-size: 0.7rem;
   color: var(--color-text-muted, #64748B);
@@ -1103,37 +1122,75 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: 0 10px 30px -10px rgba(127, 29, 29, 0.12);
 }
 
-.ticket-card.global-registration-closed::after {
+.ticket-card.ticket-sale-closed::after {
   content: "";
   position: absolute;
   inset: 0;
   z-index: 3;
   pointer-events: none;
   background:
-    linear-gradient(135deg, transparent calc(50% - 2px), rgba(220, 38, 38, 0.42) 50%, transparent calc(50% + 2px)),
-    linear-gradient(45deg, transparent calc(50% - 2px), rgba(220, 38, 38, 0.42) 50%, transparent calc(50% + 2px));
+    linear-gradient(135deg, transparent calc(50% - 6px), rgba(127, 29, 29, 0.94) calc(50% - 2px), #DC2626 50%, rgba(127, 29, 29, 0.94) calc(50% + 2px), transparent calc(50% + 6px)),
+    linear-gradient(45deg, transparent calc(50% - 6px), rgba(127, 29, 29, 0.94) calc(50% - 2px), #DC2626 50%, rgba(127, 29, 29, 0.94) calc(50% + 2px), transparent calc(50% + 6px));
 }
 
-.ticket-card.global-registration-closed .global-sold-stamp {
+.ticket-card.ticket-sale-closed .global-sold-stamp {
   position: absolute;
   top: 50%;
   left: 50%;
   z-index: 4;
-  padding: 8px 18px;
-  border: 3px solid #DC2626;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.94);
-  color: #B91C1C;
-  font-size: 1.1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 25px;
+  border: 4px solid #991B1B;
+  border-radius: 9px;
+  outline: 2px solid rgba(255, 255, 255, 0.96);
+  background: rgba(255, 255, 255, 0.98);
+  color: #991B1B;
+  font-size: clamp(1.4rem, 4vw, 2rem);
   font-weight: 900;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.18em;
   transform: translate(-50%, -50%) rotate(-12deg);
-  box-shadow: 0 4px 14px rgba(127, 29, 29, 0.2);
+  box-shadow: 0 7px 22px rgba(127, 29, 29, 0.4), 0 0 0 5px rgba(255, 255, 255, 0.42);
 }
 
-.ticket-card.global-registration-closed .btn-select-ticket {
+.ticket-card.ticket-sale-closed .btn-select-ticket {
   position: relative;
   z-index: 5;
+}
+
+.global-closed-stamp {
+  color: #B45309;
+  font-size: 0.67rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+}
+
+.ticket-card.registration-phase-race_day .global-closed-stamp {
+  color: #C2410C;
+}
+
+.ticket-event-date {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px;
+  margin: -4px 0 12px;
+  color: #475569;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.ticket-event-date > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #FFF7ED;
+  color: #C2410C;
+  font-size: 0.67rem;
+  font-weight: 800;
 }
 
 /* 2. Top Header Utility Bar (Di atas Gambar Banner) */
@@ -2696,7 +2753,56 @@ h1, h2, h3, h4, h5, h6 {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 14px;
   background: #F8FAFC;
+}
+
+.registration-timer-info {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 11px;
+  border: 1px solid #FED7AA;
+  border-radius: 12px;
+  background: #FFF7ED;
+  color: #C2410C;
+}
+
+.registration-timer-info > i {
+  flex: 0 0 auto;
+  font-size: 1rem;
+}
+
+.registration-timer-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+  line-height: 1.2;
+}
+
+.registration-timer-copy > span {
+  color: #7C2D12;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.registration-timer-copy > strong {
+  color: #9A3412;
+  font-size: 0.88rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+}
+
+.registration-timer-info .urgent {
+  color: #B91C1C;
+  animation: registrationTimerPulse 1s ease-in-out infinite alternate;
+}
+
+@keyframes registrationTimerPulse {
+  from { opacity: 1; }
+  to { opacity: 0.62; }
 }
 
 .order-total-preview {
@@ -3348,6 +3454,9 @@ h1, h2, h3, h4, h5, h6 {
     align-items: stretch;
     gap: 10px;
   }
+  .registration-timer-info {
+    justify-content: center;
+  }
   .order-total-preview {
     flex-direction: row;
     justify-content: space-between;
@@ -3552,6 +3661,17 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: 12px;
 }
 
+.stats-banner .stat-icon {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  margin: 0 auto 7px;
+  place-items: center;
+  border-radius: 9px;
+  background: #FFF7ED;
+  color: #EA580C;
+}
+
 .stats-banner .stat-num {
   overflow-wrap: anywhere;
 }
@@ -3634,7 +3754,232 @@ h1, h2, h3, h4, h5, h6 {
   color: #64748B;
 }
 
+.route-checkpoint-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 900px;
+  object-fit: contain;
+  border-radius: 14px;
+  background: #FFFFFF;
+}
+
+.faq-coming-soon {
+  max-width: 760px;
+  margin: 24px auto 0;
+  padding: clamp(24px, 6vw, 48px) 20px;
+  border: 1px solid rgba(255, 107, 0, 0.28);
+  border-radius: 18px;
+  background: linear-gradient(135deg, #FFF7ED, #FFFFFF 65%);
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+  text-align: center;
+  transform: rotate(-1.5deg);
+}
+
+.faq-coming-soon span {
+  color: #EA580C;
+  font-size: clamp(1.3rem, 5vw, 2rem);
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: 0.08em;
+}
+
+.site-coming-soon[hidden],
+.mobile-bottom-dock[hidden],
+.coming-soon-ticket-image img[hidden],
+.coming-soon-ticket-image-fallback[hidden] {
+  display: none !important;
+}
+
+.site-coming-soon {
+  min-height: min(78vh, 760px);
+  display: grid;
+  align-items: center;
+  padding: clamp(44px, 8vw, 100px) 0;
+  background:
+    radial-gradient(ellipse at 10% 12%, rgba(255, 107, 0, 0.12), transparent 34%),
+    radial-gradient(ellipse at 90% 88%, rgba(14, 165, 233, 0.08), transparent 36%);
+}
+
+.coming-soon-ticket {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  width: min(100%, 980px);
+  min-height: 340px;
+  margin: 0 auto;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  border-radius: 26px;
+  background: linear-gradient(120deg, #FFFFFF 0%, #FFF7ED 100%);
+  box-shadow: 0 28px 80px rgba(15, 23, 42, 0.15);
+}
+
+.coming-soon-ticket::before,
+.coming-soon-ticket::after {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--color-bg-base, #F8FAFC);
+  content: "";
+  transform: translateY(-50%);
+}
+
+.coming-soon-ticket::before {
+  left: calc(44.99% - 15px);
+}
+
+.coming-soon-ticket::after {
+  left: calc(45% - 15px);
+  display: none;
+}
+
+.coming-soon-ticket-image {
+  position: relative;
+  display: grid;
+  min-height: 340px;
+  place-items: center;
+  overflow: hidden;
+  background:
+    linear-gradient(145deg, rgba(15, 23, 42, 0.12), rgba(15, 23, 42, 0.45)),
+    linear-gradient(135deg, #FF8A32, #C2410C);
+}
+
+.coming-soon-ticket-image::after {
+  position: absolute;
+  inset: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  border-radius: 18px;
+  content: "";
+  pointer-events: none;
+}
+
+.coming-soon-ticket-image img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.coming-soon-ticket-image-fallback {
+  display: grid;
+  width: 124px;
+  height: 124px;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.54);
+  border-radius: 34px;
+  background: rgba(255, 255, 255, 0.17);
+  color: #FFFFFF;
+  font-size: 3.5rem;
+  transform: rotate(-12deg);
+  backdrop-filter: blur(8px);
+}
+
+.coming-soon-ticket-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  padding: clamp(30px, 6vw, 68px);
+}
+
+.coming-soon-ticket-content::before {
+  position: absolute;
+  top: 24px;
+  bottom: 24px;
+  left: 0;
+  border-left: 2px dashed #FDBA74;
+  content: "";
+}
+
+.coming-soon-eyebrow,
+.coming-soon-ticket-stamp {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #C2410C;
+  font-size: 0.74rem;
+  font-weight: 850;
+  letter-spacing: 0.14em;
+}
+
+.coming-soon-ticket-content h1 {
+  margin: 18px 0 12px;
+  color: #0F172A;
+  font-size: clamp(2rem, 5vw, 3.8rem);
+  font-weight: 900;
+  line-height: 1.02;
+  letter-spacing: -0.045em;
+  overflow-wrap: anywhere;
+}
+
+.coming-soon-ticket-content p {
+  max-width: 430px;
+  margin: 0;
+  color: #64748B;
+  font-size: clamp(0.94rem, 2vw, 1.08rem);
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.coming-soon-ticket-stamp {
+  margin-top: 28px;
+  padding: 9px 13px;
+  border: 1px solid #FED7AA;
+  border-radius: 999px;
+  background: rgba(255, 247, 237, 0.9);
+}
+
 @media (max-width: 600px) {
+  .site-coming-soon {
+    min-height: 72vh;
+    padding: 34px 0;
+  }
+
+  .coming-soon-ticket {
+    grid-template-columns: 1fr;
+    border-radius: 20px;
+  }
+
+  .coming-soon-ticket-image {
+    min-height: clamp(180px, 54vw, 260px);
+  }
+
+  .coming-soon-ticket-image::after {
+    inset: 10px;
+    border-radius: 13px;
+  }
+
+  .coming-soon-ticket-content {
+    padding: 28px 24px 32px;
+  }
+
+  .coming-soon-ticket-content::before {
+    top: 0;
+    right: 20px;
+    bottom: auto;
+    left: 20px;
+    border-top: 2px dashed #FDBA74;
+    border-left: 0;
+  }
+
+  .coming-soon-ticket::before {
+    top: calc(clamp(180px, 54vw, 260px) - 15px);
+    left: -15px;
+  }
+
+  .coming-soon-ticket::after {
+    top: calc(clamp(180px, 54vw, 260px) - 15px);
+    right: -15px;
+    left: auto;
+    display: block;
+  }
+
   .countdown-grid {
     gap: 7px;
   }
@@ -4001,5 +4346,207 @@ h1, h2, h3, h4, h5, h6 {
   .hero-actions .btn {
     width: 100%;
     justify-content: center;
+  }
+}
+
+/* Compact, clean ticket pass layout */
+.ticket-pass-card.ticket-sale-closed::after {
+  background:
+    linear-gradient(135deg, transparent calc(50% - 2px), rgba(185, 28, 28, 0.55) 50%, transparent calc(50% + 2px)),
+    linear-gradient(45deg, transparent calc(50% - 2px), rgba(185, 28, 28, 0.55) 50%, transparent calc(50% + 2px));
+}
+
+.ticket-pass-card.ticket-sale-closed .global-sold-stamp {
+  padding: 7px 18px;
+  border-width: 3px;
+  border-radius: 8px;
+  font-size: clamp(1.15rem, 3.2vw, 1.6rem);
+  letter-spacing: 0.14em;
+  transform: translate(-50%, -50%) rotate(-8deg);
+  box-shadow: 0 5px 16px rgba(127, 29, 29, 0.28), 0 0 0 4px rgba(255, 255, 255, 0.42);
+}
+
+.ticket-pass-card .ticket-stub-header {
+  min-height: 40px;
+  gap: 12px;
+  padding: 8px 16px;
+  font-size: 0.7rem;
+  letter-spacing: 0.035em;
+}
+
+.ticket-pass-card .ticket-card-banner {
+  height: 142px;
+}
+
+.ticket-pass-card .ticket-header {
+  padding: 15px 18px 8px;
+}
+
+.ticket-pass-card .ticket-category-tag {
+  margin-bottom: 4px;
+  font-size: 0.69rem;
+}
+
+.ticket-pass-card .ticket-title {
+  margin-bottom: 8px;
+  font-size: 1.25rem;
+  line-height: 1.2;
+}
+
+.ticket-pass-card .ticket-event-date {
+  gap: 5px;
+  margin: 0 0 9px;
+  font-size: 0.7rem;
+  line-height: 1.4;
+}
+
+.ticket-pass-card .ticket-event-date > span {
+  font-size: 0.62rem;
+}
+
+.ticket-pass-card .ticket-price {
+  gap: 5px;
+  margin-bottom: 4px;
+}
+
+.ticket-pass-card .price-currency {
+  font-size: 1rem;
+}
+
+.ticket-pass-card .price-amount {
+  font-size: 2rem;
+}
+
+.ticket-pass-card .price-unit {
+  font-size: 0.74rem;
+}
+
+.ticket-pass-card .ticket-perforated-divider {
+  margin: 8px 0;
+}
+
+.ticket-pass-card .ticket-perforated-divider .notch {
+  width: 14px;
+  height: 14px;
+}
+
+.ticket-pass-card .ticket-perforated-divider .notch-left {
+  left: -7px;
+}
+
+.ticket-pass-card .ticket-perforated-divider .notch-right {
+  right: -7px;
+}
+
+.ticket-pass-card .stock-wrapper {
+  margin: 0 16px 10px;
+  padding: 9px 10px;
+  border-radius: 10px;
+}
+
+.ticket-pass-card .stock-info {
+  gap: 8px;
+  margin-bottom: 6px;
+  font-size: 0.72rem;
+}
+
+.ticket-pass-card .stock-status {
+  text-align: right;
+  font-size: 0.68rem;
+}
+
+.ticket-pass-card .ticket-benefits {
+  gap: 7px;
+  margin: 0 18px 10px;
+  padding: 0;
+}
+
+.ticket-pass-card .benefit-item {
+  gap: 8px;
+  font-size: 0.78rem;
+}
+
+.ticket-pass-card .benefit-icon {
+  width: 18px;
+  height: 18px;
+  font-size: 0.65rem;
+}
+
+.ticket-pass-card .ticket-barcode-strip {
+  margin: 2px 16px 0;
+  padding: 7px 9px;
+}
+
+.ticket-pass-card .ticket-barcode-lines {
+  height: 20px;
+}
+
+.ticket-pass-card .ticket-barcode-serial {
+  margin-top: 3px;
+  font-size: 0.58rem;
+}
+
+.ticket-pass-card .ticket-pass-actions {
+  gap: 8px !important;
+  padding: 10px 16px 16px;
+}
+
+.ticket-pass-card .ticket-pass-actions .btn {
+  min-width: 0;
+  min-height: 40px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  font-size: 0.74rem;
+  line-height: 1.25;
+}
+
+@media (max-width: 992px) {
+  .tickets-grid {
+    max-width: 520px;
+  }
+}
+
+@media (max-width: 600px) {
+  .ticket-pass-card .ticket-card-banner {
+    height: 132px;
+  }
+
+  .ticket-pass-card .ticket-header {
+    padding: 13px 15px 7px;
+  }
+
+  .ticket-pass-card .ticket-title {
+    font-size: 1.15rem;
+  }
+
+  .ticket-pass-card .price-amount {
+    font-size: 1.8rem;
+  }
+
+  .ticket-pass-card .stock-wrapper {
+    margin-right: 13px;
+    margin-left: 13px;
+  }
+
+  .ticket-pass-card .ticket-benefits {
+    margin-right: 15px;
+    margin-left: 15px;
+  }
+
+  .ticket-pass-card .ticket-barcode-strip {
+    margin-right: 13px;
+    margin-left: 13px;
+  }
+
+  .ticket-pass-card .ticket-pass-actions {
+    padding: 9px 13px 13px;
+  }
+}
+
+@media (max-width: 360px) {
+  .ticket-pass-card .ticket-pass-actions .btn {
+    gap: 5px;
+    padding: 7px 6px;
+    font-size: 0.68rem;
   }
 }

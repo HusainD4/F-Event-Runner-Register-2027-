@@ -1,6 +1,19 @@
 <div class="admin-tab-pane" id="pane-cms">
           <form id="formCmsSettings">
-            <!-- 1. Identitas & Hero Section -->
+    <div class="cms-submit-actions cms-submit-actions-top">
+      <span class="cms-save-context"><i class="fa-solid fa-cloud-arrow-up"></i> Perubahan akan diterapkan setelah disimpan</span>
+      <div class="cms-save-buttons">
+        <a href="/" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm">
+          <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
+          <span>Buka Website</span>
+        </a>
+        <button type="submit" class="btn btn-primary btn-sm btn-glow" id="btnSaveCmsSubmit" data-permission="cms:manage">
+          <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i>
+          <span>Simpan Perubahan</span>
+        </button>
+      </div>
+    </div>
+    <!-- 1. Identitas & Hero Section -->
             <div class="admin-section">
               <div class="admin-section-header">
                 <div>
@@ -17,6 +30,84 @@
                 <div class="form-group">
                   <label class="form-label">Tagline Slogan</label>
                   <input type="text" class="form-input" id="cmsSiteTagline" placeholder="Lari Bersama Menembus Batas di Kota Bahari">
+                </div>
+              </div>
+
+              <div class="cms-branding-panel">
+                <div class="cms-branding-heading">
+                  <span class="cms-branding-symbol"><i class="fa-solid fa-swatchbook"></i></span>
+                  <div>
+                    <h4>Branding Navbar</h4>
+                    <p>Atur nama dan identitas visual yang tampil di navbar website.</p>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="cmsNavbarTitle">Judul / Nama yang Tampil di Navbar</label>
+                  <input type="text" class="form-input" id="cmsNavbarTitle" maxlength="80" placeholder="TEGAL RUN 2027">
+                  <div class="form-hint">Nama navbar bisa berbeda dari judul tab browser.</div>
+                </div>
+
+                <fieldset class="cms-mode-fieldset">
+                  <legend class="form-label">Tampilan ikon navbar</legend>
+                  <div class="cms-mode-options">
+                    <label class="cms-mode-option">
+                      <input type="radio" name="cmsNavbarIconMode" value="ICON" checked>
+                      <span class="cms-mode-card">
+                        <i class="fa-solid fa-icons"></i>
+                        <span><strong>Pilih ikon</strong><small>Gunakan ikon dari 20 pilihan</small></span>
+                      </span>
+                    </label>
+                    <label class="cms-mode-option">
+                      <input type="radio" name="cmsNavbarIconMode" value="IMAGE">
+                      <span class="cms-mode-card">
+                        <i class="fa-regular fa-image"></i>
+                        <span><strong>Link gambar</strong><small>Gunakan logo dari URL gambar</small></span>
+                      </span>
+                    </label>
+                  </div>
+                </fieldset>
+
+                <div class="cms-branding-controls">
+                  <div class="form-group" id="cmsNavbarIconField">
+                    <label class="form-label">Pilih ikon (20 pilihan)</label>
+                    <input type="hidden" id="cmsNavbarIcon" value="fa-person-running">
+                    <div class="cms-icon-picker-grid" id="cmsNavbarIconPicker" role="group" aria-label="Pilih ikon navbar"></div>
+                  </div>
+                  <div class="form-group" id="cmsNavbarIconUrlField" hidden>
+                    <label class="form-label" for="cmsNavbarIconUrl">URL Gambar Ikon / Logo Navbar</label>
+                    <input type="url" class="form-input" id="cmsNavbarIconUrl" placeholder="https://domain.com/logo.png">
+                    <div class="form-hint">Masukkan URL gambar yang dapat diakses publik (HTTP atau HTTPS).</div>
+                  </div>
+                </div>
+
+                <div class="cms-brand-preview" aria-live="polite">
+                  <span class="cms-preview-label">Pratinjau navbar</span>
+                  <div class="cms-preview-brand">
+                    <span class="cms-preview-icon" id="cmsNavbarIconPreview"><i class="fa-solid fa-person-running"></i></span>
+                    <strong id="cmsNavbarTitlePreview">TEGAL RUN 2027</strong>
+                  </div>
+                </div>
+              </div>
+
+              <div class="cms-branding-panel cms-favicon-panel">
+                <div class="cms-branding-heading">
+                  <span class="cms-branding-symbol"><i class="fa-regular fa-window-maximize"></i></span>
+                  <div>
+                    <h4>Favicon Website</h4>
+                    <p>Ikon kecil pada tab browser. Kosongkan URL untuk memakai favicon bawaan.</p>
+                  </div>
+                </div>
+                <div class="cms-favicon-row">
+                  <div class="form-group">
+                    <label class="form-label" for="cmsFaviconUrl">URL Favicon</label>
+                    <input type="url" class="form-input" id="cmsFaviconUrl" placeholder="https://domain.com/favicon.png">
+                    <div class="form-hint">Gunakan gambar PNG, SVG, ICO, atau format favicon lain melalui URL HTTP/HTTPS.</div>
+                  </div>
+                  <div class="cms-favicon-preview-wrap">
+                    <span class="cms-preview-label">Pratinjau</span>
+                    <span class="cms-favicon-preview"><img id="cmsFaviconPreview" alt="Pratinjau favicon" hidden><i class="fa-solid fa-person-running" id="cmsFaviconFallback"></i></span>
+                  </div>
                 </div>
               </div>
 
@@ -40,7 +131,11 @@
                 <label class="form-label">Subjudul Hero / Deskripsi Singkat</label>
                 <textarea class="form-input" id="cmsHeroSubtitle" rows="2" placeholder="Kompetisi lari terbesar di Kota Bahari dengan standar race profesional..."></textarea>
               </div>
-              <label class="form-label"><input type="checkbox" id="cmsShowHero" checked> Tampilkan section Hero di website</label>
+              <label class="cms-toggle">
+                <input type="checkbox" id="cmsShowHero" checked>
+                <span class="cms-toggle-switch" aria-hidden="true"></span>
+                <span class="cms-toggle-label">Tampilkan section Hero di website</span>
+              </label>
             </div>
 
             <!-- 1.5. Live Event Stats Grid (Bebas Tambah & Bisa Otomatis dari Data) -->
@@ -48,63 +143,99 @@
               <div class="admin-section-header" style="flex-wrap: wrap; gap: 12px;">
                 <div>
                   <h3><i class="fa-solid fa-chart-line" style="color: var(--color-primary);"></i> Live Event Stats Grid (Banner Statistik Hero)</h3>
-                  <p>Bebas menambahkan, mengubah, atau menghapus kartu statistik. Bisa menggunakan data otomatis real-time dari database atau angka kustom manual.</p>
+                  <p>Gunakan angka pendaftaran aktual yang diperbarui saat data berubah, atau buat informasi statistik kustom sesuai kebutuhan.</p>
                 </div>
                 <button type="button" class="btn btn-secondary btn-sm" id="btnAddCmsStatItem">
                   <i class="fa-solid fa-plus"></i> Tambah Kartu Statistik
                 </button>
               </div>
+              <div class="cms-stats-source-note">
+                <i class="fa-solid fa-circle-info"></i>
+                <span>Data otomatis mengikuti pesanan aktif di database. Pendaftaran menunggu pembayaran tetap menghitung kuota; pesanan kedaluwarsa, batal, atau ditolak tidak dihitung.</span>
+              </div>
 
               <!-- Dynamic Repeater Container -->
-              <div id="cmsStatsItemsContainer" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px;">
+              <div id="cmsStatsItemsContainer" class="cms-repeater-grid">
                 <!-- Di-render oleh cms.js -->
               </div>
-              <label class="form-label" style="margin-top: 14px;"><input type="checkbox" id="cmsShowStats" checked> Tampilkan banner statistik</label>
+              <label class="cms-toggle cms-toggle-spaced">
+                <input type="checkbox" id="cmsShowStats" checked>
+                <span class="cms-toggle-switch" aria-hidden="true"></span>
+                <span class="cms-toggle-label">Tampilkan banner statistik</span>
+              </label>
             </div>
 
             <!-- 2. Rute Lari & Google Maps Embed -->
             <div class="admin-section">
               <div class="admin-section-header">
                 <div>
-                  <h3><i class="fa-solid fa-map-location-dot" style="color: var(--color-primary);"></i> Rute Lari & Link Google Maps</h3>
-                  <p>Paste link Google Maps (URL langsung atau kode iframe embed) serta gambar rute.</p>
+                  <h3><i class="fa-solid fa-map-location-dot" style="color: var(--color-primary);"></i> Manajemen Rute & Checkpoint</h3>
+                  <p>Pengaturan peta, gambar A4, dan checkpoint manual kini dikelola bersama di halaman Manajemen Rute &amp; Checkpoint.</p>
                 </div>
               </div>
-
-              <div class="form-row">
-                <div class="form-group">
-                  <label class="form-label">Judul Section Rute</label>
-                  <input type="text" class="form-input" id="cmsRouteTitle" placeholder="Rute Lari Resmi & Titik Kumpul">
-                </div>
-                <div class="form-group">
-                  <label class="form-label">URL Gambar Peta Rute Lari</label>
-                  <input type="url" class="form-input" id="cmsRouteMapImage" placeholder="https://images.unsplash.com/...">
-                </div>
-              </div>
-
-              <div class="form-group">
-                <label class="form-label">Deskripsi Rute Lari</label>
-                <textarea class="form-input" id="cmsRouteDesc" rows="2" placeholder="Jalur datar beraspal mulus melintasi landmark bersejarah..."></textarea>
-              </div>
-
-              <div class="form-group">
-                <label class="form-label">
-                  <i class="fa-brands fa-google" style="color: #4285F4;"></i> Link / Embed Google Maps <span class="req">*</span>
-                </label>
-                <textarea class="form-input" id="cmsGmapsUrl" rows="2" placeholder="Paste link Google Maps Embed atau tag <iframe src='https://www.google.com/maps/embed?...'></iframe> di sini"></textarea>
-                <div class="form-hint">
-                  Tips: Buka Google Maps > Bagikan (Share) > Sematkan Peta (Embed a map) > Salin HTML / URL src-nya dan paste di sini.
-                </div>
-              </div>
-
-              <div class="form-group">
-                <label class="form-label">Link Unduh File GPX Rute Resmi</label>
-                <input type="text" class="form-input" id="cmsRouteGpxUrl" placeholder="https://... atau /assets/rute-tegal-run.gpx">
-              </div>
-              <label class="form-label"><input type="checkbox" id="cmsShowRoute" checked> Tampilkan section rute</label>
+              <p class="form-hint">Gunakan tab <strong>Manajemen Rute &amp; Checkpoint</strong> untuk memilih Google Maps atau gambar peta, mengatur mode checkpoint, dan mengelola media pratinjau.</p>
+              <label class="cms-toggle">
+                <input type="checkbox" id="cmsShowRoute" checked>
+                <span class="cms-toggle-switch" aria-hidden="true"></span>
+                <span class="cms-toggle-label">Tampilkan section rute</span>
+              </label>
             </div>
 
             <!-- 3. Fasilitas, Kategori & Gambar Media -->
+            <div class="admin-section">
+              <div class="admin-section-header" style="flex-wrap: wrap; gap: 12px;">
+                <div>
+                  <h3><i class="fa-solid fa-circle-question" style="color: var(--color-primary);"></i> Pertanyaan yang Sering Diajukan (FAQ)</h3>
+                  <p>Kelola pertanyaan dan jawaban. Jika semua FAQ dimatikan, website menampilkan box EVENT COMING SOON.</p>
+                </div>
+                <button type="button" class="btn btn-secondary btn-sm" id="btnAddCmsFaqItem">
+                  <i class="fa-solid fa-plus"></i> Tambah FAQ
+                </button>
+              </div>
+              <div id="cmsFaqItemsContainer" class="cms-repeater-grid"></div>
+              <label class="cms-toggle cms-toggle-spaced">
+                <input type="checkbox" id="cmsShowFaq" checked>
+                <span class="cms-toggle-switch" aria-hidden="true"></span>
+                <span class="cms-toggle-label">Tampilkan section FAQ</span>
+              </label>
+            </div>
+
+            <div class="admin-section">
+              <div class="admin-section-header">
+                <div>
+                  <h3><i class="fa-solid fa-ticket" style="color: var(--color-primary);"></i> Tampilan Saat Semua Section Nonaktif</h3>
+                  <p>Box tiket ini muncul otomatis jika seluruh section Konten Website &amp; CMS dimatikan.</p>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label" for="cmsComingSoonTitle">Teks utama</label>
+                  <input type="text" class="form-input" id="cmsComingSoonTitle" maxlength="100" placeholder="COMING SOON EVENT!">
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="cmsComingSoonImageUrl">URL gambar (opsional)</label>
+                  <input type="url" class="form-input" id="cmsComingSoonImageUrl" maxlength="2048" placeholder="https://domain.com/gambar-event.jpg">
+                  <div class="form-hint">Gunakan link gambar publik dengan protokol HTTPS atau HTTP.</div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="cmsComingSoonMessage">Teks deskripsi</label>
+                <textarea class="form-input" id="cmsComingSoonMessage" rows="2" maxlength="500" placeholder="Informasi lengkap acara akan segera hadir. Nantikan kabar terbaru dari kami!"></textarea>
+              </div>
+              <div class="cms-coming-soon-preview" id="cmsComingSoonPreview" aria-live="polite">
+                <div class="cms-coming-soon-preview-image">
+                  <img id="cmsComingSoonPreviewImage" alt="Pratinjau gambar Coming Soon" hidden>
+                  <i class="fa-solid fa-ticket" id="cmsComingSoonPreviewFallback" aria-hidden="true"></i>
+                </div>
+                <div>
+                  <span>EVENT UPDATE</span>
+                  <strong id="cmsComingSoonPreviewTitle">COMING SOON EVENT!</strong>
+                  <p id="cmsComingSoonPreviewMessage">Informasi lengkap acara akan segera hadir. Nantikan kabar terbaru dari kami!</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- 4. Kontak & Footer -->
             <div class="admin-section">
               <div class="admin-section-header" style="flex-wrap: wrap; gap: 12px;">
                 <div>
@@ -135,10 +266,14 @@
               <!-- Dynamic Facilities Repeater Container -->
               <div style="margin-top: 16px; margin-bottom: 24px;">
                 <label class="form-label" style="font-weight: 700; color: var(--color-primary);">Daftar Butir Fasilitas Pelari (Dynamic Cards)</label>
-                <div id="cmsFacilitiesItemsContainer" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px;">
+                <div id="cmsFacilitiesItemsContainer" class="cms-repeater-grid">
                   <!-- Di-render oleh cms.js -->
                 </div>
-                <label class="form-label"><input type="checkbox" id="cmsShowFacilities" checked> Tampilkan section fasilitas</label>
+                <label class="cms-toggle">
+                  <input type="checkbox" id="cmsShowFacilities" checked>
+                  <span class="cms-toggle-switch" aria-hidden="true"></span>
+                  <span class="cms-toggle-label">Tampilkan section fasilitas</span>
+                </label>
               </div>
 
               <div class="form-row">
@@ -156,7 +291,11 @@
                 <label class="form-label">Deskripsi Section Tiket</label>
                 <textarea class="form-input" id="cmsTicketsDesc" rows="2" placeholder="Tersedia kategori kompetitif bagi atlet dan fun run santai..."></textarea>
               </div>
-              <label class="form-label"><input type="checkbox" id="cmsShowTickets" checked> Tampilkan section kategori tiket</label>
+              <label class="cms-toggle">
+                <input type="checkbox" id="cmsShowTickets" checked>
+                <span class="cms-toggle-switch" aria-hidden="true"></span>
+                <span class="cms-toggle-label">Tampilkan section kategori tiket</span>
+              </label>
             </div>
 
             <!-- 3.5. Perizinan & Kepatuhan Hukum (Legal) -->
@@ -184,10 +323,14 @@
               <!-- Dynamic Legal Repeater Container -->
               <div style="margin-top: 16px;">
                 <label class="form-label" style="font-weight: 700; color: var(--color-primary);">Daftar Poin Kepatuhan Hukum (Dynamic Cards)</label>
-                <div id="cmsLegalItemsContainer" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px;">
+                <div id="cmsLegalItemsContainer" class="cms-repeater-grid">
                   <!-- Di-render oleh cms.js -->
                 </div>
-                <label class="form-label" style="margin-top: 14px;"><input type="checkbox" id="cmsShowLegal" checked> Tampilkan section perizinan &amp; kepatuhan</label>
+                <label class="cms-toggle cms-toggle-spaced">
+                  <input type="checkbox" id="cmsShowLegal" checked>
+                  <span class="cms-toggle-switch" aria-hidden="true"></span>
+                  <span class="cms-toggle-label">Tampilkan section perizinan &amp; kepatuhan</span>
+                </label>
               </div>
             </div>
 
@@ -220,16 +363,46 @@
                 <label class="form-label">Teks Hak Cipta Footer</label>
                 <input type="text" class="form-input" id="cmsFooterCopyright" placeholder="Hak Cipta Terpelihara © 2027 Panitia Resmi Tegal Run.">
               </div>
-              <label class="form-label"><input type="checkbox" id="cmsShowFooter" checked> Tampilkan footer website</label>
+              <label class="cms-toggle">
+                <input type="checkbox" id="cmsShowFooter" checked>
+                <span class="cms-toggle-switch" aria-hidden="true"></span>
+                <span class="cms-toggle-label">Tampilkan footer website</span>
+              </label>
 
-              <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--color-border-subtle);">
-                <a href="/" target="_blank" class="btn btn-secondary btn-sm">
-                  <i class="fa-solid fa-arrow-up-right-from-square"></i> Lihat Website
-                </a>
-                <button type="submit" class="btn btn-primary btn-sm btn-glow" id="btnSaveCmsSubmit">
-                  <i class="fa-solid fa-floppy-disk"></i> Simpan Seluruh Konten Website
+              <aside class="cms-live-preview is-open" id="cmsLivePreview" aria-label="Pratinjau halaman utama">
+                <button type="button" class="cms-preview-handle" id="btnToggleCmsPreview"
+                  aria-expanded="true" aria-controls="cmsPreviewPanel" aria-label="Lipat pratinjau halaman utama"
+                  title="Tarik ke kanan untuk melipat; tarik ke kiri untuk memperlebar">
+                  <span class="cms-preview-handle-pin"><i class="fa-solid fa-thumbtack"></i></span>
+                  <span class="cms-preview-handle-label">LIPAT</span>
+                  <i class="fa-solid fa-chevron-left cms-preview-handle-arrow" aria-hidden="true"></i>
                 </button>
-              </div>
+                <div class="cms-preview-panel" id="cmsPreviewPanel">
+                  <div class="cms-preview-panel-heading">
+                    <span class="cms-preview-summary-icon"><i class="fa-solid fa-display"></i></span>
+                    <span class="cms-preview-summary-copy"><strong>Pratinjau halaman utama</strong><small>Pratinjau website publik</small></span>
+                    <span class="cms-preview-summary-state"><i class="fa-solid fa-circle"></i> LIVE</span>
+                  </div>
+                  <div class="cms-preview-frame-toolbar">
+                    <span><i class="fa-solid fa-globe"></i> Beranda publik · <span id="cmsPreviewUpdated">Memuat pratinjau sesuai pengaturan tersimpan</span></span>
+                    <div class="cms-preview-toolbar-actions">
+                      <div class="cms-device-switch" role="group" aria-label="Mode pratinjau">
+                        <button type="button" class="cms-device-button is-active" data-preview-mode="mobile" aria-pressed="true">
+                          <i class="fa-solid fa-mobile-screen-button"></i><span>Mobile</span>
+                        </button>
+                        <button type="button" class="cms-device-button" data-preview-mode="desktop" aria-pressed="false">
+                          <i class="fa-solid fa-desktop"></i><span>Desktop</span>
+                        </button>
+                      </div>
+                      <button type="button" class="btn btn-secondary btn-sm" id="btnRefreshCmsPreview" aria-label="Muat ulang pratinjau" title="Muat ulang pratinjau"><i class="fa-solid fa-rotate"></i></button>
+                    </div>
+                  </div>
+                  <div class="cms-preview-viewport is-mobile-mode" id="cmsPreviewViewport">
+                    <iframe id="cmsWebsitePreview" src="/" title="Pratinjau langsung halaman utama website" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+                  </div>
+                </div>
+              </aside>
+
             </div>
           </form>
         </div>

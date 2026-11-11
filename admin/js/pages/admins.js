@@ -103,19 +103,21 @@ const DEFAULT_ROLE_DIRECTORY = [
 ];
 
 const SYSTEM_MODULES_FALLBACK = [
-  { key: 'page:dashboard', label: 'Dashboard Overview', icon: 'fa-gauge-high', desc: 'Ringkasan statistik, kuota & omzet' },
-  { key: 'page:events', label: 'Manajemen Event & Tiket', icon: 'fa-calendar-days', desc: 'Kategori tiket, harga, kuota & benefit' },
-  { key: 'page:participants', label: 'Manajemen Peserta', icon: 'fa-users', desc: 'Pendaftar, nomor BIB & status' },
-  { key: 'page:racepack', label: 'Pengambilan Racepack (RPC)', icon: 'fa-box-open', desc: 'Scan QR kamera HP, verifikasi E-Tiket & serah terima' },
-  { key: 'page:orders', label: 'Transaksi & Keuangan', icon: 'fa-receipt', desc: 'Audit order, Midtrans & refund' },
-  { key: 'page:notif-logs', label: 'Log Notifikasi Peserta', icon: 'fa-paper-plane', desc: 'Riwayat WA & email E-Tiket' },
-  { key: 'page:whatsapp-web', label: 'WhatsApp Web Console', icon: 'fa-brands fa-whatsapp', desc: 'Chat langsung & CS peserta' },
-  { key: 'page:cms', label: 'Konten Website & CMS', icon: 'fa-pen-ruler', desc: 'Teks website, sponsor & banner' },
-  { key: 'page:countdown', label: 'Countdown & Status Event', icon: 'fa-stopwatch-20', desc: 'Status pendaftaran & waktu lomba' },
-  { key: 'page:notifications', label: 'Konfigurasi Notifikasi', icon: 'fa-bell', desc: 'Gateway WA, SMTP & template' },
-  { key: 'page:routes', label: 'Rute & Checkpoint', icon: 'fa-map-pin', desc: 'Pos medis, water station & jalur' },
-  { key: 'page:admins', label: 'Kelola Admin & RBAC', icon: 'fa-shield-halved', desc: 'Akun staf & hak akses role' },
-  { key: 'page:logs', label: 'Log Audit Sistem', icon: 'fa-clock-rotate-left', desc: 'Rekam jejak audit keamanan' }
+  { key: 'page:dashboard', label: 'Dashboard Overview', icon: 'fa-gauge-high', desc: 'Ringkasan statistik, kuota & omzet', apiPermissions: [] },
+  { key: 'page:events', label: 'Manajemen Event & Tiket', icon: 'fa-calendar-days', desc: 'Kategori tiket, harga, kuota & benefit', apiPermissions: ['events:read', 'events:create', 'events:update', 'events:delete', 'benefits:manage', 'jerseys:manage'] },
+  { key: 'page:participants', label: 'Manajemen Peserta', icon: 'fa-users', desc: 'Pendaftar, nomor BIB & status', apiPermissions: ['participants:read', 'participants:create', 'participants:update', 'participants:delete', 'bib:manage'] },
+  { key: 'page:racepack', label: 'Pengambilan Racepack (RPC)', icon: 'fa-box-open', desc: 'Scan QR kamera HP, verifikasi E-Tiket & serah terima', apiPermissions: ['participants:read', 'participants:update', 'racepack:checkin'] },
+  { key: 'page:racepack-view', label: 'Live View Antrean Racepack', icon: 'fa-list-check', desc: 'Pantau antrean check-in racepack', apiPermissions: ['participants:read'] },
+  { key: 'page:orders', label: 'Transaksi & Keuangan', icon: 'fa-receipt', desc: 'Audit order, Midtrans & refund', apiPermissions: ['orders:read', 'orders:update', 'orders:delete', 'finance:read'] },
+  { key: 'page:notif-logs', label: 'Log Notifikasi Peserta', icon: 'fa-paper-plane', desc: 'Riwayat WA & email E-Tiket', apiPermissions: ['notifications:read', 'notifications:dispatch'] },
+  { key: 'page:whatsapp-web', label: 'WhatsApp Web Console', icon: 'fa-brands fa-whatsapp', desc: 'Chat langsung & CS peserta', apiPermissions: ['notifications:manage', 'whatsapp:chat', 'whatsapp:session'] },
+  { key: 'page:cms', label: 'Konten Website & CMS', icon: 'fa-pen-ruler', desc: 'Teks website, sponsor & banner', apiPermissions: ['cms:manage'] },
+  { key: 'page:countdown', label: 'Countdown & Status Event', icon: 'fa-stopwatch-20', desc: 'Status pendaftaran & waktu lomba', apiPermissions: ['countdown:manage'] },
+  { key: 'page:notifications', label: 'Konfigurasi Notifikasi', icon: 'fa-bell', desc: 'Gateway WA, SMTP & template', apiPermissions: ['notifications:manage'] },
+  { key: 'page:routes', label: 'Rute & Checkpoint', icon: 'fa-map-pin', desc: 'Pos medis, water station & jalur', apiPermissions: ['routes:read', 'routes:manage'] },
+  { key: 'page:bib-settings', label: 'Pengaturan BIB & E-Tiket', icon: 'fa-id-badge', desc: 'Konfigurasi BIB, QR & petunjuk', apiPermissions: ['bib:manage'] },
+  { key: 'page:admins', label: 'Kelola Admin & RBAC', icon: 'fa-shield-halved', desc: 'Akun staf & hak akses role', apiPermissions: ['admins:manage'] },
+  { key: 'page:logs', label: 'Log Audit Sistem', icon: 'fa-clock-rotate-left', desc: 'Rekam jejak audit keamanan', apiPermissions: ['logs:read'] }
 ];
 
 function switchRbacSubTab(tab) {
@@ -127,9 +129,12 @@ function switchRbacSubTab(tab) {
   const secRoles = document.getElementById('rbacSectionRoles');
   const secMatrix = document.getElementById('rbacSectionMatrix');
 
-  if (btnUsers) btnUsers.className = tab === 'users' ? 'btn btn-primary btn-sm' : 'btn btn-outline btn-sm';
-  if (btnRoles) btnRoles.className = tab === 'roles' ? 'btn btn-primary btn-sm' : 'btn btn-outline btn-sm';
-  if (btnMatrix) btnMatrix.className = tab === 'matrix' ? 'btn btn-primary btn-sm' : 'btn btn-outline btn-sm';
+  [btnUsers, btnRoles, btnMatrix].forEach((button, index) => {
+    if (button) button.setAttribute('aria-selected', String(index === ['users', 'roles', 'matrix'].indexOf(tab)));
+  });
+  if (btnUsers) btnUsers.className = `btn btn-sm rbac-subnav-button ${tab === 'users' ? 'btn-primary' : 'btn-outline'}`;
+  if (btnRoles) btnRoles.className = `btn btn-sm rbac-subnav-button ${tab === 'roles' ? 'btn-primary' : 'btn-outline'}`;
+  if (btnMatrix) btnMatrix.className = `btn btn-sm rbac-subnav-button ${tab === 'matrix' ? 'btn-primary' : 'btn-outline'}`;
 
   if (secUsers) secUsers.style.display = tab === 'users' ? 'block' : 'none';
   if (secRoles) secRoles.style.display = tab === 'roles' ? 'block' : 'none';
@@ -140,13 +145,15 @@ window.switchRbacSubTab = switchRbacSubTab;
 async function loadAdminsAndRoles() {
   try {
     const [adminsRes, rolesRes] = await Promise.all([
-      fetchAdmin('/admin/users-management').catch(() => null),
-      fetchAdmin('/admin/roles').catch(() => null)
+      fetchAdmin('/admin/users-management'),
+      fetchAdmin('/admin/roles')
     ]);
 
-    if (rolesRes && rolesRes.status === 'success') {
+    if (rolesRes?.status === 'success') {
       adminState.roles = rolesRes.data || [];
       adminState.systemModules = rolesRes.modules || SYSTEM_MODULES_FALLBACK;
+      adminState.rolePermissions = rolesRes.permissions || [];
+      adminState.dashboardWidgets = (rolesRes.dashboardWidgets || []).filter(widget => widget.key !== 'dashboard:configured');
 
       const select = document.getElementById('adminUserRoleId');
       if (select) {
@@ -157,14 +164,19 @@ async function loadAdminsAndRoles() {
 
       renderAdminRolesTable(adminState.roles);
       renderRoleDirectoryTable();
+    } else {
+      throw new Error(rolesRes?.message || 'Katalog role dan izin tidak dapat dimuat.');
     }
 
-    if (adminsRes && adminsRes.status === 'success') {
+    if (adminsRes?.status === 'success') {
       adminState.admins = adminsRes.data || [];
       renderAdminUsersTable(adminState.admins);
+    } else {
+      throw new Error(adminsRes?.message || 'Daftar akun admin tidak dapat dimuat.');
     }
   } catch (err) {
     console.error('Failed to load admins and roles:', err);
+    showAdminToast('error', 'Gagal Memuat Hak Akses', err.message);
   }
 }
 
@@ -181,18 +193,18 @@ function renderAdminUsersTable(admins) {
     const isSuper = a.role?.name === 'SUPERADMIN';
     return `
       <tr>
-        <td>${idx + 1}</td>
-        <td><strong>${escapeHtml(a.fullName)}</strong></td>
-        <td><code>@${escapeHtml(a.username)}</code></td>
-        <td>${escapeHtml(a.email)}</td>
-        <td><span class="admin-badge-role">${escapeHtml(a.role?.name || 'ADMIN')}</span></td>
-        <td>
+        <td data-label="No">${idx + 1}</td>
+        <td data-label="Nama"><strong>${escapeHtml(a.fullName)}</strong></td>
+        <td data-label="Username"><code>@${escapeHtml(a.username)}</code></td>
+        <td data-label="Email">${escapeHtml(a.email)}</td>
+        <td data-label="Role"><span class="admin-badge-role">${escapeHtml(a.role?.name || 'ADMIN')}</span></td>
+        <td data-label="Status">
           <span class="status-pill ${a.isActive ? 'success' : 'danger'}">
             ${a.isActive ? 'AKTIF' : 'NONAKTIF'}
           </span>
         </td>
-        <td><small style="color: #64748B;">${new Date(a.createdAt).toLocaleDateString('id-ID')}</small></td>
-        <td>
+        <td data-label="Dibuat"><small style="color: #64748B;">${new Date(a.createdAt).toLocaleDateString('id-ID')}</small></td>
+        <td data-label="Aksi">
           <div class="table-actions">
             <button class="btn-icon edit btn-edit-admin-user" data-id="${a.id}" title="Edit Admin">
               <i class="fa-solid fa-pen-to-square"></i>
@@ -241,7 +253,7 @@ function renderAdminRolesTable(roles) {
   if (!tbody) return;
 
   if (roles.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 20px; color: #94A3B8;">Belum ada role terdaftar.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 20px; color: #94A3B8;">Belum ada role terdaftar.</td></tr>`;
     return;
   }
 
@@ -249,6 +261,16 @@ function renderAdminRolesTable(roles) {
   (adminState.systemModules || SYSTEM_MODULES_FALLBACK).forEach(m => {
     moduleMap[m.key] = m.label;
   });
+  const widgetMap = new Map((adminState.dashboardWidgets || []).map(widget => [widget.key, widget.label]));
+  const compactBadges = (items, labelFor, limit = 3) => {
+    const visible = items.slice(0, limit).map(item =>
+      `<span class="role-page-pill">${escapeHtml(labelFor(item))}</span>`
+    ).join('');
+    const remainder = items.length > limit
+      ? `<span class="role-page-pill role-page-pill-more">+${items.length - limit}</span>`
+      : '';
+    return visible + remainder;
+  };
 
   tbody.innerHTML = roles.map((r, idx) => {
     const isSuper = r.name === 'SUPERADMIN';
@@ -263,36 +285,46 @@ function renderAdminRolesTable(roles) {
       if (pages.length === 0) {
         pageBadgesHtml = `<span style="color: #94A3B8; font-size: 0.75rem;">(Belum ada halaman diizinkan)</span>`;
       } else {
-        pageBadgesHtml = pages.map(p => {
-          const label = moduleMap[p] || p.replace('page:', '');
-          return `<span class="role-page-pill">${escapeHtml(label)}</span>`;
-        }).join('');
+        pageBadgesHtml = compactBadges(pages, page => moduleMap[page] || page.replace('page:', ''));
       }
     }
 
+    const widgetKeys = perms.filter(permission => permission.startsWith('dashboard:') && permission !== 'dashboard:configured');
+    const widgetsHtml = !isSuper && !perms.includes('page:dashboard')
+      ? `<span class="role-table-muted">Dashboard tidak diizinkan</span>`
+      : perms.includes('dashboard:configured')
+      ? (widgetKeys.length
+        ? compactBadges(widgetKeys, key => widgetMap.get(key) || key)
+        : `<span class="role-table-muted">Tidak ada widget</span>`)
+      : `<span class="role-table-muted">Default semua widget</span>`;
     const adminCount = r._count?.admins || 0;
     const isStandardRole = DEFAULT_ROLE_DIRECTORY.some(d => d.name === r.name);
 
     return `
       <tr>
-        <td>${idx + 1}</td>
-        <td>
+        <td data-label="No">${idx + 1}</td>
+        <td data-label="Role">
           <span class="admin-badge-role" style="font-weight: 800; font-size: 0.8rem;">${escapeHtml(r.name)}</span>
         </td>
-        <td style="max-width: 280px; font-size: 0.82rem; color: #475569;">
+        <td data-label="Deskripsi" style="max-width: 280px; font-size: 0.82rem; color: #475569;">
           ${escapeHtml(r.description || '-')}
         </td>
-        <td style="max-width: 320px;">
+        <td data-label="Halaman" style="max-width: 320px;">
           <div style="display: flex; flex-wrap: wrap; gap: 4px;">
             ${pageBadgesHtml}
           </div>
         </td>
-        <td style="text-align: center;">
+        <td data-label="Widget dashboard" style="max-width: 280px;">
+          <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+            ${widgetsHtml}
+          </div>
+        </td>
+        <td data-label="Petugas" style="text-align: center;">
           <span class="badge" style="background: #F8FAFC; color: #0F172A; border: 1px solid #E2E8F0; font-weight: 700; padding: 4px 10px;">
             <i class="fa-solid fa-user"></i> ${adminCount}
           </span>
         </td>
-        <td>
+        <td data-label="Aksi">
           <div class="table-actions">
             <button class="btn btn-outline btn-sm btn-edit-role" data-id="${r.id}" title="Atur Hak Akses Halaman">
               <i class="fa-solid fa-sliders"></i> Atur Akses
@@ -344,24 +376,24 @@ function renderRoleDirectoryTable() {
     const pagesPills = item.pages.map(p => `<span class="role-page-pill">${escapeHtml(p)}</span>`).join('');
     return `
       <tr>
-        <td>
+        <td data-label="Role">
           <div style="display: flex; flex-direction: column; gap: 4px;">
             <span class="admin-badge-role" style="width: fit-content; font-size: 0.8rem; font-weight: 800;">${item.name}</span>
             <small style="color: #64748B; font-size: 0.72rem;">Divisi #${idx + 1}</small>
           </div>
         </td>
-        <td style="font-size: 0.85rem; color: #334155; line-height: 1.5;">
+        <td data-label="Tanggung jawab" style="font-size: 0.85rem; color: #334155; line-height: 1.5;">
           <strong>${escapeHtml(item.desc)}</strong>
           <div style="font-size: 0.76rem; color: #64748B; margin-top: 4px;">
             <i class="fa-solid fa-circle-info" style="color: var(--color-primary);"></i> ${escapeHtml(item.reason)}
           </div>
         </td>
-        <td>
+        <td data-label="Cakupan umum">
           <div style="display: flex; flex-wrap: wrap; gap: 4px;">
             ${pagesPills}
           </div>
         </td>
-        <td>
+        <td data-label="Otoritas">
           <span style="display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; background: ${item.authorityColor}15; color: ${item.authorityColor}; border: 1px solid ${item.authorityColor}40;">
             ${escapeHtml(item.authority)}
           </span>
@@ -375,7 +407,8 @@ function renderRoleModuleCheckboxes(selectedPages = [], isSuperadmin = false) {
   const container = document.getElementById('roleModulesContainer');
   if (!container) return;
 
-  const modules = adminState.systemModules || SYSTEM_MODULES_FALLBACK;
+  const modules = (adminState.systemModules || SYSTEM_MODULES_FALLBACK)
+    .filter(module => isSuperadmin || module.key !== 'page:admins');
 
   container.innerHTML = modules.map(m => {
     const isChecked = isSuperadmin || selectedPages.includes(m.key);
@@ -400,6 +433,40 @@ function renderRoleModuleCheckboxes(selectedPages = [], isSuperadmin = false) {
   }).join('');
 }
 
+function renderRoleApiPermissions(selectedPermissions = [], isSuperadmin = false) {
+  const container = document.getElementById('roleApiPermissionsContainer');
+  if (!container) return;
+  const permissions = (adminState.rolePermissions || []).filter(item =>
+    item.key !== '*' && item.key !== 'admins:manage' && !item.key.startsWith('page:') && !item.key.startsWith('dashboard:')
+  );
+  container.innerHTML = permissions.map(item => {
+    const checked = selectedPermissions.includes(item.key);
+    return `
+      <label class="role-permission-option ${checked ? 'checked' : ''}">
+        <input type="checkbox" name="role_api" value="${item.key}" ${checked ? 'checked' : ''} ${isSuperadmin ? 'disabled' : ''} onchange="toggleRolePermissionStyle(this)">
+        <span>${escapeHtml(item.label)}</span>
+      </label>
+    `;
+  }).join('');
+}
+
+function renderRoleDashboardWidgets(selectedWidgets = [], isConfigured = false) {
+  const container = document.getElementById('roleDashboardWidgetsContainer');
+  if (!container) return;
+  container.innerHTML = (adminState.dashboardWidgets || []).map(widget => {
+    const checked = isConfigured ? selectedWidgets.includes(widget.key) : true;
+    return `
+      <label class="role-widget-card ${checked ? 'checked' : ''}">
+        <input type="checkbox" name="role_widget" value="${widget.key}" ${checked ? 'checked' : ''} onchange="toggleRoleOptionStyle(this)">
+        <span class="role-widget-card-copy">
+          <strong>${escapeHtml(widget.label)}</strong>
+          <small>${escapeHtml(widget.desc || '')}</small>
+        </span>
+      </label>
+    `;
+  }).join('');
+}
+
 window.toggleModuleCardStyle = function(cb) {
   const card = cb.closest('.role-module-card');
   if (card) {
@@ -409,6 +476,28 @@ window.toggleModuleCardStyle = function(cb) {
       card.classList.remove('checked');
     }
   }
+  const module = (adminState.systemModules || SYSTEM_MODULES_FALLBACK).find(item => item.key === cb.value);
+  if (module) {
+    (module.apiPermissions || []).forEach(permission => {
+      const apiCheckbox = document.querySelector(`input[name="role_api"][value="${permission}"]`);
+      const selectedByAnotherPage = Array.from(document.querySelectorAll('input[name="role_page"]:checked'))
+        .some(pageCheckbox => pageCheckbox !== cb && (adminState.systemModules || SYSTEM_MODULES_FALLBACK)
+          .find(item => item.key === pageCheckbox.value)?.apiPermissions?.includes(permission));
+      const shouldCheck = cb.checked || selectedByAnotherPage;
+      if (apiCheckbox && !apiCheckbox.disabled && (cb.checked || !selectedByAnotherPage)) {
+        apiCheckbox.checked = shouldCheck;
+        apiCheckbox.closest('.role-permission-option')?.classList.toggle('checked', shouldCheck);
+      }
+    });
+  }
+};
+
+window.toggleRoleOptionStyle = function(cb) {
+  cb.closest('.role-widget-card')?.classList.toggle('checked', cb.checked);
+};
+
+window.toggleRolePermissionStyle = function(cb) {
+  cb.closest('.role-permission-option')?.classList.toggle('checked', cb.checked);
 };
 
 function openCreateRoleModal() {
@@ -420,6 +509,8 @@ function openCreateRoleModal() {
   document.getElementById('roleFormDesc').value = '';
 
   renderRoleModuleCheckboxes(['page:dashboard'], false);
+  renderRoleApiPermissions([], false);
+  renderRoleDashboardWidgets((adminState.dashboardWidgets || []).map(widget => widget.key), true);
   document.getElementById('modalRoleBackdrop')?.classList.add('open');
 }
 
@@ -436,13 +527,20 @@ function openEditRoleModal(role) {
 
   const perms = Array.isArray(role.permissions) ? role.permissions : [];
   let activePages = [];
-  if (perms.includes('*')) {
+  if (isSuper) {
     activePages = (adminState.systemModules || SYSTEM_MODULES_FALLBACK).map(m => m.key);
   } else {
     activePages = perms.filter(p => p.startsWith('page:'));
   }
 
   renderRoleModuleCheckboxes(activePages, isSuper);
+  renderRoleApiPermissions(isSuper ? [] : perms.filter(permission =>
+    !permission.startsWith('page:') && !permission.startsWith('dashboard:') && permission !== '*'
+  ), isSuper);
+  renderRoleDashboardWidgets(
+    perms.filter(permission => permission.startsWith('dashboard:') && permission !== 'dashboard:configured'),
+    perms.includes('dashboard:configured')
+  );
   document.getElementById('modalRoleBackdrop')?.classList.add('open');
 }
 
@@ -456,7 +554,8 @@ async function handleRoleSubmit(e) {
   let permissions = [];
 
   if (isSuper) {
-    permissions = ['*'];
+    const selectedWidgets = Array.from(document.querySelectorAll('input[name="role_widget"]:checked')).map(cb => cb.value);
+    permissions = ['*', 'dashboard:configured', ...selectedWidgets];
   } else {
     const checkedBoxes = Array.from(document.querySelectorAll('input[name="role_page"]:checked'));
     const selectedPages = checkedBoxes.map(cb => cb.value);
@@ -466,22 +565,12 @@ async function handleRoleSubmit(e) {
       return;
     }
 
-    // Selalu pastikan Dashboard dapat diakses
-    if (!selectedPages.includes('page:dashboard')) {
-      selectedPages.unshift('page:dashboard');
+    const apiPermissions = Array.from(document.querySelectorAll('input[name="role_api"]:checked')).map(cb => cb.value);
+    const selectedWidgets = Array.from(document.querySelectorAll('input[name="role_widget"]:checked')).map(cb => cb.value);
+    permissions = [...selectedPages, ...apiPermissions];
+    if (selectedPages.includes('page:dashboard')) {
+      permissions.push('dashboard:configured', ...selectedWidgets);
     }
-
-    // Gabungkan page keys dengan API permissions terkait
-    const modules = adminState.systemModules || SYSTEM_MODULES_FALLBACK;
-    const apiPerms = new Set();
-    selectedPages.forEach(p => {
-      const mod = modules.find(m => m.key === p);
-      if (mod && Array.isArray(mod.apiPermissions)) {
-        mod.apiPermissions.forEach(ap => apiPerms.add(ap));
-      }
-    });
-
-    permissions = [...selectedPages, ...Array.from(apiPerms)];
   }
 
   const payload = { name, description, permissions };

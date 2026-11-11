@@ -1,7 +1,7 @@
 <div class="admin-tab-pane active" id="pane-dashboard">
           <!-- Top KPI Grid: Pemisahan Jelas Total Biaya Layanan & Hasil Akhir Murni Bersih -->
           <div class="admin-kpi-grid">
-            <div class="kpi-card">
+            <div class="kpi-card" data-dashboard-widget="dashboard:participants">
               <div class="kpi-icon orange"><i class="fa-solid fa-users"></i></div>
               <div class="kpi-details">
                 <span class="kpi-label">Peserta Terdaftar</span>
@@ -10,7 +10,7 @@
               </div>
             </div>
 
-            <div class="kpi-card">
+            <div class="kpi-card" data-dashboard-widget="dashboard:revenue">
               <div class="kpi-icon blue"><i class="fa-solid fa-receipt"></i></div>
               <div class="kpi-details">
                 <span class="kpi-label">Total Omzet Kotor</span>
@@ -19,7 +19,7 @@
               </div>
             </div>
 
-            <div class="kpi-card" style="border: 2px solid #FCD34D; background: #FFFBEB;">
+            <div class="kpi-card" data-dashboard-widget="dashboard:service-fee" style="border: 2px solid #FCD34D; background: #FFFBEB;">
               <div class="kpi-icon purple" style="background: #F59E0B; color: #FFFFFF;"><i class="fa-solid fa-hand-holding-dollar"></i></div>
               <div class="kpi-details">
                 <span class="kpi-label" style="color: #92400E; font-weight: 700;">TOTAL BIAYA LAYANAN</span>
@@ -28,7 +28,7 @@
               </div>
             </div>
 
-            <div class="kpi-card" style="border: 2px solid #86EFAC; background: #F0FDF4;">
+            <div class="kpi-card" data-dashboard-widget="dashboard:net-revenue" style="border: 2px solid #86EFAC; background: #F0FDF4;">
               <div class="kpi-icon green" style="background: #22C55E; color: #FFFFFF;"><i class="fa-solid fa-vault"></i></div>
               <div class="kpi-details">
                 <span class="kpi-label" style="color: #166534; font-weight: 700;">HASIL AKHIR MURNI (BERSIH)</span>
@@ -38,8 +38,13 @@
             </div>
           </div>
 
+          <div class="dashboard-stats-error" id="dashboardStatsError" role="alert" hidden>
+            <span>Statistik dashboard gagal dimuat.</span>
+            <button type="button" class="btn btn-outline btn-sm" id="btnRetryDashboardStats">Coba lagi</button>
+          </div>
+
           <!-- SECTION: REKONSILIASI KEUANGAN & RINCIAN TRANSAKSI (HANYA LUNAS, PENDING, BATAL, BIAYA LAYANAN) -->
-          <div class="admin-section" style="margin-top: 20px; border: 1px solid #E2E8F0; background: #FFFFFF; border-radius: var(--radius-xl);">
+          <div class="admin-section" data-dashboard-widget="dashboard:finance-breakdown" style="margin-top: 20px; border: 1px solid #E2E8F0; background: #FFFFFF; border-radius: var(--radius-xl);">
             <div class="admin-section-header" style="flex-wrap: wrap; gap: 12px;">
               <div>
                 <h3 style="display: flex; align-items: center; gap: 8px;">
@@ -48,7 +53,7 @@
                 </h3>
                 <p>Data keuangan terpisah rapi: Lunas, Menunggu Pembayaran, Dibatalkan, dan Akumulasi Biaya Layanan.</p>
               </div>
-              <button type="button" class="btn btn-outline btn-sm btn-glow" id="btnSyncMidtransDashboard" title="Cek &amp; perbarui seluruh status transaksi dari server Midtrans">
+              <button type="button" class="btn btn-outline btn-sm btn-glow" id="btnSyncMidtransDashboard" data-permission="finance:read" title="Cek &amp; perbarui seluruh status transaksi dari server Midtrans">
                 <i class="fa-solid fa-arrows-rotate"></i> Sinkronkan Status Midtrans
               </button>
             </div>
@@ -120,8 +125,146 @@
             </div>
           </div>
 
+          <div class="dashboard-insights-grid" data-dashboard-columns="3">
+            <section class="admin-section dashboard-insight-card" data-dashboard-widget="dashboard:registration-trend" data-dashboard-permission="participants:read">
+              <div class="admin-section-header">
+                <div>
+                  <h3><i class="fa-solid fa-chart-line"></i> Tren Pendaftaran</h3>
+                  <p>Pergerakan pendaftaran aktif selama 30 hari terakhir.</p>
+                </div>
+              </div>
+              <div id="dashboardRegistrationTrend" class="dashboard-line-chart" aria-label="Grafik tren pendaftaran"></div>
+            </section>
+
+            <section class="admin-section dashboard-insight-card" data-dashboard-widget="dashboard:revenue-trend" data-dashboard-permission-any="finance:read,orders:read">
+              <div class="admin-section-header">
+                <div>
+                  <h3><i class="fa-solid fa-chart-area"></i> Tren Pemasukan</h3>
+                  <p>Nilai transaksi lunas berdasarkan tanggal order dibuat, selama 30 hari terakhir.</p>
+                </div>
+              </div>
+              <div id="dashboardRevenueTrend" class="dashboard-line-chart" aria-label="Grafik tren pemasukan"></div>
+            </section>
+            <section class="admin-section dashboard-insight-card" data-dashboard-widget="dashboard:payment-status" data-dashboard-permission="orders:read">
+              <div class="admin-section-header">
+                <div>
+                  <h3><i class="fa-solid fa-chart-pie"></i> Status Pembayaran</h3>
+                  <p>Jumlah transaksi menurut status terakhir.</p>
+                </div>
+              </div>
+              <div id="dashboardPaymentStatuses" class="dashboard-status-chart" aria-label="Grafik status pembayaran"></div>
+            </section>
+
+            <section class="admin-section dashboard-insight-card" data-dashboard-widget="dashboard:conversion" data-dashboard-permission="orders:read">
+              <div class="admin-section-header">
+                <div>
+                  <h3><i class="fa-solid fa-arrow-trend-up"></i> Konversi &amp; Nilai Transaksi</h3>
+                  <p>Efektivitas transaksi dan rata-rata nilai pembayaran sukses.</p>
+                </div>
+              </div>
+              <div id="dashboardConversionSummary" class="dashboard-summary-grid"></div>
+            </section>
+
+            <section class="admin-section dashboard-insight-card" data-dashboard-widget="dashboard:racepack-checkin" data-dashboard-permission="participants:read">
+              <div class="admin-section-header">
+                <div>
+                  <h3><i class="fa-solid fa-box-open"></i> Check-in Racepack</h3>
+                  <p>Status pengambilan racepack untuk peserta yang sudah lunas.</p>
+                </div>
+              </div>
+              <div id="dashboardRacepackSummary" class="dashboard-racepack-summary"></div>
+            </section>
+            <section class="admin-section dashboard-insight-card dashboard-insight-card--full-row" data-dashboard-widget="dashboard:team-presence">
+              <div class="admin-section-header">
+                <div>
+                  <h3><i class="fa-solid fa-people-group"></i> Kru &amp; Kehadiran Online</h3>
+                  <p id="dashboardTeamScope">Anggota role dan status koneksi saat ini.</p>
+                </div>
+              </div>
+              <div id="dashboardTeamPresence" class="dashboard-team-list"></div>
+            </section>
+
+            <section class="admin-section dashboard-insight-card" data-dashboard-widget="dashboard:participant-profile" data-dashboard-permission="participants:read">
+              <div class="admin-section-header">
+                <div>
+                  <h3><i class="fa-solid fa-user-group"></i> Profil Peserta Aktif</h3>
+                  <p>Komposisi peserta menurut gender dan kelompok usia.</p>
+                </div>
+              </div>
+              <div class="dashboard-profile-grid">
+                <div>
+                  <h4>Gender</h4>
+                  <div id="dashboardParticipantGender" class="dashboard-donut-chart"></div>
+                </div>
+                <div>
+                  <h4>Kelompok Usia</h4>
+                  <div id="dashboardParticipantAge" class="dashboard-bar-chart"></div>
+                </div>
+              </div>
+            </section>
+
+            <section class="admin-section dashboard-insight-card" data-dashboard-widget="dashboard:jersey-sizes" data-dashboard-permission="participants:read">
+              <div class="admin-section-header">
+                <div>
+                  <h3><i class="fa-solid fa-shirt"></i> Kebutuhan Ukuran Jersey</h3>
+                  <p>Distribusi ukuran jersey dari pendaftar aktif untuk membantu perencanaan stok.</p>
+                </div>
+              </div>
+              <div id="dashboardJerseySizes" class="dashboard-bar-chart"></div>
+            </section>
+            <section class="admin-section dashboard-insight-card" data-dashboard-widget="dashboard:category-performance" data-dashboard-permission="events:read">
+              <div class="admin-section-header">
+                <div>
+                  <h3><i class="fa-solid fa-chart-column"></i> Performa Kategori Event</h3>
+                  <p>Perbandingan pendaftar aktif dengan kapasitas tiap kategori.</p>
+                </div>
+              </div>
+              <div id="dashboardCategoryPerformance" class="dashboard-category-chart"></div>
+            </section>
+
+            <section class="admin-section dashboard-insight-card" data-dashboard-widget="dashboard:event-performance" data-dashboard-permission="events:read">
+              <div class="admin-section-header">
+                <div>
+                  <h3><i class="fa-solid fa-ticket"></i> Performa Event &amp; Kuota</h3>
+                  <p>Pendaftar aktif, kapasitas, dan sisa kuota tiap kategori.</p>
+                </div>
+              </div>
+              <div class="dashboard-table-wrap">
+                <table class="dashboard-data-table">
+                  <thead><tr><th>Event / Kategori</th><th>Pendaftar</th><th>Sisa Kuota</th><th>Terisi</th><th>Status</th></tr></thead>
+                  <tbody id="dashboardEventPerformance"></tbody>
+                </table>
+              </div>
+            </section>
+
+            <section class="admin-section dashboard-insight-card" data-dashboard-widget="dashboard:recent-orders" data-dashboard-permission="orders:read">
+              <div class="admin-section-header">
+                <div>
+                  <h3><i class="fa-solid fa-receipt"></i> Transaksi Terbaru</h3>
+                  <p>Delapan transaksi terakhir tanpa menampilkan data pribadi peserta.</p>
+                </div>
+              </div>
+              <div class="dashboard-table-wrap">
+                <table class="dashboard-data-table">
+                  <thead><tr><th>Referensi</th><th>Status</th><th>Peserta</th><th>Total</th></tr></thead>
+                  <tbody id="dashboardRecentOrders"></tbody>
+                </table>
+              </div>
+            </section>
+
+            <section class="admin-section dashboard-insight-card" data-dashboard-widget="dashboard:recent-activity" data-dashboard-permission="logs:read">
+              <div class="admin-section-header">
+                <div>
+                  <h3><i class="fa-solid fa-clock-rotate-left"></i> Aktivitas Terbaru</h3>
+                  <p>Aktivitas sistem terbaru.</p>
+                </div>
+              </div>
+              <ul id="dashboardRecentActivity" class="dashboard-activity-list"></ul>
+            </section>
+          </div>
+
           <!-- Quick Overview Section -->
-          <div class="admin-section">
+          <div class="admin-section" data-dashboard-widget="dashboard:quicklinks">
             <div class="admin-section-header">
               <div>
                 <h3><i class="fa-solid fa-bolt" style="color: var(--color-primary);"></i> Pintasan Cepat & Ringkasan Operasional</h3>
@@ -130,7 +273,7 @@
             </div>
 
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px;">
-              <div class="kpi-card" style="cursor: pointer;" onclick="switchAdminTab('events')">
+              <div class="kpi-card" data-dashboard-link="page:events" style="cursor: pointer;" onclick="switchAdminTab('events')">
                 <div class="kpi-icon orange"><i class="fa-solid fa-calendar-days"></i></div>
                 <div>
                   <h4 style="font-size: 0.95rem; margin: 0 0 4px 0;">Kelola Event & Tiket</h4>
@@ -138,7 +281,7 @@
                 </div>
               </div>
 
-              <div class="kpi-card" style="cursor: pointer;" onclick="switchAdminTab('participants')">
+              <div class="kpi-card" data-dashboard-link="page:participants" style="cursor: pointer;" onclick="switchAdminTab('participants')">
                 <div class="kpi-icon blue"><i class="fa-solid fa-users"></i></div>
                 <div>
                   <h4 style="font-size: 0.95rem; margin: 0 0 4px 0;">Database Peserta</h4>
@@ -146,7 +289,7 @@
                 </div>
               </div>
 
-              <div class="kpi-card" style="cursor: pointer;" onclick="switchAdminTab('orders')">
+              <div class="kpi-card" data-dashboard-link="page:orders" style="cursor: pointer;" onclick="switchAdminTab('orders')">
                 <div class="kpi-icon green"><i class="fa-solid fa-receipt"></i></div>
                 <div>
                   <h4 style="font-size: 0.95rem; margin: 0 0 4px 0;">Transaksi & Pembayaran</h4>
@@ -154,7 +297,7 @@
                 </div>
               </div>
 
-              <div class="kpi-card" style="cursor: pointer;" onclick="switchAdminTab('countdown')">
+              <div class="kpi-card" data-dashboard-link="page:countdown" style="cursor: pointer;" onclick="switchAdminTab('countdown')">
                 <div class="kpi-icon purple"><i class="fa-solid fa-stopwatch-20"></i></div>
                 <div>
                   <h4 style="font-size: 0.95rem; margin: 0 0 4px 0;">Target Countdown Event</h4>

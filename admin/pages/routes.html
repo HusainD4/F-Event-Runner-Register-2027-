@@ -1,33 +1,98 @@
 <div class="admin-tab-pane" id="pane-routes">
-          <div class="admin-section">
-            <div class="admin-section-header">
-              <div>
-                <h3><i class="fa-solid fa-map-pin" style="color: var(--color-primary);"></i> Manajemen Rute &amp; Checkpoint</h3>
-                <p>Kelola titik-titik checkpoint, water station, dan pos medis pada rute lari.</p>
-              </div>
-              <button class="btn btn-primary btn-sm btn-glow" id="btnOpenCreateRouteModal" data-permission="events:update">
-                <i class="fa-solid fa-plus"></i> Tambah Checkpoint
-              </button>
-            </div>
-
-            <div class="table-responsive">
-              <table class="admin-table">
-                <thead>
-                  <tr>
-                    <th style="width:50px;">No</th>
-                    <th>Nama Checkpoint</th>
-                    <th>Jarak (Km)</th>
-                    <th>Kategori</th>
-                    <th>Water Station</th>
-                    <th>Pos Medis</th>
-                    <th>Deskripsi</th>
-                    <th style="width:120px; text-align:center;">Aksi</th>
-                  </tr>
-                </thead>
-                <tbody id="routePointsTableBody">
-                  <tr><td colspan="8" style="text-align:center;padding:30px;color:var(--color-text-muted);">Memuat data checkpoint...</td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
+  <div class="admin-section route-settings-section">
+    <div class="admin-section-header route-section-heading">
+      <div>
+        <span class="route-section-kicker">KONFIGURASI</span>
+        <h3><i class="fa-solid fa-map-location-dot" aria-hidden="true"></i> Pengaturan rute</h3>
+        <p>Atur informasi, peta, dan cara menampilkan checkpoint pada website.</p>
+      </div>
+    </div>
+    <form id="routeSettingsForm">
+      <div class="route-settings-fields">
+        <div class="form-group">
+          <label class="form-label" for="routeSettingsBadgeLabel">Label kecil di atas judul</label>
+          <input class="form-input" id="routeSettingsBadgeLabel" maxlength="80" placeholder="Jalur Lari Steril">
         </div>
+        <div class="form-group">
+          <label class="form-label" for="routeSettingsTitle">Judul section rute</label>
+          <input class="form-input" id="routeSettingsTitle" maxlength="160" placeholder="Rute Lari Resmi & Titik Kumpul">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="routeSettingsGpx">Link unduh GPX (opsional)</label>
+          <input class="form-input" id="routeSettingsGpx" placeholder="https://... atau /assets/rute.gpx">
+        </div>
+        <div class="form-group route-field-wide">
+          <label class="form-label" for="routeSettingsDescription">Deskripsi rute</label>
+          <textarea class="form-input" id="routeSettingsDescription" rows="2" maxlength="1000" placeholder="Ringkasan rute dan informasi penting untuk peserta"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="routeMapMode">Peta utama</label>
+          <select class="form-input" id="routeMapMode">
+            <option value="GMAPS">Link / embed Google Maps</option>
+            <option value="IMAGE">Gambar peta melalui link</option>
+          </select>
+        </div>
+        <div class="form-group route-map-source" id="routeMapUrlField">
+          <label class="form-label" for="routeSettingsGmaps">Link / embed Google Maps</label>
+          <textarea class="form-input" id="routeSettingsGmaps" rows="2" placeholder="https://www.google.com/maps/embed?..."></textarea>
+          <small class="form-hint">Tempel link Google Maps atau kode iframe embed.</small>
+        </div>
+        <div class="form-group route-map-source" id="routeMapImageField" hidden>
+          <label class="form-label" for="routeSettingsMapImage">Link gambar peta</label>
+          <input class="form-input" id="routeSettingsMapImage" type="url" maxlength="2048" placeholder="https://.../peta-rute.jpg">
+          <div class="route-admin-image-preview" id="routeMapImagePreview" hidden><img alt="Pratinjau gambar peta rute"></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="routeCheckpointMode">Tampilan checkpoint</label>
+          <select class="form-input" id="routeCheckpointMode">
+            <option value="MANUAL">Checkpoint manual dari daftar</option>
+            <option value="IMAGE">Gambar rute/checkpoint ukuran A4</option>
+          </select>
+          <small class="form-hint">Pilih daftar titik atau satu gambar A4.</small>
+        </div>
+        <div class="form-group route-map-source" id="routeCheckpointImageField" hidden>
+          <label class="form-label" for="routeSettingsCheckpointImage">Link gambar rute A4</label>
+          <input class="form-input" id="routeSettingsCheckpointImage" type="url" maxlength="2048" placeholder="https://.../rute-a4.jpg">
+          <div class="route-admin-image-preview route-admin-a4-preview" id="routeCheckpointImagePreview" hidden><img alt="Pratinjau gambar checkpoint ukuran A4"></div>
+        </div>
+      </div>
+      <div class="route-settings-actions">
+        <span><i class="fa-solid fa-circle-info" aria-hidden="true"></i> Perubahan akan diterapkan ke halaman utama setelah disimpan.</span>
+        <button type="submit" class="btn btn-primary btn-sm btn-glow" id="btnSaveRouteSettings" data-permission="routes:manage"><i class="fa-solid fa-floppy-disk"></i> Simpan Pengaturan Rute</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="admin-section route-checkpoints-section">
+    <div class="admin-section-header route-section-heading">
+      <div>
+        <span class="route-section-kicker">TITIK RUTE</span>
+        <h3><i class="fa-solid fa-map-pin" aria-hidden="true"></i> Manajemen checkpoint</h3>
+        <p>Kelola titik rute, water station, dan pos medis.</p>
+      </div>
+      <button class="btn btn-primary btn-sm route-manual-only" id="btnOpenCreateRouteModal" data-permission="routes:manage">
+        <i class="fa-solid fa-plus" aria-hidden="true"></i> Tambah titik
+      </button>
+    </div>
+
+    <div class="table-responsive route-manual-only" id="routeManualCheckpointsPanel">
+      <table class="admin-table route-checkpoints-table">
+        <thead>
+          <tr>
+            <th style="width:50px;">No</th>
+            <th>Nama Checkpoint</th>
+            <th>Jarak (Km)</th>
+            <th>Kategori</th>
+            <th>Water Station</th>
+            <th>Pos Medis</th>
+            <th>Deskripsi</th>
+            <th style="width:120px; text-align:center;">Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="routePointsTableBody">
+          <tr><td colspan="8" class="route-table-message"><i class="fa-solid fa-circle-notch fa-spin" aria-hidden="true"></i> Memuat checkpoint...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

@@ -1,6 +1,7 @@
 import { adminState } from '../core/state.js';
 import { fetchAdmin } from '../core/api.js';
 import { showAdminToast, showConfirmDialog, escapeHtml } from '../core/utils.js';
+import { applyRbacUi } from '../core/rbac.js';
 
 // =============================================================================
 // LOG PENGIRIMAN NOTIFIKASI & STATUS PESERTA (BARU)
@@ -143,7 +144,7 @@ function renderNotifLogsTable(items) {
         <td style="font-size: 0.78rem;">${sentTime}</td>
         <td style="text-align: center;">
           <div style="display: flex; gap: 6px; justify-content: center;">
-            <button class="btn btn-sm ${it.whatsappSent ? 'btn-secondary' : 'btn-primary'} btn-dispatch-single" data-id="${it.orderId}" data-name="${escapeHtml(it.customerName)}" title="Kirim Notifikasi via WhatsApp & Email">
+            <button class="btn btn-sm ${it.whatsappSent ? 'btn-secondary' : 'btn-primary'} btn-dispatch-single" data-id="${it.orderId}" data-name="${escapeHtml(it.customerName)}" data-permission="notifications:dispatch" title="Kirim Notifikasi via WhatsApp & Email">
               <i class="fa-solid fa-paper-plane"></i> ${it.whatsappSent ? 'Kirim Ulang' : 'Kirim'}
             </button>
             <a href="/e-ticket.html?orderId=${it.orderId}" target="_blank" class="btn btn-secondary btn-sm" title="Lihat E-Tiket Digital PDF">
@@ -163,6 +164,7 @@ function renderNotifLogsTable(items) {
       handleDispatchSingle(orderId, name, btn);
     });
   });
+  applyRbacUi(adminState.profile);
 }
 
 async function handleDispatchSingle(orderId, name, btnEl) {

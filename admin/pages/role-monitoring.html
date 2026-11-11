@@ -1,0 +1,32 @@
+<div class="admin-tab-pane" id="pane-role-monitoring" data-role="SUPERADMIN">
+  <section class="admin-section role-monitoring-section">
+    <div class="admin-section-header role-monitoring-header">
+      <div>
+        <h3><i class="fa-solid fa-user-shield"></i> Pemantauan Semua Role</h3>
+        <p>Pantau sesi admin secara realtime dan kelola akses per akun. Role SUPERADMIN selalu dilindungi.</p>
+      </div>
+      <button type="button" class="btn btn-outline btn-sm" id="btnRefreshRoleMonitoring">
+        <i class="fa-solid fa-arrows-rotate"></i><span>Muat Ulang</span>
+      </button>
+    </div>
+
+    <div class="role-monitoring-summary" id="roleMonitoringSummary" aria-live="polite">
+      <div class="role-monitoring-stat">
+        <span class="role-monitoring-stat-icon"><i class="fa-solid fa-layer-group"></i></span>
+        <span class="role-monitoring-stat-copy"><span>Role Terpantau</span><strong id="monitoringRoleCount">-</strong></span>
+      </div>
+      <div class="role-monitoring-stat">
+        <span class="role-monitoring-stat-icon is-blue"><i class="fa-solid fa-user-check"></i></span>
+        <span class="role-monitoring-stat-copy"><span>Akun Aktif</span><strong id="monitoringActiveCount">-</strong></span>
+      </div>
+      <div class="role-monitoring-stat">
+        <span class="role-monitoring-stat-icon is-green"><i class="fa-solid fa-signal"></i></span>
+        <span class="role-monitoring-stat-copy"><span>Sesi Online</span><strong id="monitoringOnlineCount">-</strong></span>
+      </div>
+    </div>
+
+    <div class="role-monitoring-list" id="roleMonitoringList" aria-live="polite">
+      <p class="role-monitoring-empty">Memuat data pemantauan role...</p>
+    </div>
+  </section>
+</div>

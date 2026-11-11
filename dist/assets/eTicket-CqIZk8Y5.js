@@ -1,4 +1,4 @@
-import{a as S}from"./api-KOLSX-Q2.js";function a(e){return e?String(e).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"):""}function A(e){return!e||e.length<8?e||"-":e.substring(0,6)+"******"+e.substring(e.length-4)}function C(e){if(!e)return"Minggu, 28 Feb 2027";try{return new Date(e).toLocaleDateString("id-ID",{weekday:"long",day:"numeric",month:"short",year:"numeric"})}catch{return"Minggu, 28 Feb 2027"}}async function M(){const e=document.getElementById("ticketMount"),u=document.querySelector(".instructions-box");if(!e)return;const c=new URLSearchParams(window.location.search),p=c.get("orderId")||c.get("id")||c.get("midtransOrderId")||c.get("code")||c.get("q"),f=p?p.trim():"";if(!f){e.innerHTML=`
+import{a as S}from"./api-BxOmbn0x.js";import{l as A}from"./branding-DAcsUDF1.js";A();function a(e){return e?String(e).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"):""}function C(e){return!e||e.length<8?e||"-":e.substring(0,6)+"******"+e.substring(e.length-4)}function M(e){if(!e)return"Minggu, 28 Feb 2027";try{return new Date(e).toLocaleDateString("id-ID",{weekday:"long",day:"numeric",month:"short",year:"numeric"})}catch{return"Minggu, 28 Feb 2027"}}async function B(){const e=document.getElementById("ticketMount"),u=document.querySelector(".instructions-box");if(!e)return;const c=new URLSearchParams(window.location.search),p=c.get("orderId")||c.get("id")||c.get("midtransOrderId")||c.get("code")||c.get("q"),f=p?p.trim():"";if(!f){e.innerHTML=`
       <div class="e-ticket-card" style="padding: 48px 24px; text-align: center;">
         <i class="fa-solid fa-triangle-exclamation" style="font-size: 3rem; color: #EF4444; margin-bottom: 16px;"></i>
         <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 8px;">ID Pesanan Tidak Ditemukan</h3>
@@ -128,7 +128,7 @@ import{a as S}from"./api-KOLSX-Q2.js";function a(e){return e?String(e).replace(/
 
                 <div class="detail-item">
                   <div class="detail-label"><i class="fa-solid fa-id-card"></i> Nomor Identitas (NIK)</div>
-                  <div class="detail-val" style="font-family: ui-monospace, monospace;">${a(A(i.nik))}</div>
+                  <div class="detail-val" style="font-family: ui-monospace, monospace;">${a(C(i.nik))}</div>
                 </div>
 
                 <div class="detail-item">
@@ -150,7 +150,7 @@ import{a as S}from"./api-KOLSX-Q2.js";function a(e){return e?String(e).replace(/
 
                 <div class="detail-item">
                   <div class="detail-label"><i class="fa-solid fa-location-dot"></i> Lokasi &amp; Tanggal</div>
-                  <div class="detail-val">Alun-Alun Tegal &bull; ${C((T=i.event)==null?void 0:T.eventDate)}</div>
+                  <div class="detail-val">Alun-Alun Tegal &bull; ${M((T=i.event)==null?void 0:T.eventDate)}</div>
                 </div>
               </div>
 
@@ -222,4 +222,4 @@ import{a as S}from"./api-KOLSX-Q2.js";function a(e){return e?String(e).replace(/
           <i class="fa-solid fa-rotate-right"></i> Coba Muat Ulang
         </button>
       </div>
-    `}}document.addEventListener("DOMContentLoaded",M);
+    `}}document.addEventListener("DOMContentLoaded",B);

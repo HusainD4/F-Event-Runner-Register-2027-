@@ -1,5 +1,6 @@
 import { apiClient, apiFetch, loadMidtransSdk } from './api.js';
 import { connectRealtimeSocket } from './realtime.js';
+import { applyWebsiteFavicon } from './branding.js';
 
 // Import Modular HTML Templates
 // 1. Layout
@@ -15,6 +16,7 @@ import routeHtml from '../template/sections/route.html?raw';
 import facilitiesHtml from '../template/sections/facilities.html?raw';
 import legalHtml from '../template/sections/legal.html?raw';
 import faqHtml from '../template/sections/faq.html?raw';
+import comingSoonHtml from '../template/sections/coming-soon.html?raw';
 
 // 3. Modals
 import modalsHtml from '../template/modals/modals.html?raw';
@@ -28,6 +30,7 @@ if (appContainer) {
     <div class="toast-container" id="toastContainer"></div>
     ${skeletonHtml}
     ${navbarHtml}
+    ${comingSoonHtml}
     ${heroHtml}
     ${ticketsHtml}
     ${routeHtml}
@@ -47,14 +50,28 @@ const state = {
   currentStep: 1,
   participantCount: 1,
   isGlobalClosed: true,
+  manualRegistrationClosed: false,
+  globalRegistrationPhase: 'UPCOMING',
+  globalCountdownTarget: null,
   countdownTarget: null,
   countdownInterval: null,
+  registrationTimerInterval: null,
+  registrationDeadline: null,
+  registrationWarningShown: false,
+  checkoutSubmitting: false,
+  registrationExpiredDuringSubmit: false,
   countdownSettingsLoaded: false,
   cmsHeroBadge: '',
   cmsStatsItems: null,
   cmsVisibility: {},
   cmsRouteMapUrl: '',
   cmsRouteMapImage: '',
+  cmsRouteMapMode: 'GMAPS',
+  cmsRouteCheckpointMode: 'MANUAL',
+  cmsRouteCheckpointImage: '',
+  cmsComingSoonTitle: 'COMING SOON EVENT!',
+  cmsComingSoonMessage: 'Informasi lengkap acara akan segera hadir. Nantikan kabar terbaru dari kami!',
+  cmsComingSoonImageUrl: '',
   feeSettings: {
     feeEnabled: false,
     feeType: 'PER_TRANSACTION',
@@ -141,6 +158,23 @@ function formatRupiah(number) {
   }).format(number);
 }
 
+function getWibDateKey(date) {
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Jakarta',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  }).formatToParts(date);
+  return ['year', 'month', 'day']
+    .map(type => parts.find(part => part.type === type)?.value)
+    .join('-');
+}
+
+function getTimerPhase(targetDate, now = new Date()) {
+  if (!targetDate || Number.isNaN(targetDate.getTime()) || now < targetDate) return 'UPCOMING';
+  return getWibDateKey(now) === getWibDateKey(targetDate) ? 'RACE_DAY' : 'COMPLETED';
+}
+
 // =============================================================================
 // 3. COUNTDOWN TIMER DINAMIS (DARI TANGGAL EVENT BACKEND)
 // =============================================================================
@@ -161,12 +195,14 @@ function initCountdown(targetTimestamp = null) {
   const hEl = document.getElementById('hours');
   const mEl = document.getElementById('minutes');
   const sEl = document.getElementById('seconds');
+  const countdownGrid = countdownBox?.querySelector('.countdown-grid');
 
   if (!state.countdownTarget || !Number.isFinite(Number(state.countdownTarget))) {
     if (dEl) dEl.textContent = '--';
     if (hEl) hEl.textContent = '--';
     if (mEl) mEl.textContent = '--';
     if (sEl) sEl.textContent = '--';
+    countdownGrid?.classList.remove('countdown-sold');
     return;
   }
 
@@ -175,17 +211,21 @@ function initCountdown(targetTimestamp = null) {
     const distance = state.countdownTarget - now;
 
     if (distance <= 0) {
-      if (dEl) dEl.textContent = '00';
-      if (hEl) hEl.textContent = '00';
-      if (mEl) mEl.textContent = '00';
-      if (sEl) sEl.textContent = '00';
-      if (state.countdownInterval) {
+      if (dEl) dEl.textContent = 'S';
+      if (hEl) hEl.textContent = 'O';
+      if (mEl) mEl.textContent = 'L';
+      if (sEl) sEl.textContent = 'D';
+      countdownGrid?.classList.add('countdown-sold');
+      updateGlobalRegistrationState();
+      if (getTimerPhase(new Date(state.countdownTarget)) === 'COMPLETED' && state.countdownInterval) {
         clearInterval(state.countdownInterval);
         state.countdownInterval = null;
       }
       return;
     }
 
+    countdownGrid?.classList.remove('countdown-sold');
+    updateGlobalRegistrationState();
     const days = Math.floor(distance / (1000 * 60 * 60 * 24));
     const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
@@ -212,6 +252,9 @@ async function loadCountdownSettings() {
   try {
     const settings = await apiClient.getCountdownSettings();
     state.countdownSettingsLoaded = Boolean(settings?.eventCountdownDate);
+    state.globalCountdownTarget = settings?.eventCountdownDate
+      ? new Date(settings.eventCountdownDate).getTime()
+      : null;
     if (settings && settings.eventCountdownDate) {
       const d = new Date(settings.eventCountdownDate);
       if (!isNaN(d.getTime())) {
@@ -250,14 +293,20 @@ async function loadCountdownSettings() {
     }
 
     if (settings) {
-      state.isGlobalClosed = settings.isRegistrationClosed === true
-        || String(settings.isRegistrationClosed).toLowerCase() === 'true';
+      state.manualRegistrationClosed = settings.manualRegistrationClosed === true
+        || String(settings.manualRegistrationClosed).toLowerCase() === 'true';
+      updateGlobalRegistrationState();
       applyRegistrationStatus();
+      updateRegistrationCountdown();
     }
   } catch (err) {
     console.warn('Gagal memuat pengaturan countdown dari backend:', err);
     state.isGlobalClosed = true;
+    state.manualRegistrationClosed = true;
+    state.globalRegistrationPhase = 'CLOSED';
+    state.globalCountdownTarget = null;
     applyRegistrationStatus();
+    updateRegistrationCountdown();
     state.countdownTarget = null;
     if (state.countdownInterval) {
       clearInterval(state.countdownInterval);
@@ -279,6 +328,75 @@ async function loadCountdownSettings() {
   }
 }
 
+function updateGlobalRegistrationState() {
+  const globalDate = Number.isFinite(state.globalCountdownTarget)
+    ? new Date(state.globalCountdownTarget)
+    : null;
+  const timerPhase = getTimerPhase(globalDate);
+  state.globalRegistrationPhase = timerPhase === 'UPCOMING' && state.manualRegistrationClosed
+    ? 'CLOSED'
+    : timerPhase;
+  state.isGlobalClosed = state.manualRegistrationClosed || timerPhase !== 'UPCOMING';
+}
+
+async function refreshPublicEvents() {
+  try {
+    const response = await apiFetch('/events', {
+      method: 'GET',
+      headers: { Accept: 'application/json' }
+    });
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+    const result = await response.json();
+    if (result.status !== 'success' || !Array.isArray(result.data)) {
+      throw new Error(result.message || 'Respons data event tidak valid.');
+    }
+
+    state.events = result.data;
+    const heroCta = document.getElementById('heroCtaBtn');
+    if (heroCta) heroCta.hidden = result.data.length === 0;
+    renderTickets(result.data);
+    renderStatsBanner(state.cmsStatsItems);
+
+    if (!state.countdownSettingsLoaded) {
+      const eventDates = result.data
+        .map(event => new Date(event.eventDate).getTime())
+        .filter(timestamp => Number.isFinite(timestamp) && timestamp > Date.now())
+        .sort((a, b) => a - b);
+      if (eventDates.length > 0 && eventDates[0] !== state.countdownTarget) {
+        initCountdown(eventDates[0]);
+      }
+    }
+
+    if (state.selectedEvent) {
+      const selectedEvent = result.data.find(event => event.id === state.selectedEvent.id);
+      const selectedCategoryClosed = [...document.querySelectorAll('.p-event-select')]
+        .some(select => {
+          const event = result.data.find(item => item.id === select.value);
+          return !event || isEventRegistrationClosed(event);
+        });
+      if (!selectedEvent || isEventRegistrationClosed(selectedEvent) || selectedCategoryClosed) {
+        if (state.checkoutSubmitting) {
+          state.registrationExpiredDuringSubmit = true;
+          const timerMessage = document.getElementById('registrationTimerMessage');
+          const timerValue = document.getElementById('registrationTimeRemaining');
+          if (timerMessage) timerMessage.textContent = 'Kategori ditutup — memeriksa pendaftaran';
+          if (timerValue) timerValue.textContent = '—';
+          return;
+        }
+        stopRegistrationCountdown();
+        closeRegistrationModal();
+        showToast('warning', 'Kategori Ditutup', 'Pendaftaran kategori ini ditutup saat formulir Anda terbuka. Isian belum dikirim.');
+      } else {
+        state.selectedEvent = selectedEvent;
+        updateRegistrationCountdown();
+      }
+    }
+  } catch (error) {
+    console.warn('Gagal memperbarui daftar event publik:', error);
+  }
+}
+
 function applyRegistrationStatus() {
   const statusBadge = document.getElementById('heroStatusBadge');
   const statusText = document.getElementById('heroStatusText');
@@ -286,29 +404,38 @@ function applyRegistrationStatus() {
   const ctaBtn = document.getElementById('heroCtaBtn');
   const navBtn = document.getElementById('navDaftarBtn');
   const dockBtn = document.getElementById('dockDaftarBtn');
+  const allCategoriesClosed = state.events.length > 0
+    && state.events.every(isEventRegistrationClosed);
 
-  if (state.isGlobalClosed) {
+  if (state.isGlobalClosed || allCategoriesClosed) {
+    const status = state.isGlobalClosed
+      ? state.globalRegistrationPhase === 'RACE_DAY'
+        ? { label: 'ACARA TELAH DIMULAI', color: '#F97316', icon: 'fa-flag-checkered' }
+        : state.globalRegistrationPhase === 'COMPLETED'
+          ? { label: 'EVENT TELAH SELESAI • SOLD', color: '#EF4444', icon: 'fa-ticket-slash' }
+          : { label: 'PENDAFTARAN RESMI DITUTUP', color: '#EF4444', icon: 'fa-lock' }
+      : { label: 'PENDAFTARAN KATEGORI DITUTUP', color: '#EF4444', icon: 'fa-lock' };
     if (statusBadge) {
       statusBadge.hidden = false;
-      statusBadge.style.borderColor = '#EF4444';
+      statusBadge.style.borderColor = status.color;
     }
     if (statusText) {
-      statusText.textContent = 'PENDAFTARAN RESMI DITUTUP';
-      statusText.style.color = '#EF4444';
+      statusText.textContent = status.label;
+      statusText.style.color = status.color;
     }
     if (statusDot) {
-      statusDot.style.background = '#EF4444';
-      statusDot.style.boxShadow = '0 0 8px #EF4444';
+      statusDot.style.background = status.color;
+      statusDot.style.boxShadow = `0 0 8px ${status.color}`;
     }
     if (ctaBtn) {
       ctaBtn.disabled = true;
       ctaBtn.classList.remove('btn-glow');
-      ctaBtn.innerHTML = '<i class="fa-solid fa-lock"></i> Pendaftaran Ditutup';
+      ctaBtn.innerHTML = `<i class="fa-solid ${status.icon}"></i> ${status.label}`;
     }
     if (navBtn) {
       navBtn.disabled = true;
       navBtn.classList.remove('btn-glow');
-      navBtn.innerHTML = '<i class="fa-solid fa-lock"></i> Ditutup';
+      navBtn.innerHTML = `<i class="fa-solid ${status.icon}"></i> ${status.label}`;
     }
     if (dockBtn) {
       dockBtn.style.opacity = '0.6';
@@ -355,7 +482,7 @@ async function loadEvents() {
     state.events = Array.isArray(events) ? events : [];
     const heroCta = document.getElementById('heroCtaBtn');
     if (heroCta) heroCta.hidden = state.events.length === 0;
-    renderTickets(state.events);
+    applyRegistrationStatus();
     renderStatsBanner(state.cmsStatsItems);
 
     if (!state.countdownTarget && !state.countdownSettingsLoaded) {
@@ -364,41 +491,6 @@ async function loadEvents() {
         .filter(timestamp => Number.isFinite(timestamp) && timestamp > Date.now())
         .sort((a, b) => a - b);
       if (eventDates.length > 0) initCountdown(eventDates[0]);
-    }
-
-    async function refreshPublicEvents() {
-      try {
-        const response = await apiFetch('/events', {
-          method: 'GET',
-          headers: { Accept: 'application/json' }
-        });
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-
-        const result = await response.json();
-        if (result.status !== 'success' || !Array.isArray(result.data)) {
-          throw new Error(result.message || 'Respons data event tidak valid.');
-        }
-
-        if (JSON.stringify(result.data) !== JSON.stringify(state.events)) {
-          state.events = result.data;
-          const heroCta = document.getElementById('heroCtaBtn');
-          if (heroCta) heroCta.hidden = result.data.length === 0;
-          renderTickets(result.data);
-          renderStatsBanner(state.cmsStatsItems);
-        }
-
-        if (!state.countdownSettingsLoaded) {
-          const eventDates = result.data
-            .map(event => new Date(event.eventDate).getTime())
-            .filter(timestamp => Number.isFinite(timestamp) && timestamp > Date.now())
-            .sort((a, b) => a - b);
-          if (eventDates.length > 0 && eventDates[0] !== state.countdownTarget) {
-            initCountdown(eventDates[0]);
-          }
-        }
-      } catch (error) {
-        console.warn('Gagal memperbarui daftar event publik:', error);
-      }
     }
 
     // Ambil konfigurasi batas waktu pembayaran & biaya layanan
@@ -414,7 +506,7 @@ async function loadEvents() {
     const regParam = new URLSearchParams(window.location.search).get('register');
     if (regParam) {
       const targetEvent = events.find(e => e.id === regParam);
-      if (targetEvent && !targetEvent.isClosed && !state.isGlobalClosed) {
+      if (targetEvent && !isEventRegistrationClosed(targetEvent) && !state.isGlobalClosed) {
         setTimeout(() => openRegistrationModal(targetEvent), 400);
       }
     }
@@ -448,14 +540,41 @@ function renderTickets(events) {
 
   events.forEach((ev) => {
     const is10k = ev.category === '10K';
-    const totalCapacity = ev.stock || 0;
-    const currentStock = typeof ev.stock === 'number' ? ev.stock : 0;
+    const currentStock = Number(ev.remainingStock ?? ev.stock ?? 0);
+    const totalCapacity = Number(ev.totalCapacity ?? (currentStock + Number(ev.registeredCount || 0)));
     const percentage = totalCapacity > 0 ? Math.max(0, Math.min(100, Math.round((currentStock / totalCapacity) * 100))) : 0;
     const isGlobalClosed = state.isGlobalClosed;
-    const isClosed = Boolean(ev.isClosed) || isGlobalClosed;
+    const eventPhase = ev.registrationPhase || (ev.eventDate ? getTimerPhase(new Date(ev.eventDate)) : 'UPCOMING');
+    const eventDateClosed = typeof ev.registrationClosedByTimer === 'boolean'
+      ? ev.registrationClosedByTimer
+      : eventPhase === 'RACE_DAY' || eventPhase === 'COMPLETED';
+    const categoryClosed = typeof ev.registrationClosed === 'boolean'
+      ? ev.registrationClosed
+      : Boolean(ev.isClosed) || eventDateClosed;
+    const isClosed = categoryClosed || isGlobalClosed;
+    const globalStatusLabel = state.globalRegistrationPhase === 'RACE_DAY'
+      ? 'ACARA TELAH DIMULAI'
+      : state.globalRegistrationPhase === 'COMPLETED'
+        ? 'SOLD'
+        : 'PENDAFTARAN DITUTUP';
+    const closedStatusLabel = isGlobalClosed
+      ? globalStatusLabel
+      : eventPhase === 'RACE_DAY'
+        ? 'ACARA TELAH DIMULAI'
+        : eventPhase === 'COMPLETED'
+          ? 'SOLD'
+          : 'PENDAFTARAN DITUTUP';
+    const eventDateLabel = ev.eventDate
+      ? `${new Date(ev.eventDate).toLocaleString('id-ID', {
+        dateStyle: 'long',
+        timeStyle: 'short',
+        timeZone: 'Asia/Jakarta'
+      })} WIB`
+      : '';
+    const closedPhase = isGlobalClosed ? state.globalRegistrationPhase : eventPhase;
 
     const card = document.createElement('div');
-    card.className = `glass-card ticket-card ticket-pass-card ${is10k ? 'featured' : ''} ${isClosed ? 'event-closed-card' : ''} ${isGlobalClosed ? 'global-registration-closed' : ''}`;
+    card.className = `glass-card ticket-card ticket-pass-card ${is10k ? 'featured' : ''} ${isClosed ? 'event-closed-card ticket-sale-closed' : ''} ${isGlobalClosed ? 'global-registration-closed' : ''} ${isClosed ? `registration-phase-${closedPhase.toLowerCase()}` : ''}`;
 
     const benefitsList = (Array.isArray(ev.benefits) && ev.benefits.length > 0)
       ? ev.benefits.map(b => b.name)
@@ -490,7 +609,11 @@ function renderTickets(events) {
           <i class="fa-solid fa-bolt" style="color: var(--color-primary);"></i> TEGAL RUN 2027
         </div>
         <div class="ticket-stub-tag">
-          ${isGlobalClosed ? '<span class="global-sold-stamp"><i class="fa-solid fa-ban"></i> SOLD</span>' : (isClosed ? '<span style="color:#ef4444;"><i class="fa-solid fa-lock"></i> CLOSED</span>' : (is10k ? '<span style="color:#ff6b00;"><i class="fa-solid fa-fire"></i> POPULAR</span>' : '<span>OFFICIAL PASS</span>'))}
+          ${closedStatusLabel === 'SOLD'
+            ? '<span class="global-sold-stamp"><i class="fa-solid fa-ticket-slash"></i> SOLD</span>'
+            : (isClosed
+              ? `<span class="global-closed-stamp"><i class="${eventPhase === 'RACE_DAY' || state.globalRegistrationPhase === 'RACE_DAY' ? 'fa-solid fa-flag-checkered' : 'fa-solid fa-lock'}"></i> ${escapeHtml(closedStatusLabel)}</span>`
+              : (is10k ? '<span style="color:#ff6b00;"><i class="fa-solid fa-fire"></i> POPULAR</span>' : '<span>OFFICIAL PASS</span>'))}
         </div>
       </div>
 
@@ -499,6 +622,7 @@ function renderTickets(events) {
       <div class="ticket-header">
         <span class="ticket-category-tag">${escapeHtml(ev.category)} MARATHON PASS</span>
         <h3 class="ticket-title">${escapeHtml(ev.ticketName)}</h3>
+        ${eventDateLabel ? `<div class="ticket-event-date"><i class="fa-regular fa-calendar-check"></i> ${escapeHtml(eventDateLabel)}${ev.followGlobalTimer ? '<span><i class="fa-solid fa-link"></i> Timer Global</span>' : ''}</div>` : ''}
         <div class="ticket-price">
           <span class="price-currency">Rp</span>
           <span class="price-amount">${Number(ev.price).toLocaleString('id-ID')}</span>
@@ -518,7 +642,7 @@ function renderTickets(events) {
           <span>Status Kuota</span>
           <span class="stock-status" style="color: ${isClosed ? '#EF4444' : '#10B981'};">
             <i class="${isClosed ? 'fa-solid fa-lock' : 'fa-solid fa-fire'}"></i> 
-            ${isGlobalClosed ? 'Seluruh Pendaftaran Ditutup' : (isClosed ? 'Pendaftaran Ditutup' : `${currentStock} Tiket Tersedia`)}
+            ${isClosed ? escapeHtml(closedStatusLabel) : `${currentStock} Tiket Tersedia`}
           </span>
         </div>
         <div class="stock-bar-bg">
@@ -536,16 +660,20 @@ function renderTickets(events) {
         <div class="ticket-barcode-serial">RACE PASS • VERIFIED PASI TIMING</div>
       </div>
 
-      <div style="display: flex; gap: 8px; margin-top: auto; padding-top: 14px;">
+      <div class="ticket-pass-actions" style="display: flex; gap: 8px; margin-top: auto; padding-top: 14px;">
         <button class="btn btn-secondary btn-sm btn-view-ticket-detail" data-id="${ev.id}" ${isGlobalClosed ? 'disabled aria-disabled="true" title="Detail tiket tidak tersedia saat pendaftaran ditutup"' : 'title="Lihat Fasilitas & Rincian Lengkap"'} style="flex: 1;">
           <i class="fa-solid ${isGlobalClosed ? 'fa-lock' : 'fa-circle-info'}"></i> ${isGlobalClosed ? 'Detail Ditutup' : 'Detail Tiket'}
         </button>
         <button class="btn ${isClosed ? 'btn-secondary' : 'btn-primary btn-glow'} btn-sm btn-select-ticket" data-id="${ev.id}" ${isClosed ? 'disabled aria-disabled="true" title="Pendaftaran sedang ditutup"' : ''} style="flex: 1.3;">
           <i class="${isClosed ? 'fa-solid fa-lock' : 'fa-solid fa-ticket'}"></i> 
-          ${isGlobalClosed ? 'SOLD' : (isClosed ? 'Ditutup' : 'Daftar Sekarang')}
+          ${isClosed ? escapeHtml(closedStatusLabel) : 'Daftar Sekarang'}
         </button>
       </div>
     `;
+
+    if (isClosed && closedStatusLabel !== 'SOLD') {
+      card.insertAdjacentHTML('beforeend', '<span class="global-sold-stamp"><i class="fa-solid fa-ticket-slash"></i> SOLD</span>');
+    }
 
     grid.appendChild(card);
   });
@@ -740,20 +868,154 @@ async function openTicketDetailModal(eventSummary) {
 // =============================================================================
 // 5. REGISTRATION MODAL LOGIC
 // =============================================================================
+function isEventRegistrationClosed(event) {
+  if (typeof event?.registrationClosed === 'boolean') return event.registrationClosed;
+  return Boolean(event?.isClosed)
+    || getTimerPhase(event?.eventDate ? new Date(event.eventDate) : null) !== 'UPCOMING';
+}
+
+function getRegistrationDeadline() {
+  const deadlines = [];
+  if (Number.isFinite(state.globalCountdownTarget)) {
+    deadlines.push(state.globalCountdownTarget);
+  }
+
+  const eventIds = new Set([state.selectedEvent?.id]);
+  document.querySelectorAll('.p-event-select').forEach(select => eventIds.add(select.value));
+  eventIds.delete(undefined);
+  for (const id of eventIds) {
+    const event = state.events.find(item => item.id === id);
+    const date = event?.eventDate ? new Date(event.eventDate).getTime() : NaN;
+    if (Number.isFinite(date)) deadlines.push(date);
+  }
+
+  return deadlines.length ? Math.min(...deadlines) : null;
+}
+
+function getSelectedRegistrationEvents() {
+  const eventIds = new Set([state.selectedEvent?.id]);
+  document.querySelectorAll('.p-event-select').forEach(select => eventIds.add(select.value));
+  eventIds.delete(undefined);
+  return [...eventIds]
+    .map(id => state.events.find(event => event.id === id))
+    .filter(Boolean);
+}
+
+function formatRegistrationTimeLeft(milliseconds) {
+  const totalSeconds = Math.max(0, Math.floor(milliseconds / 1000));
+  const seconds = totalSeconds % 60;
+  const minutes = Math.floor(totalSeconds / 60) % 60;
+  const hours = Math.floor(totalSeconds / 3600) % 24;
+  const days = Math.floor(totalSeconds / 86400);
+  const clock = [hours, minutes, seconds].map(value => String(value).padStart(2, '0')).join(':');
+  return days > 0 ? `${days} hari ${clock}` : clock;
+}
+
+function stopRegistrationCountdown() {
+  if (state.registrationTimerInterval) {
+    clearInterval(state.registrationTimerInterval);
+    state.registrationTimerInterval = null;
+  }
+  state.registrationDeadline = null;
+}
+
+function updateRegistrationCountdown() {
+  const modal = document.getElementById('regModal');
+  const timer = document.getElementById('registrationTimeRemaining');
+  const message = document.getElementById('registrationTimerMessage');
+  const submitBtn = document.getElementById('btnModalSubmit');
+  if (!modal?.classList.contains('active') || !timer || !message) return;
+
+  const deadline = getRegistrationDeadline();
+  state.registrationDeadline = deadline;
+  if (state.isGlobalClosed || getSelectedRegistrationEvents().some(isEventRegistrationClosed)) {
+    if (state.checkoutSubmitting) {
+      state.registrationExpiredDuringSubmit = true;
+      message.textContent = 'Batas pendaftaran tercapai — memeriksa status';
+      timer.textContent = '—';
+      if (submitBtn) submitBtn.disabled = true;
+      return;
+    }
+    stopRegistrationCountdown();
+    closeRegistrationModal();
+    showToast('warning', 'Pendaftaran Ditutup', 'Waktu pendaftaran telah berakhir. Formulir Anda dibatalkan dan belum dikirim.');
+    return;
+  }
+
+  if (!Number.isFinite(deadline)) {
+    timer.textContent = '—';
+    message.textContent = 'Batas waktu pendaftaran belum ditentukan';
+    timer.classList.remove('urgent');
+    return;
+  }
+
+  const remaining = deadline - Date.now();
+  if (remaining <= 0) {
+    if (state.checkoutSubmitting) {
+      state.registrationExpiredDuringSubmit = true;
+      message.textContent = 'Batas pendaftaran tercapai — memeriksa status';
+      timer.textContent = '—';
+      timer.classList.add('urgent');
+      if (submitBtn) submitBtn.disabled = true;
+      return;
+    }
+    stopRegistrationCountdown();
+    if (submitBtn) submitBtn.disabled = true;
+    closeRegistrationModal();
+    showToast('warning', 'Pendaftaran Berakhir', 'Waktu pendaftaran telah habis. Formulir Anda dibatalkan dan belum dikirim.');
+    return;
+  }
+
+  timer.textContent = formatRegistrationTimeLeft(remaining);
+  timer.classList.toggle('urgent', remaining < 10 * 60 * 1000);
+  message.textContent = remaining < 10 * 60 * 1000
+    ? 'Pendaftaran akan segera ditutup'
+    : 'Sisa waktu pendaftaran';
+
+  if (remaining < 10 * 60 * 1000 && !state.registrationWarningShown) {
+    state.registrationWarningShown = true;
+    showToast('warning', 'Pendaftaran Hampir Ditutup', 'Waktu pendaftaran tersisa kurang dari 10 menit. Selesaikan formulir dan lanjutkan pembayaran segera.');
+  }
+}
+
+function startRegistrationCountdown() {
+  stopRegistrationCountdown();
+  state.registrationWarningShown = false;
+  state.registrationExpiredDuringSubmit = false;
+  updateRegistrationCountdown();
+  if (document.getElementById('regModal')?.classList.contains('active')) {
+    state.registrationTimerInterval = setInterval(updateRegistrationCountdown, 1000);
+  }
+}
+
 function openRegistrationModal(selectedEvent = null) {
   if (state.isGlobalClosed) {
-    showToast('error', 'Pendaftaran Ditutup', 'Mohon maaf, seluruh pendaftaran Tegal Run 2027 telah resmi ditutup oleh panitia.');
+    const message = state.globalRegistrationPhase === 'RACE_DAY'
+      ? 'Pendaftaran ditutup otomatis karena acara telah dimulai.'
+      : state.globalRegistrationPhase === 'COMPLETED'
+        ? 'Pendaftaran ditutup karena hari pelaksanaan acara telah lewat.'
+        : 'Seluruh pendaftaran Tegal Run 2027 telah ditutup oleh panitia.';
+    showToast('error', 'Pendaftaran Ditutup', message);
     return;
   }
 
   // Hanya buka event yang tidak ditutup
-  const availableEvents = state.events.filter(e => !e.isClosed);
+  const availableEvents = state.events.filter(e => !isEventRegistrationClosed(e));
   if (availableEvents.length === 0) {
-    showToast('error', 'Pendaftaran Ditutup', 'Seluruh pendaftaran kategori event telah resmi ditutup oleh panitia.');
+    const timerClosed = state.events.some(event => typeof event.registrationClosedByTimer === 'boolean'
+      ? event.registrationClosedByTimer
+      : getTimerPhase(event.eventDate ? new Date(event.eventDate) : null) !== 'UPCOMING');
+    showToast(
+      'error',
+      'Pendaftaran Ditutup',
+      timerClosed
+        ? 'Tanggal pelaksanaan seluruh kategori telah tiba atau lewat. Ubah tanggal kategori atau sinkronkan dengan timer global di halaman admin.'
+        : 'Seluruh pendaftaran kategori event telah ditutup oleh panitia.'
+    );
     return;
   }
 
-  state.selectedEvent = (selectedEvent && !selectedEvent.isClosed) ? selectedEvent : availableEvents[0];
+  state.selectedEvent = (selectedEvent && !isEventRegistrationClosed(selectedEvent)) ? selectedEvent : availableEvents[0];
   state.currentStep = 1;
   state.participantCount = 1;
 
@@ -775,6 +1037,7 @@ function openRegistrationModal(selectedEvent = null) {
 
   modal.classList.add('active');
   document.body.style.overflow = 'hidden';
+  startRegistrationCountdown();
 
   // Sinkronkan data biaya layanan & timer terbaru dari backend / admin secara realtime
   apiClient.getCheckoutConfig().then(cfg => {
@@ -786,6 +1049,7 @@ function openRegistrationModal(selectedEvent = null) {
 }
 
 function closeRegistrationModal() {
+  stopRegistrationCountdown();
   const modal = document.getElementById('regModal');
   if (modal) {
     modal.classList.remove('active');
@@ -901,7 +1165,7 @@ function renderParticipantForms() {
   if (!container) return;
 
   container.innerHTML = '';
-  const availableEvents = state.events.filter(e => !e.isClosed);
+  const availableEvents = state.events.filter(e => !isEventRegistrationClosed(e));
   const defaultEventId = state.selectedEvent?.id || (availableEvents[0]?.id ?? '');
 
   for (let i = 0; i < state.participantCount; i++) {
@@ -986,17 +1250,7 @@ function renderParticipantForms() {
             <option value="O" selected>O</option>
           </select>
         </div>
-        <div class="form-group">
-          <label class="form-label">Ukuran Jersey Resmi</label>
-          <select class="form-select p-size" data-index="${i}">
-            <option value="XS">XS (46 x 66 cm)</option>
-            <option value="S">S (48 x 68 cm)</option>
-            <option value="M" selected>M (50 x 70 cm)</option>
-            <option value="L">L (52 x 72 cm)</option>
-            <option value="XL">XL (54 x 74 cm)</option>
-            <option value="XXL">XXL (56 x 76 cm)</option>
-          </select>
-        </div>
+        <div class="form-group p-jersey-fields" data-index="${i}"></div>
       </div>
 
       <div class="form-row">
@@ -1030,13 +1284,81 @@ function renderParticipantForms() {
     setupPhoneAutoFormat(emgPhoneInput);
 
     // Listen event select perubahan harga
-    pBox.querySelector('.p-event-select')?.addEventListener('change', () => {
+    const eventSelect = pBox.querySelector('.p-event-select');
+    renderParticipantJerseyFields(pBox, i, eventSelect?.value || defaultEventId);
+    eventSelect?.addEventListener('change', () => {
+      renderParticipantJerseyFields(pBox, i, eventSelect.value);
       updateOrderPreview();
     });
   }
 
   // Auto-sync jika checkbox aktif
   syncBookerToParticipant1();
+}
+
+function getConfiguredJerseySizes(jersey) {
+  if (Array.isArray(jersey?.sizes)) return jersey.sizes.filter(size => typeof size === 'string' && size.trim());
+  if (typeof jersey?.sizes === 'string') {
+    try {
+      const sizes = JSON.parse(jersey.sizes);
+      return Array.isArray(sizes) ? sizes.filter(size => typeof size === 'string' && size.trim()) : [];
+    } catch (error) {
+      console.warn('Ukuran jersey dari backend tidak valid:', error);
+    }
+  }
+  return [];
+}
+
+function renderParticipantJerseyFields(participantBox, index, eventId, selectedJerseyId = '', selectedSize = '') {
+  const container = participantBox.querySelector('.p-jersey-fields');
+  if (!container) return;
+  const event = state.events.find(item => item.id === eventId);
+  const jerseys = Array.isArray(event?.jerseys) ? event.jerseys : [];
+
+  if (jerseys.length === 0) {
+    container.innerHTML = `
+      <label class="form-label" for="participantSize-${index}">Ukuran Jersey Resmi</label>
+      <select class="form-select p-size" id="participantSize-${index}" data-index="${index}">
+        <option value="XS">XS (46 x 66 cm)</option>
+        <option value="S">S (48 x 68 cm)</option>
+        <option value="M" selected>M (50 x 70 cm)</option>
+        <option value="L">L (52 x 72 cm)</option>
+        <option value="XL">XL (54 x 74 cm)</option>
+        <option value="XXL">XXL (56 x 76 cm)</option>
+      </select>
+      <div class="form-hint">Ukuran jersey standar event.</div>
+    `;
+    return;
+  }
+
+  const selectedJersey = jerseys.find(jersey => jersey.id === selectedJerseyId) || jerseys[0];
+  const sizes = getConfiguredJerseySizes(selectedJersey);
+  const typeControl = jerseys.length > 1
+    ? `<label class="form-label" for="participantJersey-${index}">Tipe Jersey</label>
+       <select class="form-select p-jersey" id="participantJersey-${index}" data-index="${index}" required>
+         ${jerseys.map(jersey => `<option value="${escapeHtml(jersey.id)}" ${jersey.id === selectedJersey.id ? 'selected' : ''}>${escapeHtml(jersey.name)} — ${escapeHtml(jersey.type)}</option>`).join('')}
+       </select>`
+    : `<input type="hidden" class="p-jersey-id" data-index="${index}" value="${escapeHtml(selectedJersey.id)}">
+       <label class="form-label">Tipe Jersey</label>
+       <div class="participant-jersey-type"><i class="fa-solid fa-shirt" aria-hidden="true"></i> ${escapeHtml(selectedJersey.name)} — ${escapeHtml(selectedJersey.type)}</div>`;
+  const jerseyImage = selectedJersey.image
+    ? `<img class="participant-jersey-preview" src="${escapeHtml(selectedJersey.image)}" alt="Pratinjau ${escapeHtml(selectedJersey.name)}" loading="lazy" onerror="this.hidden=true">`
+    : '';
+
+  container.innerHTML = `
+    ${typeControl}
+    <label class="form-label" for="participantSize-${index}" style="margin-top:8px;">Ukuran Jersey Resmi</label>
+    <select class="form-select p-size" id="participantSize-${index}" data-index="${index}" required ${sizes.length ? '' : 'disabled'}>
+      ${sizes.map(size => `<option value="${escapeHtml(size)}" ${size === selectedSize ? 'selected' : ''}>${escapeHtml(size)}</option>`).join('')}
+    </select>
+    ${sizes.length ? '' : '<div class="form-hint">Ukuran untuk tipe ini belum tersedia. Hubungi panitia.</div>'}
+    ${jerseyImage}
+  `;
+
+  container.querySelector('.p-jersey')?.addEventListener('change', event => {
+    const currentSize = container.querySelector('.p-size')?.value || '';
+    renderParticipantJerseyFields(participantBox, index, eventId, event.target.value, currentSize);
+  });
 }
 
 function validateStep(step) {
@@ -1180,8 +1502,11 @@ function updateSummaryReview() {
 // 6. CHECKOUT VIA BACKEND & MIDTRANS SNAP POPUP
 // =============================================================================
 async function handleCheckoutSubmit() {
-  if (state.selectedEvent?.isClosed) {
-    showToast('error', 'Pendaftaran Ditutup', 'Pendaftaran untuk kategori ini telah resmi ditutup.');
+  const registrationDeadline = getRegistrationDeadline();
+  if (state.isGlobalClosed
+    || getSelectedRegistrationEvents().some(isEventRegistrationClosed)
+    || (Number.isFinite(registrationDeadline) && Date.now() >= registrationDeadline)) {
+    updateRegistrationCountdown();
     return;
   }
 
@@ -1197,12 +1522,6 @@ async function handleCheckoutSubmit() {
     return;
   }
 
-  const submitBtn = document.getElementById('btnModalSubmit');
-  if (submitBtn) {
-    submitBtn.disabled = true;
-    submitBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Memproses Pesanan...';
-  }
-
   const participants = [];
   for (let i = 0; i < state.participantCount; i++) {
     const eventId = document.querySelector(`.p-event-select[data-index="${i}"]`)?.value || state.selectedEvent.id;
@@ -1216,6 +1535,9 @@ async function handleCheckoutSubmit() {
     const fullAddress = document.querySelector(`.p-address[data-index="${i}"]`)?.value.trim();
     const bloodType = document.querySelector(`.p-blood[data-index="${i}"]`)?.value;
     const selectedSize = document.querySelector(`.p-size[data-index="${i}"]`)?.value;
+    const jerseyId = document.querySelector(`.p-jersey[data-index="${i}"]`)?.value
+      || document.querySelector(`.p-jersey-id[data-index="${i}"]`)?.value
+      || null;
     const emergencyContactName = document.querySelector(`.p-emg-name[data-index="${i}"]`)?.value.trim();
     const emergencyContactPhone = normalizePhone(document.querySelector(`.p-emg-phone[data-index="${i}"]`)?.value.trim());
     const communityName = document.querySelector(`.p-community[data-index="${i}"]`)?.value.trim() || null;
@@ -1232,6 +1554,7 @@ async function handleCheckoutSubmit() {
       birthDate,
       fullAddress,
       bloodType,
+      jerseyId,
       selectedSize,
       emergencyContactName,
       emergencyContactPhone,
@@ -1257,9 +1580,18 @@ async function handleCheckoutSubmit() {
     participants
   };
 
+  const submitBtn = document.getElementById('btnModalSubmit');
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Memproses Pesanan...';
+  }
+
   showToast('warning', 'Menghubungkan Server', 'Mengamankan slot tiket Anda ke sistem database...');
 
+  state.checkoutSubmitting = true;
+  state.registrationExpiredDuringSubmit = false;
   const result = await apiClient.registerOrder(payload);
+  state.checkoutSubmitting = false;
 
   if (submitBtn) {
     submitBtn.disabled = false;
@@ -1267,10 +1599,19 @@ async function handleCheckoutSubmit() {
   }
 
   if (!result.success) {
+    if (state.registrationExpiredDuringSubmit
+      || (Number.isFinite(state.registrationDeadline) && Date.now() >= state.registrationDeadline)
+      || state.isGlobalClosed
+      || getSelectedRegistrationEvents().some(isEventRegistrationClosed)) {
+      closeRegistrationModal();
+      showToast('warning', 'Pendaftaran Berakhir', result.message || 'Waktu pendaftaran telah habis. Formulir Anda dibatalkan.');
+      return;
+    }
     showToast('error', 'Gagal Memesan Tiket', result.message);
     return;
   }
 
+  stopRegistrationCountdown();
   showToast('success', 'Slot Tiket Diamankan!', 'Membuka gerbang pembayaran resmi Midtrans Snap...');
 
   const { paymentToken, paymentUrl, orderId, midtransOrderId } = result.data;
@@ -1347,8 +1688,7 @@ function renderStatsBanner(items) {
     const hasLabel = Boolean(String(item.unit || item.desc || '').trim());
     if (!hasLabel) return false;
     if (item.type === 'AUTO') {
-      return events.length > 0
-        && ['TOTAL_PARTICIPANTS', 'TOTAL_CATEGORIES', 'TOTAL_CAPACITY', 'AVAILABLE_SLOTS'].includes(item.autoKey);
+      return ['TOTAL_PARTICIPANTS', 'PAID_PARTICIPANTS', 'TOTAL_CATEGORIES', 'TOTAL_CAPACITY', 'AVAILABLE_SLOTS'].includes(item.autoKey);
     }
     return String(item.val ?? '').trim() !== '';
   });
@@ -1358,13 +1698,15 @@ function renderStatsBanner(items) {
 
   const totals = events.reduce((result, event) => {
     result.participants += Number(event.registeredCount || 0);
-    result.capacity += Number(event.stock || 0);
-    result.available += Number(event.remainingStock ?? Math.max(0, Number(event.stock || 0) - Number(event.registeredCount || 0)));
+    result.paid += Number(event.paidCount || 0);
+    result.capacity += Number(event.totalCapacity ?? (Number(event.remainingStock ?? event.stock ?? 0) + Number(event.registeredCount || 0)));
+    result.available += Number(event.remainingStock ?? event.stock ?? 0);
     return result;
-  }, { participants: 0, capacity: 0, available: 0 });
+  }, { participants: 0, paid: 0, capacity: 0, available: 0 });
 
   const autoValues = {
     TOTAL_PARTICIPANTS: totals.participants,
+    PAID_PARTICIPANTS: totals.paid,
     TOTAL_CATEGORIES: events.length,
     TOTAL_CAPACITY: totals.capacity,
     AVAILABLE_SLOTS: totals.available
@@ -1376,6 +1718,13 @@ function renderStatsBanner(items) {
     const value = isAuto ? Number(rawValue || 0).toLocaleString('id-ID') : rawValue;
     const card = document.createElement('div');
     card.className = 'stat-item';
+    const iconName = typeof item.icon === 'string' && /^[a-z0-9-]+$/.test(item.icon) ? item.icon : 'fa-chart-simple';
+    const iconWrap = document.createElement('span');
+    iconWrap.className = 'stat-icon';
+    const icon = document.createElement('i');
+    icon.className = `fa-solid ${iconName}`;
+    icon.setAttribute('aria-hidden', 'true');
+    iconWrap.append(icon);
     const number = document.createElement('div');
     number.className = 'stat-num';
     if (index < 4) number.id = `statVal${index + 1}`;
@@ -1391,7 +1740,7 @@ function renderStatsBanner(items) {
     descEl.className = 'stat-desc';
     descEl.textContent = item.desc || '';
     if (index < 4) descEl.id = `statDesc${index + 1}`;
-    card.append(number, descEl);
+    card.append(iconWrap, number, descEl);
     banner.append(card);
   });
 }
@@ -1401,8 +1750,9 @@ function renderRouteVisual(mapUrl, mapImage) {
   if (!visualCard) return;
 
   const source = String(mapUrl || '').trim();
+  const mapMode = state.cmsRouteMapMode;
   let embedUrl = '';
-  if (source) {
+  if (mapMode === 'GMAPS' && source) {
     const srcMatch = source.match(/src=["']([^"']+)["']/i);
     const candidate = srcMatch?.[1] || source;
     try {
@@ -1423,7 +1773,9 @@ function renderRouteVisual(mapUrl, mapImage) {
   visualCard.replaceChildren();
   const badge = document.createElement('div');
   badge.className = 'route-badge-float';
-  badge.innerHTML = '<i class="fa-solid fa-location-dot"></i> Rute & Lokasi Google Maps';
+  badge.innerHTML = mapMode === 'IMAGE'
+    ? '<i class="fa-solid fa-map"></i> Peta Rute'
+    : '<i class="fa-solid fa-location-dot"></i> Rute & Lokasi Google Maps';
   visualCard.append(badge);
 
   if (embedUrl) {
@@ -1437,7 +1789,7 @@ function renderRouteVisual(mapUrl, mapImage) {
     iframe.referrerPolicy = 'no-referrer-when-downgrade';
     wrapper.append(iframe);
     visualCard.append(wrapper);
-  } else if (mapImage) {
+  } else if (mapMode === 'IMAGE' && mapImage) {
     const image = document.createElement('img');
     image.className = 'route-map-image';
     image.src = mapImage;
@@ -1452,6 +1804,96 @@ function renderRouteVisual(mapUrl, mapImage) {
   }
 }
 
+function renderFaqItems(rawItems) {
+  const faqSection = document.getElementById('faq');
+  const faqList = document.getElementById('faqList');
+  const comingSoon = document.getElementById('faqComingSoon');
+  if (!faqSection || !faqList || !comingSoon) return;
+
+  let items = rawItems;
+  if (typeof items === 'string') {
+    try {
+      items = JSON.parse(items);
+    } catch (error) {
+      console.warn('Data FAQ CMS tidak valid:', error);
+      faqList.replaceChildren();
+      faqList.hidden = true;
+      comingSoon.textContent = 'FAQ tidak dapat dimuat.';
+      comingSoon.hidden = false;
+      return;
+    }
+  }
+  if (!Array.isArray(items)) {
+    console.warn('Data FAQ CMS tidak berbentuk daftar.');
+    faqList.replaceChildren();
+    faqList.hidden = true;
+    comingSoon.textContent = 'FAQ tidak dapat dimuat.';
+    comingSoon.hidden = false;
+    return;
+  }
+
+  const visibleItems = items.filter(item =>
+    item && typeof item === 'object' && item.enabled !== false &&
+    String(item.question || '').trim() && String(item.answer || '').trim()
+  );
+
+  faqList.replaceChildren();
+  comingSoon.textContent = 'EVENT COMING SOON!';
+  comingSoon.hidden = visibleItems.length > 0;
+  faqList.hidden = visibleItems.length === 0;
+  visibleItems.forEach((item, index) => {
+    const article = document.createElement('article');
+    article.className = `faq-item${index === 0 ? ' active' : ''}`;
+    article.innerHTML = `
+      <button class="faq-question" type="button" aria-expanded="${index === 0}">
+        <span>${escapeHtml(item.question)}</span>
+        <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+      </button>
+      <div class="faq-answer-wrapper">
+        <div class="faq-answer">${escapeHtml(item.answer)}</div>
+      </div>
+    `;
+    faqList.append(article);
+  });
+}
+
+function updateComingSoonSection(visibility) {
+  const section = document.getElementById('siteComingSoon');
+  if (!section) return;
+  const allSectionKeys = ['hero', 'stats', 'route', 'facilities', 'tickets', 'legal', 'faq', 'footer'];
+  const allSectionsOff = allSectionKeys.every(key => visibility[key] === false);
+  section.hidden = !allSectionsOff;
+  const mobileDock = document.querySelector('.mobile-bottom-dock');
+  if (mobileDock) mobileDock.hidden = allSectionsOff;
+  if (!allSectionsOff) return;
+
+  const title = document.getElementById('comingSoonTitle');
+  const message = document.getElementById('comingSoonMessage');
+  const image = document.getElementById('comingSoonImage');
+  const fallback = document.getElementById('comingSoonImageFallback');
+  if (title) title.textContent = state.cmsComingSoonTitle;
+  if (message) {
+    message.textContent = state.cmsComingSoonMessage;
+    message.hidden = !state.cmsComingSoonMessage;
+  }
+  if (!image || !fallback) return;
+
+  image.onerror = () => {
+    image.hidden = true;
+    fallback.hidden = false;
+  };
+  if (state.cmsComingSoonImageUrl) {
+    image.alt = state.cmsComingSoonTitle;
+    image.src = state.cmsComingSoonImageUrl;
+    image.hidden = false;
+    fallback.hidden = true;
+  } else {
+    image.removeAttribute('src');
+    image.hidden = true;
+    fallback.hidden = false;
+  }
+}
+
 async function loadWebsiteSettings() {
   try {
     const cms = await apiClient.getWebsiteSettings();
@@ -1463,26 +1905,85 @@ async function loadWebsiteSettings() {
       console.warn('Pengaturan visibilitas CMS tidak valid:', error);
     }
     state.cmsVisibility = visibility;
+    state.cmsComingSoonTitle = typeof cms.coming_soon_title === 'string' && cms.coming_soon_title.trim()
+      ? cms.coming_soon_title.trim()
+      : 'COMING SOON EVENT!';
+    state.cmsComingSoonMessage = typeof cms.coming_soon_message === 'string'
+      ? cms.coming_soon_message.trim()
+      : 'Informasi lengkap acara akan segera hadir. Nantikan kabar terbaru dari kami!';
+    state.cmsComingSoonImageUrl = '';
+    if (typeof cms.coming_soon_image_url === 'string' && cms.coming_soon_image_url.trim()) {
+      try {
+        const imageUrl = new URL(cms.coming_soon_image_url.trim());
+        if (['http:', 'https:'].includes(imageUrl.protocol)) state.cmsComingSoonImageUrl = imageUrl.href;
+      } catch (error) {
+        console.warn('URL gambar Coming Soon tidak valid:', error);
+      }
+    }
     const sectionVisibility = [
       ['beranda', 'hero'],
       ['rute', 'route'],
       ['fasilitas', 'facilities'],
       ['kategori', 'tickets'],
       ['legal', 'legal'],
+      ['faq', 'faq'],
     ];
     sectionVisibility.forEach(([elementId, key]) => {
       const element = document.getElementById(elementId);
-      if (element && visibility[key] === false) element.hidden = true;
+      if (element) element.hidden = visibility[key] === false;
     });
     const statsBanner = document.getElementById('statsBanner');
-    if (statsBanner && visibility.stats === false) statsBanner.hidden = true;
+    if (statsBanner) statsBanner.hidden = visibility.stats === false;
     document.querySelectorAll('.glass-footer').forEach(element => {
-      if (visibility.footer === false) element.hidden = true;
+      element.hidden = visibility.footer === false;
     });
+    updateComingSoonSection(visibility);
 
     // 1. Judul Website (Title Browser Tab)
     if (cms.site_title) {
       document.title = cms.site_title;
+    }
+    applyWebsiteFavicon(cms.favicon_url);
+
+    const navbarBrand = document.querySelector('.top-navbar .nav-brand');
+    const navbarText = navbarBrand?.querySelector('.brand-text');
+    if (navbarText && typeof cms.navbar_title === 'string') {
+      navbarText.textContent = cms.navbar_title.trim();
+    }
+
+    const navbarIconContainer = navbarBrand?.querySelector('.brand-icon');
+    if (navbarIconContainer) {
+      const navbarIcons = new Set([
+        'fa-person-running', 'fa-medal', 'fa-trophy', 'fa-flag-checkered', 'fa-bolt',
+        'fa-fire', 'fa-star', 'fa-mountain-sun', 'fa-shoe-prints', 'fa-heart-pulse',
+        'fa-stopwatch', 'fa-award', 'fa-dumbbell', 'fa-route', 'fa-location-dot',
+        'fa-sun', 'fa-water', 'fa-compass', 'fa-crown', 'fa-leaf'
+      ]);
+      const imageUrl = typeof cms.navbar_icon_url === 'string' ? cms.navbar_icon_url.trim() : '';
+      const useImage = cms.navbar_icon_mode === 'IMAGE' || (!cms.navbar_icon_mode && Boolean(imageUrl));
+      let safeImageUrl = '';
+      if (useImage && imageUrl) {
+        try {
+          const parsedUrl = new URL(imageUrl);
+          if (['http:', 'https:'].includes(parsedUrl.protocol)) safeImageUrl = parsedUrl.href;
+        } catch {
+          safeImageUrl = '';
+        }
+      }
+
+      if (safeImageUrl) {
+        const image = document.createElement('img');
+        image.src = safeImageUrl;
+        image.alt = '';
+        image.loading = 'lazy';
+        image.style.cssText = 'width: 100%; height: 100%; padding: 4px; object-fit: contain; border-radius: inherit; background: #FFFFFF;';
+        navbarIconContainer.replaceChildren(image);
+      } else {
+        const icon = document.createElement('i');
+        const iconName = navbarIcons.has(cms.navbar_icon) ? cms.navbar_icon : 'fa-person-running';
+        icon.className = `fa-solid ${iconName}`;
+        navbarIconContainer.replaceChildren(icon);
+      }
     }
 
     // 2. Hero Section
@@ -1555,6 +2056,12 @@ async function loadWebsiteSettings() {
     // 3. Rute & Google Maps
     const routeSection = document.getElementById('rute');
     if (routeSection) {
+      const routeBadgeLabel = document.getElementById('routeSectionBadgeLabel');
+      if (routeBadgeLabel && typeof cms.route_badge_label === 'string') {
+        routeBadgeLabel.textContent = cms.route_badge_label;
+        routeBadgeLabel.parentElement.hidden = !cms.route_badge_label.trim();
+      }
+
       const routeTitle = document.getElementById('routeSectionTitle') || routeSection.querySelector('.section-title');
       if (routeTitle && typeof cms.route_title === 'string') {
         routeTitle.textContent = cms.route_title;
@@ -1593,8 +2100,13 @@ async function loadWebsiteSettings() {
         ? cms.route_gmaps_url
         : (cms.gmaps_embed_url || '');
       state.cmsRouteMapImage = cms.route_map_image || '';
+      state.cmsRouteMapMode = cms.route_map_mode === 'IMAGE' ? 'IMAGE' : 'GMAPS';
+      state.cmsRouteCheckpointMode = cms.route_checkpoint_mode === 'IMAGE' ? 'IMAGE' : 'MANUAL';
+      state.cmsRouteCheckpointImage = cms.route_checkpoint_image || '';
       renderRouteVisual(state.cmsRouteMapUrl, state.cmsRouteMapImage);
     }
+
+    renderFaqItems(cms.faq_items);
 
     // 4. Fasilitas Section
     const facSection = document.getElementById('fasilitas');
@@ -1744,11 +2256,28 @@ async function loadRouteData() {
 
     if (!state.cmsRouteMapUrl) state.cmsRouteMapUrl = data.gmapsUrl || '';
     if (!state.cmsRouteMapImage) state.cmsRouteMapImage = data.routeMapImage || '';
+    state.cmsRouteMapMode = data.mapMode === 'IMAGE' ? 'IMAGE' : 'GMAPS';
+    state.cmsRouteCheckpointMode = data.checkpointMode === 'IMAGE' ? 'IMAGE' : 'MANUAL';
+    state.cmsRouteCheckpointImage = data.checkpointImage || '';
+    const routeBadgeLabel = document.getElementById('routeSectionBadgeLabel');
+    if (routeBadgeLabel && typeof data.badgeLabel === 'string') {
+      routeBadgeLabel.textContent = data.badgeLabel;
+      routeBadgeLabel.parentElement.hidden = !data.badgeLabel.trim();
+    }
     renderRouteVisual(state.cmsRouteMapUrl, state.cmsRouteMapImage);
 
     // Render checkpoint list
     if (container) {
-      if (Array.isArray(data.points) && data.points.length > 0) {
+      if (state.cmsRouteCheckpointMode === 'IMAGE' && state.cmsRouteCheckpointImage) {
+        const image = document.createElement('img');
+        image.className = 'route-checkpoint-image';
+        image.src = state.cmsRouteCheckpointImage;
+        image.alt = 'Peta checkpoint dan detail rute event';
+        image.loading = 'lazy';
+        container.replaceChildren(image);
+      } else if (state.cmsRouteCheckpointMode === 'IMAGE') {
+        container.innerHTML = '<p class="route-map-empty">Gambar checkpoint belum tersedia.</p>';
+      } else if (Array.isArray(data.points) && data.points.length > 0) {
         container.innerHTML = data.points.map((pt, i) => `
           <div class="route-point">
             <div class="route-point-marker">${String(i + 1).padStart(2, '0')}</div>
@@ -1765,7 +2294,8 @@ async function loadRouteData() {
       }
     }
   } catch (err) {
-    if (container) container.innerHTML = '<p style="color:var(--color-text-muted);font-size:0.9rem;padding:12px 0;">Belum ada titik checkpoint rute yang tersimpan.</p>';
+    console.error('Gagal memuat data rute:', err);
+    if (container) container.innerHTML = '<p style="color:var(--color-text-muted);font-size:0.9rem;padding:12px 0;">Data rute gagal dimuat. Silakan coba beberapa saat lagi.</p>';
   }
 }
 
@@ -1831,7 +2361,10 @@ function initApp() {
   realtimeSocket.on('public:data_changed', ({ topics = [] } = {}) => {
     if (topics.includes('events')) refreshPublicEvents();
     if (topics.includes('countdown')) loadCountdownSettings();
-    if (topics.includes('cms')) loadWebsiteSettings();
+    if (topics.includes('cms')) {
+      loadWebsiteSettings();
+      loadRouteData();
+    }
     if (topics.includes('routes')) loadRouteData();
   });
   window.addEventListener('realtime:reconnected', () => {
@@ -1883,7 +2416,12 @@ function initApp() {
       state.selectedEvent = ev;
       renderParticipantForms();
       updateOrderPreview();
+      updateRegistrationCountdown();
     }
+  });
+
+  document.getElementById('regModal')?.addEventListener('change', (e) => {
+    if (e.target.matches('.p-event-select')) updateRegistrationCountdown();
   });
 
   document.getElementById('modalParticipantCount')?.addEventListener('change', (e) => {
@@ -1951,11 +2489,19 @@ function initApp() {
   document.getElementById('sizeChartOkBtn')?.addEventListener('click', () => closeModal('sizeChartModal'));
 
   // FAQ Accordion
-  document.querySelectorAll('.faq-question').forEach(q => {
-    q.addEventListener('click', () => {
-      const item = q.parentElement;
-      item.classList.toggle('active');
+  document.getElementById('faqList')?.addEventListener('click', (event) => {
+    const question = event.target.closest('.faq-question');
+    if (!question) return;
+    const item = question.closest('.faq-item');
+    const isActive = item.classList.contains('active');
+    document.querySelectorAll('#faqList .faq-item.active').forEach(activeItem => {
+      activeItem.classList.remove('active');
+      activeItem.querySelector('.faq-question')?.setAttribute('aria-expanded', 'false');
     });
+    if (!isActive) {
+      item.classList.add('active');
+      question.setAttribute('aria-expanded', 'true');
+    }
   });
 
   // Mobile Bottom Dock Scroll Tracking

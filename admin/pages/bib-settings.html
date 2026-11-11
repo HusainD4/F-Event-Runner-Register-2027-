@@ -127,10 +127,10 @@
           </div>
 
           <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-            <button type="submit" class="btn btn-primary" id="btnSaveBibSettings" style="flex: 1;">
+            <button type="submit" class="btn btn-primary" id="btnSaveBibSettings" data-permission="bib:manage" style="flex: 1;">
               <i class="fa-solid fa-floppy-disk"></i> Simpan Pengaturan BIB
             </button>
-            <button type="button" class="btn btn-secondary" id="btnTriggerBulkGenerate" style="flex: 1; border-color: #C7D2FE; color: #4338CA;">
+            <button type="button" class="btn btn-secondary" id="btnTriggerBulkGenerate" data-permission="bib:manage" style="flex: 1; border-color: #C7D2FE; color: #4338CA;">
               <i class="fa-solid fa-wand-magic-sparkles"></i> Generate Massal Sekarang
             </button>
           </div>
@@ -157,7 +157,7 @@
               </label>
               <div style="display: flex; gap: 10px;">
                 <input type="text" class="form-input" id="qrInputPrefix" placeholder="TEGALRUN" value="TEGALRUN" required style="font-family: monospace; text-transform: uppercase; font-weight: 700;">
-                <button type="submit" class="btn btn-primary" id="btnSaveQrPrefix">
+                <button type="submit" class="btn btn-primary" id="btnSaveQrPrefix" data-permission="bib:manage">
                   <i class="fa-solid fa-check"></i> Simpan
                 </button>
               </div>
@@ -196,7 +196,7 @@
               <textarea class="form-input" id="rpcInstructionsTextarea" rows="5" style="resize: vertical; font-size: 0.85rem; line-height: 1.6;"></textarea>
             </div>
 
-            <button type="submit" class="btn btn-primary" id="btnSaveRpcInstructions" style="width: 100%;">
+            <button type="submit" class="btn btn-primary" id="btnSaveRpcInstructions" data-permission="bib:manage" style="width: 100%;">
               <i class="fa-solid fa-floppy-disk"></i> Simpan Petunjuk E-Tiket
             </button>
           </form>
@@ -248,7 +248,7 @@
               </div>
             </div>
 
-            <button type="submit" class="btn btn-primary" id="btnSavePaymentFeeSettings" style="width: 100%;">
+            <button type="submit" class="btn btn-primary" id="btnSavePaymentFeeSettings" data-permission="bib:manage" style="width: 100%;">
               <i class="fa-solid fa-floppy-disk"></i> Simpan Pengaturan Pembayaran
             </button>
           </form>
@@ -258,4 +258,3 @@
     </div>
   </div>
 </div>
-

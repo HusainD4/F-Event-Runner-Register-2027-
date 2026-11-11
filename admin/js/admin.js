@@ -18,15 +18,17 @@ import notificationsPane from '../pages/notifications.html?raw';
 import notifLogsPane from '../pages/notif-logs.html?raw';
 import whatsappWebPane from '../pages/whatsapp-web.html?raw';
 import logsPane from '../pages/logs.html?raw';
+import roleMonitoringPane from '../pages/role-monitoring.html?raw';
 import modalsHtml from '../modals/modals.html?raw';
 
 // 2. Core Modules
 import { adminState } from './core/state.js';
-import { handleLogin, checkAuthAndInit } from './core/auth.js';
+import { handleLogin, handleLogout, checkAuthAndInit } from './core/auth.js';
 import { openMobileSidebar, closeMobileSidebar, switchAdminTab } from './core/sidebar.js';
+import { showAdminToast } from './core/utils.js';
 
 // 3. Page Modules
-import { loadEvents, openCreateEventModal, handleEventFormSubmit, resetBenefitForm, handleBenefitFormSubmit } from './pages/events.js';
+import { loadEvents, openCreateEventModal, handleEventFormSubmit, resetBenefitForm, handleBenefitFormSubmit, handleJerseyFormSubmit, resetJerseyForm, updateJerseyImagePreview } from './pages/events.js';
 import { loadParticipants, renderParticipantsTable, openCreateParticipantModal, handleParticipantFormSubmit, exportParticipantsCsv, switchParticipantFilterTab, applyParticipantFilters } from './pages/participants.js';
 import { loadRacepackStats, startRpcCamera, stopRpcCamera, triggerNativeCamera, handleNativeCameraFile, handleConfirmRacepackCheckin, handleRevertRacepackCheckin, verifyRacepackByCode } from './pages/racepack.js';
 import { loadRacepackQueue } from './pages/racepack-view.js';
@@ -35,11 +37,12 @@ import { handleSaveGlobalCountdown, handleResetGlobalCountdown, handleToggleGlob
 import { initBibSettingsListeners } from './pages/bib-settings.js';
 import { handleCmsSubmit } from './pages/cms.js';
 import { openCreateAdminUserModal, handleAdminUserSubmit, openCreateRoleModal, handleRoleSubmit, handleResetDefaultRoles, DEFAULT_ROLE_DIRECTORY } from './pages/admins.js';
-import { openCreateRouteModal, handleRoutePointFormSubmit } from './pages/routes.js';
+import { openCreateRouteModal, handleRoutePointFormSubmit, handleRouteSettingsSubmit, updateRouteSettingPreviews } from './pages/routes.js';
 import { handleNotificationSettingsSubmit, handleSendTestNotif, handleGenerateWaQr, handleDisconnectWa, handleRealtimeWhatsAppSession } from './pages/notifications.js';
 import { loadNotificationLogs, handleBatchSendNotif } from './pages/notif-logs.js';
 import { loadWhatsAppWebConsole, handleSendDirectWaMessage, handleWaTemplateChange, handleQuickDispatchTicket, renderWhatsAppWebContactList, waWebContacts } from './pages/whatsapp-web.js';
 import { loadAuditLogs } from './pages/logs.js';
+import { loadRoleMonitoring } from './pages/role-monitoring.js';
 import { handleSyncMidtransDashboard, loadDashboardStats } from './pages/dashboard.js';
 import { loadAdminsAndRoles } from './pages/admins.js';
 import { loadRoutePoints } from './pages/routes.js';
@@ -73,7 +76,8 @@ async function refreshActiveAdminData() {
     countdown: { topics: ['countdown'], load: loadGlobalSettings },
     'notif-logs': { topics: ['notif-logs'], load: () => loadNotificationLogs({ showLoading: false }) },
     racepack: { topics: ['racepack'], load: loadRacepackStats },
-    'racepack-view': { topics: ['racepack'], load: loadRacepackQueue }
+    'racepack-view': { topics: ['racepack'], load: loadRacepackQueue },
+    'role-monitoring': { topics: ['admins'], load: loadRoleMonitoring }
   };
   const loader = loaders[tabKey];
   if (!loader || !loader.topics.some(topic => pendingAdminTopics.has(topic))) return;
@@ -119,7 +123,8 @@ function mountModularContent() {
       notificationsPane,
       notifLogsPane,
       whatsappWebPane,
-      logsPane
+      logsPane,
+      roleMonitoringPane
     ].join('\n');
   }
 
@@ -171,19 +176,14 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btnSelectAllPages')?.addEventListener('click', () => {
     document.querySelectorAll('#roleModulesContainer input[type="checkbox"]:not(:disabled)').forEach(cb => {
       cb.checked = true;
-      cb.closest('.role-module-card')?.classList.add('checked');
+      cb.dispatchEvent(new Event('change', { bubbles: true }));
     });
   });
 
   document.getElementById('btnClearAllPages')?.addEventListener('click', () => {
     document.querySelectorAll('#roleModulesContainer input[type="checkbox"]:not(:disabled)').forEach(cb => {
-      if (cb.value === 'page:dashboard') {
-        cb.checked = true;
-        cb.closest('.role-module-card')?.classList.add('checked');
-      } else {
-        cb.checked = false;
-        cb.closest('.role-module-card')?.classList.remove('checked');
-      }
+      cb.checked = false;
+      cb.dispatchEvent(new Event('change', { bubbles: true }));
     });
   });
 
@@ -205,14 +205,15 @@ document.addEventListener('DOMContentLoaded', () => {
       ['page:dashboard']
     ) : ['page:dashboard'];
 
+    document.querySelectorAll('#roleApiPermissionsContainer input[type="checkbox"]:not(:disabled)').forEach(cb => {
+      cb.checked = false;
+      cb.closest('.role-permission-option')?.classList.remove('checked');
+    });
+
     document.querySelectorAll('#roleModulesContainer input[type="checkbox"]:not(:disabled)').forEach(cb => {
       const match = pagesToSelect.includes(cb.value);
       cb.checked = match;
-      if (match) {
-        cb.closest('.role-module-card')?.classList.add('checked');
-      } else {
-        cb.closest('.role-module-card')?.classList.remove('checked');
-      }
+      cb.dispatchEvent(new Event('change', { bubbles: true }));
     });
   });
 
@@ -222,7 +223,15 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btnSendTestNotif')?.addEventListener('click', handleSendTestNotif);
   document.getElementById('formEventBenefit')?.addEventListener('submit', handleBenefitFormSubmit);
   document.getElementById('btnCancelBenefitEdit')?.addEventListener('click', resetBenefitForm);
+  document.getElementById('formEventJersey')?.addEventListener('submit', handleJerseyFormSubmit);
+  document.getElementById('btnCancelJerseyEdit')?.addEventListener('click', resetJerseyForm);
+  document.getElementById('jerseyFormImage')?.addEventListener('input', updateJerseyImagePreview);
   document.getElementById('formRoutePoint')?.addEventListener('submit', handleRoutePointFormSubmit);
+  document.getElementById('routeSettingsForm')?.addEventListener('submit', handleRouteSettingsSubmit);
+  document.getElementById('routeMapMode')?.addEventListener('change', updateRouteSettingPreviews);
+  document.getElementById('routeCheckpointMode')?.addEventListener('change', updateRouteSettingPreviews);
+  document.getElementById('routeSettingsMapImage')?.addEventListener('input', updateRouteSettingPreviews);
+  document.getElementById('routeSettingsCheckpointImage')?.addEventListener('input', updateRouteSettingPreviews);
 
   // Countdown & Global Closed
   document.getElementById('btnSaveGlobalCountdown')?.addEventListener('click', handleSaveGlobalCountdown);
@@ -319,6 +328,22 @@ document.addEventListener('DOMContentLoaded', () => {
   const realtimeSocket = getRealtimeSocket();
   realtimeSocket.on('admin:data_changed', handleAdminDataChanged);
   realtimeSocket.on('admin:whatsapp_session', handleRealtimeWhatsAppSession);
+  realtimeSocket.on('admin:force_logout', () => {
+    showAdminToast('warning', 'Sesi Diakhiri', 'Superadmin telah mengakhiri sesi Anda. Silakan login kembali jika diperlukan.');
+    handleLogout();
+  });
+  realtimeSocket.on('admin:presence_changed', () => {
+    const role = adminState.profile?.role;
+    if (role?.name === 'SUPERADMIN' && adminState.activeTab === 'role-monitoring') {
+      loadRoleMonitoring();
+    }
+    const permissions = Array.isArray(role?.permissions) ? role.permissions : [];
+    const hasDashboard = role?.name === 'SUPERADMIN' || permissions.includes('page:dashboard');
+    const hasTeamWidget = role?.name === 'SUPERADMIN'
+      || !permissions.includes('dashboard:configured')
+      || permissions.includes('dashboard:team-presence');
+    if (hasDashboard && hasTeamWidget) loadDashboardStats();
+  });
   window.addEventListener('admin:tab-changed', refreshActiveAdminData);
   document.addEventListener('focusout', refreshActiveAdminData);
   document.addEventListener('visibilitychange', () => {

@@ -1,4 +1,7 @@
 import { apiFetch } from './api.js';
+import { loadWebsiteBranding } from './branding.js';
+
+loadWebsiteBranding();
 
 function escapeHtml(str) {
   if (!str) return '';

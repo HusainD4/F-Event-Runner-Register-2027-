@@ -1,4 +1,7 @@
 import { apiFetch } from './api.js';
+import { loadWebsiteBranding } from './branding.js';
+
+loadWebsiteBranding();
 
 function showToast(type = 'success', message = '') {
   const container = document.getElementById('ticketToastContainer');

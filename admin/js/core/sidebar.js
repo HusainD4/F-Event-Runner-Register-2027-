@@ -12,6 +12,7 @@ import { loadRacepackStats, stopRpcCamera } from '../pages/racepack.js';
 import { loadRacepackQueue } from '../pages/racepack-view.js';
 import { loadBibSettings } from '../pages/bib-settings.js';
 import { loadGlobalSettings } from '../pages/countdown.js';
+import { loadRoleMonitoring } from '../pages/role-monitoring.js';
 
 export async function loadSidebar() {
   const mount = document.getElementById('sidebarMount');
@@ -48,6 +49,16 @@ export function initSidebar() {
 
   if (adminState.profile) {
     applyRbacUi(adminState.profile);
+    const roleName = adminState.profile.role?.name || '';
+    const permissions = Array.isArray(adminState.profile.role?.permissions) ? adminState.profile.role.permissions : [];
+    const isSuper = roleName === 'SUPERADMIN';
+    if (!isSuper && !permissions.includes('page:dashboard')) {
+      const firstAllowedTab = Array.from(document.querySelectorAll('.sidebar-nav .nav-item')).find(button => {
+        const pageKey = button.getAttribute('data-page');
+        return pageKey && permissions.includes(pageKey);
+      })?.getAttribute('data-nav');
+      if (firstAllowedTab) switchAdminTab(firstAllowedTab);
+    }
   }
 }
 
@@ -55,9 +66,9 @@ export function switchAdminTab(tabKey) {
   if (adminState.profile && adminState.profile.role) {
     const roleName = adminState.profile.role.name || '';
     const permissions = Array.isArray(adminState.profile.role.permissions) ? adminState.profile.role.permissions : [];
-    const isSuper = roleName === 'SUPERADMIN' || permissions.includes('*');
+    const isSuper = roleName === 'SUPERADMIN';
 
-    if (!isSuper && tabKey !== 'dashboard') {
+    if (!isSuper) {
       const navButton = document.querySelector(`.sidebar-nav .nav-item[data-nav="${tabKey}"]`);
       const pageKey = navButton?.getAttribute('data-page') || `page:${tabKey}`;
       if (!permissions.includes(pageKey)) {
@@ -101,6 +112,7 @@ export function switchAdminTab(tabKey) {
     'notif-logs': { title: 'Log Pengiriman Notifikasi & Peserta', sub: 'Portal Admin / WhatsApp & Email Delivery Tracking' },
     'whatsapp-web': { title: 'WhatsApp Web Enterprise Console', sub: 'Portal Admin / Real-Time Messaging & Session Hub' },
     admins: { title: 'Kelola Admin & Hak Akses', sub: 'Portal Admin / Manajemen RBAC Superadmin' },
+    'role-monitoring': { title: 'Pemantauan Semua Role', sub: 'Portal Admin / Sesi Online & Kontrol Akses' },
     logs: { title: 'Log Audit Sistem', sub: 'Portal Admin / Rekam Jejak Keamanan' }
   };
 
@@ -137,6 +149,9 @@ export function switchAdminTab(tabKey) {
   }
   if (tabKey === 'notif-logs') {
     loadNotificationLogs();
+  }
+  if (tabKey === 'role-monitoring') {
+    loadRoleMonitoring();
   }
 
   window.dispatchEvent(new CustomEvent('admin:tab-changed', { detail: { tabKey } }));

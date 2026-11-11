@@ -1,19 +1,19 @@
 <div class="admin-tab-pane" id="pane-admins" data-role="SUPERADMIN">
           <!-- Sub-nav Tabs RBAC -->
-          <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
-            <button type="button" class="btn btn-primary btn-sm" id="btnRbacTabUsers" onclick="switchRbacSubTab('users')">
+          <div class="rbac-subnav" role="tablist" aria-label="Bagian pengelolaan admin">
+            <button type="button" class="btn btn-primary btn-sm rbac-subnav-button" id="btnRbacTabUsers" role="tab" aria-controls="rbacSectionUsers" aria-selected="true" onclick="switchRbacSubTab('users')">
               <i class="fa-solid fa-users-gear"></i> Daftar Akun Staf Admin
             </button>
-            <button type="button" class="btn btn-outline btn-sm" id="btnRbacTabRoles" onclick="switchRbacSubTab('roles')">
-              <i class="fa-solid fa-key"></i> Pengaturan Hak Akses 12 Role
+            <button type="button" class="btn btn-outline btn-sm rbac-subnav-button" id="btnRbacTabRoles" role="tab" aria-controls="rbacSectionRoles" aria-selected="false" onclick="switchRbacSubTab('roles')">
+              <i class="fa-solid fa-key"></i> Pengaturan Hak Akses Role
             </button>
-            <button type="button" class="btn btn-outline btn-sm" id="btnRbacTabMatrix" onclick="switchRbacSubTab('matrix')">
+            <button type="button" class="btn btn-outline btn-sm rbac-subnav-button" id="btnRbacTabMatrix" role="tab" aria-controls="rbacSectionMatrix" aria-selected="false" onclick="switchRbacSubTab('matrix')">
               <i class="fa-solid fa-table-list"></i> Direktori &amp; Arti 12 Role
             </button>
           </div>
 
           <!-- SUB-SECTION 1: AKUN ADMIN -->
-          <div id="rbacSectionUsers" class="admin-section">
+          <div id="rbacSectionUsers" class="admin-section rbac-panel" role="tabpanel" aria-labelledby="btnRbacTabUsers">
             <div class="admin-section-header">
               <div>
                 <h3><i class="fa-solid fa-shield-halved" style="color: var(--color-primary);"></i> Manajemen Akun Petugas Admin</h3>
@@ -24,8 +24,8 @@
               </button>
             </div>
 
-            <div class="table-responsive">
-              <table class="admin-table">
+            <div class="table-responsive rbac-table-scroll">
+              <table class="admin-table rbac-table rbac-users-table">
                 <thead>
                   <tr>
                     <th>No</th>
@@ -50,14 +50,14 @@
           </div>
 
           <!-- SUB-SECTION 2: MANAJEMEN ROLE & HAK AKSES HALAMAN -->
-          <div id="rbacSectionRoles" class="admin-section" style="display: none;">
+          <div id="rbacSectionRoles" class="admin-section rbac-panel" role="tabpanel" aria-labelledby="btnRbacTabRoles" style="display: none;">
             <div class="admin-section-header">
               <div>
                 <h3><i class="fa-solid fa-key" style="color: var(--color-primary);"></i> Pengaturan Hak Akses Halaman Role</h3>
-                <p>Superadmin dapat menentukan secara fleksibel modul dan halaman apa saja yang boleh diakses oleh setiap role di database.</p>
+                <p>Atur akses halaman, izin aksi API, dan widget dashboard setiap role secara terpisah.</p>
               </div>
-              <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                <button type="button" class="btn btn-outline btn-sm" id="btnResetDefaultRoles" style="color: #64748B; border-color: #CBD5E1;">
+              <div class="rbac-header-actions">
+                <button type="button" class="btn btn-outline btn-sm" id="btnResetDefaultRoles">
                   <i class="fa-solid fa-rotate-left"></i> Reset ke 12 Role Default
                 </button>
                 <button type="button" class="btn btn-primary btn-sm btn-glow" id="btnOpenCreateRoleModal">
@@ -66,21 +66,22 @@
               </div>
             </div>
 
-            <div class="table-responsive">
-              <table class="admin-table">
+            <div class="table-responsive rbac-table-scroll">
+              <table class="admin-table rbac-table rbac-roles-table">
                 <thead>
                   <tr>
                     <th>No</th>
                     <th>Nama Role</th>
                     <th>Deskripsi Tanggung Jawab</th>
                     <th>Halaman yang Diizinkan</th>
+                    <th>Widget Dashboard</th>
                     <th>Jumlah Petugas</th>
                     <th>Aksi</th>
                   </tr>
                 </thead>
                 <tbody id="adminRolesTableBody">
                   <tr>
-                    <td colspan="6" style="text-align: center; padding: 30px; color: var(--color-text-muted);">
+                    <td colspan="7" style="text-align: center; padding: 30px; color: var(--color-text-muted);">
                       Memuat daftar role...
                     </td>
                   </tr>
@@ -90,21 +91,21 @@
           </div>
 
           <!-- SUB-SECTION 3: DIREKTORI & PENJELASAN ARTI 12 ROLE -->
-          <div id="rbacSectionMatrix" class="admin-section" style="display: none;">
+          <div id="rbacSectionMatrix" class="admin-section rbac-panel" role="tabpanel" aria-labelledby="btnRbacTabMatrix" style="display: none;">
             <div class="admin-section-header">
               <div>
                 <h3><i class="fa-solid fa-book-open-reader" style="color: var(--color-primary);"></i> Direktori &amp; Arti Tanggung Jawab 12 Role Resmi</h3>
-                <p>Panduan lengkap fungsi operasional dan pembagian wewenang halaman admin untuk setiap divisi kepanitiaan Tegal Run 2027.</p>
+                <p>Panduan peran resmi. Hak akses aktual mengikuti konfigurasi di tab Pengaturan Hak Akses.</p>
               </div>
             </div>
 
-            <div class="table-responsive">
-              <table class="admin-table">
+            <div class="table-responsive rbac-table-scroll">
+              <table class="admin-table rbac-table rbac-directory-table">
                 <thead>
                   <tr style="background: #F8FAFC;">
                     <th style="width: 170px;">Role / Peran</th>
                     <th style="min-width: 250px;">Tugas &amp; Tanggung Jawab Operasional</th>
-                    <th style="min-width: 280px;">Akses Halaman yang Diberikan Superadmin</th>
+                    <th style="min-width: 280px;">Cakupan Umum (Dapat Disesuaikan)</th>
                     <th style="min-width: 140px;">Tingkat Otoritas</th>
                   </tr>
                 </thead>
