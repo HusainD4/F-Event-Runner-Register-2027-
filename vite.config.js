@@ -23,7 +23,8 @@ export default defineConfig({
       'www.haisen.my.id',
       'pendaftaran-running.haisen.my.id',
       'tegalrun2027.com',
-      'www.tegalrun2027.com'
+      'www.tegalrun2027.com',
+      'siexa.haisen.my.id'
     ],
     proxy: {
       '/api': {
