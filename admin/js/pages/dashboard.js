@@ -2,12 +2,6 @@ import { adminState } from '../core/state.js';
 import { fetchAdmin } from '../core/api.js';
 import { showAdminToast, formatRupiah } from '../core/utils.js';
 import { applyRbacUi } from '../core/rbac.js';
-import { loadGlobalSettings } from './countdown.js';
-import { loadEvents } from './events.js';
-import { loadParticipants } from './participants.js';
-import { loadOrders } from './orders.js';
-import { loadAdminsAndRoles } from './admins.js';
-import { loadAuditLogs } from './logs.js';
 
 async function loadDashboardData() {
   const role = adminState.profile?.role;
@@ -15,24 +9,11 @@ async function loadDashboardData() {
   const permissions = Array.isArray(role?.permissions) ? role.permissions : [];
   const isSuper = roleName === 'SUPERADMIN';
   const hasPage = page => isSuper || permissions.includes(page);
-  const hasApiPermission = permission => {
-    const [domain] = permission.split(':');
-    return isSuper || permissions.includes(permission) || permissions.includes(`${domain}:*`);
-  };
 
   if (!hasPage('page:dashboard')) return;
 
   try {
     await loadDashboardStats();
-
-    if (hasPage('page:countdown') && hasApiPermission('countdown:manage')) await loadGlobalSettings();
-    if (hasPage('page:events') && hasApiPermission('events:read')) await loadEvents();
-    if ((hasPage('page:participants') || hasPage('page:racepack')) && hasApiPermission('participants:read')) await loadParticipants();
-    if (hasPage('page:orders') && hasApiPermission('orders:read')) await loadOrders();
-    if (isSuper) {
-      await loadAdminsAndRoles();
-    }
-    if (hasPage('page:logs') && hasApiPermission('logs:read')) await loadAuditLogs();
     applyRbacUi(adminState.profile);
   } catch (err) {
     console.error('Error loading dashboard data:', err);

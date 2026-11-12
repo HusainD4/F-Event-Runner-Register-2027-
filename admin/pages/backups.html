@@ -1,0 +1,55 @@
+<div class="admin-tab-pane" id="pane-backups" data-role="SUPERADMIN">
+  <section class="admin-section backup-section">
+    <div class="admin-section-header backup-header">
+      <div>
+        <h3><i class="fa-solid fa-database" aria-hidden="true"></i> Backup Database</h3>
+        <p>Unduh salinan seluruh tabel dan data database. Akses hanya tersedia untuk Superadmin.</p>
+      </div>
+      <button type="button" class="btn btn-secondary btn-sm" id="btnRefreshBackupOverview">
+        <i class="fa-solid fa-rotate" aria-hidden="true"></i> Periksa Database
+      </button>
+    </div>
+
+    <div class="backup-warning" role="alert">
+      <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+      <div>
+        <strong>File backup berisi data sangat sensitif.</strong>
+        <p>Termasuk data peserta, konfigurasi, dan hash password admin. Simpan di tempat terenkripsi dan jangan bagikan file secara publik.</p>
+      </div>
+    </div>
+
+    <div class="backup-download-grid">
+      <article class="backup-download-card">
+        <span class="backup-download-icon"><i class="fa-solid fa-file-code" aria-hidden="true"></i></span>
+        <div>
+          <h4>Backup SQL lengkap</h4>
+          <p>Skema tabel dan seluruh record dalam format SQL. Impor ke database kosong.</p>
+        </div>
+        <button type="button" class="btn btn-primary" id="btnDownloadSqlBackup">
+          <i class="fa-solid fa-download" aria-hidden="true"></i> Unduh SQL
+        </button>
+      </article>
+      <article class="backup-download-card">
+        <span class="backup-download-icon backup-csv-icon"><i class="fa-solid fa-file-csv" aria-hidden="true"></i></span>
+        <div>
+          <h4>Backup CSV gabungan</h4>
+          <p>Semua tabel dalam satu CSV; kolom <code>table_name</code> membedakan jenis record.</p>
+        </div>
+        <button type="button" class="btn btn-secondary" id="btnDownloadCsvBackup">
+          <i class="fa-solid fa-download" aria-hidden="true"></i> Unduh CSV
+        </button>
+      </article>
+    </div>
+
+    <div class="backup-overview">
+      <div class="backup-overview-heading">
+        <div>
+          <h4>Cakupan backup</h4>
+          <p id="backupTablesStatus" aria-live="polite">Memuat daftar tabel...</p>
+        </div>
+        <strong id="backupTableCount">-</strong>
+      </div>
+      <ul id="backupTablesList" class="backup-table-list" aria-label="Daftar tabel yang akan dicadangkan"></ul>
+    </div>
+  </section>
+</div>

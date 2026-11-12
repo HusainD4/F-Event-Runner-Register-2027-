@@ -26,25 +26,40 @@ async function ensureGlobalTimerSettings() {
 async function loadEvents() {
   try {
     const res = await fetchAdmin('/admin/events');
-    if (res.status === 'success') {
-      adminState.events = res.data;
-      renderEvents(res.data);
-      updateKpis();
-
-      // Populate Event Select Options for Participant Modal
-      const eventSelect = document.getElementById('partFormEventId');
-      if (eventSelect) {
-        eventSelect.innerHTML = res.data.map(e => `
-          <option value="${e.id}">${escapeHtml(e.ticketName)} (${escapeHtml(e.category)})</option>
-        `).join('');
-      }
-
-      // Update badge on sidebar
-      const navBadge = document.getElementById('navEventsCount');
-      if (navBadge) navBadge.textContent = res.data.length;
+    if (res.status !== 'success' || !Array.isArray(res.data)) {
+      throw new Error(res.message || 'Gagal memuat daftar event.');
     }
+
+    adminState.events = res.data;
+    renderEvents(res.data);
+    updateKpis();
+
+    const eventSelect = document.getElementById('partFormEventId');
+    if (eventSelect) {
+      eventSelect.innerHTML = res.data.map(e => `
+        <option value="${escapeHtml(e.id)}">${escapeHtml(e.ticketName)} (${escapeHtml(e.category)})</option>
+      `).join('');
+    }
+
+    const navBadge = document.getElementById('navEventsCount');
+    if (navBadge) navBadge.textContent = res.data.length;
   } catch (err) {
     console.error('Failed to load events:', err);
+    const container = document.getElementById('adminEventsContainer');
+    if (container) {
+      const errorState = document.createElement('div');
+      errorState.className = 'admin-events-error';
+      errorState.setAttribute('role', 'alert');
+      const message = document.createElement('p');
+      message.textContent = `Daftar event gagal dimuat: ${err.message}`;
+      const retryButton = document.createElement('button');
+      retryButton.type = 'button';
+      retryButton.className = 'btn btn-secondary btn-sm';
+      retryButton.innerHTML = '<i class="fa-solid fa-rotate" aria-hidden="true"></i> Coba Lagi';
+      retryButton.addEventListener('click', loadEvents);
+      errorState.replaceChildren(message, retryButton);
+      container.replaceChildren(errorState);
+    }
   }
 }
 
@@ -148,8 +163,20 @@ function renderEvents(events) {
   document.querySelectorAll('.btn-quick-save-event').forEach(btn => {
     btn.addEventListener('click', async () => {
       const id = btn.getAttribute('data-id');
-      const stock = parseInt(document.getElementById(`eventStock-${id}`).value, 10);
-      const price = parseFloat(document.getElementById(`eventPrice-${id}`).value);
+      const stockInput = document.getElementById(`eventStock-${id}`);
+      const priceInput = document.getElementById(`eventPrice-${id}`);
+      const stock = Number(stockInput.value);
+      const price = Number(priceInput.value);
+      if (!Number.isInteger(stock) || stock < 0) {
+        stockInput.focus();
+        showAdminToast('warning', 'Kuota Tidak Valid', 'Kuota harus berupa bilangan bulat minimal 0.');
+        return;
+      }
+      if (!Number.isFinite(price) || price < 0) {
+        priceInput.focus();
+        showAdminToast('warning', 'Harga Tidak Valid', 'Harga harus berupa angka minimal 0.');
+        return;
+      }
       await updateEventApi(id, { stock, price }, 'Kuota dan harga kategori berhasil diperbarui!');
     });
   });
@@ -179,11 +206,11 @@ function renderEvents(events) {
       const name = btn.getAttribute('data-name');
       openEventBenefitsModal(id, name);
     });
+  });
 
-    document.querySelectorAll('.btn-manage-jerseys').forEach(btn => {
-      btn.addEventListener('click', () => {
-        openEventJerseysModal(btn.dataset.id, btn.dataset.name || 'Kategori');
-      });
+  document.querySelectorAll('.btn-manage-jerseys').forEach(btn => {
+    btn.addEventListener('click', () => {
+      openEventJerseysModal(btn.dataset.id, btn.dataset.name || 'Kategori');
     });
   });
 
@@ -388,6 +415,7 @@ async function deleteEventApi(id) {
 let currentJerseyEventId = null;
 let currentEditingJerseyId = null;
 let currentEventJerseys = [];
+let jerseyBannerInputCounter = 0;
 
 async function openEventJerseysModal(eventId, eventName) {
   currentJerseyEventId = eventId;
@@ -424,6 +452,7 @@ function renderEventJerseys(jerseys) {
 
   list.innerHTML = jerseys.map((jersey, index) => {
     const sizes = Array.isArray(jersey.sizes) ? jersey.sizes : [];
+    const bannerImages = Array.isArray(jersey.bannerImages) ? jersey.bannerImages : [];
     return `
       <article class="jersey-admin-card">
         <div class="jersey-admin-card-image ${jersey.image ? '' : 'is-empty'}">
@@ -436,6 +465,7 @@ function renderEventJerseys(jerseys) {
           <strong>${escapeHtml(jersey.name)}</strong>
           <span>${escapeHtml(jersey.type)}</span>
           <small>Ukuran: ${escapeHtml(sizes.join(', '))}</small>
+          ${bannerImages.length ? `<small><i class="fa-regular fa-images" aria-hidden="true"></i> ${bannerImages.length} banner informasi</small>` : ''}
         </div>
         <div class="jersey-admin-card-actions">
           <button type="button" class="btn btn-secondary btn-sm btn-edit-jersey" data-index="${index}" aria-label="Edit jersey ${escapeHtml(jersey.name)}"><i class="fa-solid fa-pen"></i></button>
@@ -477,6 +507,59 @@ function updateJerseyImagePreview() {
   }
 }
 
+function getJerseyBannerImageFields() {
+  return [...document.querySelectorAll('#jerseyBannerImageFields .jersey-banner-url')]
+    .map(input => input.value.trim())
+    .filter(Boolean);
+}
+
+function updateJerseyBannerImagePreview() {
+  const fields = document.getElementById('jerseyBannerImageFields');
+  const preview = document.getElementById('jerseyBannerImagePreview');
+  const count = document.getElementById('jerseyBannerImageCount');
+  const addButton = document.getElementById('btnAddJerseyBannerImage');
+  if (!fields || !preview) return;
+
+  const inputs = [...fields.querySelectorAll('.jersey-banner-url')];
+  if (count) count.textContent = `${inputs.filter(input => input.value.trim()).length} / 5`;
+  if (addButton) addButton.disabled = inputs.length >= 5;
+
+  preview.innerHTML = inputs.map((input, index) => {
+    const url = input.value.trim();
+    if (!url || !input.checkValidity() || !/^https?:\/\//i.test(url)) return '';
+    return `
+      <div class="jersey-banner-preview-card">
+        <img src="${escapeHtml(url)}" alt="Pratinjau banner jersey ${index + 1}" loading="lazy"
+          onerror="this.hidden=true;this.parentElement.classList.add('is-invalid')">
+        <span>${index + 1}</span>
+      </div>
+    `;
+  }).join('');
+}
+
+function addJerseyBannerImageField(value = '') {
+  const fields = document.getElementById('jerseyBannerImageFields');
+  if (!fields) return;
+  if (fields.querySelectorAll('.jersey-banner-url').length >= 5) {
+    showAdminToast('warning', 'Maksimal Banner Tercapai', 'Setiap tipe jersey hanya dapat memiliki maksimal 5 banner gambar.');
+    return;
+  }
+
+  const row = document.createElement('div');
+  row.className = 'jersey-banner-input-row';
+  const index = ++jerseyBannerInputCounter;
+  row.innerHTML = `
+    <label class="sr-only" for="jerseyBannerImage-${index}">Link banner informasi ${index}</label>
+    <input class="form-input jersey-banner-url" id="jerseyBannerImage-${index}" type="url" maxlength="2048"
+      placeholder="https://contoh.com/banner-jersey-${index}.jpg" value="${escapeHtml(value)}">
+    <button type="button" class="btn btn-outline btn-sm btn-remove-jersey-banner" aria-label="Hapus banner ${index}">
+      <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
+    </button>
+  `;
+  fields.appendChild(row);
+  updateJerseyBannerImagePreview();
+}
+
 function resetJerseyForm() {
   currentEditingJerseyId = null;
   const form = document.getElementById('formEventJersey');
@@ -484,7 +567,11 @@ function resetJerseyForm() {
   document.getElementById('jerseyFormId').value = '';
   document.getElementById('btnSaveJersey').innerHTML = '<i class="fa-solid fa-plus"></i> Tambah Jersey';
   document.getElementById('btnCancelJerseyEdit').hidden = true;
+  const bannerFields = document.getElementById('jerseyBannerImageFields');
+  if (bannerFields) bannerFields.replaceChildren();
+  addJerseyBannerImageField();
   updateJerseyImagePreview();
+  updateJerseyBannerImagePreview();
 }
 
 function editJerseyForm(jersey) {
@@ -494,9 +581,15 @@ function editJerseyForm(jersey) {
   document.getElementById('jerseyFormType').value = jersey.type;
   document.getElementById('jerseyFormSizes').value = (Array.isArray(jersey.sizes) ? jersey.sizes : []).join(', ');
   document.getElementById('jerseyFormImage').value = jersey.image || '';
+  const bannerFields = document.getElementById('jerseyBannerImageFields');
+  if (bannerFields) bannerFields.replaceChildren();
+  const bannerImages = Array.isArray(jersey.bannerImages) ? jersey.bannerImages.slice(0, 5) : [];
+  bannerImages.forEach(url => addJerseyBannerImageField(url));
+  if (!bannerImages.length) addJerseyBannerImageField();
   document.getElementById('btnSaveJersey').innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Simpan Perubahan';
   document.getElementById('btnCancelJerseyEdit').hidden = false;
   updateJerseyImagePreview();
+  updateJerseyBannerImagePreview();
 }
 
 async function handleJerseyFormSubmit(event) {
@@ -505,6 +598,18 @@ async function handleJerseyFormSubmit(event) {
   const type = document.getElementById('jerseyFormType').value.trim();
   const sizes = [...new Set(document.getElementById('jerseyFormSizes').value.split(',').map(size => size.trim()).filter(Boolean))];
   const image = document.getElementById('jerseyFormImage').value.trim() || null;
+  const bannerImageInputs = [...document.querySelectorAll('#jerseyBannerImageFields .jersey-banner-url')];
+  const invalidBanner = bannerImageInputs.find(input => input.value.trim() && (!input.checkValidity() || !/^https?:\/\//i.test(input.value.trim())));
+  const bannerImages = bannerImageInputs.map(input => input.value.trim()).filter(Boolean);
+  if (invalidBanner) {
+    invalidBanner.focus();
+    showAdminToast('warning', 'Link Banner Tidak Valid', 'Gunakan URL gambar lengkap yang diawali http:// atau https://.');
+    return;
+  }
+  if (bannerImages.length > 5) {
+    showAdminToast('warning', 'Maksimal Banner Tercapai', 'Setiap tipe jersey hanya dapat memiliki maksimal 5 banner gambar.');
+    return;
+  }
   if (!currentJerseyEventId || !name || !type || !sizes.length) {
     showAdminToast('warning', 'Data Belum Lengkap', 'Nama, tipe, dan minimal satu ukuran jersey wajib diisi.');
     return;
@@ -514,7 +619,7 @@ async function handleJerseyFormSubmit(event) {
   button.disabled = true;
   button.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
   try {
-    const payload = { eventId: currentJerseyEventId, name, type, sizes, image };
+    const payload = { eventId: currentJerseyEventId, name, type, sizes, image, bannerImages };
     const response = currentEditingJerseyId
       ? await fetchAdmin(`/admin/jerseys/${currentEditingJerseyId}`, { method: 'PUT', body: JSON.stringify(payload) })
       : await fetchAdmin('/admin/jerseys', { method: 'POST', body: JSON.stringify(payload) });
@@ -528,6 +633,23 @@ async function handleJerseyFormSubmit(event) {
     button.disabled = false;
     button.innerHTML = originalHtml;
   }
+
+}
+
+function initializeJerseyBannerImageFields() {
+  const fields = document.getElementById('jerseyBannerImageFields');
+  const addButton = document.getElementById('btnAddJerseyBannerImage');
+  if (!fields || fields.dataset.initialized === 'true') return;
+  fields.dataset.initialized = 'true';
+  addButton?.addEventListener('click', () => addJerseyBannerImageField());
+  fields.addEventListener('input', updateJerseyBannerImagePreview);
+  fields.addEventListener('click', event => {
+    const removeButton = event.target.closest('.btn-remove-jersey-banner');
+    if (!removeButton) return;
+    removeButton.closest('.jersey-banner-input-row')?.remove();
+    updateJerseyBannerImagePreview();
+  });
+  addJerseyBannerImageField();
 }
 
 async function deleteJersey(jerseyId) {
@@ -767,6 +889,7 @@ window.openEventBenefitsModal = openEventBenefitsModal;
 window.openEventJerseysModal = openEventJerseysModal;
 
 export {
+  initializeJerseyBannerImageFields,
   loadEvents,
   renderEvents,
   openCreateEventModal,

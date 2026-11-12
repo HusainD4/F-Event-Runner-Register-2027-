@@ -1,12 +1,43 @@
 import { fetchAdmin } from '../core/api.js';
+import { adminState } from '../core/state.js';
 import { showAdminToast, showConfirmDialog, escapeHtml } from '../core/utils.js';
-import { loadParticipants } from './participants.js';
 
 let currentRacepackData = null;
+let racepackConfirmationParticipants = [];
+let racepackConfirmationLoadedAdminId = null;
+let racepackConfirmationLoading = false;
+let racepackStatsLoaded = false;
+let racepackStatsLoading = false;
 let html5QrScannerInstance = null;
 let rawCameraStream = null;
 let rawCameraLoopTimer = null;
 let nativeBarcodeDetector = null;
+
+function adjustRacepackStats(checkedInDelta) {
+  const checkedEl = document.getElementById('rpcKpiCheckedIn');
+  const remainingEl = document.getElementById('rpcKpiRemaining');
+  const percentageEl = document.getElementById('rpcKpiPercentage');
+  const checked = Number(checkedEl?.textContent);
+  const remaining = Number(remainingEl?.textContent);
+  const paid = Number(document.getElementById('rpcKpiPaidTotal')?.textContent);
+  if (!Number.isFinite(checked) || !Number.isFinite(remaining)) return;
+
+  const nextChecked = Math.max(0, checked + checkedInDelta);
+  const nextRemaining = Math.max(0, remaining - checkedInDelta);
+  if (checkedEl) checkedEl.textContent = String(nextChecked);
+  if (remainingEl) remainingEl.textContent = String(nextRemaining);
+  if (percentageEl && Number.isFinite(paid) && paid > 0) {
+    percentageEl.textContent = `${Math.round((nextChecked / paid) * 100)}% dari peserta lunas`;
+  }
+  const infoChecked = document.getElementById('rpcInfoCheckedIn');
+  const infoRemaining = document.getElementById('rpcInfoRemaining');
+  const infoPercentage = document.getElementById('rpcInfoPercentage');
+  if (infoChecked) infoChecked.textContent = String(nextChecked);
+  if (infoRemaining) infoRemaining.textContent = String(nextRemaining);
+  if (infoPercentage && Number.isFinite(paid) && paid > 0) {
+    infoPercentage.textContent = `${Math.round((nextChecked / paid) * 100)}% dari peserta lunas`;
+  }
+}
 
 // Cek apakah browser mendukung BarcodeDetector bawaan
 if (typeof window !== 'undefined' && 'BarcodeDetector' in window) {
@@ -20,10 +51,13 @@ if (typeof window !== 'undefined' && 'BarcodeDetector' in window) {
 /**
  * Muat ringkasan statistik Racepack
  */
-export async function loadRacepackStats() {
+export async function loadRacepackStats({ force = false } = {}) {
+  if (racepackStatsLoading || (racepackStatsLoaded && !force)) return;
+  racepackStatsLoading = true;
   try {
     const res = await fetchAdmin('/admin/racepack/stats');
     if (res && res.status === 'success' && res.data) {
+      racepackStatsLoaded = true;
       const d = res.data;
       const elChecked = document.getElementById('rpcKpiCheckedIn');
       const elRemaining = document.getElementById('rpcKpiRemaining');
@@ -45,6 +79,181 @@ export async function loadRacepackStats() {
     }
   } catch (err) {
     console.warn('Gagal memuat statistik racepack:', err);
+  } finally {
+    racepackStatsLoading = false;
+  }
+}
+
+function renderRacepackConfirmations() {
+  const table = document.getElementById('racepackConfirmationsTable');
+  const summary = document.getElementById('racepackConfirmationsSummary');
+  if (!table) return;
+
+  const participants = racepackConfirmationParticipants;
+  const role = adminState.profile?.role;
+  const permissions = Array.isArray(role?.permissions) ? role.permissions : [];
+  const canConfirm = role?.name === 'SUPERADMIN'
+    || permissions.includes('racepack:checkin')
+    || permissions.includes('racepack:*')
+    || permissions.includes('*');
+  if (participants.length === 0) {
+    table.innerHTML = '<tr><td colspan="4" class="text-center">Belum ada peserta yang Anda kirim ke antrean.</td></tr>';
+  } else {
+    table.innerHTML = participants.map(participant => `
+      <tr>
+        <td>${escapeHtml(participant.fullNameKtp || '-')}</td>
+        <td><strong>${escapeHtml(participant.bibNumber || 'Belum diterbitkan')}</strong></td>
+        <td>${participant.checkedIn
+          ? `<span class="status-pill success">Sudah diambil${participant.checkedInBy ? ` · ${escapeHtml(participant.checkedInBy)}` : ''}</span>`
+          : '<span class="status-pill pending">Belum diambil</span>'}</td>
+        <td>${participant.checkedIn
+          ? '<span class="racepack-confirm-done">Selesai</span>'
+          : canConfirm
+          ? `<button type="button" class="btn btn-primary btn-sm" data-confirm-racepack-id="${escapeHtml(participant.id)}"><i class="fa-solid fa-check"></i> Konfirmasi</button>`
+          : '<span class="form-hint">Tidak memiliki izin konfirmasi</span>'}</td>
+      </tr>
+    `).join('');
+  }
+  if (summary) {
+    const completed = participants.filter(participant => participant.checkedIn).length;
+    summary.textContent = `${participants.length} peserta antrean Anda · ${completed} sudah check-in · ${participants.length - completed} belum diambil`;
+  }
+}
+
+export async function loadRacepackConfirmations({ force = false } = {}) {
+  const table = document.getElementById('racepackConfirmationsTable');
+  const summary = document.getElementById('racepackConfirmationsSummary');
+  if (!table || racepackConfirmationLoading) return;
+
+  const adminId = adminState.profile?.id;
+  if (!adminId) {
+    table.innerHTML = '<tr><td colspan="4" class="text-center">Sesi admin tidak valid. Silakan masuk kembali.</td></tr>';
+    if (summary) summary.textContent = '';
+    return;
+  }
+  if (!force && racepackConfirmationLoadedAdminId === adminId) {
+    renderRacepackConfirmations();
+    return;
+  }
+
+  table.innerHTML = '<tr><td colspan="4" class="text-center">Memuat antrean Anda...</td></tr>';
+  racepackConfirmationLoading = true;
+  try {
+    const res = await fetchAdmin('/admin/racepack/confirmations');
+    if (!res || res.status !== 'success' || !Array.isArray(res.data)) {
+      throw new Error(res?.message || 'Gagal memuat daftar konfirmasi racepack.');
+    }
+    if (adminState.profile?.id !== adminId) return;
+    racepackConfirmationParticipants = res.data;
+    racepackConfirmationLoadedAdminId = adminId;
+    renderRacepackConfirmations();
+  } catch (error) {
+    table.innerHTML = `<tr><td colspan="4" class="text-center">${escapeHtml(error.message || 'Gagal memuat daftar konfirmasi.')}</td></tr>`;
+    if (summary) summary.textContent = '';
+    console.error('Gagal memuat daftar konfirmasi racepack:', error);
+  } finally {
+    racepackConfirmationLoading = false;
+  }
+}
+
+export function handleRacepackConfirmationSocketEvent(event) {
+  const adminId = adminState.profile?.id;
+  if (!adminId || racepackConfirmationLoadedAdminId !== adminId || !event) return;
+
+  if (event.type === 'removed') {
+    const filteredParticipants = racepackConfirmationParticipants
+      .filter(participant => participant.id !== event.participantId);
+    if (filteredParticipants.length === racepackConfirmationParticipants.length) return;
+    racepackConfirmationParticipants = filteredParticipants;
+  } else if (event.type === 'queued' || event.type === 'checked_in') {
+    if (!event.participant?.id) return;
+    const existingIndex = racepackConfirmationParticipants
+      .findIndex(participant => participant.id === event.participant.id);
+    const existing = racepackConfirmationParticipants[existingIndex];
+    if (existing && existing.checkedIn === event.participant.checkedIn
+      && existing.checkedInBy === event.participant.checkedInBy
+      && existing.bibNumber === event.participant.bibNumber) return;
+    const participant = {
+      ...(existingIndex >= 0 ? racepackConfirmationParticipants[existingIndex] : {}),
+      ...event.participant,
+    };
+    if (existingIndex >= 0) racepackConfirmationParticipants[existingIndex] = participant;
+    else racepackConfirmationParticipants.push(participant);
+    racepackConfirmationParticipants.sort((a, b) => (a.fullNameKtp || '').localeCompare(b.fullNameKtp || ''));
+  } else {
+    return;
+  }
+
+  if (adminState.activeTab === 'racepack-confirm') renderRacepackConfirmations();
+}
+
+export function handleRacepackScanSocketEvent(event) {
+  const participant = currentRacepackData?.participant;
+  const participantId = event?.participantId || event?.participant?.id;
+  if (!participant || participant.id !== participantId) return;
+
+  if (event.type === 'queued') {
+    if (currentRacepackData.racepack?.queued) return;
+    currentRacepackData.racepack = {
+      ...currentRacepackData.racepack,
+      queued: true,
+      queuedAt: event.participant?.queue?.queuedAt,
+    };
+  } else if (event.type === 'checked_in') {
+    if (currentRacepackData.racepack?.checkedIn) return;
+    currentRacepackData.racepack = {
+      ...currentRacepackData.racepack,
+      ...event.participant,
+      checkedIn: true,
+      queued: false,
+    };
+    adjustRacepackStats(1);
+  } else if (event.type === 'removed') {
+    if (!currentRacepackData.racepack?.checkedIn && !currentRacepackData.racepack?.queued) return;
+    if (currentRacepackData.racepack?.checkedIn) adjustRacepackStats(-1);
+    currentRacepackData.racepack = {
+      ...currentRacepackData.racepack,
+      checkedIn: false,
+      queued: false,
+    };
+  } else {
+    return;
+  }
+
+  if (adminState.activeTab === 'racepack') renderRacepackDetails(currentRacepackData);
+}
+
+export async function handleConfirmRacepackTableCheckin(participantId) {
+  if (!participantId) return;
+  const confirmed = await showConfirmDialog({
+    title: 'Konfirmasi Check-in Racepack',
+    message: 'Pastikan racepack sudah diserahkan kepada peserta sebelum mengonfirmasi check-in.',
+    confirmText: 'Ya, Konfirmasi',
+    type: 'warning',
+  });
+  if (!confirmed) return;
+
+  try {
+    const res = await fetchAdmin('/admin/racepack/checkin', {
+      method: 'POST',
+      body: JSON.stringify({ participantId }),
+    });
+    if (!res || res.status !== 'success') {
+      throw new Error(res?.message || 'Check-in racepack gagal dikonfirmasi.');
+    }
+    showAdminToast('success', 'Check-in Berhasil', res.message || 'Pengambilan racepack berhasil dikonfirmasi.');
+    handleRacepackConfirmationSocketEvent({
+      type: 'checked_in',
+      participant: {
+        ...racepackConfirmationParticipants.find(participant => participant.id === participantId),
+        checkedIn: true,
+        checkedInAt: res.data?.checkedInAt || new Date().toISOString(),
+        checkedInBy: res.data?.checkedInBy || adminState.profile?.fullName || 'Admin',
+        bibNumber: res.data?.bibNumber || racepackConfirmationParticipants.find(participant => participant.id === participantId)?.bibNumber,
+      },
+    });
+  } catch (error) {
+    showAdminToast('error', 'Gagal Check-in', error.message || 'Terjadi kesalahan saat mengonfirmasi racepack.');
   }
 }
 
@@ -359,9 +568,10 @@ async function handleBatchRacepackCheckin(data) {
         throw new Error(`${res?.message || 'Gagal mengirim peserta ke antrean.'} (${queuedCount} peserta sudah terkirim)`);
       }
       queuedCount += 1;
+      participant.racepack = { ...participant.racepack, queued: true };
     }
     showAdminToast('success', 'Peserta Dikirim ke Antrean', `${queuedCount} peserta dikirim ke Live View Antrean Racepack.`);
-    verifyRacepackByCode(data.order.midtransOrderId || data.order.id);
+    renderRacepackDetails(data);
   } catch (err) {
     showAdminToast('error', 'Pengiriman Antrean Gagal', err.message);
   } finally {
@@ -441,11 +651,12 @@ export async function handleConfirmRacepackCheckin() {
         throw new Error(res?.message || 'Gagal menyimpan check-in racepack.');
       }
 
+      const wasCheckedIn = Boolean(currentRacepackData.racepack?.checkedIn);
       currentRacepackData.racepack = res.data;
       if (res.data?.bibNumber) p.bibNumber = res.data.bibNumber;
+      if (!wasCheckedIn) adjustRacepackStats(1);
       renderRacepackDetails(currentRacepackData);
       showAdminToast('success', 'Racepack Diserahkan', res.message);
-      await Promise.all([loadRacepackStats(), loadParticipants()]);
     }
   } catch (err) {
     showAdminToast('error', queued ? 'Gagal Check-in' : 'Gagal Mengirim', err.message);
@@ -482,10 +693,9 @@ export async function handleRevertRacepackCheckin() {
 
     if (res && res.status === 'success') {
       showAdminToast('success', 'Dibatalkan', 'Status pengambilan racepack berhasil dibatalkan.');
+      if (currentRacepackData.racepack?.checkedIn) adjustRacepackStats(-1);
       currentRacepackData.racepack = { checkedIn: false };
       renderRacepackDetails(currentRacepackData);
-      loadRacepackStats();
-      loadParticipants();
     } else {
       showAdminToast('error', 'Gagal', res?.message);
     }

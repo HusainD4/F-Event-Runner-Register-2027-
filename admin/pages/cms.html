@@ -283,9 +283,24 @@
                   <label class="form-label">Judul Section Tiket</label>
                   <input type="text" class="form-input" id="cmsTicketsTitle" placeholder="Pilih Tantangan Jarak Lari Anda">
                 </div>
-                <div class="form-group">
-                  <label class="form-label">URL Gambar Preview Medali Finisher</label>
-                  <input type="url" class="form-input" id="cmsMedalImage" placeholder="https://images.unsplash.com/...">
+              </div>
+
+              <div class="form-group cms-ticket-image-control">
+                <label class="form-label" for="cmsMedalImage">Gambar Strip Kategori Tiket</label>
+                <div class="cms-ticket-image-url-row">
+                  <input type="url" class="form-input" id="cmsMedalImage" placeholder="https://domain.com/gambar-event.jpg">
+                  <button type="button" class="btn btn-secondary btn-sm" id="btnClearCmsMedalImage" aria-label="Hapus gambar strip tiket" title="Hapus gambar">
+                    <i class="fa-solid fa-trash-can" aria-hidden="true"></i><span>Hapus</span>
+                  </button>
+                </div>
+                <div class="form-hint">Gunakan URL gambar publik. Gambar akan ditampilkan sebagai strip lebar penuh dari tepi kiri ke kanan.</div>
+                <div class="cms-ticket-image-preview" id="cmsTicketImagePreview">
+                  <img id="cmsTicketImagePreviewImg" alt="Pratinjau strip gambar kategori tiket" hidden>
+                  <div class="cms-ticket-image-preview-empty" id="cmsTicketImagePreviewEmpty">
+                    <i class="fa-regular fa-image" aria-hidden="true"></i>
+                    <span>Pratinjau strip gambar full-width</span>
+                  </div>
+                  <span class="cms-ticket-image-preview-badge"><i class="fa-solid fa-arrows-left-right" aria-hidden="true"></i> FULL WIDTH</span>
                 </div>
               </div>
 

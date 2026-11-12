@@ -28,6 +28,26 @@ function getRegistrationPhase(settings = adminState.globalSettings || {}) {
   return timerPhase === 'UPCOMING' && settings.manualRegistrationClosed ? 'CLOSED' : timerPhase;
 }
 
+function formatWibInputValue(isoDate) {
+  const date = new Date(isoDate);
+  if (Number.isNaN(date.getTime())) return '';
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Jakarta',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23'
+  }).formatToParts(date);
+  const part = type => parts.find(item => item.type === type)?.value || '';
+  return `${part('year')}-${part('month')}-${part('day')}T${part('hour')}:${part('minute')}`;
+}
+
+function parseWibInputValue(value) {
+  return value ? new Date(`${value}:00+07:00`) : null;
+}
+
 /**
  * Memuat pengaturan countdown global dari server
  */
@@ -122,6 +142,25 @@ function renderGlobalSettings(settings = {}) {
     // Pasang listener input agar preview ter-update langsung saat tanggal diubah pengguna
     input.removeEventListener('change', handleInputChangePreview);
     input.addEventListener('change', handleInputChangePreview);
+  }
+
+  const closedMessageInput = document.getElementById('registrationClosedMessage');
+  const operatingHoursInput = document.getElementById('registrationOperatingHours');
+  const maintenanceEnabledInput = document.getElementById('maintenanceEnabled');
+  const maintenanceTypeInput = document.getElementById('maintenanceType');
+  const maintenanceTitleInput = document.getElementById('maintenanceTitle');
+  const maintenanceMessageInput = document.getElementById('maintenanceMessage');
+  const maintenanceEndInput = document.getElementById('maintenanceExpectedEnd');
+  if (closedMessageInput) closedMessageInput.value = settings.registrationClosedMessage || '';
+  if (operatingHoursInput) operatingHoursInput.value = settings.registrationOperatingHours || '';
+  if (maintenanceEnabledInput) maintenanceEnabledInput.checked = Boolean(settings.maintenanceEnabled);
+  if (maintenanceTypeInput) maintenanceTypeInput.value = settings.maintenanceType || 'REPAIR';
+  if (maintenanceTitleInput) maintenanceTitleInput.value = settings.maintenanceTitle || '';
+  if (maintenanceMessageInput) maintenanceMessageInput.value = settings.maintenanceMessage || '';
+  if (maintenanceEndInput) {
+    maintenanceEndInput.value = settings.maintenanceExpectedEnd
+      ? formatWibInputValue(settings.maintenanceExpectedEnd)
+      : '';
   }
 
   updateCountdownPreview(settings.eventCountdownDate);
@@ -323,6 +362,71 @@ async function handleToggleGlobalClosed() {
   }
 }
 
+async function handleSaveRegistrationInfo() {
+  const button = document.getElementById('btnSaveWebsiteStatus');
+  const originalButtonHtml = button?.innerHTML;
+  if (button) {
+    button.disabled = true;
+    button.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
+  }
+
+  try {
+    const res = await fetchAdmin('/admin/settings/countdown', {
+      method: 'PUT',
+      body: JSON.stringify({
+        registrationClosedMessage: document.getElementById('registrationClosedMessage')?.value || '',
+        registrationOperatingHours: document.getElementById('registrationOperatingHours')?.value || ''
+      })
+    });
+
+    if (!res || (res.status !== 'success' && !res.success)) {
+      throw new Error(res?.message || 'Gagal menyimpan informasi website.');
+    }
+    adminState.globalSettings = { ...adminState.globalSettings, ...res.data };
+    renderGlobalSettings(adminState.globalSettings);
+    showAdminToast('success', 'Tersimpan', 'Informasi pendaftaran berhasil diperbarui.');
+  } catch (err) {
+    showAdminToast('error', 'Gagal Menyimpan', err.message || 'Terjadi kesalahan saat menyimpan pengaturan.');
+  } finally {
+    if (button) {
+      button.disabled = false;
+      button.innerHTML = originalButtonHtml;
+    }
+  }
+}
+
+async function handleMaintenanceToggleChange(event) {
+  const toggle = event.currentTarget;
+  if (!(toggle instanceof HTMLInputElement)) return;
+
+  const previousValue = Boolean(adminState.globalSettings?.maintenanceEnabled);
+  const requestedValue = toggle.checked;
+  toggle.disabled = true;
+
+  try {
+    const res = await fetchAdmin('/admin/settings/countdown', {
+      method: 'PUT',
+      body: JSON.stringify({ maintenanceEnabled: requestedValue })
+    });
+    if (!res || (res.status !== 'success' && !res.success)) {
+      throw new Error(res?.message || 'Gagal memperbarui mode maintenance.');
+    }
+
+    adminState.globalSettings = { ...adminState.globalSettings, ...res.data };
+    renderGlobalSettings(adminState.globalSettings);
+    showAdminToast(
+      'success',
+      'Mode Maintenance Diperbarui',
+      requestedValue ? 'Halaman maintenance sudah aktif.' : 'Halaman maintenance sudah dinonaktifkan.'
+    );
+  } catch (err) {
+    toggle.checked = previousValue;
+    showAdminToast('error', 'Gagal Memperbarui', err.message || 'Mode maintenance tidak berhasil diubah.');
+  } finally {
+    toggle.disabled = false;
+  }
+}
+
 /**
  * Hentikan timer preview saat berpindah halaman admin
  */
@@ -339,5 +443,7 @@ export {
   handleSaveGlobalCountdown,
   handleResetGlobalCountdown,
   handleToggleGlobalClosed,
+  handleSaveRegistrationInfo,
+  handleMaintenanceToggleChange,
   destroyCountdownPreview
 };

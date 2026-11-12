@@ -1,0 +1,29 @@
+<div class="admin-tab-pane" id="pane-racepack-confirm">
+  <div class="admin-section racepack-confirm-section">
+    <div class="admin-section-header">
+      <div class="racepack-confirm-heading">
+        <h3>Konfirmasi Check-in Racepack</h3>
+        <p>Antrean peserta lunas yang Anda kirim. Konfirmasikan setelah racepack diserahkan.</p>
+      </div>
+      <button type="button" class="btn btn-secondary btn-sm" id="btnRefreshRacepackConfirmations" aria-label="Muat ulang daftar peserta">
+        <i class="fa-solid fa-rotate"></i> Muat ulang
+      </button>
+    </div>
+    <p id="racepackConfirmationsSummary" class="racepack-confirm-summary" aria-live="polite"></p>
+    <div class="table-responsive">
+      <table class="admin-table racepack-confirm-table">
+        <thead>
+          <tr>
+            <th>Nama Peserta</th>
+            <th>Nomor BIB</th>
+            <th>Status</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="racepackConfirmationsTable">
+          <tr><td colspan="4" class="text-center">Memuat daftar peserta...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

@@ -168,8 +168,8 @@ function renderStatsRepeater() {
       </div>
 
       <div class="form-group">
-        <label class="form-label">Nilai statistik ${item.type === 'AUTO' ? '(otomatis dari backend)' : '(bebas diisi)'}</label>
-        <input type="text" class="form-input stat-input-val" data-idx="${idx}" value="${escapeAttr(item.val || '')}" placeholder="Contoh: 2.500+, 100%, atau Rp 75 juta" ${item.type === 'AUTO' ? 'disabled' : ''}>
+        <label class="form-label">Nilai statistik${item.type === 'AUTO' ? ' · dihitung dari data aktual' : ''}</label>
+        <input type="text" class="form-input stat-input-val" data-idx="${idx}" value="${item.type === 'AUTO' ? '' : escapeAttr(item.val || '')}" placeholder="${item.type === 'AUTO' ? 'Akan ditampilkan dari data event' : 'Masukkan nilai statistik'}" ${item.type === 'AUTO' ? 'disabled' : ''}>
       </div>
 
       <div class="form-group">
@@ -220,6 +220,9 @@ function renderStatsRepeater() {
         const defaults = CMS_AUTO_STATS[statsItems[idx].autoKey];
         statsItems[idx].unit = defaults.unit;
         statsItems[idx].desc = defaults.desc;
+        statsItems[idx].val = '';
+      } else {
+        statsItems[idx].val = '';
       }
       renderStatsRepeater();
     });
@@ -543,6 +546,37 @@ function updateFaviconPreview() {
   }
 }
 
+function updateTicketImagePreview() {
+  const input = document.getElementById('cmsMedalImage');
+  const image = document.getElementById('cmsTicketImagePreviewImg');
+  const fallback = document.getElementById('cmsTicketImagePreviewEmpty');
+  if (!input || !image || !fallback) return;
+
+  let safeUrl = '';
+  try {
+    const url = new URL(input.value.trim());
+    if (['http:', 'https:'].includes(url.protocol)) safeUrl = url.href;
+  } catch {
+    safeUrl = '';
+  }
+
+  image.onerror = () => {
+    image.hidden = true;
+    fallback.hidden = false;
+  };
+  image.onload = () => {
+    image.hidden = false;
+    fallback.hidden = true;
+  };
+  if (safeUrl) {
+    image.src = safeUrl;
+  } else {
+    image.removeAttribute('src');
+    image.hidden = true;
+    fallback.hidden = false;
+  }
+}
+
 function initCmsButtons() {
   renderNavbarIconPicker();
   const setAllSectionVisibility = visible => {
@@ -584,6 +618,15 @@ function initCmsButtons() {
   if (navbarTitle) navbarTitle.oninput = updateNavbarIconPreview;
   const faviconUrl = document.getElementById('cmsFaviconUrl');
   if (faviconUrl) faviconUrl.oninput = updateFaviconPreview;
+  const medalImage = document.getElementById('cmsMedalImage');
+  if (medalImage) medalImage.oninput = updateTicketImagePreview;
+  const clearMedalImage = document.getElementById('btnClearCmsMedalImage');
+  if (clearMedalImage) {
+    clearMedalImage.onclick = () => {
+      if (medalImage) medalImage.value = '';
+      updateTicketImagePreview();
+    };
+  }
   const comingSoonTitle = document.getElementById('cmsComingSoonTitle');
   const comingSoonMessage = document.getElementById('cmsComingSoonMessage');
   const comingSoonImageUrl = document.getElementById('cmsComingSoonImageUrl');
@@ -627,11 +670,12 @@ function initCmsButtons() {
   updateComingSoonPreview();
   updateNavbarIconPreview();
   updateFaviconPreview();
+  updateTicketImagePreview();
 
   const statBtn = document.getElementById('btnAddCmsStatItem');
   if (statBtn) {
     statBtn.onclick = () => {
-      statsItems.push({ type: 'CUSTOM', autoKey: '', icon: 'fa-chart-simple', val: '100+', unit: 'Statistik Baru', desc: 'Keterangan statistik' });
+      statsItems.push({ type: 'CUSTOM', autoKey: '', icon: 'fa-chart-simple', val: '', unit: '', desc: '' });
       renderStatsRepeater();
     };
   }
@@ -839,6 +883,10 @@ async function loadCmsSettings() {
       if (s.stats_banner_items) {
         try {
           statsItems = JSON.parse(s.stats_banner_items);
+          if (!Array.isArray(statsItems)) statsItems = [];
+          statsItems = statsItems.map(item => item && typeof item === 'object'
+            ? { ...item, val: item.type === 'AUTO' ? '' : item.val }
+            : item);
         } catch {
           statsItems = [];
         }

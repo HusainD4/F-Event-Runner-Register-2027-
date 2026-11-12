@@ -30,7 +30,7 @@ export async function loadBibSettings() {
 
       if (kpiAssigned) kpiAssigned.textContent = assignedCount;
       if (kpiUnassigned) kpiUnassigned.textContent = unassignedCount;
-      if (kpiQrPreview) kpiQrPreview.textContent = `${qrPrefix || 'TEGALRUN'}|...`;
+      if (kpiQrPreview) kpiQrPreview.textContent = `${qrPrefix || 'TEGALRUN'}|##########`;
 
       // Set Timing radio
       const timingRadios = document.querySelectorAll('input[name="bibTiming"]');
@@ -219,7 +219,7 @@ export async function handleSaveQrPrefixSubmit(e) {
       const qrExample = document.getElementById('qrPrefixExample');
       const kpiQrPreview = document.getElementById('kpiQrFormatPreview');
       if (qrExample) qrExample.textContent = res.data.prefix;
-      if (kpiQrPreview) kpiQrPreview.textContent = `${res.data.prefix}|...`;
+      if (kpiQrPreview) kpiQrPreview.textContent = `${res.data.prefix}|##########`;
     } else {
       showAdminToast('error', 'Gagal', res?.message || 'Gagal menyimpan prefix QR.');
     }
@@ -335,4 +335,3 @@ export function initBibSettingsListeners() {
 
   document.getElementById('btnRefreshBibSettings')?.addEventListener('click', loadBibSettings);
 }
-

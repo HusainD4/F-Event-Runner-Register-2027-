@@ -6,7 +6,7 @@
           <i class="fa-solid fa-id-badge" style="color: #6366F1;"></i>
           Pengaturan Nomor BIB, Format QR &amp; Petunjuk E-Tiket
         </h3>
-        <p>Tentukan kapan dan bagaimana nomor BIB digenerate, atur awalan QR Code terenkripsi (<code>BEBASNAMA|enkripsi_teks</code>), serta kelola teks petunjuk E-Tiket secara terpusat.</p>
+        <p>Tentukan kapan dan bagaimana nomor BIB digenerate, atur awalan QR Code dengan token acak 10 digit, serta kelola teks petunjuk E-Tiket secara terpusat.</p>
       </div>
       <div class="admin-action-bar">
         <button type="button" class="btn btn-secondary btn-sm" id="btnRefreshBibSettings">
@@ -39,8 +39,8 @@
         <div class="kpi-icon green" style="background: #10B981; color: #FFFFFF;"><i class="fa-solid fa-qrcode"></i></div>
         <div class="kpi-details">
           <span class="kpi-label">Format Aktif QR Code</span>
-          <h3 class="kpi-val" id="kpiQrFormatPreview" style="font-size: 1.15rem; font-family: monospace; color: #0F172A;">TEGALRUN|...</h3>
-          <span class="kpi-sub" style="color: #059669;"><i class="fa-solid fa-lock"></i> AES-256 Enkripsi Aman</span>
+          <h3 class="kpi-val" id="kpiQrFormatPreview" style="font-size: 1.15rem; font-family: monospace; color: #0F172A;">TEGALRUN|##########</h3>
+          <span class="kpi-sub" style="color: #059669;"><i class="fa-solid fa-shield-halved"></i> Token acak unik tersimpan di server</span>
         </div>
       </div>
     </div>
@@ -144,10 +144,10 @@
         <div class="glass-card" style="padding: 24px; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 18px; box-shadow: 0 4px 14px rgba(0,0,0,0.03);">
           <h4 style="font-size: 1.05rem; font-weight: 800; color: #0F172A; margin-bottom: 6px; display: flex; align-items: center; gap: 8px;">
             <i class="fa-solid fa-qrcode" style="color: #10B981;"></i>
-            Pengaturan Awalan (Prefix) &amp; Enkripsi QR Code
+            Pengaturan Awalan (Prefix) &amp; Token QR Code
           </h4>
           <p style="font-size: 0.82rem; color: #64748B; margin-bottom: 16px;">
-            Ganti awalan QR Code dengan nama bebas. Format yang dihasilkan berupa <code>BEBASNAMA|enkripsi_teks</code> yang terlindungi enkripsi kriptografi AES-256.
+            Ganti awalan QR Code dengan nama bebas. QR baru memakai format <code>PREFIX|10_digit_acak</code>. Token dipetakan di server dan dipindai melalui akun petugas yang berizin.
           </p>
 
           <form id="formQrPrefixSettings">
@@ -170,7 +170,7 @@
               <div style="display: flex; align-items: center; gap: 6px; font-weight: 700; margin-bottom: 4px;">
                 <i class="fa-solid fa-shield-check"></i> Keamanan Enkripsi Kriptografi Aktif
               </div>
-              <div>QR Code yang di-generate menggunakan format <code><span id="qrPrefixExample">TEGALRUN</span>|&lt;ciphertext_aes256&gt;</code> untuk menjamin keaslian tiket dari pemalsuan.</div>
+              <div>Format baru: <code><span id="qrPrefixExample">TEGALRUN</span>|1234567890</code>. Setiap token acak 10 digit unik dan diverifikasi terhadap data tiket di server. QR terenkripsi lama tetap dapat dipindai.</div>
             </div>
           </form>
         </div>

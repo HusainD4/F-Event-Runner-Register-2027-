@@ -1,79 +1,214 @@
 import { fetchAdmin } from '../core/api.js';
+import { adminState } from '../core/state.js';
 import { escapeHtml } from '../core/utils.js';
+import { connectRealtimeSocket } from '../../../js/realtime.js';
 
 let queueRequestInProgress = false;
+let queueLoaded = false;
+let racepackQueue = [];
+let pendingQueueEvents = [];
+
+function formatQueueTime(value) {
+  if (!value) return '-';
+  const date = new Date(value);
+  return Number.isNaN(date.getTime())
+    ? '-'
+    : date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+}
 
 function renderQueue(queue) {
   const container = document.getElementById('racepackQueueContainer');
   if (!container) return;
 
   if (!queue.length) {
-    container.innerHTML = '<div class="glass-card" style="padding:28px; text-align:center; color:#64748B;"><i class="fa-solid fa-inbox" style="font-size:2rem; display:block; margin-bottom:8px;"></i>Belum ada peserta di antrean.</div>';
+    container.innerHTML = `
+      <div class="racepack-live-empty">
+        <span class="racepack-live-empty-icon"><i class="fa-solid fa-inbox" aria-hidden="true"></i></span>
+        <strong>Antrean masih kosong</strong>
+        <span>Peserta yang dikirim dari halaman Pengambilan Racepack akan tampil di sini.</span>
+      </div>
+    `;
     return;
   }
 
-  container.innerHTML = queue.map((participant, index) => {
-    const queuedAt = participant.queue?.queuedAt ? new Date(participant.queue.queuedAt).toLocaleString('id-ID') : '-';
-    const eventName = participant.event?.ticketName || participant.event?.category || '-';
+  const cards = queue.map((participant, index) => {
+    const gender = participant.gender === 'MALE'
+      ? 'LAKI-LAKI'
+      : participant.gender === 'FEMALE'
+        ? 'PEREMPUAN'
+        : participant.gender || '-';
+
     return `
-      <article class="glass-card" style="padding:18px; border:1px solid #E2E8F0; background:#FFFFFF; border-radius:14px;">
-        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap;">
-          <div>
-            <span class="badge" style="background:#FFF7ED; color:#C2410C; font-weight:800;">ANTREAN #${index + 1}</span>
-            <h4 style="margin:8px 0 4px; color:#0F172A;">${escapeHtml(participant.fullNameKtp)}</h4>
-            <div style="color:#475569; font-size:.86rem;">
-              ${escapeHtml(eventName)} · BIB ${escapeHtml(participant.bibNumber || 'Belum diterbitkan')} · Jersey ${escapeHtml(participant.selectedSize || '-')}
-            </div>
+      <article class="racepack-live-card" data-racepack-participant-id="${escapeHtml(participant.id || '')}">
+        <div class="racepack-live-card-top">
+          <strong class="racepack-live-position">ANTREAN #${index + 1}</strong>
+          <small>Masuk antrean · ${escapeHtml(formatQueueTime(participant.queue?.queuedAt))}</small>
+        </div>
+        <div class="racepack-live-staff">
+          <span class="racepack-live-cell-label">NAMA PETUGAS</span>
+          <strong><i class="fa-solid fa-user-check" aria-hidden="true"></i>${escapeHtml(participant.queue?.queuedBy || '-')}</strong>
+        </div>
+        <div class="racepack-live-participant">
+          <span class="racepack-live-cell-label">NAMA PESERTA</span>
+          <strong>${escapeHtml(participant.fullNameKtp || '-')}</strong>
+        </div>
+        <div class="racepack-live-bib">
+          <span class="racepack-live-cell-label">NOMOR BIB</span>
+          <strong>${escapeHtml(participant.bibNumber || 'BELUM TERBIT')}</strong>
+        </div>
+        <div class="racepack-live-data-grid">
+          <div class="racepack-live-data">
+            <span class="racepack-live-cell-label">UKURAN JERSEY</span>
+            <strong>${escapeHtml(participant.selectedSize || '-')}</strong>
+          </div>
+          <div class="racepack-live-data">
+            <span class="racepack-live-cell-label">TIPE JERSEY</span>
+            <strong>${escapeHtml(participant.jersey?.type || participant.jersey?.name || '-')}</strong>
+          </div>
+          <div class="racepack-live-data">
+            <span class="racepack-live-cell-label">JENIS KELAMIN</span>
+            <strong>${escapeHtml(gender)}</strong>
+          </div>
+          <div class="racepack-live-data">
+            <span class="racepack-live-cell-label">NAMA BIB</span>
+            <strong>${escapeHtml(participant.bibName || '-')}</strong>
           </div>
         </div>
-        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:8px; margin-top:14px; font-size:.82rem; color:#475569;">
-          <div><strong>NIK:</strong> ${escapeHtml(participant.nik || '-')}</div>
-          <div><strong>Jenis kelamin / golongan darah:</strong> ${escapeHtml(participant.gender || '-')} / ${escapeHtml(participant.bloodType || '-')}</div>
-          <div><strong>Telepon peserta:</strong> ${escapeHtml(participant.phoneNumber || participant.order?.user?.phoneNumber || '-')}</div>
-          <div><strong>Kontak darurat:</strong> ${escapeHtml(participant.emergencyContactName || '-')} (${escapeHtml(participant.emergencyContactPhone || '-')})</div>
-          <div><strong>Nama BIB:</strong> ${escapeHtml(participant.bibName || '-')}</div>
-          <div><strong>Komunitas:</strong> ${escapeHtml(participant.communityName || '-')}</div>
-          <div><strong>Masuk antrean:</strong> ${escapeHtml(queuedAt)}</div>
-          <div><strong>Dikirim petugas:</strong> ${escapeHtml(participant.queue?.queuedBy || '-')}</div>
-        </div>
-        <details style="margin-top:12px; color:#475569; font-size:.82rem;">
-          <summary style="cursor:pointer; font-weight:700;">Informasi lengkap peserta &amp; tiket</summary>
-          <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:8px; margin-top:10px;">
-            <div><strong>Tanggal lahir:</strong> ${escapeHtml(participant.birthDate ? new Date(participant.birthDate).toLocaleDateString('id-ID') : '-')}</div>
-            <div><strong>Tempat lahir:</strong> ${escapeHtml(participant.birthPlace || '-')}</div>
-            <div><strong>Alamat:</strong> ${escapeHtml(participant.fullAddress || '-')}</div>
-            <div><strong>Riwayat medis:</strong> ${escapeHtml(participant.medicalHistory || '-')}</div>
-            <div><strong>Pemesan:</strong> ${escapeHtml(participant.order?.user?.fullName || '-')}</div>
-            <div><strong>Email pemesan:</strong> ${escapeHtml(participant.order?.user?.email || '-')}</div>
-            <div><strong>Order:</strong> ${escapeHtml(participant.order?.midtransOrderId || participant.order?.id || '-')}</div>
-            <div><strong>Status pembayaran:</strong> ${escapeHtml(participant.order?.status || '-')}</div>
-            <div><strong>Nama / jenis jersey:</strong> ${escapeHtml(participant.jersey?.name || '-')} / ${escapeHtml(participant.jersey?.type || '-')}</div>
-          </div>
-        </details>
       </article>
     `;
   }).join('');
 
+  container.innerHTML = cards;
 }
 
-export async function loadRacepackQueue() {
-  if (queueRequestInProgress || !document.getElementById('pane-racepack-view')?.classList.contains('active')) return;
+export async function loadRacepackQueue({ force = false } = {}) {
+  const pane = document.getElementById('pane-racepack-view');
+  const standalonePage = document.body.classList.contains('racepack-live-page');
+  if (queueRequestInProgress || (!standalonePage && !pane?.classList.contains('active'))) return;
+  if (queueLoaded && !force) return;
   queueRequestInProgress = true;
+  pendingQueueEvents = [];
   try {
     const res = await fetchAdmin('/admin/racepack/queue');
     if (!res || res.status !== 'success' || !Array.isArray(res.data)) {
       throw new Error(res?.message || 'Gagal memuat data antrean.');
     }
-    renderQueue(res.data);
+    racepackQueue = res.data;
+    pendingQueueEvents.forEach(applyRacepackQueueEvent);
+    pendingQueueEvents = [];
+    queueLoaded = true;
+    renderQueue(racepackQueue);
     const updated = document.getElementById('racepackQueueLastUpdated');
     if (updated) updated.textContent = `Diperbarui ${new Date().toLocaleTimeString('id-ID')}`;
   } catch (error) {
     const container = document.getElementById('racepackQueueContainer');
     if (container) {
-      container.innerHTML = `<div class="glass-card" style="padding:20px; color:#B91C1C;">${escapeHtml(error.message)}</div>`;
+      container.innerHTML = `<div class="racepack-live-error">${escapeHtml(error.message)}</div>`;
     }
     console.error('Gagal memuat antrean racepack:', error);
   } finally {
     queueRequestInProgress = false;
   }
+}
+
+function applyRacepackQueueEvent(event) {
+  const participantId = event.participantId || event.participant?.id;
+  if (!participantId) return;
+
+  if (event.type === 'queued' && event.participant) {
+    const index = racepackQueue.findIndex(participant => participant.id === participantId);
+    if (index >= 0) racepackQueue[index] = { ...racepackQueue[index], ...event.participant };
+    else racepackQueue.push(event.participant);
+    racepackQueue.sort((a, b) => new Date(a.queue?.queuedAt || 0) - new Date(b.queue?.queuedAt || 0));
+    return;
+  }
+
+  if (event.type === 'checked_in' || event.type === 'removed') {
+    racepackQueue = racepackQueue.filter(participant => participant.id !== participantId);
+  }
+}
+
+export function handleRacepackQueueSocketEvent(event) {
+  if (!event) return;
+  if (queueRequestInProgress) {
+    pendingQueueEvents.push(event);
+    return;
+  }
+
+  const previousLength = racepackQueue.length;
+  const participantId = event.participantId || event.participant?.id;
+  const previousParticipant = racepackQueue.find(participant => participant.id === participantId);
+  applyRacepackQueueEvent(event);
+  if (previousLength === racepackQueue.length && previousParticipant === racepackQueue.find(participant => participant.id === participantId)) {
+    return;
+  }
+
+  renderQueue(racepackQueue);
+  const updated = document.getElementById('racepackQueueLastUpdated');
+  if (updated) updated.textContent = `Diperbarui ${new Date().toLocaleTimeString('id-ID')}`;
+}
+
+export function initRacepackLivePage() {
+  if (!document.body.classList.contains('racepack-live-page')) return;
+  const container = document.getElementById('racepackQueueContainer');
+  const updated = document.getElementById('racepackQueueLastUpdated');
+  const redirectToAdminLogin = () => {
+    window.location.replace('/admin.html');
+  };
+  const showAccessError = message => {
+    if (container) {
+      container.innerHTML = `
+        <div class="racepack-live-error">
+          ${escapeHtml(message)}
+          <a href="/admin.html" class="btn btn-secondary btn-sm">Buka halaman Admin</a>
+        </div>
+      `;
+    }
+    if (updated) updated.textContent = 'Tidak dapat memverifikasi akses.';
+  };
+
+  document.getElementById('btnRefreshRacepackQueue')?.addEventListener('click', () => {
+    if (!adminState.isAuthenticated) {
+      redirectToAdminLogin();
+      return;
+    }
+    void loadRacepackQueue({ force: true });
+  });
+
+  void (async () => {
+    try {
+      const response = await fetchAdmin('/admin/auth/me');
+      if (!response || response.status !== 'success' || !response.data?.id) {
+        adminState.isAuthenticated = false;
+        adminState.profile = null;
+        redirectToAdminLogin();
+        return;
+      }
+
+      adminState.isAuthenticated = true;
+      adminState.profile = response.data;
+      const role = response.data.role;
+      const permissions = Array.isArray(role?.permissions) ? role.permissions : [];
+      const canReadParticipants = role?.name === 'SUPERADMIN'
+        || permissions.includes('participants:read')
+        || permissions.includes('participants:*');
+      if (!canReadParticipants) {
+        showAccessError('Akun admin ini tidak memiliki izin untuk melihat antrean racepack.');
+        return;
+      }
+
+      const socket = connectRealtimeSocket();
+      socket.off('admin:racepack_queue_changed', handleRacepackQueueSocketEvent);
+      socket.on('admin:racepack_queue_changed', handleRacepackQueueSocketEvent);
+      window.addEventListener('pagehide', () => socket.off('admin:racepack_queue_changed', handleRacepackQueueSocketEvent), { once: true });
+      await loadRacepackQueue();
+    } catch (error) {
+      console.error('Gagal memverifikasi sesi admin untuk Live View racepack:', error);
+      if (!adminState.isAuthenticated) {
+        redirectToAdminLogin();
+        return;
+      }
+      showAccessError(error.message || 'Sesi admin tidak dapat diverifikasi. Silakan coba lagi.');
+    }
+  })();
 }

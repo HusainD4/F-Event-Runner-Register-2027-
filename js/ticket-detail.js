@@ -322,21 +322,72 @@ function renderTicketData(event, feeSettings = {}, isGlobalClosed = false) {
       } catch {
         sizes = [];
       }
+      let bannerImages = [];
+      try {
+        const configuredImages = Array.isArray(j.bannerImages) ? j.bannerImages : JSON.parse(j.bannerImages || '[]');
+        if (Array.isArray(configuredImages)) {
+          bannerImages = configuredImages
+            .filter(url => typeof url === 'string' && /^https?:\/\//i.test(url))
+            .slice(0, 5);
+        }
+      } catch {
+        bannerImages = [];
+      }
       return `
-        <div style="background: #F8FAFC; border: 1px solid var(--color-border-subtle); border-radius: var(--radius-lg); padding: 18px; margin-bottom: 12px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-            <strong style="font-size: 1rem; color: var(--color-text-title);">${escapeHtml(j.name)}</strong>
-            <span class="badge" style="background: #FFFFFF; font-weight: 700;">Jenis: ${escapeHtml(j.type)}</span>
+        <article class="td-jersey-card">
+          <div class="td-jersey-media">
+            ${j.image
+              ? `<img class="td-jersey-image" src="${escapeHtml(j.image)}" alt="${escapeHtml(j.name)}" loading="lazy">`
+              : '<span class="td-jersey-image-fallback" aria-hidden="true"><i class="fa-solid fa-shirt"></i></span>'}
           </div>
+          <div class="td-jersey-content">
+            <div class="td-jersey-heading">
+              <strong class="td-jersey-name">${escapeHtml(j.name)}</strong>
+              <span class="td-jersey-type">Jenis: ${escapeHtml(j.type)}</span>
+            </div>
           ${sizes.length ? `
-            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-              <span style="font-size: 0.78rem; font-weight: 700; color: var(--color-text-muted);">Pilihan ukuran:</span>
-              ${sizes.map(s => `<span style="background: #FFFFFF; border: 1px solid var(--color-border-subtle); padding: 4px 10px; border-radius: 6px; font-weight: 800; font-size: 0.8rem; color: var(--color-primary);">${escapeHtml(s)}</span>`).join('')}
+            <div class="td-jersey-sizes">
+              <span class="td-jersey-size-label">Pilihan ukuran:</span>
+              <div class="td-jersey-size-list">
+                ${sizes.map(s => `<span class="td-jersey-size">${escapeHtml(s)}</span>`).join('')}
+              </div>
             </div>
           ` : ''}
-        </div>
+          ${bannerImages.length ? `
+            <div class="td-jersey-banners">
+              <span class="td-jersey-size-label"><i class="fa-regular fa-images" aria-hidden="true"></i> Informasi jersey</span>
+              <div class="td-jersey-banner-grid">
+                ${bannerImages.map((url, index) => `
+                  <figure class="td-jersey-banner">
+                    <img src="${escapeHtml(url)}" alt="Informasi ${escapeHtml(j.name)} ${index + 1}" loading="lazy">
+                  </figure>
+                `).join('')}
+              </div>
+            </div>
+          ` : ''}
+          </div>
+        </article>
       `;
     }).join('');
+    jerseysContainer.querySelectorAll('.td-jersey-image').forEach(image => {
+      image.addEventListener('error', () => {
+        const fallback = document.createElement('span');
+        fallback.className = 'td-jersey-image-fallback';
+        fallback.setAttribute('aria-hidden', 'true');
+        fallback.innerHTML = '<i class="fa-solid fa-shirt"></i>';
+        image.replaceWith(fallback);
+      }, { once: true });
+    });
+    jerseysContainer.querySelectorAll('.td-jersey-banner img').forEach(image => {
+      image.addEventListener('error', () => {
+        const banner = image.closest('.td-jersey-banner');
+        const grid = banner?.parentElement;
+        banner?.remove();
+        if (grid && !grid.querySelector('.td-jersey-banner')) {
+          grid.closest('.td-jersey-banners')?.remove();
+        }
+      }, { once: true });
+    });
   } else {
     jerseysContainer.innerHTML = `
       <p style="font-size: 0.88rem; color: var(--color-text-muted); padding: 12px; background: #F8FAFC; border-radius: 8px;">

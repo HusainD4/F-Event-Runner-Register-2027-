@@ -42,4 +42,67 @@
               </div>
             </div>
           </div>
-        </div>
+
+          <div class="admin-section" style="margin-top: 24px;">
+            <div class="admin-section-header">
+              <div>
+                <h3><i class="fa-solid fa-bullhorn" style="color: var(--color-primary);"></i> Informasi Pendaftaran Ditutup</h3>
+                <p>Atur pesan dan jam operasional yang ditampilkan kepada calon peserta saat pendaftaran ditutup.</p>
+              </div>
+            </div>
+            <div class="countdown-settings-layout">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="registrationClosedMessage">Pesan penutupan pendaftaran</label>
+                <input class="form-input" id="registrationClosedMessage" maxlength="300" placeholder="Pendaftaran sedang ditutup sementara.">
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="registrationOperatingHours">Jam operasional pendaftaran</label>
+                <input class="form-input" id="registrationOperatingHours" maxlength="120" placeholder="Contoh: Senin–Jumat, 09.00–17.00 WIB">
+                <div class="form-hint">Isi sesuai jadwal resmi. Informasi ini tampil pada halaman publik saat pendaftaran ditutup.</div>
+              </div>
+            </div>
+            <div class="countdown-actions" style="margin-top: 18px;">
+              <button type="button" class="btn btn-primary btn-sm btn-glow" id="btnSaveWebsiteStatus" data-permission="countdown:manage">
+                <i class="fa-solid fa-floppy-disk"></i> Simpan Informasi Pendaftaran
+              </button>
+            </div>
+          </div>
+
+          <div class="admin-section" style="margin-top: 24px;">
+            <div class="admin-section-header">
+              <div>
+                <h3><i class="fa-solid fa-screwdriver-wrench" style="color: var(--color-primary);"></i> Halaman Under Maintenance</h3>
+                <p>Jika diaktifkan, halaman utama akan menampilkan informasi maintenance dan pendaftaran akan diblokir sementara.</p>
+              </div>
+              <label class="maintenance-toggle" for="maintenanceEnabled">
+                <input type="checkbox" id="maintenanceEnabled" role="switch" aria-label="Aktifkan mode maintenance">
+                <span class="maintenance-toggle-track" aria-hidden="true"><span></span></span>
+                <span class="maintenance-toggle-label">Aktifkan maintenance</span>
+              </label>
+            </div>
+            <div class="countdown-settings-layout">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="maintenanceType">Jenis maintenance</label>
+                <select class="form-input" id="maintenanceType">
+                  <option value="REPAIR">Perbaikan sistem</option>
+                  <option value="ROUTINE">Perawatan rutin</option>
+                  <option value="UPDATE">Pembaruan sistem</option>
+                  <option value="OTHER">Lainnya</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="maintenanceTitle">Judul halaman</label>
+                <input class="form-input" id="maintenanceTitle" maxlength="120" placeholder="Website sedang dalam pemeliharaan">
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="maintenanceMessage">Keterangan untuk pengunjung</label>
+                <textarea class="form-input" id="maintenanceMessage" maxlength="1000" rows="4" placeholder="Kami sedang melakukan perawatan agar layanan lebih baik. Silakan kembali beberapa saat lagi."></textarea>
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="maintenanceExpectedEnd">Perkiraan selesai (opsional)</label>
+                <input type="datetime-local" class="form-input" id="maintenanceExpectedEnd">
+                <div class="form-hint">Masukkan waktu dalam WIB. Perkiraan ini ditampilkan kepada pengunjung.</div>
+              </div>
+            </div>
+          </div>
+          </div>

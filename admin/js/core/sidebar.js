@@ -8,11 +8,36 @@ import { loadRoutePoints } from '../pages/routes.js';
 import { loadNotificationSettings } from '../pages/notifications.js';
 import { loadWhatsAppWebConsole } from '../pages/whatsapp-web.js';
 import { loadNotificationLogs } from '../pages/notif-logs.js';
-import { loadRacepackStats, stopRpcCamera } from '../pages/racepack.js';
+import { loadRacepackStats, loadRacepackConfirmations, stopRpcCamera } from '../pages/racepack.js';
 import { loadRacepackQueue } from '../pages/racepack-view.js';
 import { loadBibSettings } from '../pages/bib-settings.js';
 import { loadGlobalSettings } from '../pages/countdown.js';
 import { loadRoleMonitoring } from '../pages/role-monitoring.js';
+import { loadEvents } from '../pages/events.js';
+import { loadParticipants } from '../pages/participants.js';
+import { loadOrders } from '../pages/orders.js';
+import { loadAdminsAndRoles } from '../pages/admins.js';
+import { loadAuditLogs } from '../pages/logs.js';
+
+const loadedAdminTabs = new Set();
+
+function loadAdminTabOnce(tabKey, loader) {
+  const loadKey = `${adminState.profile?.id || 'anonymous'}:${tabKey}`;
+  if (loadedAdminTabs.has(loadKey)) return;
+  loadedAdminTabs.add(loadKey);
+  try {
+    const result = loader();
+    if (result && typeof result.catch === 'function') {
+      result.catch(error => {
+        loadedAdminTabs.delete(loadKey);
+        console.error(`Gagal memuat halaman admin "${tabKey}":`, error);
+      });
+    }
+  } catch (error) {
+    loadedAdminTabs.delete(loadKey);
+    console.error(`Gagal memuat halaman admin "${tabKey}":`, error);
+  }
+}
 
 export async function loadSidebar() {
   const mount = document.getElementById('sidebarMount');
@@ -102,6 +127,7 @@ export function switchAdminTab(tabKey) {
     events: { title: 'Manajemen Event & Kategori', sub: 'Portal Admin / Manajemen Tiket Lomba' },
     participants: { title: 'Manajemen Peserta', sub: 'Portal Admin / Database Pelari & BIB' },
     racepack: { title: 'Pengambilan Racepack & Check-in', sub: 'Portal Admin / Validasi E-Tiket & Serah Terima RPC' },
+    'racepack-confirm': { title: 'Konfirmasi Check-in Racepack', sub: 'Portal Admin / Daftar Peserta dan Konfirmasi Serah Terima' },
     'racepack-view': { title: 'Live View Antrean Racepack', sub: 'Portal Admin / Pemantauan Antrean Real-Time' },
     orders: { title: 'Transaksi & Order', sub: 'Portal Admin / Status Pembayaran Tiket' },
     countdown: { title: 'Countdown & Status Event', sub: 'Portal Admin / Konfigurasi Race Day' },
@@ -113,6 +139,7 @@ export function switchAdminTab(tabKey) {
     'whatsapp-web': { title: 'WhatsApp Web Enterprise Console', sub: 'Portal Admin / Real-Time Messaging & Session Hub' },
     admins: { title: 'Kelola Admin & Hak Akses', sub: 'Portal Admin / Manajemen RBAC Superadmin' },
     'role-monitoring': { title: 'Pemantauan Semua Role', sub: 'Portal Admin / Sesi Online & Kontrol Akses' },
+    backups: { title: 'Backup Database', sub: 'Portal Admin / Ekspor Database Sensitif' },
     logs: { title: 'Log Audit Sistem', sub: 'Portal Admin / Rekam Jejak Keamanan' }
   };
 
@@ -122,37 +149,30 @@ export function switchAdminTab(tabKey) {
   if (titleEl) titleEl.textContent = info.title;
   if (breadEl) breadEl.textContent = info.sub;
 
-  if (tabKey === 'cms') {
-    loadCmsSettings();
-  }
-  if (tabKey === 'countdown') {
-    loadGlobalSettings();
-  }
-  if (tabKey === 'bib-settings') {
-    loadBibSettings();
-  }
-  if (tabKey === 'routes') {
-    loadRoutePoints();
-  }
-  if (tabKey === 'racepack') {
-    loadRacepackStats();
+  const initialLoaders = {
+    events: loadEvents,
+    participants: loadParticipants,
+    orders: loadOrders,
+    admins: loadAdminsAndRoles,
+    logs: loadAuditLogs,
+    'notif-logs': loadNotificationLogs,
+    cms: loadCmsSettings,
+    countdown: loadGlobalSettings,
+    'bib-settings': loadBibSettings,
+    routes: loadRoutePoints,
+    racepack: loadRacepackStats,
+    'racepack-confirm': loadRacepackConfirmations,
+    'racepack-view': loadRacepackQueue,
+    notifications: loadNotificationSettings,
+    'whatsapp-web': loadWhatsAppWebConsole,
+    'role-monitoring': loadRoleMonitoring,
+  };
+  if (initialLoaders[tabKey]) {
+    loadAdminTabOnce(tabKey, initialLoaders[tabKey]);
   } else {
     stopRpcCamera();
   }
-  if (tabKey === 'racepack-view') {
-    loadRacepackQueue();
-  }
-  if (tabKey === 'notifications') {
-    loadNotificationSettings();
-  } else if (tabKey === 'whatsapp-web') {
-    loadWhatsAppWebConsole();
-  }
-  if (tabKey === 'notif-logs') {
-    loadNotificationLogs();
-  }
-  if (tabKey === 'role-monitoring') {
-    loadRoleMonitoring();
-  }
+  if (tabKey !== 'racepack') stopRpcCamera();
 
   window.dispatchEvent(new CustomEvent('admin:tab-changed', { detail: { tabKey } }));
 }

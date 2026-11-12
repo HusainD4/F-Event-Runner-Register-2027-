@@ -1,5 +1,7 @@
+localStorage.removeItem('tegal_admin_token');
+
 export const adminState = {
-  token: localStorage.getItem('tegal_admin_token') || null,
+  isAuthenticated: false,
   profile: null,
   activeTab: 'dashboard',
   globalSettings: {
@@ -18,7 +20,7 @@ export const SYSTEM_MODULES = [
   { key: 'page:dashboard', name: 'Dashboard Overview', desc: 'Akses statistik KPI & omzet' },
   { key: 'page:events', name: 'Event & Tiket', desc: 'Kelola kategori tiket lomba & harga' },
   { key: 'page:participants', name: 'Peserta & BIB', desc: 'Kelola data pelari, BIB, & ekspor CSV' },
-  { key: 'page:racepack', name: 'Pengambilan Racepack', desc: 'Scan QR kamera HP, verifikasi status bayar & serah terima RPC' },
+  { key: 'page:racepack', name: 'Pengambilan & Konfirmasi Racepack', desc: 'Scan QR, verifikasi pembayaran, dan konfirmasi serah terima RPC' },
   { key: 'page:orders', name: 'Transaksi & Order', desc: 'Verifikasi status bayar Midtrans' },
   { key: 'page:countdown', name: 'Countdown & Status', desc: 'Atur tanggal lomba & tutup pendaftaran' },
   { key: 'page:cms', name: 'Website CMS', desc: 'Kelola teks, foto banner & Google Maps' },

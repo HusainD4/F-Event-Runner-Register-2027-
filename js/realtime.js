@@ -15,7 +15,7 @@ export function getRealtimeSocket() {
       autoConnect: false,
       transports: ['websocket'],
       reconnection: true,
-      auth: {}
+      withCredentials: true
     });
 
     socket.on('connect', () => {
@@ -29,12 +29,15 @@ export function getRealtimeSocket() {
   return socket;
 }
 
-export function connectRealtimeSocket(adminToken) {
+export function subscribeRealtimeEvent(eventName, handler) {
   const realtimeSocket = getRealtimeSocket();
-  if (adminToken) {
-    realtimeSocket.auth = { token: adminToken };
-    if (realtimeSocket.connected) realtimeSocket.disconnect();
-  }
+  realtimeSocket.off(eventName, handler);
+  realtimeSocket.on(eventName, handler);
+  return () => realtimeSocket.off(eventName, handler);
+}
+
+export function connectRealtimeSocket() {
+  const realtimeSocket = getRealtimeSocket();
   if (!realtimeSocket.connected) realtimeSocket.connect();
   return realtimeSocket;
 }

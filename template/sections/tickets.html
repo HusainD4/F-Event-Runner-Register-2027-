@@ -12,7 +12,10 @@
         Tersedia kategori kompetitif bagi atlet dan fun run santai bagi keluarga & komunitas. 
         Seluruh peserta yang finis sebelum batas waktu (Cut-Off Time) berhak atas Medali Finisher resmi.
       </p>
-      <img id="ticketsCmsMedia" class="tickets-cms-media" alt="Preview medali finisher" loading="lazy" hidden>
+    </div>
+
+    <div class="tickets-cms-media-wrap" id="ticketsCmsMediaWrap" hidden>
+      <img id="ticketsCmsMedia" class="tickets-cms-media" alt="Gambar kategori dan medali finisher" loading="eager" hidden>
     </div>
 
     <!-- Container Tiket Dinamis (Di-render via JavaScript) -->
@@ -64,6 +67,28 @@
         <div class="sk" style="width: 100%; height: 48px; border-radius: 30px;"></div>
       </div>
     </div>
+
+    <div id="registrationClosedNotice" class="registration-closed-notice" hidden aria-live="polite">
+      <i class="fa-solid fa-clock" aria-hidden="true"></i>
+      <div>
+        <h3 id="registrationClosedNoticeTitle">Pendaftaran sedang ditutup</h3>
+        <p>Pendaftaran saat ini belum tersedia. Buka informasi untuk melihat pesan dari panitia dan jam operasional.</p>
+        <button type="button" class="registration-notice-button" id="btnShowRegistrationNotice">
+          <i class="fa-solid fa-circle-info" aria-hidden="true"></i> Tampilkan informasi
+        </button>
+      </div>
+    </div>
+    <dialog class="registration-notice-dialog" id="registrationNoticeDialog" aria-labelledby="registrationNoticeDialogTitle">
+      <div class="registration-notice-dialog-content">
+        <button type="button" class="registration-notice-dialog-close" id="btnCloseRegistrationNotice" aria-label="Tutup informasi">
+          <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+        </button>
+        <span class="registration-notice-dialog-icon"><i class="fa-solid fa-bullhorn" aria-hidden="true"></i></span>
+        <h3 id="registrationNoticeDialogTitle">Informasi Pendaftaran</h3>
+        <p id="registrationClosedNoticeMessage"></p>
+        <p id="registrationOperatingHoursNotice" hidden></p>
+      </div>
+    </dialog>
 
     <!-- Template State Kosong / Pendaftaran Ditutup (Hidden by default) -->
     <template id="ticketClosedTemplate">

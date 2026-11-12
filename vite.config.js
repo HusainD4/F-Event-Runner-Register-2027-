@@ -3,6 +3,7 @@ import { resolve } from 'path';
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
+  const apiProxyTarget = env.VITE_DEV_API_PROXY_TARGET || 'http://127.0.0.1:3000';
 
   return {
     appType: 'mpa',
@@ -12,6 +13,7 @@ export default defineConfig(({ mode }) => {
           main: resolve(__dirname, 'index.html'),
           admin: resolve(__dirname, 'admin.html'),
           adminModular: resolve(__dirname, 'admin/index.html'),
+          racepackLive: resolve(__dirname, 'racepack-live.html'),
           ticketDetail: resolve(__dirname, 'ticket-detail.html'),
           cekTiket: resolve(__dirname, 'cek-tiket.html'),
           payment: resolve(__dirname, 'payment.html'),
@@ -24,14 +26,14 @@ export default defineConfig(({ mode }) => {
     },
     server: {
       port: 5173,
-      allowedHosts: ['siexa.haisen.my.id'],
+      allowedHosts: ['siexa.haisen.my.id', 'localhost', '127.0.0.1','api.haisen.my.id'],
       proxy: {
         '/api': {
-          target: env.VITE_DEV_API_PROXY_TARGET || 'http://localhost:3000',
+          target: apiProxyTarget,
           changeOrigin: true
         },
         '/socket.io': {
-          target: env.VITE_DEV_API_PROXY_TARGET || 'http://localhost:3000',
+          target: apiProxyTarget,
           changeOrigin: true,
           ws: true
         }

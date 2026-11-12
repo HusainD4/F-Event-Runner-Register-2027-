@@ -7,6 +7,7 @@ import dashboardPane from '../pages/dashboard.html?raw';
 import eventsPane from '../pages/events.html?raw';
 import participantsPane from '../pages/participants.html?raw';
 import racepackPane from '../pages/racepack.html?raw';
+import racepackConfirmPane from '../pages/racepack-confirm.html?raw';
 import racepackViewPane from '../pages/racepack-view.html?raw';
 import ordersPane from '../pages/orders.html?raw';
 import countdownPane from '../pages/countdown.html?raw';
@@ -19,6 +20,7 @@ import notifLogsPane from '../pages/notif-logs.html?raw';
 import whatsappWebPane from '../pages/whatsapp-web.html?raw';
 import logsPane from '../pages/logs.html?raw';
 import roleMonitoringPane from '../pages/role-monitoring.html?raw';
+import backupsPane from '../pages/backups.html?raw';
 import modalsHtml from '../modals/modals.html?raw';
 
 // 2. Core Modules
@@ -28,12 +30,12 @@ import { openMobileSidebar, closeMobileSidebar, switchAdminTab } from './core/si
 import { showAdminToast } from './core/utils.js';
 
 // 3. Page Modules
-import { loadEvents, openCreateEventModal, handleEventFormSubmit, resetBenefitForm, handleBenefitFormSubmit, handleJerseyFormSubmit, resetJerseyForm, updateJerseyImagePreview } from './pages/events.js';
+import { loadEvents, openCreateEventModal, handleEventFormSubmit, resetBenefitForm, handleBenefitFormSubmit, handleJerseyFormSubmit, resetJerseyForm, updateJerseyImagePreview, initializeJerseyBannerImageFields } from './pages/events.js';
 import { loadParticipants, renderParticipantsTable, openCreateParticipantModal, handleParticipantFormSubmit, exportParticipantsCsv, switchParticipantFilterTab, applyParticipantFilters } from './pages/participants.js';
-import { loadRacepackStats, startRpcCamera, stopRpcCamera, triggerNativeCamera, handleNativeCameraFile, handleConfirmRacepackCheckin, handleRevertRacepackCheckin, verifyRacepackByCode } from './pages/racepack.js';
-import { loadRacepackQueue } from './pages/racepack-view.js';
+import { loadRacepackStats, loadRacepackConfirmations, handleRacepackConfirmationSocketEvent, handleRacepackScanSocketEvent, handleConfirmRacepackTableCheckin, startRpcCamera, stopRpcCamera, triggerNativeCamera, handleNativeCameraFile, handleConfirmRacepackCheckin, handleRevertRacepackCheckin, verifyRacepackByCode } from './pages/racepack.js';
+import { loadRacepackQueue, handleRacepackQueueSocketEvent } from './pages/racepack-view.js';
 import { loadOrders, handleOrderStatusSubmit } from './pages/orders.js';
-import { handleSaveGlobalCountdown, handleResetGlobalCountdown, handleToggleGlobalClosed } from './pages/countdown.js';
+import { handleSaveGlobalCountdown, handleResetGlobalCountdown, handleToggleGlobalClosed, handleSaveRegistrationInfo, handleMaintenanceToggleChange } from './pages/countdown.js';
 import { initBibSettingsListeners } from './pages/bib-settings.js';
 import { handleCmsSubmit } from './pages/cms.js';
 import { openCreateAdminUserModal, handleAdminUserSubmit, openCreateRoleModal, handleRoleSubmit, handleResetDefaultRoles, DEFAULT_ROLE_DIRECTORY } from './pages/admins.js';
@@ -42,61 +44,33 @@ import { handleNotificationSettingsSubmit, handleSendTestNotif, handleGenerateWa
 import { loadNotificationLogs, handleBatchSendNotif } from './pages/notif-logs.js';
 import { loadWhatsAppWebConsole, handleSendDirectWaMessage, handleWaTemplateChange, handleQuickDispatchTicket, renderWhatsAppWebContactList, waWebContacts } from './pages/whatsapp-web.js';
 import { loadAuditLogs } from './pages/logs.js';
-import { loadRoleMonitoring } from './pages/role-monitoring.js';
 import { handleSyncMidtransDashboard, loadDashboardStats } from './pages/dashboard.js';
-import { loadAdminsAndRoles } from './pages/admins.js';
-import { loadRoutePoints } from './pages/routes.js';
-import { loadGlobalSettings } from './pages/countdown.js';
-import { getRealtimeSocket } from '../../js/realtime.js';
+import { initBackupPage } from './pages/backups.js';
+import { subscribeRealtimeEvent } from '../../js/realtime.js';
 
-let adminRefreshInProgress = false;
-const pendingAdminTopics = new Set();
+function handleRacepackQueueChange(event) {
+  handleRacepackQueueSocketEvent(event);
+  handleRacepackScanSocketEvent(event);
+}
 
-async function refreshActiveAdminData() {
-  if (!adminState.token || !adminState.profile || document.hidden || adminRefreshInProgress) return;
-  const tabKey = adminState.activeTab;
-  const pane = document.getElementById(`pane-${tabKey}`);
-  if (!pane || document.querySelector('.admin-modal-backdrop.open, .confirm-modal-backdrop.open, dialog[open]')) return;
-  const activeElement = document.activeElement;
-  if (
-    tabKey !== 'racepack' &&
-    activeElement instanceof HTMLElement &&
-    pane.contains(activeElement) &&
-    activeElement.matches('input, textarea, select, [contenteditable="true"]')
-  ) return;
-
-  const loaders = {
-    dashboard: { topics: ['dashboard'], load: loadDashboardStats },
-    events: { topics: ['events'], load: loadEvents },
-    participants: { topics: ['participants'], load: loadParticipants },
-    orders: { topics: ['orders'], load: loadOrders },
-    admins: { topics: ['admins'], load: loadAdminsAndRoles },
-    logs: { topics: ['logs'], load: loadAuditLogs },
-    routes: { topics: ['routes'], load: () => loadRoutePoints({ showLoading: false }) },
-    countdown: { topics: ['countdown'], load: loadGlobalSettings },
-    'notif-logs': { topics: ['notif-logs'], load: () => loadNotificationLogs({ showLoading: false }) },
-    racepack: { topics: ['racepack'], load: loadRacepackStats },
-    'racepack-view': { topics: ['racepack'], load: loadRacepackQueue },
-    'role-monitoring': { topics: ['admins'], load: loadRoleMonitoring }
-  };
-  const loader = loaders[tabKey];
-  if (!loader || !loader.topics.some(topic => pendingAdminTopics.has(topic))) return;
-
-  adminRefreshInProgress = true;
-  try {
-    loader.topics.forEach(topic => pendingAdminTopics.delete(topic));
-    await loader.load();
-  } catch (error) {
-    console.error(`Failed to refresh admin tab "${tabKey}":`, error);
-  } finally {
-    adminRefreshInProgress = false;
-    if (loader.topics.some(topic => pendingAdminTopics.has(topic))) refreshActiveAdminData();
+function handleWhatsAppSessionUpdate(session) {
+  if (['notifications', 'whatsapp-web'].includes(adminState.activeTab)) {
+    handleRealtimeWhatsAppSession(session);
   }
 }
 
-function handleAdminDataChanged({ topics = [] } = {}) {
-  topics.forEach(topic => pendingAdminTopics.add(topic));
-  refreshActiveAdminData();
+function handleAdminForceLogout() {
+  showAdminToast('warning', 'Sesi Diakhiri', 'Superadmin telah mengakhiri sesi Anda. Silakan login kembali jika diperlukan.');
+  handleLogout();
+}
+
+function subscribeAdminRealtimeEvents() {
+  return [
+    subscribeRealtimeEvent('admin:racepack_confirmation_changed', handleRacepackConfirmationSocketEvent),
+    subscribeRealtimeEvent('admin:racepack_queue_changed', handleRacepackQueueChange),
+    subscribeRealtimeEvent('admin:whatsapp_session', handleWhatsAppSessionUpdate),
+    subscribeRealtimeEvent('admin:force_logout', handleAdminForceLogout),
+  ];
 }
 
 // Global Modal Closer Helper
@@ -113,6 +87,7 @@ function mountModularContent() {
       eventsPane,
       participantsPane,
       racepackPane,
+      racepackConfirmPane,
       racepackViewPane,
       ordersPane,
       countdownPane,
@@ -124,7 +99,8 @@ function mountModularContent() {
       notifLogsPane,
       whatsappWebPane,
       logsPane,
-      roleMonitoringPane
+      roleMonitoringPane,
+      backupsPane
     ].join('\n');
   }
 
@@ -143,6 +119,7 @@ function mountModularContent() {
 document.addEventListener('DOMContentLoaded', () => {
   // Mount modular HTML panes & modals
   mountModularContent();
+  initBackupPage();
 
   // Login & Logout
   document.getElementById('adminLoginForm')?.addEventListener('submit', handleLogin);
@@ -226,6 +203,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('formEventJersey')?.addEventListener('submit', handleJerseyFormSubmit);
   document.getElementById('btnCancelJerseyEdit')?.addEventListener('click', resetJerseyForm);
   document.getElementById('jerseyFormImage')?.addEventListener('input', updateJerseyImagePreview);
+  initializeJerseyBannerImageFields();
   document.getElementById('formRoutePoint')?.addEventListener('submit', handleRoutePointFormSubmit);
   document.getElementById('routeSettingsForm')?.addEventListener('submit', handleRouteSettingsSubmit);
   document.getElementById('routeMapMode')?.addEventListener('change', updateRouteSettingPreviews);
@@ -237,6 +215,8 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btnSaveGlobalCountdown')?.addEventListener('click', handleSaveGlobalCountdown);
   document.getElementById('btnResetGlobalCountdown')?.addEventListener('click', handleResetGlobalCountdown);
   document.getElementById('btnToggleGlobalClosed')?.addEventListener('click', handleToggleGlobalClosed);
+  document.getElementById('btnSaveWebsiteStatus')?.addEventListener('click', handleSaveRegistrationInfo);
+  document.getElementById('maintenanceEnabled')?.addEventListener('change', handleMaintenanceToggleChange);
 
   // Filter & Search Orders
   document.getElementById('filterOrderStatus')?.addEventListener('change', loadOrders);
@@ -260,7 +240,12 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Racepack Collection & Check-in Controls
-  document.getElementById('btnRefreshRacepackStats')?.addEventListener('click', loadRacepackStats);
+  document.getElementById('btnRefreshRacepackStats')?.addEventListener('click', () => loadRacepackStats({ force: true }));
+  document.getElementById('btnRefreshRacepackConfirmations')?.addEventListener('click', () => loadRacepackConfirmations({ force: true }));
+  document.getElementById('racepackConfirmationsTable')?.addEventListener('click', event => {
+    const button = event.target.closest('[data-confirm-racepack-id]');
+    if (button) void handleConfirmRacepackTableCheckin(button.dataset.confirmRacepackId);
+  });
   const rpcInfoDialog = document.getElementById('rpcInfoDialog');
   document.getElementById('btnRpcInfo')?.addEventListener('click', () => {
     if (rpcInfoDialog instanceof HTMLDialogElement && !rpcInfoDialog.open) {
@@ -280,7 +265,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btnTriggerNativeCamera')?.addEventListener('click', triggerNativeCamera);
   document.getElementById('rpcNativeCameraInput')?.addEventListener('change', handleNativeCameraFile);
   document.getElementById('btnConfirmRpcCheckin')?.addEventListener('click', handleConfirmRacepackCheckin);
-  document.getElementById('btnRefreshRacepackQueue')?.addEventListener('click', loadRacepackQueue);
+  document.getElementById('btnRefreshRacepackQueue')?.addEventListener('click', () => loadRacepackQueue({ force: true }));
   document.getElementById('btnRevertRpcCheckin')?.addEventListener('click', handleRevertRacepackCheckin);
   document.getElementById('formRpcManualSearch')?.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -325,32 +310,12 @@ document.addEventListener('DOMContentLoaded', () => {
   initBibSettingsListeners();
 
   // Check auth and initialize portal
-  const realtimeSocket = getRealtimeSocket();
-  realtimeSocket.on('admin:data_changed', handleAdminDataChanged);
-  realtimeSocket.on('admin:whatsapp_session', handleRealtimeWhatsAppSession);
-  realtimeSocket.on('admin:force_logout', () => {
-    showAdminToast('warning', 'Sesi Diakhiri', 'Superadmin telah mengakhiri sesi Anda. Silakan login kembali jika diperlukan.');
-    handleLogout();
-  });
-  realtimeSocket.on('admin:presence_changed', () => {
-    const role = adminState.profile?.role;
-    if (role?.name === 'SUPERADMIN' && adminState.activeTab === 'role-monitoring') {
-      loadRoleMonitoring();
-    }
-    const permissions = Array.isArray(role?.permissions) ? role.permissions : [];
-    const hasDashboard = role?.name === 'SUPERADMIN' || permissions.includes('page:dashboard');
-    const hasTeamWidget = role?.name === 'SUPERADMIN'
-      || !permissions.includes('dashboard:configured')
-      || permissions.includes('dashboard:team-presence');
-    if (hasDashboard && hasTeamWidget) loadDashboardStats();
-  });
-  window.addEventListener('admin:tab-changed', refreshActiveAdminData);
-  document.addEventListener('focusout', refreshActiveAdminData);
-  document.addEventListener('visibilitychange', () => {
-    if (!document.hidden) refreshActiveAdminData();
-  });
-  window.addEventListener('realtime:reconnected', () => {
-    handleAdminDataChanged({ topics: ['dashboard', 'events', 'participants', 'orders', 'admins', 'logs', 'routes', 'notif-logs', 'racepack'] });
+  let removeAdminSocketListeners = subscribeAdminRealtimeEvents();
+  window.addEventListener('pagehide', () => removeAdminSocketListeners.forEach(remove => remove()), { once: true });
+  window.addEventListener('pageshow', event => {
+    if (!event.persisted) return;
+    removeAdminSocketListeners.forEach(remove => remove());
+    removeAdminSocketListeners = subscribeAdminRealtimeEvents();
   });
   checkAuthAndInit();
 });

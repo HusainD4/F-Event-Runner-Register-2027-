@@ -1,5 +1,4 @@
 import { apiFetch } from '../../../js/api.js';
-import { adminState } from './state.js';
 import { handleLogout } from './auth.js';
 
 export async function fetchAdmin(endpoint, options = {}, maybeBody = null) {
@@ -19,18 +18,15 @@ export async function fetchAdmin(endpoint, options = {}, maybeBody = null) {
     ...opts.headers
   };
 
-  if (adminState.token) {
-    headers['Authorization'] = `Bearer ${adminState.token}`;
-  }
-
   try {
     const response = await apiFetch(endpoint, {
       ...opts,
+      credentials: 'include',
       headers
     });
 
     if (response.status === 401) {
-      handleLogout();
+      handleLogout({ revoke: false });
       throw new Error('Sesi autentikasi telah habis. Silakan login kembali.');
     }
 

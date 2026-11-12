@@ -1,5 +1,4 @@
 import { apiClient, apiFetch, loadMidtransSdk } from './api.js';
-import { connectRealtimeSocket } from './realtime.js';
 import { applyWebsiteBranding } from './branding.js';
 
 // Import Modular HTML Templates
@@ -53,6 +52,8 @@ const state = {
   manualRegistrationClosed: false,
   globalRegistrationPhase: 'UPCOMING',
   globalCountdownTarget: null,
+  registrationOperatingHours: '',
+  registrationClosedMessage: '',
   countdownTarget: null,
   countdownInterval: null,
   registrationTimerInterval: null,
@@ -293,11 +294,14 @@ async function loadCountdownSettings() {
     }
 
     if (settings) {
+      state.registrationOperatingHours = settings.registrationOperatingHours || '';
+      state.registrationClosedMessage = settings.registrationClosedMessage || '';
       state.manualRegistrationClosed = settings.manualRegistrationClosed === true
         || String(settings.manualRegistrationClosed).toLowerCase() === 'true';
       updateGlobalRegistrationState();
       applyRegistrationStatus();
       updateRegistrationCountdown();
+      renderMaintenancePage(settings);
     }
   } catch (err) {
     console.warn('Gagal memuat pengaturan countdown dari backend:', err);
@@ -337,64 +341,60 @@ function updateGlobalRegistrationState() {
     ? 'CLOSED'
     : timerPhase;
   state.isGlobalClosed = state.manualRegistrationClosed || timerPhase !== 'UPCOMING';
+  renderRegistrationClosedNotice();
 }
 
-async function refreshPublicEvents() {
-  try {
-    const response = await apiFetch('/events', {
-      method: 'GET',
-      headers: { Accept: 'application/json' }
-    });
-    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+function renderRegistrationClosedNotice() {
+  const notice = document.getElementById('registrationClosedNotice');
+  const message = document.getElementById('registrationClosedNoticeMessage');
+  const hours = document.getElementById('registrationOperatingHoursNotice');
+  const footerHours = document.getElementById('footerRegistrationHours');
+  const footerHoursValue = document.getElementById('footerRegistrationHoursValue');
+  if (!notice || !message || !hours) return;
 
-    const result = await response.json();
-    if (result.status !== 'success' || !Array.isArray(result.data)) {
-      throw new Error(result.message || 'Respons data event tidak valid.');
-    }
-
-    state.events = result.data;
-    const heroCta = document.getElementById('heroCtaBtn');
-    if (heroCta) heroCta.hidden = result.data.length === 0;
-    renderTickets(result.data);
-    renderStatsBanner(state.cmsStatsItems);
-
-    if (!state.countdownSettingsLoaded) {
-      const eventDates = result.data
-        .map(event => new Date(event.eventDate).getTime())
-        .filter(timestamp => Number.isFinite(timestamp) && timestamp > Date.now())
-        .sort((a, b) => a - b);
-      if (eventDates.length > 0 && eventDates[0] !== state.countdownTarget) {
-        initCountdown(eventDates[0]);
-      }
-    }
-
-    if (state.selectedEvent) {
-      const selectedEvent = result.data.find(event => event.id === state.selectedEvent.id);
-      const selectedCategoryClosed = [...document.querySelectorAll('.p-event-select')]
-        .some(select => {
-          const event = result.data.find(item => item.id === select.value);
-          return !event || isEventRegistrationClosed(event);
-        });
-      if (!selectedEvent || isEventRegistrationClosed(selectedEvent) || selectedCategoryClosed) {
-        if (state.checkoutSubmitting) {
-          state.registrationExpiredDuringSubmit = true;
-          const timerMessage = document.getElementById('registrationTimerMessage');
-          const timerValue = document.getElementById('registrationTimeRemaining');
-          if (timerMessage) timerMessage.textContent = 'Kategori ditutup — memeriksa pendaftaran';
-          if (timerValue) timerValue.textContent = '—';
-          return;
-        }
-        stopRegistrationCountdown();
-        closeRegistrationModal();
-        showToast('warning', 'Kategori Ditutup', 'Pendaftaran kategori ini ditutup saat formulir Anda terbuka. Isian belum dikirim.');
-      } else {
-        state.selectedEvent = selectedEvent;
-        updateRegistrationCountdown();
-      }
-    }
-  } catch (error) {
-    console.warn('Gagal memperbarui daftar event publik:', error);
+  notice.hidden = !state.isGlobalClosed;
+  message.textContent = state.registrationClosedMessage || 'Pendaftaran sedang ditutup untuk sementara.';
+  hours.textContent = state.registrationOperatingHours
+    ? `Jam operasional pendaftaran: ${state.registrationOperatingHours}`
+    : 'Informasi jam operasional akan diumumkan melalui kanal resmi.';
+  hours.hidden = !state.registrationOperatingHours;
+  if (footerHours && footerHoursValue) {
+    footerHoursValue.textContent = state.registrationOperatingHours;
+    footerHours.hidden = !state.registrationOperatingHours;
   }
+}
+
+function renderMaintenancePage(settings = {}) {
+  const page = document.getElementById('siteMaintenancePage');
+  const title = document.getElementById('siteMaintenanceTitle');
+  const type = document.getElementById('siteMaintenanceType');
+  const message = document.getElementById('siteMaintenanceMessage');
+  const expectedEnd = document.getElementById('siteMaintenanceExpectedEnd');
+  const isEnabled = settings.maintenanceEnabled === true || String(settings.maintenanceEnabled).toLowerCase() === 'true';
+  if (!page || !title || !type || !message || !expectedEnd) return;
+
+  const typeLabels = {
+    REPAIR: 'PERBAIKAN SISTEM',
+    ROUTINE: 'PERAWATAN RUTIN',
+    UPDATE: 'PEMBARUAN SISTEM',
+    OTHER: 'INFORMASI LAYANAN'
+  };
+  title.textContent = settings.maintenanceTitle || 'Website Sedang Dalam Pemeliharaan';
+  type.textContent = typeLabels[settings.maintenanceType] || typeLabels.OTHER;
+  message.textContent = settings.maintenanceMessage || 'Kami sedang melakukan pemeliharaan. Silakan kembali beberapa saat lagi.';
+  if (settings.maintenanceExpectedEnd && !Number.isNaN(new Date(settings.maintenanceExpectedEnd).getTime())) {
+    expectedEnd.textContent = `Perkiraan layanan kembali: ${new Date(settings.maintenanceExpectedEnd).toLocaleString('id-ID', {
+      dateStyle: 'full',
+      timeStyle: 'short',
+      timeZone: 'Asia/Jakarta'
+    })} WIB`;
+    expectedEnd.hidden = false;
+  } else {
+    expectedEnd.textContent = '';
+    expectedEnd.hidden = true;
+  }
+  page.hidden = !isEnabled;
+  if (appContainer) appContainer.hidden = isEnabled;
 }
 
 function applyRegistrationStatus() {
@@ -406,6 +406,7 @@ function applyRegistrationStatus() {
   const dockBtn = document.getElementById('dockDaftarBtn');
   const allCategoriesClosed = state.events.length > 0
     && state.events.every(isEventRegistrationClosed);
+  renderRegistrationClosedNotice();
 
   if (state.isGlobalClosed || allCategoriesClosed) {
     const status = state.isGlobalClosed
@@ -430,12 +431,14 @@ function applyRegistrationStatus() {
     if (ctaBtn) {
       ctaBtn.disabled = true;
       ctaBtn.classList.remove('btn-glow');
-      ctaBtn.innerHTML = `<i class="fa-solid ${status.icon}"></i> ${status.label}`;
+      ctaBtn.classList.add('is-event-status');
+      ctaBtn.innerHTML = `<i class="fa-solid ${status.icon}" aria-hidden="true"></i><span>${status.label}</span>`;
     }
     if (navBtn) {
       navBtn.disabled = true;
       navBtn.classList.remove('btn-glow');
-      navBtn.innerHTML = `<i class="fa-solid ${status.icon}"></i> ${status.label}`;
+      navBtn.classList.add('is-event-status');
+      navBtn.innerHTML = `<i class="fa-solid ${status.icon}" aria-hidden="true"></i><span>${status.label}</span>`;
     }
     if (dockBtn) {
       dockBtn.style.opacity = '0.6';
@@ -459,11 +462,13 @@ function applyRegistrationStatus() {
   }
   if (ctaBtn) {
     ctaBtn.disabled = false;
+    ctaBtn.classList.remove('is-event-status');
     ctaBtn.classList.add('btn-glow');
     ctaBtn.innerHTML = '<i class="fa-solid fa-ticket" aria-hidden="true"></i> Amankan Slot Lari Sekarang';
   }
   if (navBtn) {
     navBtn.disabled = false;
+    navBtn.classList.remove('is-event-status');
     navBtn.classList.add('btn-glow');
     navBtn.innerHTML = '<i class="fa-solid fa-bolt"></i> Daftar Tiket';
   }
@@ -1021,6 +1026,13 @@ function openRegistrationModal(selectedEvent = null) {
 
   const modal = document.getElementById('regModal');
   if (!modal) return;
+  closeRegistrationSelects();
+
+  const participantCountSelect = document.getElementById('modalParticipantCount');
+  if (participantCountSelect) {
+    participantCountSelect.value = '1';
+    participantCountSelect._customSelectRefresh?.();
+  }
 
   const eventSelect = document.getElementById('modalEventSelect');
   if (eventSelect) {
@@ -1029,6 +1041,7 @@ function openRegistrationModal(selectedEvent = null) {
         ${ev.ticketName} - ${formatRupiah(ev.price)}
       </option>
     `).join('');
+    eventSelect._customSelectRefresh?.();
   }
 
   updateModalSteps();
@@ -1049,6 +1062,7 @@ function openRegistrationModal(selectedEvent = null) {
 }
 
 function closeRegistrationModal() {
+  closeRegistrationSelects();
   stopRegistrationCountdown();
   const modal = document.getElementById('regModal');
   if (modal) {
@@ -1160,6 +1174,405 @@ function syncBookerToParticipant1() {
   }
 }
 
+function formatBirthDate(value) {
+  if (!value) return '';
+  const [year, month, day] = value.split('-').map(Number);
+  return new Intl.DateTimeFormat('id-ID', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  }).format(new Date(year, month - 1, day));
+}
+
+let birthdateDismissListenerInitialized = false;
+
+function initializeBirthdateDismissListener() {
+  if (birthdateDismissListenerInitialized) return;
+  document.addEventListener('pointerdown', event => {
+    document.querySelectorAll('.birthdate-picker.is-open').forEach(picker => {
+      if (picker.contains(event.target)) return;
+      picker.classList.remove('is-open');
+      picker.classList.remove('opens-up');
+      picker.querySelector('.birthdate-trigger')?.setAttribute('aria-expanded', 'false');
+      const popover = picker.querySelector('.birthdate-popover');
+      popover?.setAttribute('hidden', '');
+      if (popover) popover.style.maxHeight = '';
+    });
+  });
+  birthdateDismissListenerInitialized = true;
+}
+
+function positionRegistrationPopup(trigger, popup, wrapper, maxHeight) {
+  const scrollArea = wrapper.closest('.modal-body');
+  if (!scrollArea) return;
+  const triggerRect = trigger.getBoundingClientRect();
+  const areaRect = scrollArea.getBoundingClientRect();
+  const spaceBelow = areaRect.bottom - triggerRect.bottom - 12;
+  const spaceAbove = triggerRect.top - areaRect.top - 12;
+  const desiredHeight = Math.min(maxHeight, popup.scrollHeight);
+  const opensUp = spaceBelow < desiredHeight && spaceAbove > spaceBelow;
+  const availableSpace = opensUp ? spaceAbove : spaceBelow;
+  wrapper.classList.toggle('opens-up', opensUp);
+  popup.style.maxHeight = `${Math.max(120, Math.min(maxHeight, availableSpace - 16))}px`;
+}
+
+function setupBirthDatePicker(participantBox) {
+  initializeBirthdateDismissListener();
+  const picker = participantBox.querySelector('.birthdate-picker');
+  const valueInput = picker?.querySelector('.p-birthdate');
+  const trigger = picker?.querySelector('.birthdate-trigger');
+  const triggerValue = picker?.querySelector('.birthdate-trigger-value');
+  const popover = picker?.querySelector('.birthdate-popover');
+  if (!picker || !valueInput || !trigger || !triggerValue || !popover) return;
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const minYear = 1900;
+  const maxYear = today.getFullYear();
+  const monthNames = Array.from({ length: 12 }, (_, month) =>
+    new Intl.DateTimeFormat('id-ID', { month: 'long' }).format(new Date(2024, month, 1))
+  );
+  const weekdays = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
+  let selectedDate = valueInput.value ? new Date(`${valueInput.value}T00:00:00`) : null;
+  let viewDate = selectedDate ? new Date(selectedDate) : new Date(today.getFullYear() - 18, today.getMonth(), 1);
+  let view = 'days';
+  let yearPage = Math.min(maxYear, Math.max(minYear, viewDate.getFullYear()));
+
+  const render = (scrollSelectedYear = false) => {
+    const year = viewDate.getFullYear();
+    const month = viewDate.getMonth();
+    const previousMonth = new Date(year, month - 1, 1);
+    const nextMonth = new Date(year, month + 1, 1);
+    const canGoPrevious = previousMonth.getFullYear() >= minYear;
+    const canGoNext = nextMonth <= new Date(today.getFullYear(), today.getMonth(), 1);
+
+    if (view === 'days') {
+      const firstDay = new Date(year, month, 1).getDay();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const previousMonthDays = new Date(year, month, 0).getDate();
+      const cells = Array.from({ length: 42 }, (_, cellIndex) => {
+        const dayNumber = cellIndex - firstDay + 1;
+        const cellDate = dayNumber < 1
+          ? new Date(year, month - 1, previousMonthDays + dayNumber)
+          : dayNumber > daysInMonth
+            ? new Date(year, month + 1, dayNumber - daysInMonth)
+            : new Date(year, month, dayNumber);
+        const dateValue = [
+          cellDate.getFullYear(),
+          String(cellDate.getMonth() + 1).padStart(2, '0'),
+          String(cellDate.getDate()).padStart(2, '0')
+        ].join('-');
+        const isCurrentMonth = cellDate.getMonth() === month;
+        const isSelected = selectedDate
+          && cellDate.getFullYear() === selectedDate.getFullYear()
+          && cellDate.getMonth() === selectedDate.getMonth()
+          && cellDate.getDate() === selectedDate.getDate();
+        const isToday = cellDate.toDateString() === today.toDateString();
+        const isDisabled = cellDate > today || cellDate.getFullYear() < minYear;
+        return `<button type="button" class="birthdate-day${isCurrentMonth ? '' : ' is-outside'}${isSelected ? ' is-selected' : ''}${isToday ? ' is-today' : ''}" data-action="select-day" data-date="${dateValue}" aria-label="${formatBirthDate(dateValue)}"${isSelected ? ' aria-pressed="true"' : ''}${isDisabled ? ' disabled' : ''}>${cellDate.getDate()}</button>`;
+      }).join('');
+
+      popover.innerHTML = `
+        <div class="birthdate-calendar-header">
+          <button type="button" class="birthdate-nav-button" data-action="previous-month" aria-label="Bulan sebelumnya"${canGoPrevious ? '' : ' disabled'}>
+            <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
+          </button>
+          <div class="birthdate-calendar-heading">
+            <button type="button" class="birthdate-heading-button" data-action="show-months">${monthNames[month]}</button>
+            <button type="button" class="birthdate-heading-button birthdate-year-heading" data-action="show-years">${year}</button>
+          </div>
+          <button type="button" class="birthdate-nav-button" data-action="next-month" aria-label="Bulan berikutnya"${canGoNext ? '' : ' disabled'}>
+            <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="birthdate-weekdays" aria-hidden="true">${weekdays.map(day => `<span>${day}</span>`).join('')}</div>
+        <div class="birthdate-days-grid">${cells}</div>
+        <div class="birthdate-calendar-footer">
+          <span><i class="fa-solid fa-circle-info" aria-hidden="true"></i> Pilih tanggal lahir</span>
+          <button type="button" data-action="today">Hari ini</button>
+        </div>
+      `;
+    } else if (view === 'months') {
+      popover.innerHTML = `
+        <div class="birthdate-calendar-header birthdate-picker-header">
+          <button type="button" class="birthdate-nav-button" data-action="previous-year" aria-label="Tahun sebelumnya"${year <= minYear ? ' disabled' : ''}>
+            <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
+          </button>
+          <button type="button" class="birthdate-heading-button birthdate-year-heading" data-action="show-years">${year}</button>
+          <button type="button" class="birthdate-nav-button" data-action="next-year" aria-label="Tahun berikutnya"${year >= maxYear ? ' disabled' : ''}>
+            <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="birthdate-months-grid">${monthNames.map((name, monthIndex) => {
+          const isDisabled = year === maxYear && monthIndex > today.getMonth();
+          return `<button type="button" class="birthdate-month${monthIndex === month ? ' is-selected' : ''}" data-action="select-month" data-month="${monthIndex}"${isDisabled ? ' disabled' : ''}>${name}</button>`;
+        }).join('')}</div>
+        <div class="birthdate-calendar-footer"><button type="button" data-action="show-days"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Kembali ke kalender</button></div>
+      `;
+    } else {
+      const years = Array.from({ length: maxYear - minYear + 1 }, (_, offset) => maxYear - offset);
+      popover.innerHTML = `
+        <div class="birthdate-calendar-header birthdate-picker-header">
+          <button type="button" class="birthdate-nav-button" data-action="previous-year-page" aria-label="Tahun lebih lama"${yearPage <= minYear ? ' disabled' : ''}>
+            <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
+          </button>
+          <span class="birthdate-years-title">Pilih tahun</span>
+          <button type="button" class="birthdate-nav-button" data-action="next-year-page" aria-label="Tahun lebih baru"${yearPage >= maxYear ? ' disabled' : ''}>
+            <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="birthdate-years-list" role="listbox" aria-label="Pilih tahun lahir">
+          ${years.map(item => `<button type="button" role="option" aria-selected="${item === year}" class="birthdate-year-option${item === year ? ' is-selected' : ''}" data-action="select-year" data-year="${item}">${item}</button>`).join('')}
+        </div>
+        <div class="birthdate-calendar-footer"><button type="button" data-action="show-days"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Kembali ke kalender</button></div>
+      `;
+      if (scrollSelectedYear) {
+        requestAnimationFrame(() => popover.querySelector('.birthdate-year-option.is-selected')?.scrollIntoView({ block: 'center' }));
+      }
+    }
+  };
+
+  if (selectedDate) triggerValue.textContent = formatBirthDate(valueInput.value);
+
+  trigger.addEventListener('click', () => {
+    const isOpen = trigger.getAttribute('aria-expanded') === 'true';
+    document.querySelectorAll('.birthdate-trigger[aria-expanded="true"]').forEach(openTrigger => {
+      openTrigger.setAttribute('aria-expanded', 'false');
+      openTrigger.closest('.birthdate-picker')?.classList.remove('is-open');
+      openTrigger.closest('.birthdate-picker')?.querySelector('.birthdate-popover')?.setAttribute('hidden', '');
+    });
+    if (isOpen) return;
+    view = 'days';
+    viewDate = selectedDate ? new Date(selectedDate) : new Date(today.getFullYear() - 18, today.getMonth(), 1);
+    trigger.setAttribute('aria-expanded', 'true');
+    picker.classList.add('is-open');
+    popover.removeAttribute('hidden');
+    render();
+    positionRegistrationPopup(trigger, popover, picker, 360);
+  });
+
+  picker.addEventListener('click', event => {
+    const button = event.target.closest('button[data-action]');
+    if (!button || button.disabled) return;
+    const action = button.dataset.action;
+
+    if (action === 'previous-month') viewDate = new Date(viewDate.getFullYear(), viewDate.getMonth() - 1, 1);
+    else if (action === 'next-month') viewDate = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 1);
+    else if (action === 'show-months') view = 'months';
+    else if (action === 'show-years') {
+      view = 'years';
+      yearPage = viewDate.getFullYear();
+    } else if (action === 'previous-year' || action === 'next-year') {
+      viewDate = new Date(viewDate.getFullYear() + (action === 'previous-year' ? -1 : 1), viewDate.getMonth(), 1);
+    } else if (action === 'previous-year-page' || action === 'next-year-page') {
+      yearPage = Math.min(maxYear, Math.max(minYear, yearPage + (action === 'previous-year-page' ? -12 : 12)));
+      viewDate = new Date(yearPage, viewDate.getMonth(), 1);
+    } else if (action === 'select-month') {
+      viewDate = new Date(viewDate.getFullYear(), Number(button.dataset.month), 1);
+      view = 'days';
+    } else if (action === 'select-year') {
+      viewDate = new Date(Number(button.dataset.year), viewDate.getMonth(), 1);
+      view = 'months';
+    } else if (action === 'show-days') view = 'days';
+    else if (action === 'today') {
+      button.dataset.date = [
+        today.getFullYear(),
+        String(today.getMonth() + 1).padStart(2, '0'),
+        String(today.getDate()).padStart(2, '0')
+      ].join('-');
+      button.dataset.action = 'select-day';
+      button.click();
+      return;
+    } else if (action === 'select-day') {
+      const value = button.dataset.date;
+      selectedDate = new Date(`${value}T00:00:00`);
+      valueInput.value = value;
+      triggerValue.textContent = formatBirthDate(value);
+      trigger.classList.add('has-value');
+      trigger.setAttribute('aria-expanded', 'false');
+      picker.classList.remove('is-open');
+      picker.classList.remove('opens-up');
+      popover.style.maxHeight = '';
+      popover.setAttribute('hidden', '');
+      valueInput.dispatchEvent(new Event('change', { bubbles: true }));
+      return;
+    }
+
+    render(action === 'show-years' || action === 'previous-year-page' || action === 'next-year-page');
+  });
+
+  picker.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && trigger.getAttribute('aria-expanded') === 'true') {
+      trigger.setAttribute('aria-expanded', 'false');
+      picker.classList.remove('is-open');
+      picker.classList.remove('opens-up');
+      popover.style.maxHeight = '';
+      popover.setAttribute('hidden', '');
+      trigger.focus();
+    }
+  });
+}
+
+let registrationSelectCounter = 0;
+
+function initializeRegistrationSelects(root = document) {
+  root.querySelectorAll('select.form-select').forEach(select => {
+    if (!select.closest('#regModal')) return;
+    if (select.dataset.customSelect === 'true') return;
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'custom-select';
+    const parent = select.parentNode;
+    if (!parent) return;
+    parent.insertBefore(wrapper, select);
+    wrapper.appendChild(select);
+    select.classList.add('form-select-native');
+    select.hidden = true;
+    select.tabIndex = -1;
+    select.setAttribute('aria-hidden', 'true');
+    select.dataset.customSelect = 'true';
+
+    const trigger = document.createElement('button');
+    trigger.type = 'button';
+    trigger.className = 'custom-select-trigger';
+    trigger.id = `registrationSelectTrigger-${++registrationSelectCounter}`;
+    trigger.setAttribute('aria-haspopup', 'listbox');
+    trigger.setAttribute('aria-expanded', 'false');
+    trigger.setAttribute('aria-required', String(select.required));
+    const label = select.closest('.form-group')?.querySelector('.form-label');
+    if (label) {
+      if (!label.id) label.id = `registrationSelectLabel-${registrationSelectCounter}`;
+      label.setAttribute('for', trigger.id);
+      trigger.setAttribute('aria-labelledby', label.id);
+    } else {
+      trigger.setAttribute('aria-label', select.getAttribute('aria-label') || 'Pilih opsi');
+    }
+    const selectedOption = select.options[select.selectedIndex];
+    trigger.innerHTML = `
+      <span class="custom-select-icon" aria-hidden="true"><i class="${getRegistrationSelectIcon(select)}"></i></span>
+      <span class="custom-select-value">${escapeHtml(selectedOption?.textContent.trim() || 'Pilih opsi')}</span>
+      <i class="fa-solid fa-chevron-down custom-select-chevron" aria-hidden="true"></i>
+    `;
+    wrapper.appendChild(trigger);
+
+    const menu = document.createElement('div');
+    menu.className = 'custom-select-menu';
+    menu.setAttribute('role', 'listbox');
+    menu.hidden = true;
+    const menuId = `custom-select-menu-${registrationSelectCounter}`;
+    menu.id = menuId;
+    trigger.setAttribute('aria-controls', menuId);
+    wrapper.appendChild(menu);
+
+    const renderOptions = () => {
+      menu.innerHTML = Array.from(select.options, (option, optionIndex) => {
+        const isSelected = option.value === select.value;
+        const isDisabled = option.disabled;
+        return `<button type="button" class="custom-select-option${isSelected ? ' is-selected' : ''}" role="option" aria-selected="${isSelected}" data-option-index="${optionIndex}"${isDisabled ? ' disabled' : ''}>
+          <span>${escapeHtml(option.textContent.trim())}</span>
+          ${isSelected ? '<i class="fa-solid fa-check" aria-hidden="true"></i>' : ''}
+        </button>`;
+      }).join('');
+      trigger.querySelector('.custom-select-value').textContent =
+        select.options[select.selectedIndex]?.textContent.trim() || 'Pilih opsi';
+      trigger.disabled = select.disabled;
+      trigger.classList.toggle('is-disabled', select.disabled);
+      trigger.setAttribute('aria-disabled', String(select.disabled));
+    };
+
+    renderOptions();
+    trigger.addEventListener('click', () => {
+      const willOpen = menu.hidden;
+      closeRegistrationSelects();
+      if (!willOpen || select.disabled) return;
+      menu.hidden = false;
+      trigger.setAttribute('aria-expanded', 'true');
+      wrapper.classList.add('is-open');
+      positionRegistrationPopup(trigger, menu, wrapper, 280);
+      const activeOption = menu.querySelector('.is-selected:not(:disabled)') || menu.querySelector('.custom-select-option:not(:disabled)');
+      activeOption?.focus();
+    });
+
+    menu.addEventListener('click', event => {
+      const optionButton = event.target.closest('.custom-select-option');
+      if (!optionButton || optionButton.disabled) return;
+      const option = select.options[Number(optionButton.dataset.optionIndex)];
+      if (!option) return;
+      select.value = option.value;
+      select.dispatchEvent(new Event('change', { bubbles: true }));
+      renderOptions();
+      closeRegistrationSelects();
+      trigger.focus();
+    });
+
+    menu.addEventListener('keydown', event => {
+      const options = [...menu.querySelectorAll('.custom-select-option:not(:disabled)')];
+      const currentIndex = options.indexOf(document.activeElement);
+      if (event.key === 'Escape') {
+        closeRegistrationSelects();
+        trigger.focus();
+      } else if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+        event.preventDefault();
+        const direction = event.key === 'ArrowDown' ? 1 : -1;
+        if (options.length) {
+          const nextIndex = currentIndex < 0
+            ? direction > 0 ? 0 : options.length - 1
+            : (currentIndex + direction + options.length) % options.length;
+          options[nextIndex]?.focus();
+        }
+      } else if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        document.activeElement?.click();
+      }
+    });
+
+    select.addEventListener('change', renderOptions);
+    select.addEventListener('input', renderOptions);
+    select._customSelectRefresh = renderOptions;
+  });
+}
+
+function getRegistrationSelectIcon(select) {
+  if (select.matches('#modalEventSelect, .p-event-select')) return 'fa-solid fa-person-running';
+  if (select.matches('#modalParticipantCount')) return 'fa-solid fa-users';
+  if (select.matches('.p-gender')) return 'fa-solid fa-venus-mars';
+  if (select.matches('.p-blood')) return 'fa-solid fa-droplet';
+  if (select.matches('.p-jersey')) return 'fa-solid fa-shirt';
+  if (select.matches('.p-size')) return 'fa-solid fa-ruler-combined';
+  return 'fa-solid fa-list-check';
+}
+
+function closeRegistrationSelects() {
+  document.querySelectorAll('#regModal .custom-select.is-open').forEach(wrapper => {
+    wrapper.classList.remove('is-open');
+    wrapper.classList.remove('opens-up');
+    wrapper.querySelector('.custom-select-trigger')?.setAttribute('aria-expanded', 'false');
+    const menu = wrapper.querySelector('.custom-select-menu');
+    if (menu) {
+      menu.hidden = true;
+      menu.style.maxHeight = '';
+    }
+  });
+}
+
+let registrationSelectDismissInitialized = false;
+
+function initializeRegistrationSelectDismiss() {
+  if (registrationSelectDismissInitialized) return;
+  document.addEventListener('pointerdown', event => {
+    if (!event.target.closest('#regModal .custom-select')) closeRegistrationSelects();
+  });
+  document.addEventListener('keydown', event => {
+    if (event.key !== 'Tab') return;
+    const openWrapper = document.querySelector('#regModal .custom-select.is-open');
+    const trigger = openWrapper?.querySelector('.custom-select-trigger');
+    const focusIsInMenu = openWrapper?.querySelector('.custom-select-menu')?.contains(document.activeElement);
+    closeRegistrationSelects();
+    if (focusIsInMenu) trigger?.focus();
+  });
+  registrationSelectDismissInitialized = true;
+}
+
 function renderParticipantForms() {
   const container = document.getElementById('participantsContainer');
   if (!container) return;
@@ -1230,8 +1643,19 @@ function renderParticipantForms() {
           <input type="text" class="form-input p-birthplace" required placeholder="Contoh: Tegal" data-index="${i}">
         </div>
         <div class="form-group">
-          <label class="form-label">Tanggal Lahir <span class="req">*</span></label>
-          <input type="date" class="form-input p-birthdate" required data-index="${i}">
+          <label class="form-label" id="participantBirthdateLabel-${i}">Tanggal Lahir <span class="req">*</span></label>
+          <div class="birthdate-picker">
+            <input type="hidden" class="p-birthdate" required data-index="${i}">
+            <button type="button" class="birthdate-trigger" id="participantBirthdateTrigger-${i}" aria-labelledby="participantBirthdateLabel-${i} participantBirthdateValue-${i}" aria-haspopup="dialog" aria-expanded="false">
+              <span class="birthdate-trigger-icon"><i class="fa-solid fa-calendar-days" aria-hidden="true"></i></span>
+              <span class="birthdate-trigger-copy">
+                <span class="birthdate-trigger-caption">Tanggal lahir peserta</span>
+                <strong class="birthdate-trigger-value" id="participantBirthdateValue-${i}">Pilih tanggal</strong>
+              </span>
+              <i class="fa-solid fa-chevron-down birthdate-trigger-chevron" aria-hidden="true"></i>
+            </button>
+            <div class="birthdate-popover" role="dialog" aria-label="Pilih tanggal lahir" hidden></div>
+          </div>
         </div>
       </div>
 
@@ -1276,6 +1700,7 @@ function renderParticipantForms() {
       </div>
     `;
     container.appendChild(pBox);
+    setupBirthDatePicker(pBox);
 
     // Pasang auto format telepon
     const phoneInput = pBox.querySelector('.p-phone');
@@ -1286,6 +1711,7 @@ function renderParticipantForms() {
     // Listen event select perubahan harga
     const eventSelect = pBox.querySelector('.p-event-select');
     renderParticipantJerseyFields(pBox, i, eventSelect?.value || defaultEventId);
+    initializeRegistrationSelects(pBox);
     eventSelect?.addEventListener('change', () => {
       renderParticipantJerseyFields(pBox, i, eventSelect.value);
       updateOrderPreview();
@@ -1328,6 +1754,7 @@ function renderParticipantJerseyFields(participantBox, index, eventId, selectedJ
       </select>
       <div class="form-hint">Ukuran jersey standar event.</div>
     `;
+    initializeRegistrationSelects(container);
     return;
   }
 
@@ -1354,6 +1781,7 @@ function renderParticipantJerseyFields(participantBox, index, eventId, selectedJ
     ${sizes.length ? '' : '<div class="form-hint">Ukuran untuk tipe ini belum tersedia. Hubungi panitia.</div>'}
     ${jerseyImage}
   `;
+  initializeRegistrationSelects(container);
 
   container.querySelector('.p-jersey')?.addEventListener('change', event => {
     const currentSize = container.querySelector('.p-size')?.value || '';
@@ -1925,6 +2353,24 @@ function renderLegalDocument(container, content) {
   container.replaceChildren(fragment);
 }
 
+function syncHeroCountdownLayout() {
+  const countdown = document.getElementById('heroCountdown');
+  const actions = document.querySelector('#beranda .hero-actions');
+  const visual = document.getElementById('heroVisual');
+  const image = document.getElementById('heroDisplayImg');
+  const overlay = document.getElementById('heroCountdownOverlay');
+  if (!countdown || !actions) return;
+
+  const hasLoadedImage = visual && !visual.hidden && image?.complete && image.naturalWidth > 0;
+  if (window.matchMedia('(max-width: 576px)').matches && hasLoadedImage && overlay) {
+    overlay.append(countdown);
+    return;
+  }
+  if (countdown.parentElement !== actions.parentElement || actions.nextElementSibling !== countdown) {
+    actions.after(countdown);
+  }
+}
+
 async function loadWebsiteSettings() {
   try {
     const cms = await apiClient.getWebsiteSettings();
@@ -2045,10 +2491,12 @@ async function loadWebsiteSettings() {
       heroDisplayImg.onload = () => {
         heroVisual.hidden = false;
         heroGrid?.classList.remove('hero-no-visual');
+        syncHeroCountdownLayout();
       };
       heroDisplayImg.onerror = () => {
         heroVisual.hidden = true;
         heroGrid?.classList.add('hero-no-visual');
+        syncHeroCountdownLayout();
       };
       if (imageUrl) {
         heroDisplayImg.alt = typeof cms.hero_title === 'string' ? cms.hero_title.trim() : '';
@@ -2056,9 +2504,11 @@ async function loadWebsiteSettings() {
         if (heroDisplayImg.complete && heroDisplayImg.naturalWidth > 0) {
           heroVisual.hidden = false;
           heroGrid?.classList.remove('hero-no-visual');
+          syncHeroCountdownLayout();
         }
       } else {
         heroDisplayImg.removeAttribute('src');
+        syncHeroCountdownLayout();
       }
     }
 
@@ -2207,9 +2657,33 @@ async function loadWebsiteSettings() {
       }
     }
     const ticketMedia = document.getElementById('ticketsCmsMedia');
-    if (ticketMedia) {
-      ticketMedia.hidden = !cms.medal_image;
-      if (cms.medal_image) ticketMedia.src = cms.medal_image;
+    const ticketMediaWrap = document.getElementById('ticketsCmsMediaWrap');
+    if (ticketMedia && ticketMediaWrap) {
+      let safeMediaUrl = '';
+      try {
+        const mediaUrl = new URL(typeof cms.medal_image === 'string' ? cms.medal_image.trim() : '');
+        if (['http:', 'https:'].includes(mediaUrl.protocol)) safeMediaUrl = mediaUrl.href;
+      } catch {
+        safeMediaUrl = '';
+      }
+      ticketMedia.onerror = () => {
+        ticketMedia.hidden = true;
+        ticketMediaWrap.hidden = true;
+      };
+      ticketMedia.onload = () => {
+        ticketMedia.hidden = false;
+        ticketMediaWrap.hidden = false;
+      };
+      if (safeMediaUrl) {
+        ticketMediaWrap.hidden = false;
+        ticketMedia.hidden = false;
+        ticketMedia.loading = 'eager';
+        ticketMedia.src = safeMediaUrl;
+      } else {
+        ticketMedia.removeAttribute('src');
+        ticketMedia.hidden = true;
+        ticketMediaWrap.hidden = true;
+      }
     }
 
     // 5.5. Legal Section
@@ -2398,25 +2872,29 @@ function initNavbarDropdowns() {
 // 8. APP INITIALIZATION
 // =============================================================================
 function initApp() {
+  initializeRegistrationSelectDismiss();
+  initializeRegistrationSelects();
+  const heroMobileLayout = window.matchMedia('(max-width: 576px)');
+  syncHeroCountdownLayout();
+  heroMobileLayout.addEventListener('change', syncHeroCountdownLayout);
+  window.addEventListener('resize', syncHeroCountdownLayout);
   initCountdown();
   loadCountdownSettings();
   loadWebsiteSettings();
   loadRouteData();
   loadEvents();
   initNavbarDropdowns();
-
-  const realtimeSocket = connectRealtimeSocket();
-  realtimeSocket.on('public:data_changed', ({ topics = [] } = {}) => {
-    if (topics.includes('events')) refreshPublicEvents();
-    if (topics.includes('countdown')) loadCountdownSettings();
-    if (topics.includes('cms')) {
-      loadWebsiteSettings();
-      loadRouteData();
-    }
-    if (topics.includes('routes')) loadRouteData();
+  document.getElementById('btnShowRegistrationNotice')?.addEventListener('click', () => {
+    const dialog = document.getElementById('registrationNoticeDialog');
+    if (dialog instanceof HTMLDialogElement && !dialog.open) dialog.showModal();
   });
-  window.addEventListener('realtime:reconnected', () => {
-    Promise.all([refreshPublicEvents(), loadCountdownSettings(), loadWebsiteSettings(), loadRouteData()]);
+  document.getElementById('btnCloseRegistrationNotice')?.addEventListener('click', () => {
+    const dialog = document.getElementById('registrationNoticeDialog');
+    if (dialog instanceof HTMLDialogElement && dialog.open) dialog.close();
+  });
+  document.getElementById('registrationNoticeDialog')?.addEventListener('click', event => {
+    const dialog = event.currentTarget;
+    if (event.target === dialog && dialog instanceof HTMLDialogElement) dialog.close();
   });
 
   // CTA Buttons

@@ -18,6 +18,7 @@ export async function handleLogin(e) {
   try {
     const res = await apiFetch('/admin/auth/login', {
       method: 'POST',
+      credentials: 'include',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify({ identifier, password })
     });
@@ -39,8 +40,7 @@ export async function handleLogin(e) {
       return;
     }
 
-    adminState.token = data.data.token;
-    localStorage.setItem('tegal_admin_token', data.data.token);
+    adminState.isAuthenticated = true;
     adminState.profile = data.data.admin;
 
     showAdminToast('success', 'Selamat Datang!', `Berhasil masuk sebagai ${data.data.admin.fullName}`);
@@ -55,11 +55,26 @@ export async function handleLogin(e) {
   }
 }
 
-export function handleLogout() {
+export function handleLogout({ revoke = true } = {}) {
   disconnectRealtimeSocket();
-  adminState.token = null;
+  adminState.isAuthenticated = false;
   adminState.profile = null;
   localStorage.removeItem('tegal_admin_token');
+
+  if (revoke) {
+    void apiFetch('/admin/auth/logout', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Accept': 'application/json' }
+    }).then(response => {
+      if (!response.ok) {
+        console.error(`Gagal mengakhiri sesi admin di server (HTTP ${response.status}).`);
+      }
+    }).catch(error => {
+      console.error('Gagal menghubungi server untuk mengakhiri sesi admin:', error);
+    });
+  }
+
   const dash = document.getElementById('adminDashboardSection');
   const login = document.getElementById('adminLoginSection');
   if (dash) dash.style.display = 'none';
@@ -67,25 +82,19 @@ export function handleLogout() {
 }
 
 export async function checkAuthAndInit() {
-  if (!adminState.token) {
-    const login = document.getElementById('adminLoginSection');
-    const dash = document.getElementById('adminDashboardSection');
-    if (login) login.style.display = 'flex';
-    if (dash) dash.style.display = 'none';
-    return;
-  }
-
   try {
     const res = await apiFetch('/admin/auth/me', {
-      headers: { 'Authorization': `Bearer ${adminState.token}` }
+      credentials: 'include',
+      headers: { 'Accept': 'application/json' }
     });
     const data = await res.json();
 
     if (!res.ok || data.status !== 'success') {
-      handleLogout();
+      handleLogout({ revoke: false });
       return;
     }
 
+    adminState.isAuthenticated = true;
     adminState.profile = data.data;
 
     const login = document.getElementById('adminLoginSection');
@@ -105,9 +114,9 @@ export async function checkAuthAndInit() {
     await loadSidebar();
     applyRbacUi(adminState.profile);
     await loadDashboardData();
-    connectRealtimeSocket(adminState.token);
+    connectRealtimeSocket();
   } catch (err) {
     console.error('Failed to authenticate:', err);
-    handleLogout();
+    handleLogout({ revoke: false });
   }
 }

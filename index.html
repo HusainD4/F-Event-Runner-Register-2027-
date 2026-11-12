@@ -28,6 +28,16 @@
 <body>
   <!-- Container for template/body.html -->
   <div id="app"></div>
+  <main id="siteMaintenancePage" class="site-maintenance-page" hidden aria-live="polite">
+    <div class="site-maintenance-card">
+      <div class="site-maintenance-icon"><i class="fa-solid fa-screwdriver-wrench" aria-hidden="true"></i></div>
+      <p class="site-maintenance-eyebrow" id="siteMaintenanceType">INFORMASI LAYANAN</p>
+      <h1 id="siteMaintenanceTitle">Website Sedang Dalam Pemeliharaan</h1>
+      <p id="siteMaintenanceMessage">Kami sedang melakukan pemeliharaan. Silakan kembali beberapa saat lagi.</p>
+      <div class="site-maintenance-time" id="siteMaintenanceExpectedEnd" hidden></div>
+      <a class="site-maintenance-home" href="/">Coba lagi nanti</a>
+    </div>
+  </main>
 
   <!-- Main Application Script (ESM) -->
   <script type="module" src="/js/app.js"></script>
