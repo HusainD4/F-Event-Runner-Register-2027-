@@ -419,6 +419,13 @@
                 <p class="form-hint">Pratinjau langsung: gambar ditampilkan ke bawah sesuai urutan URL. Pilih gambar untuk memperbesar.</p>
                 <div id="cmsJerseyGalleryPreview" hidden></div>
               </div>
+              <div class="form-group jersey-banner-form-group">
+                <label class="form-label" for="cmsBibPreviewImage">Gambar contoh kartu BIB (global, opsional)</label>
+                <p class="form-hint">Masukkan satu URL gambar publik HTTP atau HTTPS. Contoh ini ditampilkan di semua detail tiket dan bukan nomor BIB peserta. Kosongkan untuk menyembunyikannya.</p>
+                <input class="form-input" type="url" id="cmsBibPreviewImage" maxlength="2048" placeholder="https://contoh.com/desain-bib.jpg" aria-describedby="cmsBibPreviewError">
+                <p id="cmsBibPreviewError" class="jersey-admin-error" role="status" hidden></p>
+                <div id="cmsBibPreview" hidden></div>
+              </div>
             </div>
 
             <!-- 3.5. Perizinan & Kepatuhan Hukum (Legal) -->

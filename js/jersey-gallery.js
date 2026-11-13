@@ -1,14 +1,18 @@
 import '../css/jersey-gallery.css';
 
+export function isValidGalleryImageUrl(value) {
+  if (typeof value !== 'string' || value.length > 2048) return false;
+  try { return ['http:', 'https:'].includes(new URL(value).protocol); }
+  catch { return false; }
+}
+
 export function parseJerseyGallery(value, { strict = false } = {}) {
   if (!value) return [];
   try {
     const images = JSON.parse(value);
-    if (!Array.isArray(images) || images.length > 5 || images.some(url => {
-      if (typeof url !== 'string' || url.length > 2048) return true;
-      try { return !['http:', 'https:'].includes(new URL(url).protocol); }
-      catch { return true; }
-    })) throw new Error('Daftar banner jersey tidak valid.');
+    if (!Array.isArray(images) || images.length > 5 || images.some(url => !isValidGalleryImageUrl(url))) {
+      throw new Error('Daftar banner jersey tidak valid.');
+    }
     return images;
   } catch (error) {
     if (strict) throw error;
@@ -17,7 +21,7 @@ export function parseJerseyGallery(value, { strict = false } = {}) {
   }
 }
 
-export function renderJerseyGallery(container, images) {
+export function renderJerseyGallery(container, images, { subject = 'jersey', description = 'Banner jersey dan informasi ukuran' } = {}) {
   container.replaceChildren();
   container.hidden = images.length === 0;
   if (!images.length) return;
@@ -25,10 +29,10 @@ export function renderJerseyGallery(container, images) {
   gallery.className = 'jersey-gallery';
   const track = document.createElement('div');
   track.className = 'jersey-gallery-track';
-  track.setAttribute('aria-label', 'Daftar gambar jersey');
+  track.setAttribute('aria-label', `Daftar gambar ${subject}`);
   const dialog = document.createElement('dialog');
   dialog.className = 'jersey-gallery-dialog';
-  dialog.setAttribute('aria-label', 'Pratinjau gambar jersey');
+  dialog.setAttribute('aria-label', `Pratinjau gambar ${subject}`);
   const close = document.createElement('button');
   close.type = 'button';
   close.className = 'jersey-gallery-close';
@@ -41,10 +45,10 @@ export function renderJerseyGallery(container, images) {
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'jersey-gallery-slide';
-    button.setAttribute('aria-label', `Perbesar banner jersey ${index + 1}`);
+    button.setAttribute('aria-label', `Perbesar gambar ${subject} ${index + 1}`);
     const image = document.createElement('img');
     image.src = url;
-    image.alt = `Banner jersey dan informasi ukuran ${index + 1}`;
+    image.alt = `${description} ${index + 1}`;
     image.loading = 'lazy';
     const error = document.createElement('span');
     error.className = 'jersey-gallery-error';

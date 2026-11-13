@@ -2,7 +2,7 @@ import { fetchAdmin } from '../core/api.js';
 import { showAdminToast } from '../core/utils.js';
 import { DEFAULT_APPEARANCE, APPEARANCE_COLOR_FIELDS, HOME_THEME_SECTIONS, SECTION_COLOR_LABELS, applyAppearanceColors, normalizeAppearance, normalizeSectionColors, setAnimatedTitle } from '../../../js/home-appearance.js';
 import { COLOR_PALETTES, createColorPalette } from './color-palettes.js';
-import { parseJerseyGallery, renderJerseyGallery } from '../../../js/jersey-gallery.js';
+import { isValidGalleryImageUrl, parseJerseyGallery, renderJerseyGallery } from '../../../js/jersey-gallery.js';
 import '../../../css/hero-animation.css';
 
 let statsItems = [];
@@ -14,11 +14,22 @@ let cmsIconDismissHandlersBound = false;
 function getJerseyGalleryInput() {
   const input = document.getElementById('cmsJerseyGalleryImages');
   const images = input.value.split(/\r?\n/).map(value => value.trim()).filter(Boolean);
-  const invalid = images.find(value => {
-    try { return value.length > 2048 || !['http:', 'https:'].includes(new URL(value).protocol); }
-    catch { return true; }
-  });
+  const invalid = images.find(value => !isValidGalleryImageUrl(value));
   return { images, error: images.length > 5 ? 'Maksimal 5 gambar.' : invalid ? 'Gunakan URL gambar HTTP atau HTTPS yang valid (maksimal 2048 karakter).' : '' };
+}
+
+function updateBibPreview() {
+  const input = document.getElementById('cmsBibPreviewImage');
+  const url = input.value.trim();
+  const error = url && !isValidGalleryImageUrl(url) ? 'Gunakan URL gambar HTTP atau HTTPS yang valid (maksimal 2048 karakter).' : '';
+  const message = document.getElementById('cmsBibPreviewError');
+  message.textContent = error;
+  message.hidden = !error;
+  input.setAttribute('aria-invalid', String(Boolean(error)));
+  renderJerseyGallery(document.getElementById('cmsBibPreview'), url && !error ? [url] : [], {
+    subject: 'BIB', description: 'Contoh desain kartu BIB'
+  });
+  return { url, error };
 }
 
 function updateJerseyGalleryPreview() {
@@ -607,6 +618,11 @@ function initCmsButtons() {
     jerseyGalleryInput.oninput = updateJerseyGalleryPreview;
     updateJerseyGalleryPreview();
   }
+  const bibPreviewInput = document.getElementById('cmsBibPreviewImage');
+  if (bibPreviewInput) {
+    bibPreviewInput.oninput = updateBibPreview;
+    updateBibPreview();
+  }
   const sectionContainer = document.getElementById('cmsSectionColors');
   const colorInputs = [...document.querySelectorAll('[data-theme-color]')];
   const getAppearanceColors = () => Object.fromEntries(colorInputs.map(input => [input.dataset.themeColor, input.value]));
@@ -1088,6 +1104,7 @@ async function loadCmsSettings() {
       setVal('cmsTicketsDesc', s.tickets_desc);
       setVal('cmsMedalImage', s.medal_image);
       setVal('cmsJerseyGalleryImages', parseJerseyGallery(s.jersey_gallery_images).join('\n'));
+      setVal('cmsBibPreviewImage', s.bib_preview_image_url);
 
       // Legal & Perizinan
       setVal('cmsLegalBadge', s.legal_badge_label);
@@ -1137,6 +1154,12 @@ async function handleCmsSubmit(e) {
     updateJerseyGalleryPreview();
     document.getElementById('cmsJerseyGalleryImages').focus();
     showAdminToast('warning', 'Galeri Jersey Tidak Valid', jerseyGallery.error);
+    return;
+  }
+  const bibPreview = updateBibPreview();
+  if (bibPreview.error) {
+    document.getElementById('cmsBibPreviewImage').focus();
+    showAdminToast('warning', 'Gambar BIB Tidak Valid', bibPreview.error);
     return;
   }
   const btn = document.getElementById('btnSaveCmsSubmit');
@@ -1209,6 +1232,7 @@ async function handleCmsSubmit(e) {
     tickets_desc: getVal('cmsTicketsDesc'),
     medal_image: getVal('cmsMedalImage'),
     jersey_gallery_images: JSON.stringify(jerseyGallery.images),
+    bib_preview_image_url: bibPreview.url,
 
     // Legal
     legal_badge_label: getVal('cmsLegalBadge'),

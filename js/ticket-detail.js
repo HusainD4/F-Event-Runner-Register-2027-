@@ -1,6 +1,6 @@
 import { apiFetch } from './api.js';
 import { loadWebsiteBranding } from './branding.js';
-import { parseJerseyGallery, renderJerseyGallery } from './jersey-gallery.js';
+import { isValidGalleryImageUrl, parseJerseyGallery, renderJerseyGallery } from './jersey-gallery.js';
 
 loadWebsiteBranding().then(settings => {
   const section = document.getElementById('tdJerseyGallerySection');
@@ -8,6 +8,16 @@ loadWebsiteBranding().then(settings => {
   const images = parseJerseyGallery(settings?.jersey_gallery_images);
   renderJerseyGallery(container, images);
   section.hidden = !images.length;
+  const bibImage = settings?.bib_preview_image_url;
+  const bibSection = document.getElementById('tdBibPreviewSection');
+  if (bibImage && !isValidGalleryImageUrl(bibImage)) {
+    console.warn('URL gambar contoh BIB tidak valid.');
+  } else if (bibImage) {
+    renderJerseyGallery(document.getElementById('tdBibPreview'), [bibImage], {
+      subject: 'BIB', description: 'Contoh desain kartu BIB'
+    });
+    bibSection.hidden = false;
+  }
 });
 
 function showToast(type = 'success', message = '') {
@@ -396,7 +406,7 @@ function renderTicketData(event, feeSettings = {}, isGlobalClosed = false) {
   } else {
     bibContainer.innerHTML = `
       <p style="font-size: 0.88rem; color: var(--color-text-muted); padding: 12px; background: #F8FAFC; border-radius: 8px;">
-        Informasi nomor dada untuk kategori ini belum tersedia.
+        Nomor BIB ditetapkan melalui sistem setelah pendaftaran, sesuai waktu yang ditentukan panitia.
       </p>
     `;
   }
