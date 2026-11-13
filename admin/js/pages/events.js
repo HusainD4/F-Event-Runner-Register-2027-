@@ -3,6 +3,8 @@ import { fetchAdmin } from '../core/api.js';
 import { showAdminToast, showConfirmDialog, escapeHtml } from '../core/utils.js';
 import { applyRbacUi } from '../core/rbac.js';
 import { updateKpis } from './dashboard.js';
+import { apiFetch } from '../../../js/api.js';
+import { parseJerseyGallery } from '../../../js/jersey-gallery.js';
 
 let globalTimerSettingsLoaded = false;
 
@@ -495,13 +497,64 @@ function updateJerseyImagePreview() {
   const input = document.getElementById('jerseyFormImage');
   const preview = document.getElementById('jerseyImagePreview');
   const image = preview?.querySelector('img');
+  const error = document.getElementById('jerseyImagePreviewError');
   const url = input?.value.trim() || '';
   const isValid = Boolean(url && input?.checkValidity() && /^https?:\/\//i.test(url));
   if (preview) preview.hidden = !isValid;
-  if (image) {
-    if (isValid) image.src = url;
-    else image.removeAttribute('src');
+  if (error) {
+    error.textContent = url && !isValid ? 'Gunakan URL gambar HTTP atau HTTPS yang valid.' : '';
+    error.hidden = !error.textContent;
   }
+  if (image) {
+    image.onerror = () => {
+      preview.hidden = true;
+      error.textContent = 'Gambar tidak dapat dimuat. Pastikan tautan dapat diakses publik dan mengarah langsung ke gambar.';
+      error.hidden = false;
+    };
+    if (isValid) image.src = url;
+    else { image.onerror = null; image.removeAttribute('src'); }
+  }
+}
+
+async function loadJerseyGalleryChoices() {
+  const button = document.getElementById('btnLoadJerseyGallery');
+  const select = document.getElementById('jerseyGalleryChoice');
+  const useButton = document.getElementById('btnUseJerseyGallery');
+  const status = document.getElementById('jerseyGalleryPickerStatus');
+  button.disabled = true;
+  status.textContent = 'Memuat galeri global...';
+  select.hidden = true;
+  useButton.hidden = true;
+  try {
+    const response = await apiFetch('/settings/website');
+    if (!response.ok) throw new Error(`Server mengembalikan HTTP ${response.status}.`);
+    const result = await response.json();
+    if (result.status !== 'success' || !result.data) throw new Error(result.message || 'Pengaturan website tidak tersedia.');
+    const images = parseJerseyGallery(result.data.jersey_gallery_images, { strict: true });
+    select.replaceChildren();
+    images.forEach((url, index) => {
+      const option = document.createElement('option');
+      option.value = url;
+      option.textContent = `Gambar ${index + 1}`;
+      select.append(option);
+    });
+    select.hidden = images.length === 0;
+    useButton.hidden = images.length === 0;
+    status.textContent = images.length
+      ? 'Pilih gambar, lalu klik Gunakan gambar ini. Simpan perubahan jersey untuk menerapkannya.'
+      : 'Galeri kosong. Tambahkan gambar pada CMS atau masukkan URL secara langsung.';
+  } catch (error) {
+    status.textContent = `Galeri gagal dimuat: ${error.message}`;
+    showAdminToast('error', 'Gagal Memuat Galeri Jersey', error.message);
+  } finally {
+    button.disabled = false;
+  }
+}
+
+function useJerseyGalleryChoice() {
+  const input = document.getElementById('jerseyFormImage');
+  input.value = document.getElementById('jerseyGalleryChoice').value;
+  updateJerseyImagePreview();
 }
 
 function resetJerseyForm() {
@@ -511,6 +564,9 @@ function resetJerseyForm() {
   document.getElementById('jerseyFormId').value = '';
   document.getElementById('btnSaveJersey').innerHTML = '<i class="fa-solid fa-plus"></i> Tambah Jersey';
   document.getElementById('btnCancelJerseyEdit').hidden = true;
+  document.getElementById('jerseyGalleryChoice').hidden = true;
+  document.getElementById('btnUseJerseyGallery').hidden = true;
+  document.getElementById('jerseyGalleryPickerStatus').textContent = '';
   updateJerseyImagePreview();
 }
 
@@ -532,6 +588,11 @@ async function handleJerseyFormSubmit(event) {
   const type = document.getElementById('jerseyFormType').value.trim();
   const sizes = [...new Set(document.getElementById('jerseyFormSizes').value.split(',').map(size => size.trim()).filter(Boolean))];
   const image = document.getElementById('jerseyFormImage').value.trim() || null;
+  if (image && (!document.getElementById('jerseyFormImage').checkValidity() || !/^https?:\/\//i.test(image))) {
+    showAdminToast('warning', 'Link Gambar Tidak Valid', 'Gunakan URL gambar HTTP atau HTTPS.');
+    document.getElementById('jerseyFormImage').focus();
+    return;
+  }
   if (!currentJerseyEventId || !name || !type || !sizes.length) {
     showAdminToast('warning', 'Data Belum Lengkap', 'Nama, tipe, dan minimal satu ukuran jersey wajib diisi.');
     return;
@@ -811,5 +872,7 @@ export {
   openEventJerseysModal,
   handleJerseyFormSubmit,
   resetJerseyForm,
-  updateJerseyImagePreview
+  updateJerseyImagePreview,
+  loadJerseyGalleryChoices,
+  useJerseyGalleryChoice
 };

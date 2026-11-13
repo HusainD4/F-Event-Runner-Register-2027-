@@ -446,13 +446,22 @@
             <small class="form-hint">Pisahkan dengan koma. Setiap tipe jersey memiliki daftar ukuran sendiri.</small>
           </div>
           <div class="form-group">
-            <label class="form-label" for="jerseyFormImage">Link gambar jersey (opsional)</label>
+            <label class="form-label" for="jerseyFormImage">Gambar untuk tipe jersey ini (opsional)</label>
             <input class="form-input" id="jerseyFormImage" type="url" maxlength="2048" placeholder="https://contoh.com/jersey.jpg">
+            <small class="form-hint">Gambar kecil pada kartu tipe jersey menggunakan URL ini, bukan otomatis dari banner global. Edit tipe jersey dan simpan untuk menggantinya.</small>
+            <div class="jersey-gallery-picker">
+              <button type="button" class="btn btn-outline btn-sm" id="btnLoadJerseyGallery">Pilih dari galeri global</button>
+              <label for="jerseyGalleryChoice" class="sr-only">Pilih gambar galeri global</label>
+              <select id="jerseyGalleryChoice" class="form-input" hidden></select>
+              <button type="button" class="btn btn-secondary btn-sm" id="btnUseJerseyGallery" hidden>Gunakan gambar ini</button>
+              <small id="jerseyGalleryPickerStatus" class="form-hint" role="status"></small>
+            </div>
           </div>
           <div class="jersey-image-preview" id="jerseyImagePreview" hidden>
             <img alt="Pratinjau gambar jersey">
             <span>Pratinjau jersey</span>
           </div>
+          <p class="jersey-admin-error" id="jerseyImagePreviewError" role="status" hidden></p>
           <p class="form-hint">Banner desain jersey dan panduan ukuran diatur secara global di CMS, terpisah dari tipe dan ukuran jersey.</p>
           <div class="admin-modal-footer">
             <button type="button" class="btn btn-secondary btn-sm" id="btnCancelJerseyEdit" hidden>Batal edit</button>

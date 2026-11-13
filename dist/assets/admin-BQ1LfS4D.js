@@ -1,4 +1,4 @@
-import{f as ja,e as Ga,h as Ua,a as qa,o as Ha,c as Wa,l as Ja,b as w,d as _a,g as Qa,i as Va,j as Ya,k as Xa,m as $a,n as Za,p as an,q as nn,r as en,s as tn,t as sn,u as ln,D as on,v as Ra,w as rn,x as dn,y as cn,z as pn,A as mn,B as un,C as bn,E as gn,F as vn,G as k,H as fn,I as hn,J as kn,K as yn,L as xn,M as wn,N as La,O as En,P as Fn,Q as An,R as Sn,S as Pn,T as Tn,U as Cn,V as Bn,W as In,X as Rn,Y as Ln,Z as Nn,_ as Dn,$ as E,a0 as Mn,a1 as Na,a2 as Kn,a3 as zn,a4 as On,a5 as Un,a6 as Da,a7 as jn,a8 as Gn,a9 as qn,aa as Hn,ab as y,ac as Wn,ad as Jn,ae as _n,af as Qn,ag as Vn,ah as Yn}from"./auth-B9jrpJ_1.js";import{a as Xn,b as $n}from"./api-iQl_QkSJ.js";import{a as Zn}from"./home-appearance-Db1ttUVV.js";const ae=`<div class="admin-tab-pane active" id="pane-dashboard">
+import{f as qa,e as Ha,h as Ga,a as Wa,o as Ja,c as _a,l as Qa,b as w,d as Va,g as Ya,i as Xa,j as $a,k as Za,m as an,n as nn,p as en,q as tn,r as sn,s as ln,t as on,u as rn,D as dn,v as Na,w as cn,x as pn,y as mn,z as un,A as bn,B as gn,C as vn,E as fn,F as hn,G as kn,H as yn,I as k,J as xn,K as wn,L as En,M as Fn,N as An,O as Sn,P as Da,Q as Pn,R as Tn,S as Cn,T as Bn,U as In,V as Rn,W as Ln,X as Nn,Y as Dn,Z as Mn,_ as Kn,$ as zn,a0 as On,a1 as E,a2 as Un,a3 as Ma,a4 as jn,a5 as Gn,a6 as qn,a7 as Hn,a8 as Ka,a9 as Wn,aa as Jn,ab as _n,ac as Qn,ad as y,ae as Vn,af as Yn,ag as Xn,ah as $n,ai as Zn,aj as ae}from"./auth-BdCnSfUH.js";import{a as ne,b as ee}from"./api-iQl_QkSJ.js";import{a as ie}from"./home-appearance-Db1ttUVV.js";const te=`<div class="admin-tab-pane active" id="pane-dashboard">
           <!-- Top KPI Grid: Pemisahan Jelas Total Biaya Layanan & Hasil Akhir Murni Bersih -->
           <div class="admin-kpi-grid">
             <div class="kpi-card" data-dashboard-widget="dashboard:participants">
@@ -306,7 +306,7 @@ import{f as ja,e as Ga,h as Ua,a as qa,o as Ha,c as Wa,l as Ja,b as w,d as _a,g 
               </div>
             </div>
           </div>
-        </div>`,ne=`<div class="admin-tab-pane" id="pane-events">
+        </div>`,se=`<div class="admin-tab-pane" id="pane-events">
           <div class="admin-section">
             <div class="admin-section-header">
               <div>
@@ -331,7 +331,7 @@ import{f as ja,e as Ga,h as Ua,a as qa,o as Ha,c as Wa,l as Ja,b as w,d as _a,g 
               </div>
             </div>
           </div>
-        </div>`,ee=`<div class="admin-tab-pane" id="pane-participants">
+        </div>`,le=`<div class="admin-tab-pane" id="pane-participants">
   <div class="admin-section">
     <div class="admin-section-header" style="flex-wrap: wrap; gap: 14px;">
       <div>
@@ -417,7 +417,7 @@ import{f as ja,e as Ga,h as Ua,a as qa,o as Ha,c as Wa,l as Ja,b as w,d as _a,g 
     </div>
   </div>
 </div>
-`,ie=`<div class="admin-tab-pane" id="pane-racepack">
+`,oe=`<div class="admin-tab-pane" id="pane-racepack">
   <div class="admin-section">
     <div class="admin-section-header" style="flex-wrap: wrap; gap: 14px;">
       <div>
@@ -707,7 +707,7 @@ import{f as ja,e as Ga,h as Ua,a as qa,o as Ha,c as Wa,l as Ja,b as w,d as _a,g 
     </div>
   </div>
 </div>
-`,te=`<div class="admin-tab-pane" id="pane-racepack-confirm">\r
+`,re=`<div class="admin-tab-pane" id="pane-racepack-confirm">\r
   <div class="admin-section racepack-confirm-section">\r
     <div class="admin-section-header">\r
       <div class="racepack-confirm-heading">\r
@@ -736,7 +736,7 @@ import{f as ja,e as Ga,h as Ua,a as qa,o as Ha,c as Wa,l as Ja,b as w,d as _a,g 
     </div>\r
   </div>\r
 </div>\r
-`,se=`<div class="admin-tab-pane" id="pane-racepack-view">\r
+`,de=`<div class="admin-tab-pane" id="pane-racepack-view">\r
   <div class="admin-section racepack-live-section">\r
     <div class="admin-section-header racepack-live-header">\r
       <div>\r
@@ -756,7 +756,7 @@ import{f as ja,e as Ga,h as Ua,a as qa,o as Ha,c as Wa,l as Ja,b as w,d as _a,g 
     </div>\r
   </div>\r
 </div>\r
-`,le=`<div class="admin-tab-pane" id="pane-orders">
+`,ce=`<div class="admin-tab-pane" id="pane-orders">
           <div class="admin-section">
             <div class="admin-section-header">
               <div>
@@ -805,7 +805,7 @@ import{f as ja,e as Ga,h as Ua,a as qa,o as Ha,c as Wa,l as Ja,b as w,d as _a,g 
               </table>
             </div>
           </div>
-        </div>`,oe=`<div class="admin-tab-pane" id="pane-countdown">
+        </div>`,pe=`<div class="admin-tab-pane" id="pane-countdown">
           <div class="admin-section">
             <div class="admin-section-header">
               <div>
@@ -912,7 +912,7 @@ import{f as ja,e as Ga,h as Ua,a as qa,o as Ha,c as Wa,l as Ja,b as w,d as _a,g 
               </div>
             </div>
           </div>
-          </div>`,re=`<div class="admin-tab-pane" id="pane-bib-settings">
+          </div>`,me=`<div class="admin-tab-pane" id="pane-bib-settings">
   <div class="admin-section">
     <div class="admin-section-header" style="flex-wrap: wrap; gap: 14px;">
       <div>
@@ -1172,7 +1172,7 @@ import{f as ja,e as Ga,h as Ua,a as qa,o as Ha,c as Wa,l as Ja,b as w,d as _a,g 
     </div>
   </div>
 </div>
-`,de=`<div class="admin-tab-pane" id="pane-cms">
+`,ue=`<div class="admin-tab-pane" id="pane-cms">
           <form id="formCmsSettings">
     <div class="cms-submit-actions cms-submit-actions-top">
       <span class="cms-save-context"><i class="fa-solid fa-cloud-arrow-up"></i> Perubahan akan diterapkan setelah disimpan</span>
@@ -1587,10 +1587,10 @@ import{f as ja,e as Ga,h as Ua,a as qa,o as Ha,c as Wa,l as Ja,b as w,d as _a,g 
               </div>
               <div class="form-group jersey-banner-form-group">
                 <label class="form-label" for="cmsJerseyGalleryImages">Galeri jersey &amp; panduan ukuran (global)</label>
-                <p class="form-hint">Masukkan maksimal 5 URL gambar publik, satu per baris, sesuai urutan tampilan. Gunakan gambar desain jersey dan tabel ukuran lengkap. Galeri ini sama untuk semua detail tiket dan terpisah dari tipe jersey.</p>
+                <p class="form-hint">Masukkan maksimal 5 URL gambar publik, satu per baris, sesuai urutan tampilan. Gunakan gambar desain jersey dan tabel ukuran lengkap. Galeri ini sama untuk semua detail tiket dan tidak otomatis mengubah gambar pada kartu tipe jersey; gambar tersebut dapat diedit di menu Jersey kategori.</p>
                 <textarea class="form-input" id="cmsJerseyGalleryImages" rows="4" placeholder="https://contoh.com/desain-jersey.jpg&#10;https://contoh.com/panduan-ukuran.jpg" aria-describedby="cmsJerseyGalleryError"></textarea>
                 <p id="cmsJerseyGalleryError" class="jersey-admin-error" role="status" hidden></p>
-                <p class="form-hint">Pratinjau langsung: geser atau gunakan tombol panah, lalu pilih gambar untuk memperbesar.</p>
+                <p class="form-hint">Pratinjau langsung: gambar ditampilkan ke bawah sesuai urutan URL. Pilih gambar untuk memperbesar.</p>
                 <div id="cmsJerseyGalleryPreview" hidden></div>
               </div>
             </div>
@@ -1743,7 +1743,7 @@ import{f as ja,e as Ga,h as Ua,a as qa,o as Ha,c as Wa,l as Ja,b as w,d as _a,g 
 
             </div>
           </form>
-        </div>`,ce=`<div class="admin-tab-pane" id="pane-admins" data-role="SUPERADMIN">
+        </div>`,be=`<div class="admin-tab-pane" id="pane-admins" data-role="SUPERADMIN">
           <!-- Sub-nav Tabs RBAC -->
           <div class="rbac-subnav" role="tablist" aria-label="Bagian pengelolaan admin">
             <button type="button" class="btn btn-primary btn-sm rbac-subnav-button" id="btnRbacTabUsers" role="tab" aria-controls="rbacSectionUsers" aria-selected="true" onclick="switchRbacSubTab('users')">
@@ -1860,7 +1860,7 @@ import{f as ja,e as Ga,h as Ua,a as qa,o as Ha,c as Wa,l as Ja,b as w,d as _a,g 
               </table>
             </div>
           </div>
-        </div>`,pe=`<div class="admin-tab-pane" id="pane-routes">
+        </div>`,ge=`<div class="admin-tab-pane" id="pane-routes">
   <div class="admin-section route-settings-section">
     <div class="admin-section-header route-section-heading">
       <div>
@@ -1957,7 +1957,7 @@ import{f as ja,e as Ga,h as Ua,a as qa,o as Ha,c as Wa,l as Ja,b as w,d as _a,g 
       </table>
     </div>
   </div>
-</div>`,me=`<div class="admin-tab-pane" id="pane-notifications">
+</div>`,ve=`<div class="admin-tab-pane" id="pane-notifications">
           <div class="admin-section">
             <div class="admin-section-header">
               <div>
@@ -2166,7 +2166,7 @@ import{f as ja,e as Ga,h as Ua,a as qa,o as Ha,c as Wa,l as Ja,b as w,d as _a,g 
               </div>
             </div>
           </div>
-        </div>`,ue=`<div class="admin-tab-pane" id="pane-notif-logs">
+        </div>`,fe=`<div class="admin-tab-pane" id="pane-notif-logs">
           <div class="admin-section">
             <div class="admin-section-header">
               <div>
@@ -2264,7 +2264,7 @@ import{f as ja,e as Ga,h as Ua,a as qa,o as Ha,c as Wa,l as Ja,b as w,d as _a,g 
               </table>
             </div>
           </div>
-        </div>`,be=`<div class="admin-tab-pane" id="pane-whatsapp-web">
+        </div>`,he=`<div class="admin-tab-pane" id="pane-whatsapp-web">
           <div class="admin-section" style="padding: 0; background: transparent; border: none; box-shadow: none;">
             <!-- Header Ringkasan Status Gateway -->
             <div style="background: #FFFFFF; border: 1px solid var(--color-border-subtle); border-radius: var(--radius-lg); padding: 18px 24px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
@@ -2396,7 +2396,7 @@ import{f as ja,e as Ga,h as Ua,a as qa,o as Ha,c as Wa,l as Ja,b as w,d as _a,g 
               </div>
             </div>
           </div>
-        </div>`,ge=`<div class="admin-tab-pane" id="pane-logs">
+        </div>`,ke=`<div class="admin-tab-pane" id="pane-logs">
           <div class="admin-section">
             <div class="admin-section-header">
               <div>
@@ -2428,7 +2428,7 @@ import{f as ja,e as Ga,h as Ua,a as qa,o as Ha,c as Wa,l as Ja,b as w,d as _a,g 
               </table>
             </div>
           </div>
-        </div>`,ve=`<div class="admin-tab-pane" id="pane-role-monitoring" data-role="SUPERADMIN">\r
+        </div>`,ye=`<div class="admin-tab-pane" id="pane-role-monitoring" data-role="SUPERADMIN">\r
   <section class="admin-section role-monitoring-section">\r
     <div class="admin-section-header role-monitoring-header">\r
       <div>\r
@@ -2460,7 +2460,7 @@ import{f as ja,e as Ga,h as Ua,a as qa,o as Ha,c as Wa,l as Ja,b as w,d as _a,g 
     </div>\r
   </section>\r
 </div>\r
-`,fe=`<div class="admin-tab-pane" id="pane-backups" data-role="SUPERADMIN">\r
+`,xe=`<div class="admin-tab-pane" id="pane-backups" data-role="SUPERADMIN">\r
   <section class="admin-section backup-section">\r
     <div class="admin-section-header backup-header">\r
       <div>\r
@@ -2515,7 +2515,7 @@ import{f as ja,e as Ga,h as Ua,a as qa,o as Ha,c as Wa,l as Ja,b as w,d as _a,g 
     </div>\r
   </section>\r
 </div>\r
-`,he=`<!-- MODAL 1: EVENT CREATE / EDIT -->
+`,we=`<!-- MODAL 1: EVENT CREATE / EDIT -->
   <div class="admin-modal-backdrop" id="modalEventBackdrop">
     <div class="admin-modal-dialog">
       <div class="admin-modal-header">
@@ -2963,13 +2963,22 @@ import{f as ja,e as Ga,h as Ua,a as qa,o as Ha,c as Wa,l as Ja,b as w,d as _a,g 
             <small class="form-hint">Pisahkan dengan koma. Setiap tipe jersey memiliki daftar ukuran sendiri.</small>
           </div>
           <div class="form-group">
-            <label class="form-label" for="jerseyFormImage">Link gambar jersey (opsional)</label>
+            <label class="form-label" for="jerseyFormImage">Gambar untuk tipe jersey ini (opsional)</label>
             <input class="form-input" id="jerseyFormImage" type="url" maxlength="2048" placeholder="https://contoh.com/jersey.jpg">
+            <small class="form-hint">Gambar kecil pada kartu tipe jersey menggunakan URL ini, bukan otomatis dari banner global. Edit tipe jersey dan simpan untuk menggantinya.</small>
+            <div class="jersey-gallery-picker">
+              <button type="button" class="btn btn-outline btn-sm" id="btnLoadJerseyGallery">Pilih dari galeri global</button>
+              <label for="jerseyGalleryChoice" class="sr-only">Pilih gambar galeri global</label>
+              <select id="jerseyGalleryChoice" class="form-input" hidden></select>
+              <button type="button" class="btn btn-secondary btn-sm" id="btnUseJerseyGallery" hidden>Gunakan gambar ini</button>
+              <small id="jerseyGalleryPickerStatus" class="form-hint" role="status"></small>
+            </div>
           </div>
           <div class="jersey-image-preview" id="jerseyImagePreview" hidden>
             <img alt="Pratinjau gambar jersey">
             <span>Pratinjau jersey</span>
           </div>
+          <p class="jersey-admin-error" id="jerseyImagePreviewError" role="status" hidden></p>
           <p class="form-hint">Banner desain jersey dan panduan ukuran diatur secara global di CMS, terpisah dari tipe dan ukuran jersey.</p>
           <div class="admin-modal-footer">
             <button type="button" class="btn btn-secondary btn-sm" id="btnCancelJerseyEdit" hidden>Batal edit</button>
@@ -3072,5 +3081,5 @@ import{f as ja,e as Ga,h as Ua,a as qa,o as Ha,c as Wa,l as Ja,b as w,d as _a,g 
         <button type="button" class="btn btn-primary btn-sm btn-glow" id="btnConfirmOk">Ya, Lanjutkan</button>
       </div>
     </div>
-  </div>`;let F=!1,Ma=!1;async function Ka(){var o;const a=document.getElementById("backupTablesStatus"),i=document.getElementById("backupTableCount"),t=document.getElementById("backupTablesList");if(!(!t||F)){F=!0,a&&(a.textContent="Memuat daftar tabel...");try{const e=await ja("/admin/backups");if(!e||e.status!=="success"||!Array.isArray((o=e.data)==null?void 0:o.tables))throw new Error((e==null?void 0:e.message)||"Daftar tabel backup gagal dimuat.");const r=e.data.tables;i&&(i.textContent=String(r.length)),a&&(a.textContent="Semua tabel database akan disertakan pada kedua format backup."),t.innerHTML=r.map(l=>`<li>${Ga(l)}</li>`).join("")}catch(e){a&&(a.textContent=e.message||"Daftar tabel gagal dimuat."),i&&(i.textContent="-"),t.replaceChildren(),console.error("Gagal memuat cakupan backup database:",e)}finally{F=!1}}}async function za(a){var r;if(!window.confirm(`Unduh backup ${a.toUpperCase()} seluruh database? File memuat data sensitif dan harus disimpan secara aman.`))return;const t=a==="sql"?"btnDownloadSqlBackup":"btnDownloadCsvBackup",o=document.getElementById(t),e=document.getElementById("backupTablesStatus");o&&(o.disabled=!0),e&&(e.textContent=`Menyiapkan backup ${a.toUpperCase()}...`);try{const l=await Xn(`/admin/backups/${a}`,{method:"POST",credentials:"include",headers:{Accept:a==="csv"?"text/csv":"text/plain","X-Backup-Request":"download"}});if(l.status===401)throw Ua({revoke:!1}),new Error("Sesi admin telah berakhir. Silakan login kembali.");if(!l.ok){let b=`Unduhan backup gagal (HTTP ${l.status}).`;try{const g=await l.json();g.message&&(b=g.message)}catch{}throw new Error(b)}const v=await l.blob(),f=((r=(l.headers.get("Content-Disposition")||"").match(/filename="([^"]+)"/))==null?void 0:r[1])||`tegal-run-backup.${a}`,u=URL.createObjectURL(v),d=document.createElement("a");d.href=u,d.download=f,document.body.appendChild(d),d.click(),d.remove(),URL.revokeObjectURL(u),e&&(e.textContent=`Backup ${a.toUpperCase()} berhasil disiapkan.`)}catch(l){e&&(e.textContent=l.message||"Unduhan backup gagal."),console.error(`Gagal mengunduh backup ${a.toUpperCase()}:`,l)}finally{o&&(o.disabled=!1)}}function ke(){var a,i,t;(a=document.getElementById("btnRefreshBackupOverview"))==null||a.addEventListener("click",Ka),(i=document.getElementById("btnDownloadSqlBackup"))==null||i.addEventListener("click",()=>za("sql")),(t=document.getElementById("btnDownloadCsvBackup"))==null||t.addEventListener("click",()=>za("csv")),window.addEventListener("admin:tab-changed",o=>{var e;((e=o.detail)==null?void 0:e.tabKey)==="backups"&&!Ma&&(Ma=!0,Ka())})}$n.getWebsiteSettings().then(a=>{a&&Zn(a)});function ye(a){Jn(a),_n(a)}function xe(a){["notifications","whatsapp-web"].includes(Qn.activeTab)&&Vn(a)}function we(){Yn("warning","Sesi Diakhiri","Superadmin telah mengakhiri sesi Anda. Silakan login kembali jika diperlukan."),Ua()}function Oa(){return[y("admin:racepack_confirmation_changed",Wn),y("admin:racepack_queue_changed",ye),y("admin:whatsapp_session",xe),y("admin:force_logout",we)]}window.closeAdminModal=function(a){var i;(i=document.getElementById(a))==null||i.classList.remove("open")};function Ee(){const a=document.getElementById("adminPanesContainer")||document.querySelector(".admin-content-body");a&&a.children.length===0&&(a.innerHTML=[ae,ne,ee,ie,te,se,le,oe,re,de,ce,pe,me,ue,be,ge,ve,fe].join(`
-`));const i=document.getElementById("rpcInfoDialog");i&&i.parentElement!==document.body&&document.body.appendChild(i);const t=document.getElementById("adminModalsContainer");t&&t.children.length===0&&(t.innerHTML=he)}document.addEventListener("DOMContentLoaded",()=>{var t,o,e,r,l,v,x,f,u,d,b,g,A,S,P,T,C,B,I,R,L,N,D,M,K,z,O,U,j,G,q,H,W,J,_,Q,V,Y,X,$,Z,aa,na,ea,ia,ta,sa,la,oa,ra,da,ca,pa,ma,ua,ba,ga,va,fa,ha,ka,ya,xa,wa,Ea,Fa,Aa,Sa,Pa,Ta,Ca,Ba,Ia;Ee(),ke(),(t=document.getElementById("adminLoginForm"))==null||t.addEventListener("submit",qa),(o=document.getElementById("btnToggleSidebar"))==null||o.addEventListener("click",Ha),(e=document.getElementById("sidebarOverlay"))==null||e.addEventListener("click",Wa),(r=document.getElementById("btnRefreshEvents"))==null||r.addEventListener("click",Ja),(l=document.getElementById("btnRefreshOrders"))==null||l.addEventListener("click",w),(v=document.getElementById("btnRefreshLogs"))==null||v.addEventListener("click",_a),(x=document.getElementById("btnExportCsv"))==null||x.addEventListener("click",Qa),(f=document.getElementById("btnOpenCreateEventModal"))==null||f.addEventListener("click",Va),(u=document.getElementById("btnOpenCreateParticipantModal"))==null||u.addEventListener("click",Ya),(d=document.getElementById("btnOpenCreateAdminModal"))==null||d.addEventListener("click",Xa),(b=document.getElementById("btnOpenCreateRouteModal"))==null||b.addEventListener("click",$a),(g=document.getElementById("btnOpenCreateRoleModal"))==null||g.addEventListener("click",Za),(A=document.getElementById("btnResetDefaultRoles"))==null||A.addEventListener("click",an),(S=document.getElementById("formEvent"))==null||S.addEventListener("submit",nn),(P=document.getElementById("formParticipant"))==null||P.addEventListener("submit",en),(T=document.getElementById("formOrderStatus"))==null||T.addEventListener("submit",tn),(C=document.getElementById("formAdminUser"))==null||C.addEventListener("submit",sn),(B=document.getElementById("formRole"))==null||B.addEventListener("submit",ln),(I=document.getElementById("btnSelectAllPages"))==null||I.addEventListener("click",()=>{document.querySelectorAll('#roleModulesContainer input[type="checkbox"]:not(:disabled)').forEach(n=>{n.checked=!0,n.dispatchEvent(new Event("change",{bubbles:!0}))})}),(R=document.getElementById("btnClearAllPages"))==null||R.addEventListener("click",()=>{document.querySelectorAll('#roleModulesContainer input[type="checkbox"]:not(:disabled)').forEach(n=>{n.checked=!1,n.dispatchEvent(new Event("change",{bubbles:!0}))})}),(L=document.getElementById("btnPresetDefaultPages"))==null||L.addEventListener("click",()=>{var m;const n=((m=document.getElementById("roleFormName"))==null?void 0:m.value.trim().toUpperCase())||"",p=on.find(c=>c.name===n)?n==="ADMINISTRATOR"?["page:dashboard","page:events","page:participants","page:racepack","page:orders","page:notif-logs","page:whatsapp-web","page:cms","page:countdown","page:routes"]:n==="FINANCE"?["page:dashboard","page:orders","page:logs"]:n==="SPONSORSHIP"?["page:dashboard","page:cms","page:events","page:notif-logs"]:n==="RACEPACK_OFFICER"?["page:dashboard","page:racepack","page:participants","page:whatsapp-web"]:n==="GATE_OPERATOR"?["page:dashboard","page:participants","page:racepack"]:n==="RACE_DIRECTOR"?["page:dashboard","page:routes","page:countdown","page:participants","page:events","page:racepack"]:n==="TIMING_JUDGE"?["page:dashboard","page:participants","page:routes"]:n==="MEDICAL_OFFICER"?["page:dashboard","page:participants","page:routes"]:n==="VOLUNTEER"?["page:dashboard","page:participants","page:racepack"]:n==="BAG_DROP_OFFICER"?["page:dashboard","page:participants"]:n==="CUSTOMER_SERVICE"?["page:dashboard","page:whatsapp-web","page:notif-logs","page:participants","page:orders","page:racepack"]:["page:dashboard"]:["page:dashboard"];document.querySelectorAll('#roleApiPermissionsContainer input[type="checkbox"]:not(:disabled)').forEach(c=>{var h;c.checked=!1,(h=c.closest(".role-permission-option"))==null||h.classList.remove("checked")}),document.querySelectorAll('#roleModulesContainer input[type="checkbox"]:not(:disabled)').forEach(c=>{const h=p.includes(c.value);c.checked=h,c.dispatchEvent(new Event("change",{bubbles:!0}))})}),(N=document.getElementById("formCmsSettings"))==null||N.addEventListener("submit",Ra),(D=document.getElementById("formWebsiteCms"))==null||D.addEventListener("submit",Ra),(M=document.getElementById("formNotificationSettings"))==null||M.addEventListener("submit",rn),(K=document.getElementById("btnSendTestNotif"))==null||K.addEventListener("click",dn),(z=document.getElementById("formEventBenefit"))==null||z.addEventListener("submit",cn),(O=document.getElementById("btnCancelBenefitEdit"))==null||O.addEventListener("click",pn),(U=document.getElementById("formEventJersey"))==null||U.addEventListener("submit",mn),(j=document.getElementById("btnCancelJerseyEdit"))==null||j.addEventListener("click",un),(G=document.getElementById("jerseyFormImage"))==null||G.addEventListener("input",bn),(q=document.getElementById("formRoutePoint"))==null||q.addEventListener("submit",gn),(H=document.getElementById("routeSettingsForm"))==null||H.addEventListener("submit",vn),(W=document.getElementById("routeMapMode"))==null||W.addEventListener("change",k),(J=document.getElementById("routeCheckpointMode"))==null||J.addEventListener("change",k),(_=document.getElementById("routeSettingsMapImage"))==null||_.addEventListener("input",k),(Q=document.getElementById("routeSettingsCheckpointImage"))==null||Q.addEventListener("input",k),(V=document.getElementById("btnSaveGlobalCountdown"))==null||V.addEventListener("click",fn),(Y=document.getElementById("btnResetGlobalCountdown"))==null||Y.addEventListener("click",hn),(X=document.getElementById("btnToggleGlobalClosed"))==null||X.addEventListener("click",kn),($=document.getElementById("btnSaveWebsiteStatus"))==null||$.addEventListener("click",yn),(Z=document.getElementById("maintenanceEnabled"))==null||Z.addEventListener("change",xn),(aa=document.getElementById("filterOrderStatus"))==null||aa.addEventListener("change",w),(na=document.getElementById("searchOrder"))==null||na.addEventListener("input",()=>{clearTimeout(window._searchOrderTimer),window._searchOrderTimer=setTimeout(w,300)}),document.querySelectorAll(".participant-tabs-nav .part-tab-btn").forEach(n=>{n.addEventListener("click",()=>{const s=n.getAttribute("data-tab");s&&wn(s)})}),(ea=document.getElementById("filterParticipantCategory"))==null||ea.addEventListener("change",La),(ia=document.getElementById("searchParticipant"))==null||ia.addEventListener("input",()=>{clearTimeout(window._searchParticipantTimer),window._searchParticipantTimer=setTimeout(La,250)}),(ta=document.getElementById("btnRefreshRacepackStats"))==null||ta.addEventListener("click",()=>En({force:!0})),(sa=document.getElementById("btnRefreshRacepackConfirmations"))==null||sa.addEventListener("click",()=>Fn({force:!0})),(la=document.getElementById("racepackConfirmationsTable"))==null||la.addEventListener("click",n=>{const s=n.target.closest("[data-confirm-racepack-id]");s&&An(s.dataset.confirmRacepackId)});const a=document.getElementById("rpcInfoDialog");(oa=document.getElementById("btnRpcInfo"))==null||oa.addEventListener("click",()=>{a instanceof HTMLDialogElement&&!a.open&&a.showModal()}),(ra=document.getElementById("btnCloseRpcInfo"))==null||ra.addEventListener("click",()=>{a instanceof HTMLDialogElement&&a.close()}),a==null||a.addEventListener("click",n=>{n.target===a&&a instanceof HTMLDialogElement&&a.close()}),(da=document.getElementById("btnStartRpcCamera"))==null||da.addEventListener("click",Sn),(ca=document.getElementById("btnStopRpcCamera"))==null||ca.addEventListener("click",Pn),(pa=document.getElementById("btnTriggerNativeCamera"))==null||pa.addEventListener("click",Tn),(ma=document.getElementById("rpcNativeCameraInput"))==null||ma.addEventListener("change",Cn),(ua=document.getElementById("btnConfirmRpcCheckin"))==null||ua.addEventListener("click",Bn),(ba=document.getElementById("btnRefreshRacepackQueue"))==null||ba.addEventListener("click",()=>In({force:!0})),(ga=document.getElementById("btnRevertRpcCheckin"))==null||ga.addEventListener("click",Rn),(va=document.getElementById("formRpcManualSearch"))==null||va.addEventListener("submit",n=>{n.preventDefault();const s=document.getElementById("rpcSearchInput"),p=s?s.value.trim():"";p&&Ln(p)}),(fa=document.getElementById("btnGenerateWaQr"))==null||fa.addEventListener("click",Nn),(ha=document.getElementById("btnDisconnectWa"))==null||ha.addEventListener("click",Dn),(ka=document.getElementById("btnRefreshNotifLogs"))==null||ka.addEventListener("click",E),(ya=document.getElementById("btnBatchSendNotif"))==null||ya.addEventListener("click",Mn),(xa=document.getElementById("filterNotifDeliveryStatus"))==null||xa.addEventListener("change",E),(wa=document.getElementById("searchNotifLogs"))==null||wa.addEventListener("input",()=>{clearTimeout(window._searchNotifTimer),window._searchNotifTimer=setTimeout(E,300)}),(Ea=document.getElementById("btnRefreshWaWeb"))==null||Ea.addEventListener("click",Na),(Fa=document.getElementById("btnWaWebSync"))==null||Fa.addEventListener("click",Na),(Aa=document.getElementById("btnGoToWaQr"))==null||Aa.addEventListener("click",()=>Kn("notifications")),(Sa=document.getElementById("btnSyncMidtransDashboard"))==null||Sa.addEventListener("click",zn),(Pa=document.getElementById("btnSendWaDirectMsg"))==null||Pa.addEventListener("click",On),(Ta=document.getElementById("waQuickTemplateSelect"))==null||Ta.addEventListener("change",Un),(Ca=document.getElementById("btnQuickSendPaidTicket"))==null||Ca.addEventListener("click",()=>Da()),(Ba=document.getElementById("btnQuickSendPending"))==null||Ba.addEventListener("click",()=>Da()),(Ia=document.getElementById("waContactSearchInput"))==null||Ia.addEventListener("input",n=>{const s=(n.target.value||"").toLowerCase(),p=jn.filter(m=>m.customerName.toLowerCase().includes(s)||m.customerPhone.includes(s)||m.ticketName.toLowerCase().includes(s));Gn(p)}),qn();let i=Oa();window.addEventListener("pagehide",()=>i.forEach(n=>n()),{once:!0}),window.addEventListener("pageshow",n=>{n.persisted&&(i.forEach(s=>s()),i=Oa())}),Hn()});
+  </div>`;let F=!1,za=!1;async function Oa(){var o;const a=document.getElementById("backupTablesStatus"),i=document.getElementById("backupTableCount"),t=document.getElementById("backupTablesList");if(!(!t||F)){F=!0,a&&(a.textContent="Memuat daftar tabel...");try{const e=await qa("/admin/backups");if(!e||e.status!=="success"||!Array.isArray((o=e.data)==null?void 0:o.tables))throw new Error((e==null?void 0:e.message)||"Daftar tabel backup gagal dimuat.");const r=e.data.tables;i&&(i.textContent=String(r.length)),a&&(a.textContent="Semua tabel database akan disertakan pada kedua format backup."),t.innerHTML=r.map(l=>`<li>${Ha(l)}</li>`).join("")}catch(e){a&&(a.textContent=e.message||"Daftar tabel gagal dimuat."),i&&(i.textContent="-"),t.replaceChildren(),console.error("Gagal memuat cakupan backup database:",e)}finally{F=!1}}}async function Ua(a){var r;if(!window.confirm(`Unduh backup ${a.toUpperCase()} seluruh database? File memuat data sensitif dan harus disimpan secara aman.`))return;const t=a==="sql"?"btnDownloadSqlBackup":"btnDownloadCsvBackup",o=document.getElementById(t),e=document.getElementById("backupTablesStatus");o&&(o.disabled=!0),e&&(e.textContent=`Menyiapkan backup ${a.toUpperCase()}...`);try{const l=await ne(`/admin/backups/${a}`,{method:"POST",credentials:"include",headers:{Accept:a==="csv"?"text/csv":"text/plain","X-Backup-Request":"download"}});if(l.status===401)throw Ga({revoke:!1}),new Error("Sesi admin telah berakhir. Silakan login kembali.");if(!l.ok){let b=`Unduhan backup gagal (HTTP ${l.status}).`;try{const g=await l.json();g.message&&(b=g.message)}catch{}throw new Error(b)}const v=await l.blob(),f=((r=(l.headers.get("Content-Disposition")||"").match(/filename="([^"]+)"/))==null?void 0:r[1])||`tegal-run-backup.${a}`,u=URL.createObjectURL(v),d=document.createElement("a");d.href=u,d.download=f,document.body.appendChild(d),d.click(),d.remove(),URL.revokeObjectURL(u),e&&(e.textContent=`Backup ${a.toUpperCase()} berhasil disiapkan.`)}catch(l){e&&(e.textContent=l.message||"Unduhan backup gagal."),console.error(`Gagal mengunduh backup ${a.toUpperCase()}:`,l)}finally{o&&(o.disabled=!1)}}function Ee(){var a,i,t;(a=document.getElementById("btnRefreshBackupOverview"))==null||a.addEventListener("click",Oa),(i=document.getElementById("btnDownloadSqlBackup"))==null||i.addEventListener("click",()=>Ua("sql")),(t=document.getElementById("btnDownloadCsvBackup"))==null||t.addEventListener("click",()=>Ua("csv")),window.addEventListener("admin:tab-changed",o=>{var e;((e=o.detail)==null?void 0:e.tabKey)==="backups"&&!za&&(za=!0,Oa())})}ee.getWebsiteSettings().then(a=>{a&&ie(a)});function Fe(a){Yn(a),Xn(a)}function Ae(a){["notifications","whatsapp-web"].includes($n.activeTab)&&Zn(a)}function Se(){ae("warning","Sesi Diakhiri","Superadmin telah mengakhiri sesi Anda. Silakan login kembali jika diperlukan."),Ga()}function ja(){return[y("admin:racepack_confirmation_changed",Vn),y("admin:racepack_queue_changed",Fe),y("admin:whatsapp_session",Ae),y("admin:force_logout",Se)]}window.closeAdminModal=function(a){var i;(i=document.getElementById(a))==null||i.classList.remove("open")};function Pe(){const a=document.getElementById("adminPanesContainer")||document.querySelector(".admin-content-body");a&&a.children.length===0&&(a.innerHTML=[te,se,le,oe,re,de,ce,pe,me,ue,be,ge,ve,fe,he,ke,ye,xe].join(`
+`));const i=document.getElementById("rpcInfoDialog");i&&i.parentElement!==document.body&&document.body.appendChild(i);const t=document.getElementById("adminModalsContainer");t&&t.children.length===0&&(t.innerHTML=we)}document.addEventListener("DOMContentLoaded",()=>{var t,o,e,r,l,v,x,f,u,d,b,g,A,S,P,T,C,B,I,R,L,N,D,M,K,z,O,U,j,G,q,H,W,J,_,Q,V,Y,X,$,Z,aa,na,ea,ia,ta,sa,la,oa,ra,da,ca,pa,ma,ua,ba,ga,va,fa,ha,ka,ya,xa,wa,Ea,Fa,Aa,Sa,Pa,Ta,Ca,Ba,Ia,Ra,La;Pe(),Ee(),(t=document.getElementById("adminLoginForm"))==null||t.addEventListener("submit",Wa),(o=document.getElementById("btnToggleSidebar"))==null||o.addEventListener("click",Ja),(e=document.getElementById("sidebarOverlay"))==null||e.addEventListener("click",_a),(r=document.getElementById("btnRefreshEvents"))==null||r.addEventListener("click",Qa),(l=document.getElementById("btnRefreshOrders"))==null||l.addEventListener("click",w),(v=document.getElementById("btnRefreshLogs"))==null||v.addEventListener("click",Va),(x=document.getElementById("btnExportCsv"))==null||x.addEventListener("click",Ya),(f=document.getElementById("btnOpenCreateEventModal"))==null||f.addEventListener("click",Xa),(u=document.getElementById("btnOpenCreateParticipantModal"))==null||u.addEventListener("click",$a),(d=document.getElementById("btnOpenCreateAdminModal"))==null||d.addEventListener("click",Za),(b=document.getElementById("btnOpenCreateRouteModal"))==null||b.addEventListener("click",an),(g=document.getElementById("btnOpenCreateRoleModal"))==null||g.addEventListener("click",nn),(A=document.getElementById("btnResetDefaultRoles"))==null||A.addEventListener("click",en),(S=document.getElementById("formEvent"))==null||S.addEventListener("submit",tn),(P=document.getElementById("formParticipant"))==null||P.addEventListener("submit",sn),(T=document.getElementById("formOrderStatus"))==null||T.addEventListener("submit",ln),(C=document.getElementById("formAdminUser"))==null||C.addEventListener("submit",on),(B=document.getElementById("formRole"))==null||B.addEventListener("submit",rn),(I=document.getElementById("btnSelectAllPages"))==null||I.addEventListener("click",()=>{document.querySelectorAll('#roleModulesContainer input[type="checkbox"]:not(:disabled)').forEach(n=>{n.checked=!0,n.dispatchEvent(new Event("change",{bubbles:!0}))})}),(R=document.getElementById("btnClearAllPages"))==null||R.addEventListener("click",()=>{document.querySelectorAll('#roleModulesContainer input[type="checkbox"]:not(:disabled)').forEach(n=>{n.checked=!1,n.dispatchEvent(new Event("change",{bubbles:!0}))})}),(L=document.getElementById("btnPresetDefaultPages"))==null||L.addEventListener("click",()=>{var m;const n=((m=document.getElementById("roleFormName"))==null?void 0:m.value.trim().toUpperCase())||"",p=dn.find(c=>c.name===n)?n==="ADMINISTRATOR"?["page:dashboard","page:events","page:participants","page:racepack","page:orders","page:notif-logs","page:whatsapp-web","page:cms","page:countdown","page:routes"]:n==="FINANCE"?["page:dashboard","page:orders","page:logs"]:n==="SPONSORSHIP"?["page:dashboard","page:cms","page:events","page:notif-logs"]:n==="RACEPACK_OFFICER"?["page:dashboard","page:racepack","page:participants","page:whatsapp-web"]:n==="GATE_OPERATOR"?["page:dashboard","page:participants","page:racepack"]:n==="RACE_DIRECTOR"?["page:dashboard","page:routes","page:countdown","page:participants","page:events","page:racepack"]:n==="TIMING_JUDGE"?["page:dashboard","page:participants","page:routes"]:n==="MEDICAL_OFFICER"?["page:dashboard","page:participants","page:routes"]:n==="VOLUNTEER"?["page:dashboard","page:participants","page:racepack"]:n==="BAG_DROP_OFFICER"?["page:dashboard","page:participants"]:n==="CUSTOMER_SERVICE"?["page:dashboard","page:whatsapp-web","page:notif-logs","page:participants","page:orders","page:racepack"]:["page:dashboard"]:["page:dashboard"];document.querySelectorAll('#roleApiPermissionsContainer input[type="checkbox"]:not(:disabled)').forEach(c=>{var h;c.checked=!1,(h=c.closest(".role-permission-option"))==null||h.classList.remove("checked")}),document.querySelectorAll('#roleModulesContainer input[type="checkbox"]:not(:disabled)').forEach(c=>{const h=p.includes(c.value);c.checked=h,c.dispatchEvent(new Event("change",{bubbles:!0}))})}),(N=document.getElementById("formCmsSettings"))==null||N.addEventListener("submit",Na),(D=document.getElementById("formWebsiteCms"))==null||D.addEventListener("submit",Na),(M=document.getElementById("formNotificationSettings"))==null||M.addEventListener("submit",cn),(K=document.getElementById("btnSendTestNotif"))==null||K.addEventListener("click",pn),(z=document.getElementById("formEventBenefit"))==null||z.addEventListener("submit",mn),(O=document.getElementById("btnCancelBenefitEdit"))==null||O.addEventListener("click",un),(U=document.getElementById("formEventJersey"))==null||U.addEventListener("submit",bn),(j=document.getElementById("btnCancelJerseyEdit"))==null||j.addEventListener("click",gn),(G=document.getElementById("jerseyFormImage"))==null||G.addEventListener("input",vn),(q=document.getElementById("btnLoadJerseyGallery"))==null||q.addEventListener("click",fn),(H=document.getElementById("btnUseJerseyGallery"))==null||H.addEventListener("click",hn),(W=document.getElementById("formRoutePoint"))==null||W.addEventListener("submit",kn),(J=document.getElementById("routeSettingsForm"))==null||J.addEventListener("submit",yn),(_=document.getElementById("routeMapMode"))==null||_.addEventListener("change",k),(Q=document.getElementById("routeCheckpointMode"))==null||Q.addEventListener("change",k),(V=document.getElementById("routeSettingsMapImage"))==null||V.addEventListener("input",k),(Y=document.getElementById("routeSettingsCheckpointImage"))==null||Y.addEventListener("input",k),(X=document.getElementById("btnSaveGlobalCountdown"))==null||X.addEventListener("click",xn),($=document.getElementById("btnResetGlobalCountdown"))==null||$.addEventListener("click",wn),(Z=document.getElementById("btnToggleGlobalClosed"))==null||Z.addEventListener("click",En),(aa=document.getElementById("btnSaveWebsiteStatus"))==null||aa.addEventListener("click",Fn),(na=document.getElementById("maintenanceEnabled"))==null||na.addEventListener("change",An),(ea=document.getElementById("filterOrderStatus"))==null||ea.addEventListener("change",w),(ia=document.getElementById("searchOrder"))==null||ia.addEventListener("input",()=>{clearTimeout(window._searchOrderTimer),window._searchOrderTimer=setTimeout(w,300)}),document.querySelectorAll(".participant-tabs-nav .part-tab-btn").forEach(n=>{n.addEventListener("click",()=>{const s=n.getAttribute("data-tab");s&&Sn(s)})}),(ta=document.getElementById("filterParticipantCategory"))==null||ta.addEventListener("change",Da),(sa=document.getElementById("searchParticipant"))==null||sa.addEventListener("input",()=>{clearTimeout(window._searchParticipantTimer),window._searchParticipantTimer=setTimeout(Da,250)}),(la=document.getElementById("btnRefreshRacepackStats"))==null||la.addEventListener("click",()=>Pn({force:!0})),(oa=document.getElementById("btnRefreshRacepackConfirmations"))==null||oa.addEventListener("click",()=>Tn({force:!0})),(ra=document.getElementById("racepackConfirmationsTable"))==null||ra.addEventListener("click",n=>{const s=n.target.closest("[data-confirm-racepack-id]");s&&Cn(s.dataset.confirmRacepackId)});const a=document.getElementById("rpcInfoDialog");(da=document.getElementById("btnRpcInfo"))==null||da.addEventListener("click",()=>{a instanceof HTMLDialogElement&&!a.open&&a.showModal()}),(ca=document.getElementById("btnCloseRpcInfo"))==null||ca.addEventListener("click",()=>{a instanceof HTMLDialogElement&&a.close()}),a==null||a.addEventListener("click",n=>{n.target===a&&a instanceof HTMLDialogElement&&a.close()}),(pa=document.getElementById("btnStartRpcCamera"))==null||pa.addEventListener("click",Bn),(ma=document.getElementById("btnStopRpcCamera"))==null||ma.addEventListener("click",In),(ua=document.getElementById("btnTriggerNativeCamera"))==null||ua.addEventListener("click",Rn),(ba=document.getElementById("rpcNativeCameraInput"))==null||ba.addEventListener("change",Ln),(ga=document.getElementById("btnConfirmRpcCheckin"))==null||ga.addEventListener("click",Nn),(va=document.getElementById("btnRefreshRacepackQueue"))==null||va.addEventListener("click",()=>Dn({force:!0})),(fa=document.getElementById("btnRevertRpcCheckin"))==null||fa.addEventListener("click",Mn),(ha=document.getElementById("formRpcManualSearch"))==null||ha.addEventListener("submit",n=>{n.preventDefault();const s=document.getElementById("rpcSearchInput"),p=s?s.value.trim():"";p&&Kn(p)}),(ka=document.getElementById("btnGenerateWaQr"))==null||ka.addEventListener("click",zn),(ya=document.getElementById("btnDisconnectWa"))==null||ya.addEventListener("click",On),(xa=document.getElementById("btnRefreshNotifLogs"))==null||xa.addEventListener("click",E),(wa=document.getElementById("btnBatchSendNotif"))==null||wa.addEventListener("click",Un),(Ea=document.getElementById("filterNotifDeliveryStatus"))==null||Ea.addEventListener("change",E),(Fa=document.getElementById("searchNotifLogs"))==null||Fa.addEventListener("input",()=>{clearTimeout(window._searchNotifTimer),window._searchNotifTimer=setTimeout(E,300)}),(Aa=document.getElementById("btnRefreshWaWeb"))==null||Aa.addEventListener("click",Ma),(Sa=document.getElementById("btnWaWebSync"))==null||Sa.addEventListener("click",Ma),(Pa=document.getElementById("btnGoToWaQr"))==null||Pa.addEventListener("click",()=>jn("notifications")),(Ta=document.getElementById("btnSyncMidtransDashboard"))==null||Ta.addEventListener("click",Gn),(Ca=document.getElementById("btnSendWaDirectMsg"))==null||Ca.addEventListener("click",qn),(Ba=document.getElementById("waQuickTemplateSelect"))==null||Ba.addEventListener("change",Hn),(Ia=document.getElementById("btnQuickSendPaidTicket"))==null||Ia.addEventListener("click",()=>Ka()),(Ra=document.getElementById("btnQuickSendPending"))==null||Ra.addEventListener("click",()=>Ka()),(La=document.getElementById("waContactSearchInput"))==null||La.addEventListener("input",n=>{const s=(n.target.value||"").toLowerCase(),p=Wn.filter(m=>m.customerName.toLowerCase().includes(s)||m.customerPhone.includes(s)||m.ticketName.toLowerCase().includes(s));Jn(p)}),_n();let i=ja();window.addEventListener("pagehide",()=>i.forEach(n=>n()),{once:!0}),window.addEventListener("pageshow",n=>{n.persisted&&(i.forEach(s=>s()),i=ja())}),Qn()});

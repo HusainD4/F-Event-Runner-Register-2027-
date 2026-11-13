@@ -1,6 +1,6 @@
 import '../css/jersey-gallery.css';
 
-export function parseJerseyGallery(value) {
+export function parseJerseyGallery(value, { strict = false } = {}) {
   if (!value) return [];
   try {
     const images = JSON.parse(value);
@@ -11,6 +11,7 @@ export function parseJerseyGallery(value) {
     })) throw new Error('Daftar banner jersey tidak valid.');
     return images;
   } catch (error) {
+    if (strict) throw error;
     console.warn('Galeri jersey tidak dapat dibaca:', error);
     return [];
   }
@@ -24,8 +25,7 @@ export function renderJerseyGallery(container, images) {
   gallery.className = 'jersey-gallery';
   const track = document.createElement('div');
   track.className = 'jersey-gallery-track';
-  track.tabIndex = 0;
-  track.setAttribute('aria-label', 'Geser untuk melihat banner jersey');
+  track.setAttribute('aria-label', 'Daftar gambar jersey');
   const dialog = document.createElement('dialog');
   dialog.className = 'jersey-gallery-dialog';
   dialog.setAttribute('aria-label', 'Pratinjau gambar jersey');
@@ -59,24 +59,9 @@ export function renderJerseyGallery(container, images) {
     button.append(image, error);
     track.append(button);
   });
-  const controls = document.createElement('div');
-  controls.className = 'jersey-gallery-controls';
   const hint = document.createElement('span');
-  hint.textContent = 'Geser gambar atau pilih untuk memperbesar';
-  controls.append(hint);
-  if (images.length > 1) {
-    for (const [label, direction] of [['Sebelumnya', -1], ['Berikutnya', 1]]) {
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.textContent = direction < 0 ? '‹' : '›';
-      button.setAttribute('aria-label', `${label} banner jersey`);
-      button.addEventListener('click', () => track.scrollBy({
-        left: direction * (track.clientWidth + 12),
-        behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
-      }));
-      controls.append(button);
-    }
-  }
-  gallery.append(track, controls, dialog);
+  hint.className = 'jersey-gallery-hint';
+  hint.textContent = 'Pilih gambar untuk memperbesar';
+  gallery.append(track, hint, dialog);
   container.append(gallery);
 }

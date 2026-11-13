@@ -4788,6 +4788,10 @@
   max-height: 240px;
   object-fit: contain;
 }
+.jersey-gallery-picker { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 10px; }
+.jersey-gallery-picker select { flex: 1 1 150px; width: auto; min-width: 0; }
+.jersey-gallery-picker select[hidden], .jersey-gallery-picker button[hidden] { display: none; }
+.jersey-gallery-picker .form-hint { flex-basis: 100%; }
 
 .jersey-banner-form-group {
   padding: 14px;

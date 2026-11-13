@@ -30,7 +30,7 @@ import { openMobileSidebar, closeMobileSidebar, switchAdminTab } from './core/si
 import { showAdminToast } from './core/utils.js';
 
 // 3. Page Modules
-import { loadEvents, openCreateEventModal, handleEventFormSubmit, resetBenefitForm, handleBenefitFormSubmit, handleJerseyFormSubmit, resetJerseyForm, updateJerseyImagePreview } from './pages/events.js';
+import { loadEvents, openCreateEventModal, handleEventFormSubmit, resetBenefitForm, handleBenefitFormSubmit, handleJerseyFormSubmit, resetJerseyForm, updateJerseyImagePreview, loadJerseyGalleryChoices, useJerseyGalleryChoice } from './pages/events.js';
 import { loadParticipants, renderParticipantsTable, openCreateParticipantModal, handleParticipantFormSubmit, exportParticipantsCsv, switchParticipantFilterTab, applyParticipantFilters } from './pages/participants.js';
 import { loadRacepackStats, loadRacepackConfirmations, handleRacepackConfirmationSocketEvent, handleRacepackScanSocketEvent, handleConfirmRacepackTableCheckin, startRpcCamera, stopRpcCamera, triggerNativeCamera, handleNativeCameraFile, handleConfirmRacepackCheckin, handleRevertRacepackCheckin, verifyRacepackByCode } from './pages/racepack.js';
 import { loadRacepackQueue, handleRacepackQueueSocketEvent } from './pages/racepack-view.js';
@@ -209,6 +209,8 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('formEventJersey')?.addEventListener('submit', handleJerseyFormSubmit);
   document.getElementById('btnCancelJerseyEdit')?.addEventListener('click', resetJerseyForm);
   document.getElementById('jerseyFormImage')?.addEventListener('input', updateJerseyImagePreview);
+  document.getElementById('btnLoadJerseyGallery')?.addEventListener('click', loadJerseyGalleryChoices);
+  document.getElementById('btnUseJerseyGallery')?.addEventListener('click', useJerseyGalleryChoice);
   document.getElementById('formRoutePoint')?.addEventListener('submit', handleRoutePointFormSubmit);
   document.getElementById('routeSettingsForm')?.addEventListener('submit', handleRouteSettingsSubmit);
   document.getElementById('routeMapMode')?.addEventListener('change', updateRouteSettingPreviews);
