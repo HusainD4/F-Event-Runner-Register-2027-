@@ -56,7 +56,7 @@ function renderWhatsAppSession(session) {
     if (badgeContainer) {
       badgeContainer.innerHTML = `
         <span class="badge" style="background: rgba(239, 68, 68, 0.15); color: #EF4444; border: 1px solid rgba(239, 68, 68, 0.3); font-size: 0.82rem; padding: 6px 12px; font-weight: 700;">
-          <i class="fa-solid fa-circle-xmark"></i> Terputus (Belum Scan QR)
+          <i class="fa-solid fa-circle-xmark"></i> Terputus
         </span>
       `;
     }
@@ -64,7 +64,7 @@ function renderWhatsAppSession(session) {
       qrContainer.innerHTML = `
         <div style="color: #64748B; padding: 30px 10px; font-size: 0.85rem;">
           <i class="fa-solid fa-qrcode" style="font-size: 3rem; margin-bottom: 10px; color: #94A3B8; display: block;"></i>
-          Klik tombol <strong>"Generate QR Code"</strong> di samping untuk memulai sesi WhatsApp Web.
+          ${session?.error ? escapeHtml(session.error) : 'Klik tombol <strong>"Generate QR Code"</strong> di samping untuk memulai sesi WhatsApp Web.'}
         </div>
       `;
     }

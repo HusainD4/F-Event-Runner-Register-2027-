@@ -1813,6 +1813,7 @@ function validateStep(step) {
   }
 
   if (step === 2) {
+    const seenNiks = new Set();
     for (let i = 0; i < state.participantCount; i++) {
       const name = document.querySelector(`.p-fullname[data-index="${i}"]`)?.value.trim();
       const phone = document.querySelector(`.p-phone[data-index="${i}"]`)?.value.trim();
@@ -1840,6 +1841,13 @@ function validateStep(step) {
         showToast('error', `Peserta #${i + 1}`, 'NIK harus tepat 16 digit angka sesuai KTP.');
         return false;
       }
+      const eventId = document.querySelector(`.p-event-select[data-index="${i}"]`)?.value || state.selectedEvent?.id || '';
+      const nikKey = `${eventId}:${nik}`;
+      if (seenNiks.has(nikKey)) {
+        showToast('error', `Peserta #${i + 1}`, 'NIK ini sudah digunakan peserta lain pada kategori yang sama.');
+        return false;
+      }
+      seenNiks.add(nikKey);
       if (!birthPlace || birthPlace.length < 3) {
         showToast('error', `Peserta #${i + 1}`, 'Tempat lahir wajib diisi.');
         return false;
@@ -2010,6 +2018,28 @@ async function handleCheckoutSubmit() {
   const submitBtn = document.getElementById('btnModalSubmit');
   if (submitBtn) {
     submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Memeriksa NIK...';
+  }
+
+  const nikCheck = await apiClient.checkParticipantNiks(participants);
+  if (!nikCheck.success) {
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<i class="fa-solid fa-credit-card"></i> Bayar Sekarang (Midtrans)';
+    }
+    showToast('error', 'Validasi NIK Gagal', nikCheck.message);
+    return;
+  }
+  if (nikCheck.duplicateParticipants.length) {
+    const participantNumber = nikCheck.duplicateParticipants[0];
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<i class="fa-solid fa-credit-card"></i> Bayar Sekarang (Midtrans)';
+    }
+    showToast('error', `Peserta #${participantNumber}`, 'NIK ini sudah terdaftar pada kategori yang sama dan tidak dapat digunakan lagi.');
+    return;
+  }
+  if (submitBtn) {
     submitBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Memproses Pesanan...';
   }
 

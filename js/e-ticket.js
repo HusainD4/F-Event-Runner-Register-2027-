@@ -1,7 +1,7 @@
 import { apiFetch } from './api.js';
 import { loadWebsiteBranding } from './branding.js';
 
-loadWebsiteBranding();
+const websiteBrandingPromise = loadWebsiteBranding();
 
 function escapeHtml(str) {
   if (!str) return '';
@@ -78,6 +78,9 @@ async function loadETicket() {
 
     const order = json.data;
     const participants = order.participants || [];
+    const websiteSettings = await websiteBrandingPromise;
+    const eventTitle = websiteSettings?.navbar_title?.trim() || 'E-Tiket Resmi';
+    document.title = `E-Tiket Resmi - ${eventTitle}`;
 
     if (participants.length === 0) {
       mount.innerHTML = `
@@ -104,7 +107,7 @@ async function loadETicket() {
             <p>Petugas RPC cukup memindai QR Master ini untuk verifikasi dan serah terima racepack seluruh ${participants.length} peserta sekaligus.</p>
             <div class="master-runner-list">
               ${participants.map((pt, i) => `
-                <span class="master-runner-pill">#${i + 1} ${escapeHtml(pt.fullNameKtp)} &bull; ${escapeHtml(pt.event?.category || '10K')}</span>
+                        <span class="master-runner-pill">#${i + 1} ${escapeHtml(pt.fullNameKtp)} &bull; ${escapeHtml(pt.event?.category || 'Kategori tidak tersedia')}</span>
               `).join('')}
             </div>
           </div>
@@ -118,13 +121,9 @@ async function loadETicket() {
 
     // 2. Render Setiap Tiket Peserta (NOMOR BIB TIDAK DITAMPILKAN DI E-TIKET)
     const ticketsHtml = participants.map((p, idx) => {
-      const category = (p.event?.category || '10K').toUpperCase();
-      const ticketName = p.event?.ticketName || `TIKET ${category} MARATHON`;
-      const waveTime = category.includes('21K')
-        ? '05:15 WIB'
-        : category.includes('10K')
-        ? '05:45 WIB'
-        : '06:15 WIB';
+      const category = p.event?.category ? String(p.event.category).toUpperCase() : 'Kategori tidak tersedia';
+      const ticketName = p.event?.ticketName || 'Nama kategori belum tersedia';
+      const eventLocation = websiteSettings?.contact_address?.trim() || 'Lokasi belum tersedia';
 
       // QR Code individual peserta (encrypted payload tanpa mengekspos nomor BIB)
       const qrCodeUrl = p.qrImageDataUrl;
@@ -139,16 +138,7 @@ async function loadETicket() {
           `).join('')
         : `
           <div class="stub-checklist-item">
-            <i class="fa-regular fa-square-check"></i> 1x Nomor Dada (BIB) &amp; Timing Chip (Diserahkan saat RPC)
-          </div>
-          <div class="stub-checklist-item">
-            <i class="fa-regular fa-square-check"></i> 1x Jersey Resmi (${escapeHtml(p.selectedSize || 'M')})
-          </div>
-          <div class="stub-checklist-item">
-            <i class="fa-regular fa-square-check"></i> 1x Drawstring Bag &amp; Panduan Lomba
-          </div>
-          <div class="stub-checklist-item">
-            <i class="fa-regular fa-square-check"></i> Refreshment &amp; Hak Medali Finisher
+            Informasi paket lomba belum tersedia.
           </div>
         `;
 
@@ -171,7 +161,7 @@ async function loadETicket() {
                 <i class="fa-solid fa-person-running"></i>
               </div>
               <div class="ticket-brand-titles">
-                <h2>TEGAL BAHARI MARATHON 2026</h2>
+                <h2>${escapeHtml(eventTitle)}</h2>
                 <p>OFFICIAL RACE ENTRY PASS &bull; VERIFIKASI RESMI</p>
               </div>
             </div>
@@ -207,9 +197,6 @@ async function loadETicket() {
                   <div class="category-tag">
                     <i class="fa-solid fa-flag-checkered"></i> KATEGORI ${escapeHtml(category)}
                   </div>
-                  <div class="wave-time-tag">
-                    <i class="fa-solid fa-clock"></i> Flag-off: ${waveTime}
-                  </div>
                   <span class="pass-serial-text">
                     ${participants.length > 1 ? `PESERTA ${idx + 1} DARI ${participants.length}` : 'ENTRY PASS RESMI'}
                   </span>
@@ -231,7 +218,8 @@ async function loadETicket() {
                 <div class="detail-item">
                   <div class="detail-label"><i class="fa-solid fa-shirt"></i> Jersey &amp; Ukuran</div>
                   <div class="detail-val">
-                    Size <strong>${escapeHtml(p.selectedSize || 'M')}</strong> &bull; ${escapeHtml(p.jersey?.type || 'Dry-Fit Official')}
+                    ${escapeHtml(p.jersey?.name || p.jersey?.type || 'Data jersey belum tersedia')}
+                    ${p.selectedSize ? `&bull; Ukuran <strong>${escapeHtml(p.selectedSize)}</strong>` : ''}
                   </div>
                 </div>
 
@@ -247,7 +235,7 @@ async function loadETicket() {
 
                 <div class="detail-item">
                   <div class="detail-label"><i class="fa-solid fa-location-dot"></i> Lokasi &amp; Tanggal</div>
-                  <div class="detail-val">Alun-Alun Tegal &bull; ${formatDate(p.event?.eventDate)}</div>
+                  <div class="detail-val">${escapeHtml(eventLocation)} &bull; ${formatDate(p.event?.eventDate)}</div>
                 </div>
               </div>
 
@@ -255,15 +243,11 @@ async function loadETicket() {
               <div class="pass-security-footer">
                 <div class="pass-security-item">
                   <i class="fa-solid fa-id-badge"></i>
-                  <span>Nomor BIB Diterbitkan Saat RPC</span>
+                  <span>QR untuk Verifikasi Peserta</span>
                 </div>
                 <div class="pass-security-item">
                   <i class="fa-solid fa-shield-halved"></i>
-                  <span>Secure QR Entry Verified</span>
-                </div>
-                <div class="pass-security-item">
-                  <i class="fa-solid fa-award"></i>
-                  <span>Finisher Medal Entitlement</span>
+                  <span>QR Tersambung ke Data Peserta</span>
                 </div>
               </div>
             </div>
@@ -300,7 +284,7 @@ async function loadETicket() {
               <div class="stub-officer-box">
                 <div style="font-weight: 700; text-transform: uppercase;">Paraf &amp; Stempel Petugas RPC</div>
                 <div style="height: 16px;"></div>
-                <div>Tgl: _____ / _____ / 2026</div>
+                <div>Tanggal verifikasi: ____ / ____ / ______</div>
               </div>
             </div>
           </div>
@@ -323,6 +307,7 @@ async function loadETicket() {
             ${points.map(pt => `<li>${escapeHtml(pt)}</li>`).join('')}
           </ul>
         `;
+        instructionsMount.hidden = false;
       }
     }
   } catch (err) {

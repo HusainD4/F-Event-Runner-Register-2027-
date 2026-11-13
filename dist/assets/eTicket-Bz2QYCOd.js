@@ -1,4 +1,4 @@
-import{a as S}from"./api-Yp4JG9No.js";import{l as P}from"./branding-Bho75hUw.js";import"./home-appearance-Db1ttUVV.js";P();function a(e){return e?String(e).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"):""}function A(e){return!e||e.length<8?e||"-":e.substring(0,6)+"******"+e.substring(e.length-4)}function C(e){if(!e)return"Tanggal belum tersedia";try{const c=new Date(e);return Number.isNaN(c.getTime())?"Tanggal belum tersedia":c.toLocaleDateString("id-ID",{weekday:"long",day:"numeric",month:"short",year:"numeric"})}catch{return"Tanggal belum tersedia"}}async function M(){const e=document.getElementById("ticketMount"),c=document.querySelector(".instructions-box");if(!e)return;const d=new URLSearchParams(window.location.search),u=d.get("orderId")||d.get("id")||d.get("midtransOrderId")||d.get("code")||d.get("q"),p=u?u.trim():"";if(!p){e.innerHTML=`
+import{a as D}from"./api-Biu4OxHL.js";import{l as M}from"./branding-BuOTZVk0.js";import"./home-appearance-Db1ttUVV.js";const L=M();function a(i){return i?String(i).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"):""}function K(i){return!i||i.length<8?i||"-":i.substring(0,6)+"******"+i.substring(i.length-4)}function B(i){if(!i)return"Tanggal belum tersedia";try{const n=new Date(i);return Number.isNaN(n.getTime())?"Tanggal belum tersedia":n.toLocaleDateString("id-ID",{weekday:"long",day:"numeric",month:"short",year:"numeric"})}catch{return"Tanggal belum tersedia"}}async function _(){var f;const i=document.getElementById("ticketMount"),n=document.querySelector(".instructions-box");if(!i)return;const o=new URLSearchParams(window.location.search),g=o.get("orderId")||o.get("id")||o.get("midtransOrderId")||o.get("code")||o.get("q"),p=g?g.trim():"";if(!p){i.innerHTML=`
       <div class="e-ticket-card" style="padding: 48px 24px; text-align: center;">
         <i class="fa-solid fa-triangle-exclamation" style="font-size: 3rem; color: #EF4444; margin-bottom: 16px;"></i>
         <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 8px;">ID Pesanan Tidak Ditemukan</h3>
@@ -7,60 +7,51 @@ import{a as S}from"./api-Yp4JG9No.js";import{l as P}from"./branding-Bho75hUw.js"
           <i class="fa-solid fa-arrow-left"></i> Kembali ke Pencarian Tiket
         </a>
       </div>
-    `;return}try{const m=await S(`/tickets/e-ticket/${encodeURIComponent(p)}`),o=await m.json();if(!m.ok||o.status!=="success"){e.innerHTML=`
+    `;return}try{const v=await D(`/tickets/e-ticket/${encodeURIComponent(p)}`),m=await v.json();if(!v.ok||m.status!=="success"){i.innerHTML=`
         <div class="e-ticket-card" style="padding: 48px 24px; text-align: center;">
           <i class="fa-solid fa-circle-xmark" style="font-size: 3rem; color: #EF4444; margin-bottom: 16px;"></i>
           <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 8px;">E-Tiket Belum Tersedia</h3>
           <p style="color: #64748B; margin-bottom: 24px; max-width: 480px; margin-left: auto; margin-right: auto;">
-            ${a(o.message||"Status pembayaran belum terkonfirmasi lunas.")}
+            ${a(m.message||"Status pembayaran belum terkonfirmasi lunas.")}
           </p>
-          ${o.orderId?`<a href="/payment.html?orderId=${encodeURIComponent(o.orderId)}" class="btn btn-print">
+          ${m.orderId?`<a href="/payment.html?orderId=${encodeURIComponent(m.orderId)}" class="btn btn-print">
                    <i class="fa-solid fa-credit-card"></i> Selesaikan Pembayaran Sekarang
                  </a>`:'<a href="/cek-tiket.html" class="btn btn-back"><i class="fa-solid fa-magnifying-glass"></i> Cek Status Pesanan</a>'}
         </div>
-      `;return}const r=o.data,s=r.participants||[];if(s.length===0){e.innerHTML=`
+      `;return}const r=m.data,t=r.participants||[],d=await L,b=((f=d==null?void 0:d.navbar_title)==null?void 0:f.trim())||"E-Tiket Resmi";if(document.title=`E-Tiket Resmi - ${b}`,t.length===0){i.innerHTML=`
         <div class="e-ticket-card" style="padding: 40px; text-align: center;">
           <i class="fa-solid fa-user-xmark" style="font-size: 2.5rem; color: #F59E0B; margin-bottom: 14px;"></i>
           <p style="color: #64748B;">Tidak ada data peserta terdaftar dalam pesanan ini.</p>
         </div>
-      `;return}const v=r.midtransOrderId||r.id;let f="";if(s.length>1){const i=r.masterQrImageDataUrl;f=`
+      `;return}const u=r.midtransOrderId||r.id;let k="";if(t.length>1){const e=r.masterQrImageDataUrl;k=`
         <div class="master-qr-banner">
           <div class="master-qr-info">
-            <span class="badge-master"><i class="fa-solid fa-layer-group"></i> QR CODE MASTER (${s.length} TIKET)</span>
+            <span class="badge-master"><i class="fa-solid fa-layer-group"></i> QR CODE MASTER (${t.length} TIKET)</span>
             <h3>1 QR Code untuk Seluruh Peserta dalam Pesanan Ini</h3>
-            <p>Petugas RPC cukup memindai QR Master ini untuk verifikasi dan serah terima racepack seluruh ${s.length} peserta sekaligus.</p>
+            <p>Petugas RPC cukup memindai QR Master ini untuk verifikasi dan serah terima racepack seluruh ${t.length} peserta sekaligus.</p>
             <div class="master-runner-list">
-              ${s.map((l,t)=>{var n;return`
-                <span class="master-runner-pill">#${t+1} ${a(l.fullNameKtp)} &bull; ${a(((n=l.event)==null?void 0:n.category)||"10K")}</span>
+              ${t.map((s,l)=>{var c;return`
+                        <span class="master-runner-pill">#${l+1} ${a(s.fullNameKtp)} &bull; ${a(((c=s.event)==null?void 0:c.category)||"Kategori tidak tersedia")}</span>
               `}).join("")}
             </div>
           </div>
           <div class="master-qr-code-box">
-            <img src="${i}" alt="Master QR ${a(v)}" class="master-qr-img" />
-            <span class="master-qr-ref">ORDER: ${a(v.substring(0,18))}</span>
+            <img src="${e}" alt="Master QR ${a(u)}" class="master-qr-img" />
+            <span class="master-qr-ref">ORDER: ${a(u.substring(0,18))}</span>
           </div>
         </div>
-      `}const T=s.map((i,l)=>{var b,k,h,y,R;const t=(((b=i.event)==null?void 0:b.category)||"10K").toUpperCase(),n=((k=i.event)==null?void 0:k.ticketName)||`TIKET ${t} MARATHON`,I=t.includes("21K")?"05:15 WIB":t.includes("10K")?"05:45 WIB":"06:15 WIB",$=i.qrImageDataUrl,g=((h=i.event)==null?void 0:h.benefits)||[],x=g.length>0?g.map(E=>`
+      `}const P=t.map((e,s)=>{var y,R,T,$,x,I,E;const l=(y=e.event)!=null&&y.category?String(e.event.category).toUpperCase():"Kategori tidak tersedia",c=((R=e.event)==null?void 0:R.ticketName)||"Nama kategori belum tersedia",S=((T=d==null?void 0:d.contact_address)==null?void 0:T.trim())||"Lokasi belum tersedia",C=e.qrImageDataUrl,h=(($=e.event)==null?void 0:$.benefits)||[],A=h.length>0?h.map(N=>`
             <div class="stub-checklist-item">
-              <i class="fa-regular fa-square-check"></i> ${a(E.name)}
+              <i class="fa-regular fa-square-check"></i> ${a(N.name)}
             </div>
           `).join(""):`
           <div class="stub-checklist-item">
-            <i class="fa-regular fa-square-check"></i> 1x Nomor Dada (BIB) &amp; Timing Chip (Diserahkan saat RPC)
-          </div>
-          <div class="stub-checklist-item">
-            <i class="fa-regular fa-square-check"></i> 1x Jersey Resmi (${a(i.selectedSize||"M")})
-          </div>
-          <div class="stub-checklist-item">
-            <i class="fa-regular fa-square-check"></i> 1x Drawstring Bag &amp; Panduan Lomba
-          </div>
-          <div class="stub-checklist-item">
-            <i class="fa-regular fa-square-check"></i> Refreshment &amp; Hak Medali Finisher
+            Informasi paket lomba belum tersedia.
           </div>
         `;return`
-        ${l>0&&s.length>1?`
+        ${s>0&&t.length>1?`
         <div class="ticket-separator">
-          <span class="ticket-separator-label">TIKET PESERTA #${l+1} DARI ${s.length}</span>
+          <span class="ticket-separator-label">TIKET PESERTA #${s+1} DARI ${t.length}</span>
         </div>
       `:""}
         <div class="e-ticket-card">
@@ -74,7 +65,7 @@ import{a as S}from"./api-Yp4JG9No.js";import{l as P}from"./branding-Bho75hUw.js"
                 <i class="fa-solid fa-person-running"></i>
               </div>
               <div class="ticket-brand-titles">
-                <h2>TEGAL BAHARI MARATHON 2026</h2>
+                <h2>${a(b)}</h2>
                 <p>OFFICIAL RACE ENTRY PASS &bull; VERIFIKASI RESMI</p>
               </div>
             </div>
@@ -84,7 +75,7 @@ import{a as S}from"./api-Yp4JG9No.js";import{l as P}from"./branding-Bho75hUw.js"
                 <i class="fa-solid fa-circle-check"></i> TERDAFTAR &amp; LUNAS
               </span>
               <div class="order-code-text">
-                REF ID: <strong>${a(v)}</strong>
+                REF ID: <strong>${a(u)}</strong>
               </div>
             </div>
           </div>
@@ -102,19 +93,16 @@ import{a as S}from"./api-Yp4JG9No.js";import{l as P}from"./branding-Bho75hUw.js"
                   <div class="ticket-entry-badge">
                     <i class="fa-solid fa-ticket"></i> TIKET RESMI PESERTA
                   </div>
-                  <h3 class="ticket-name-big">${a(n)}</h3>
-                  <span class="runner-name-display">${a(i.fullNameKtp)}</span>
+                  <h3 class="ticket-name-big">${a(c)}</h3>
+                  <span class="runner-name-display">${a(e.fullNameKtp)}</span>
                 </div>
 
                 <div class="category-pill-box">
                   <div class="category-tag">
-                    <i class="fa-solid fa-flag-checkered"></i> KATEGORI ${a(t)}
-                  </div>
-                  <div class="wave-time-tag">
-                    <i class="fa-solid fa-clock"></i> Flag-off: ${I}
+                    <i class="fa-solid fa-flag-checkered"></i> KATEGORI ${a(l)}
                   </div>
                   <span class="pass-serial-text">
-                    ${s.length>1?`PESERTA ${l+1} DARI ${s.length}`:"ENTRY PASS RESMI"}
+                    ${t.length>1?`PESERTA ${s+1} DARI ${t.length}`:"ENTRY PASS RESMI"}
                   </span>
                 </div>
               </div>
@@ -123,34 +111,35 @@ import{a as S}from"./api-Yp4JG9No.js";import{l as P}from"./branding-Bho75hUw.js"
               <div class="details-grid">
                 <div class="detail-item">
                   <div class="detail-label"><i class="fa-solid fa-user-check"></i> Nama Lengkap (KTP)</div>
-                  <div class="detail-val">${a(i.fullNameKtp)}</div>
+                  <div class="detail-val">${a(e.fullNameKtp)}</div>
                 </div>
 
                 <div class="detail-item">
                   <div class="detail-label"><i class="fa-solid fa-id-card"></i> Nomor Identitas (NIK)</div>
-                  <div class="detail-val" style="font-family: ui-monospace, monospace;">${a(A(i.nik))}</div>
+                  <div class="detail-val" style="font-family: ui-monospace, monospace;">${a(K(e.nik))}</div>
                 </div>
 
                 <div class="detail-item">
                   <div class="detail-label"><i class="fa-solid fa-shirt"></i> Jersey &amp; Ukuran</div>
                   <div class="detail-val">
-                    Size <strong>${a(i.selectedSize||"M")}</strong> &bull; ${a(((y=i.jersey)==null?void 0:y.type)||"Dry-Fit Official")}
+                    ${a(((x=e.jersey)==null?void 0:x.name)||((I=e.jersey)==null?void 0:I.type)||"Data jersey belum tersedia")}
+                    ${e.selectedSize?`&bull; Ukuran <strong>${a(e.selectedSize)}</strong>`:""}
                   </div>
                 </div>
 
                 <div class="detail-item">
                   <div class="detail-label"><i class="fa-solid fa-droplet"></i> Golongan Darah</div>
-                  <div class="detail-val">${a(i.bloodType||"-")}</div>
+                  <div class="detail-val">${a(e.bloodType||"-")}</div>
                 </div>
 
                 <div class="detail-item">
                   <div class="detail-label"><i class="fa-solid fa-phone-volume"></i> Kontak Darurat (ICE)</div>
-                  <div class="detail-val">${a(i.emergencyContactPhone||"-")} (${a(i.emergencyContactName||"-")})</div>
+                  <div class="detail-val">${a(e.emergencyContactPhone||"-")} (${a(e.emergencyContactName||"-")})</div>
                 </div>
 
                 <div class="detail-item">
                   <div class="detail-label"><i class="fa-solid fa-location-dot"></i> Lokasi &amp; Tanggal</div>
-                  <div class="detail-val">Alun-Alun Tegal &bull; ${C((R=i.event)==null?void 0:R.eventDate)}</div>
+                  <div class="detail-val">${a(S)} &bull; ${B((E=e.event)==null?void 0:E.eventDate)}</div>
                 </div>
               </div>
 
@@ -158,15 +147,11 @@ import{a as S}from"./api-Yp4JG9No.js";import{l as P}from"./branding-Bho75hUw.js"
               <div class="pass-security-footer">
                 <div class="pass-security-item">
                   <i class="fa-solid fa-id-badge"></i>
-                  <span>Nomor BIB Diterbitkan Saat RPC</span>
+                  <span>QR untuk Verifikasi Peserta</span>
                 </div>
                 <div class="pass-security-item">
                   <i class="fa-solid fa-shield-halved"></i>
-                  <span>Secure QR Entry Verified</span>
-                </div>
-                <div class="pass-security-item">
-                  <i class="fa-solid fa-award"></i>
-                  <span>Finisher Medal Entitlement</span>
+                  <span>QR Tersambung ke Data Peserta</span>
                 </div>
               </div>
             </div>
@@ -181,14 +166,14 @@ import{a as S}from"./api-Yp4JG9No.js";import{l as P}from"./branding-Bho75hUw.js"
 
               <!-- QR Code Frame -->
               <div class="stub-qr-box">
-                <img src="${$}" alt="QR E-Tiket ${a(i.fullNameKtp)}" class="stub-qr-image" />
-                <div class="stub-scan-hint">${a(i.fullNameKtp)} &bull; ${a(t)}</div>
+                <img src="${C}" alt="QR E-Tiket ${a(e.fullNameKtp)}" class="stub-qr-image" />
+                <div class="stub-scan-hint">${a(e.fullNameKtp)} &bull; ${a(l)}</div>
               </div>
 
               <!-- Simulated Barcode -->
               <div class="stub-barcode-container">
                 <div class="simulated-barcode"></div>
-                <div class="barcode-code-text">${a(v)}</div>
+                <div class="barcode-code-text">${a(u)}</div>
               </div>
 
               <!-- RPC Checklist Breakdown (Mengikuti Tiket Event yang didaftar) -->
@@ -196,30 +181,30 @@ import{a as S}from"./api-Yp4JG9No.js";import{l as P}from"./branding-Bho75hUw.js"
                 <div class="stub-checklist-title">
                   <i class="fa-solid fa-clipboard-check"></i> Hak Paket Lomba Resmi:
                 </div>
-                ${x}
+                ${A}
               </div>
 
               <!-- Officer Verification Stamp Box -->
               <div class="stub-officer-box">
                 <div style="font-weight: 700; text-transform: uppercase;">Paraf &amp; Stempel Petugas RPC</div>
                 <div style="height: 16px;"></div>
-                <div>Tgl: _____ / _____ / 2026</div>
+                <div>Tanggal verifikasi: ____ / ____ / ______</div>
               </div>
             </div>
           </div>
         </div>
-      `}).join("");if(e.innerHTML=f+T,c&&r.racepackInstructions){const i=r.racepackInstructions,l=i.title||"Petunjuk Pengambilan Racepack & Race Day:",t=Array.isArray(i.points)?i.points:[];t.length>0&&(c.innerHTML=`
-          <h4><i class="fa-solid fa-circle-info" style="color: var(--color-primary);"></i> ${a(l)}</h4>
+      `}).join("");if(i.innerHTML=k+P,n&&r.racepackInstructions){const e=r.racepackInstructions,s=e.title||"Petunjuk Pengambilan Racepack & Race Day:",l=Array.isArray(e.points)?e.points:[];l.length>0&&(n.innerHTML=`
+          <h4><i class="fa-solid fa-circle-info" style="color: var(--color-primary);"></i> ${a(s)}</h4>
           <ul>
-            ${t.map(n=>`<li>${a(n)}</li>`).join("")}
+            ${l.map(c=>`<li>${a(c)}</li>`).join("")}
           </ul>
-        `)}}catch(m){e.innerHTML=`
+        `,n.hidden=!1)}}catch(v){i.innerHTML=`
       <div class="e-ticket-card" style="padding: 48px 24px; text-align: center;">
         <i class="fa-solid fa-triangle-exclamation" style="font-size: 3rem; color: #F59E0B; margin-bottom: 16px;"></i>
         <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 8px;">Gagal Menghubungkan ke Server</h3>
-        <p style="color: #64748B; margin-bottom: 20px;">${a(m.message)}</p>
+        <p style="color: #64748B; margin-bottom: 20px;">${a(v.message)}</p>
         <button onclick="location.reload()" class="btn btn-print">
           <i class="fa-solid fa-rotate-right"></i> Coba Muat Ulang
         </button>
       </div>
-    `}}document.addEventListener("DOMContentLoaded",M);
+    `}}document.addEventListener("DOMContentLoaded",_);

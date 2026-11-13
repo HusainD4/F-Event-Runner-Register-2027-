@@ -50,13 +50,13 @@ function renderWhatsAppWebConsoleHeader(session) {
     if (headerStatus) {
       headerStatus.innerHTML = `
         <span class="badge" style="background: #FEF2F2; color: #DC2626; border: 1px solid #FECACA; padding: 6px 14px; font-weight: 700;">
-          <i class="fa-solid fa-circle-xmark"></i> Status: Terputus (Belum Scan QR)
+          <i class="fa-solid fa-circle-xmark"></i> Status: Terputus
         </span>
       `;
     }
     if (myNum) myNum.textContent = 'WhatsApp Belum Terhubung';
     if (myStatusText) {
-      myStatusText.innerHTML = '<span style="width: 7px; height: 7px; background: #DC2626; border-radius: 50%; display: inline-block;"></span> Offline (Klik Scan QR)';
+      myStatusText.innerHTML = `<span style="width: 7px; height: 7px; background: #DC2626; border-radius: 50%; display: inline-block;"></span> ${escapeHtml(session?.error || 'Offline (Klik Scan QR)')}`;
       myStatusText.style.color = '#DC2626';
     }
     return;

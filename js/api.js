@@ -200,6 +200,43 @@ export const apiClient = {
   },
 
   /**
+   * Memeriksa apakah NIK peserta sudah terdaftar pada kategori yang sama
+   */
+  async checkParticipantNiks(participants) {
+    try {
+      const response = await apiFetch('/register/check-nik', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          participants: participants.map(({ eventId, nik }) => ({ eventId, nik }))
+        })
+      });
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok || data.status !== 'success') {
+        return {
+          success: false,
+          message: data.message || 'Validasi NIK gagal. Silakan coba beberapa saat lagi.'
+        };
+      }
+
+      return {
+        success: true,
+        duplicateParticipants: data.data?.duplicateParticipants || []
+      };
+    } catch (err) {
+      console.error('❌ NIK Validation API Error:', err);
+      return {
+        success: false,
+        message: 'Validasi NIK tidak dapat terhubung ke server. Silakan coba beberapa saat lagi.'
+      };
+    }
+  },
+
+  /**
    * Mengirim pendaftaran / checkout tiket ke backend
    */
   async registerOrder(payload) {
