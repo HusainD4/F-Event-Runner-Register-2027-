@@ -613,7 +613,7 @@ function renderTickets(events) {
       <!-- E-Tiket Stub Header -->
       <div class="ticket-stub-header">
         <div class="ticket-stub-brand">
-          <i class="fa-solid fa-bolt" style="color: var(--color-primary);"></i> TEGAL RUN 2027
+          <i class="fa-solid fa-bolt" style="color: var(--color-primary);"></i> TEGAL RUN 2026
         </div>
         <div class="ticket-stub-tag">
           ${closedStatusLabel === 'SOLD'
@@ -862,7 +862,7 @@ async function openTicketDetailModal(eventSummary) {
     <div style="background: rgba(255, 107, 0, 0.05); border: 1px solid var(--border-glass-orange); border-radius: var(--radius-md); padding: 14px;">
       <h5 style="color: var(--color-primary); font-size: 0.9rem; margin-bottom: 4px;"><i class="fa-solid fa-location-dot"></i> Pengambilan Race Pack & Syarat</h5>
       <p style="font-size: 0.8rem; color: var(--color-text-main); margin: 0; line-height: 1.5;">
-        Pengambilan racepack: <strong>26–27 Februari 2027</strong> di Rita SuperMall Tegal Lantai 2 pukul 10:00 – 21:00 WIB. Wajib membawa e-tiket ber-barcode dan identitas KTP asli. Tidak dapat diambil pada hari perlombaan.
+        Informasi jadwal dan lokasi pengambilan racepack akan diumumkan melalui kanal resmi panitia. Wajib membawa e-tiket dan identitas KTP asli.
       </p>
     </div>
   `;
@@ -997,7 +997,7 @@ function openRegistrationModal(selectedEvent = null) {
       ? 'Pendaftaran ditutup otomatis karena acara telah dimulai.'
       : state.globalRegistrationPhase === 'COMPLETED'
         ? 'Pendaftaran ditutup karena hari pelaksanaan acara telah lewat.'
-        : 'Seluruh pendaftaran Tegal Run 2027 telah ditutup oleh panitia.';
+        : 'Seluruh pendaftaran Tegal Run 2026 telah ditutup oleh panitia.';
     showToast('error', 'Pendaftaran Ditutup', message);
     return;
   }
@@ -2561,7 +2561,7 @@ async function loadWebsiteSettings() {
         if (cms.route_gpx_url === '#') {
           gpxBtn.onclick = (e) => {
             e.preventDefault();
-            alert('File GPX Rute Tegal Run 2027 akan dapat diunduh pada H-14 perlombaan.');
+            alert('File GPX Rute Tegal Run 2026 akan dapat diunduh pada H-14 perlombaan.');
           };
         } else if (/^https?:\/\//i.test(cms.route_gpx_url)) {
           gpxBtn.setAttribute('target', '_blank');
@@ -2902,7 +2902,7 @@ function initApp() {
   const handleGeneralRegisterClick = async (e) => {
     if (e) e.preventDefault();
     if (state.isGlobalClosed) {
-      showToast('error', 'Pendaftaran Ditutup', 'Mohon maaf, seluruh pendaftaran Tegal Run 2027 telah resmi ditutup oleh panitia.');
+      showToast('error', 'Pendaftaran Ditutup', 'Mohon maaf, seluruh pendaftaran Tegal Run 2026 telah resmi ditutup oleh panitia.');
       return;
     }
     if (state.events.length > 0) {

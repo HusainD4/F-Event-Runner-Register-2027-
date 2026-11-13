@@ -14,9 +14,10 @@ function maskNik(nik) {
 }
 
 function formatDate(dateStr) {
-  if (!dateStr) return 'Minggu, 28 Feb 2027';
+  if (!dateStr) return 'Tanggal belum tersedia';
   try {
     const d = new Date(dateStr);
+    if (Number.isNaN(d.getTime())) return 'Tanggal belum tersedia';
     return d.toLocaleDateString('id-ID', {
       weekday: 'long',
       day: 'numeric',
@@ -24,7 +25,7 @@ function formatDate(dateStr) {
       year: 'numeric',
     });
   } catch {
-    return 'Minggu, 28 Feb 2027';
+    return 'Tanggal belum tersedia';
   }
 }
 
@@ -170,7 +171,7 @@ async function loadETicket() {
                 <i class="fa-solid fa-person-running"></i>
               </div>
               <div class="ticket-brand-titles">
-                <h2>TEGAL BAHARI MARATHON 2027</h2>
+                <h2>TEGAL BAHARI MARATHON 2026</h2>
                 <p>OFFICIAL RACE ENTRY PASS &bull; VERIFIKASI RESMI</p>
               </div>
             </div>
@@ -299,7 +300,7 @@ async function loadETicket() {
               <div class="stub-officer-box">
                 <div style="font-weight: 700; text-transform: uppercase;">Paraf &amp; Stempel Petugas RPC</div>
                 <div style="height: 16px;"></div>
-                <div>Tgl: _____ / _____ / 2027</div>
+                <div>Tgl: _____ / _____ / 2026</div>
               </div>
             </div>
           </div>

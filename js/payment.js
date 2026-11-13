@@ -165,7 +165,7 @@ function renderPaymentUI(order) {
 
   const firstP = order.participants?.[0];
   const category = firstP?.event?.category || '10K';
-  const ticketName = firstP?.event?.ticketName || 'Tegal Run 2027';
+  const ticketName = firstP?.event?.ticketName || 'Tegal Run 2026';
 
   const subtotalTickets = (order.participants || []).reduce((acc, p) => acc + (Number(p.event?.price) || 0), 0);
   const serviceFee = subtotalTickets > 0 ? Math.max(0, Number(order.totalAmount) - subtotalTickets) : 0;

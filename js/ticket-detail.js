@@ -163,7 +163,7 @@ async function loadTicketDetail() {
 function renderTicketData(event, feeSettings = {}, isGlobalClosed = false) {
   const isClosed = Boolean(event.isClosed) || isGlobalClosed;
   // Page Title
-  document.title = `${event.ticketName} - Tegal Run 2027`;
+  document.title = `${event.ticketName} - Tegal Run 2026`;
 
   // Ticket Cover Image
   const coverImg = document.getElementById('tdTicketCoverImg');

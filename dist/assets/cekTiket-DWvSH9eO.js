@@ -1,4 +1,4 @@
-import{a as u}from"./api-iQl_QkSJ.js";/* empty css              */import{l as w}from"./branding-D6uQxWn9.js";import"./home-appearance-Db1ttUVV.js";w();function m(e="success",a=""){const t=document.getElementById("cekToastContainer");if(!t)return;const n=document.createElement("div");n.className=`toast toast-${e}`,n.innerHTML=`
+import{a as u}from"./api-iQl_QkSJ.js";/* empty css              */import{l as w}from"./branding-DeAa6IZL.js";import"./home-appearance-Db1ttUVV.js";w();function m(e="success",a=""){const t=document.getElementById("cekToastContainer");if(!t)return;const n=document.createElement("div");n.className=`toast toast-${e}`,n.innerHTML=`
     <div class="toast-icon">
       <i class="${e==="success"?"fa-solid fa-circle-check":"fa-solid fa-triangle-exclamation"}"></i>
     </div>
@@ -18,7 +18,7 @@ import{a as u}from"./api-iQl_QkSJ.js";/* empty css              */import{l as w}
     <div style="text-align: center; padding: 50px 20px; color: #64748B;">
       <i class="fa-solid fa-spinner fa-spin" style="font-size: 2.2rem; color: var(--color-primary); margin-bottom: 12px;"></i>
       <h4 style="color: var(--color-text-title);">Memverifikasi Data Pendaftaran...</h4>
-      <p style="font-size: 0.88rem;">Menghubungkan ke database resmi panitia Tegal Run 2027...</p>
+      <p style="font-size: 0.88rem;">Menghubungkan ke database resmi panitia Tegal Run 2026...</p>
     </div>
   `;try{const i=await u(`/tickets/search?q=${encodeURIComponent(a)}&type=${t}`),c=await i.json();if(!i.ok||c.status!=="success"){n.innerHTML=`
         <div class="ticket-result-card" style="text-align: center; padding: 40px;">
@@ -57,7 +57,7 @@ import{a as u}from"./api-iQl_QkSJ.js";/* empty css              */import{l as w}
           </strong>
         </div>
       </div>
-    `).join(""),i=(p=t.participants)==null?void 0:p[0],c=((f=i==null?void 0:i.event)==null?void 0:f.ticketName)||"Tegal Run 2027",T=((g=i==null?void 0:i.event)==null?void 0:g.category)||"10K";return`
+    `).join(""),i=(p=t.participants)==null?void 0:p[0],c=((f=i==null?void 0:i.event)==null?void 0:f.ticketName)||"Tegal Run 2026",T=((g=i==null?void 0:i.event)==null?void 0:g.category)||"10K";return`
       <div class="ticket-result-card">
         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
           <div>

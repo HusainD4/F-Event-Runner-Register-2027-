@@ -385,7 +385,7 @@ function exportParticipantsCsv() {
   const encodedUri = encodeURI(csvContent);
   const link = document.createElement('a');
   link.setAttribute('href', encodedUri);
-  link.setAttribute('download', `peserta_tegal_run_2027_${Date.now()}.csv`);
+  link.setAttribute('download', `peserta_tegal_run_2026_${Date.now()}.csv`);
   document.body.appendChild(link);
   link.click();
   link.remove();

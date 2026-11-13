@@ -1,4 +1,4 @@
-import{f as ja,e as Ga,h as Ua,a as qa,o as Ha,c as Wa,l as _a,b as w,d as Ja,g as Qa,i as Va,j as Ya,k as Xa,m as $a,n as Za,p as an,q as nn,r as en,s as tn,t as sn,u as ln,D as on,v as Ra,w as rn,x as dn,y as cn,z as pn,A as mn,B as un,C as bn,E as gn,F as vn,G as fn,H as k,I as hn,J as kn,K as yn,L as xn,M as wn,N as En,O as La,P as Fn,Q as An,R as Sn,S as Pn,T as Tn,U as Cn,V as Bn,W as In,X as Rn,Y as Ln,Z as Nn,_ as Dn,$ as Mn,a0 as E,a1 as Kn,a2 as Na,a3 as zn,a4 as On,a5 as Un,a6 as jn,a7 as Da,a8 as Gn,a9 as qn,aa as Hn,ab as Wn,ac as y,ad as _n,ae as Jn,af as Qn,ag as Vn,ah as Yn,ai as Xn}from"./auth-C-gcTU_n.js";import{a as $n,b as Zn}from"./api-iQl_QkSJ.js";import{a as ae}from"./home-appearance-Db1ttUVV.js";const ne=`<div class="admin-tab-pane active" id="pane-dashboard">
+import{f as ja,e as Ga,h as Ua,a as qa,o as Ha,c as Wa,l as _a,b as w,d as Ja,g as Qa,i as Va,j as Ya,k as Xa,m as $a,n as Za,p as an,q as nn,r as en,s as tn,t as sn,u as ln,D as on,v as Ra,w as rn,x as dn,y as cn,z as pn,A as mn,B as un,C as bn,E as gn,F as vn,G as fn,H as k,I as hn,J as kn,K as yn,L as xn,M as wn,N as En,O as La,P as Fn,Q as An,R as Sn,S as Pn,T as Tn,U as Cn,V as Bn,W as In,X as Rn,Y as Ln,Z as Nn,_ as Dn,$ as Mn,a0 as E,a1 as Kn,a2 as Na,a3 as zn,a4 as On,a5 as Un,a6 as jn,a7 as Da,a8 as Gn,a9 as qn,aa as Hn,ab as Wn,ac as y,ad as _n,ae as Jn,af as Qn,ag as Vn,ah as Yn,ai as Xn}from"./auth-Dd2lA1cl.js";import{a as $n,b as Zn}from"./api-iQl_QkSJ.js";import{a as ae}from"./home-appearance-Db1ttUVV.js";const ne=`<div class="admin-tab-pane active" id="pane-dashboard">
           <!-- Top KPI Grid: Pemisahan Jelas Total Biaya Layanan & Hasil Akhir Murni Bersih -->
           <div class="admin-kpi-grid">
             <div class="kpi-card" data-dashboard-widget="dashboard:participants">
@@ -643,7 +643,7 @@ import{f as ja,e as Ga,h as Ua,a as qa,o as Ha,c as Wa,l as _a,b as w,d as Ja,g 
                 <label style="display: flex; align-items: center; gap: 12px; background: #F8FAFC; padding: 12px 14px; border-radius: 8px; border: 1px solid #E2E8F0; cursor: pointer;">
                   <input type="checkbox" id="chkItemJersey" checked style="width: 18px; height: 18px; accent-color: var(--color-primary);">
                   <div>
-                    <strong style="font-size: 0.88rem; color: #0F172A;">Jersey Resmi Tegal Run 2027</strong>
+                    <strong style="font-size: 0.88rem; color: #0F172A;">Jersey Resmi Tegal Run 2026</strong>
                     <div style="font-size: 0.74rem; color: #64748B;">Ukuran: <strong id="chkJerseySizeText" style="color: var(--color-primary);">M</strong> • Tipe: <span id="chkJerseyTypeText">Dry-Fit Official</span></div>
                   </div>
                 </label>
@@ -1029,7 +1029,7 @@ import{f as ja,e as Ga,h as Ua,a as qa,o as Ha,c as Wa,l as _a,b as w,d as Ja,g 
               </div>
               <div class="form-group" style="margin-bottom: 0;">
                 <label class="form-label" style="font-size: 0.78rem;">Suffix / Akhiran (Opsional)</label>
-                <input type="text" class="form-input" id="bibInputSuffix" placeholder="-2027" style="font-family: monospace;">
+                <input type="text" class="form-input" id="bibInputSuffix" placeholder="-2026" style="font-family: monospace;">
               </div>
             </div>
 
@@ -1076,7 +1076,7 @@ import{f as ja,e as Ga,h as Ua,a as qa,o as Ha,c as Wa,l as _a,b as w,d as Ja,g 
                 </button>
               </div>
               <small style="color: #64748B; font-size: 0.74rem; display: block; margin-top: 5px;">
-                Contoh: <code>TEGALRUN</code>, <code>TR2027</code>, <code>TEGALBAHARI</code>, dll.
+                Contoh: <code>TEGALRUN</code>, <code>TR2026</code>, <code>TEGALBAHARI</code>, dll.
               </small>
             </div>
 
@@ -1226,7 +1226,7 @@ import{f as ja,e as Ga,h as Ua,a as qa,o as Ha,c as Wa,l as _a,b as w,d as Ja,g 
               <div class="form-row">
                 <div class="form-group">
                   <label class="form-label">Judul Website (Title Browser Tab)</label>
-                  <input type="text" class="form-input" id="cmsSiteTitle" placeholder="Tegal Run 2027 - Official Half Marathon">
+                  <input type="text" class="form-input" id="cmsSiteTitle" placeholder="Tegal Run 2026 - Official Half Marathon">
                 </div>
                 <div class="form-group">
                   <label class="form-label">Tagline Slogan</label>
@@ -1245,7 +1245,7 @@ import{f as ja,e as Ga,h as Ua,a as qa,o as Ha,c as Wa,l as _a,b as w,d as Ja,g 
 
                 <div class="form-group">
                   <label class="form-label" for="cmsNavbarTitle">Judul / Nama yang Tampil di Navbar</label>
-                  <input type="text" class="form-input" id="cmsNavbarTitle" maxlength="80" placeholder="TEGAL RUN 2027">
+                  <input type="text" class="form-input" id="cmsNavbarTitle" maxlength="80" placeholder="TEGAL RUN 2026">
                   <div class="form-hint">Nama navbar bisa berbeda dari judul tab browser.</div>
                 </div>
 
@@ -1286,7 +1286,7 @@ import{f as ja,e as Ga,h as Ua,a as qa,o as Ha,c as Wa,l as _a,b as w,d as Ja,g 
                   <span class="cms-preview-label">Pratinjau navbar</span>
                   <div class="cms-preview-brand">
                     <span class="cms-preview-icon" id="cmsNavbarIconPreview"><i class="fa-solid fa-person-running"></i></span>
-                    <strong id="cmsNavbarTitlePreview">TEGAL RUN 2027</strong>
+                    <strong id="cmsNavbarTitlePreview">TEGAL RUN 2026</strong>
                   </div>
                 </div>
               </div>
@@ -1325,7 +1325,7 @@ import{f as ja,e as Ga,h as Ua,a as qa,o as Ha,c as Wa,l as _a,b as w,d as Ja,g 
 
               <div class="form-group">
                 <label class="form-label">Judul Utama Hero (H1)</label>
-                <input type="text" class="form-input" id="cmsHeroTitle" placeholder="Tegal Run 2027: Lari Bersama Menembus Batas">
+                <input type="text" class="form-input" id="cmsHeroTitle" placeholder="Tegal Run 2026: Lari Bersama Menembus Batas">
               </div>
 
               <div class="cms-appearance-panel">
@@ -1611,7 +1611,7 @@ import{f as ja,e as Ga,h as Ua,a as qa,o as Ha,c as Wa,l as _a,b as w,d as Ja,g 
 
               <div class="form-group">
                 <label class="form-label">Deskripsi Legalitas</label>
-                <textarea class="form-input" id="cmsLegalDesc" rows="2" placeholder="Tegal Run 2027 diselenggarakan dengan izin resmi pemerintah daerah..."></textarea>
+                <textarea class="form-input" id="cmsLegalDesc" rows="2" placeholder="Tegal Run 2026 diselenggarakan dengan izin resmi pemerintah daerah..."></textarea>
               </div>
 
               <!-- Dynamic Legal Repeater Container -->
@@ -1697,7 +1697,7 @@ import{f as ja,e as Ga,h as Ua,a as qa,o as Ha,c as Wa,l as _a,b as w,d as Ja,g 
 
               <div class="form-group">
                 <label class="form-label">Teks Hak Cipta Footer</label>
-                <input type="text" class="form-input" id="cmsFooterCopyright" placeholder="Hak Cipta Terpelihara © 2027 Panitia Resmi Tegal Run.">
+                <input type="text" class="form-input" id="cmsFooterCopyright" placeholder="Hak Cipta Terpelihara © 2026 Panitia Resmi Tegal Run.">
               </div>
               <aside class="cms-live-preview is-open" id="cmsLivePreview" aria-label="Pratinjau halaman utama">
                 <button type="button" class="cms-preview-handle" id="btnToggleCmsPreview"
@@ -2085,7 +2085,7 @@ import{f as ja,e as Ga,h as Ua,a as qa,o as Ha,c as Wa,l as _a,b as w,d as Ja,g 
                   </div>
                   <div class="form-group">
                     <label class="form-label">Nama Pengirim (From Name)</label>
-                    <input type="text" class="form-input" id="notifSettingEmailFromName" placeholder="Panitia Tegal Run 2027">
+                    <input type="text" class="form-input" id="notifSettingEmailFromName" placeholder="Panitia Tegal Run 2026">
                   </div>
                 </div>
               </div>
@@ -2150,7 +2150,7 @@ import{f as ja,e as Ga,h as Ua,a as qa,o as Ha,c as Wa,l as _a,b as w,d as Ja,g 
                 </div>
                 <div class="form-group" style="flex: 1.5; min-width: 250px; margin-bottom: 0;">
                   <label class="form-label">Pesan Uji Coba</label>
-                  <input type="text" class="form-input" id="testNotifMessage" value="Ini adalah pesan tes notifikasi otomatis dari sistem Tegal Run 2027.">
+                  <input type="text" class="form-input" id="testNotifMessage" value="Ini adalah pesan tes notifikasi otomatis dari sistem Tegal Run 2026.">
                 </div>
                 <button type="button" class="btn btn-secondary" id="btnSendTestNotif" data-permission="notifications:manage">
                   <i class="fa-solid fa-vial"></i> Kirim Tes
@@ -2519,7 +2519,7 @@ import{f as ja,e as Ga,h as Ua,a as qa,o as Ha,c as Wa,l as _a,b as w,d as Ja,g 
         <div class="admin-modal-body">
           <div class="form-group">
             <label class="form-label">Nama Tiket / Kategori Event <span class="req">*</span></label>
-            <input type="text" class="form-input" id="eventFormTicketName" placeholder="Contoh: 10K Open Marathon 2027" required>
+            <input type="text" class="form-input" id="eventFormTicketName" placeholder="Contoh: 10K Open Marathon 2026" required>
           </div>
           <div class="form-row">
             <div class="form-group">

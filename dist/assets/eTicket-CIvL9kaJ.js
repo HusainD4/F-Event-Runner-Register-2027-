@@ -1,4 +1,4 @@
-import{a as S}from"./api-iQl_QkSJ.js";import{l as P}from"./branding-D6uQxWn9.js";import"./home-appearance-Db1ttUVV.js";P();function a(e){return e?String(e).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"):""}function A(e){return!e||e.length<8?e||"-":e.substring(0,6)+"******"+e.substring(e.length-4)}function M(e){if(!e)return"Minggu, 28 Feb 2027";try{return new Date(e).toLocaleDateString("id-ID",{weekday:"long",day:"numeric",month:"short",year:"numeric"})}catch{return"Minggu, 28 Feb 2027"}}async function C(){const e=document.getElementById("ticketMount"),v=document.querySelector(".instructions-box");if(!e)return;const c=new URLSearchParams(window.location.search),u=c.get("orderId")||c.get("id")||c.get("midtransOrderId")||c.get("code")||c.get("q"),p=u?u.trim():"";if(!p){e.innerHTML=`
+import{a as S}from"./api-iQl_QkSJ.js";import{l as P}from"./branding-DeAa6IZL.js";import"./home-appearance-Db1ttUVV.js";P();function a(e){return e?String(e).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"):""}function A(e){return!e||e.length<8?e||"-":e.substring(0,6)+"******"+e.substring(e.length-4)}function C(e){if(!e)return"Tanggal belum tersedia";try{const c=new Date(e);return Number.isNaN(c.getTime())?"Tanggal belum tersedia":c.toLocaleDateString("id-ID",{weekday:"long",day:"numeric",month:"short",year:"numeric"})}catch{return"Tanggal belum tersedia"}}async function M(){const e=document.getElementById("ticketMount"),c=document.querySelector(".instructions-box");if(!e)return;const d=new URLSearchParams(window.location.search),u=d.get("orderId")||d.get("id")||d.get("midtransOrderId")||d.get("code")||d.get("q"),p=u?u.trim():"";if(!p){e.innerHTML=`
       <div class="e-ticket-card" style="padding: 48px 24px; text-align: center;">
         <i class="fa-solid fa-triangle-exclamation" style="font-size: 3rem; color: #EF4444; margin-bottom: 16px;"></i>
         <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 8px;">ID Pesanan Tidak Ditemukan</h3>
@@ -7,40 +7,40 @@ import{a as S}from"./api-iQl_QkSJ.js";import{l as P}from"./branding-D6uQxWn9.js"
           <i class="fa-solid fa-arrow-left"></i> Kembali ke Pencarian Tiket
         </a>
       </div>
-    `;return}try{const o=await S(`/tickets/e-ticket/${encodeURIComponent(p)}`),d=await o.json();if(!o.ok||d.status!=="success"){e.innerHTML=`
+    `;return}try{const m=await S(`/tickets/e-ticket/${encodeURIComponent(p)}`),o=await m.json();if(!m.ok||o.status!=="success"){e.innerHTML=`
         <div class="e-ticket-card" style="padding: 48px 24px; text-align: center;">
           <i class="fa-solid fa-circle-xmark" style="font-size: 3rem; color: #EF4444; margin-bottom: 16px;"></i>
           <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 8px;">E-Tiket Belum Tersedia</h3>
           <p style="color: #64748B; margin-bottom: 24px; max-width: 480px; margin-left: auto; margin-right: auto;">
-            ${a(d.message||"Status pembayaran belum terkonfirmasi lunas.")}
+            ${a(o.message||"Status pembayaran belum terkonfirmasi lunas.")}
           </p>
-          ${d.orderId?`<a href="/payment.html?orderId=${encodeURIComponent(d.orderId)}" class="btn btn-print">
+          ${o.orderId?`<a href="/payment.html?orderId=${encodeURIComponent(o.orderId)}" class="btn btn-print">
                    <i class="fa-solid fa-credit-card"></i> Selesaikan Pembayaran Sekarang
                  </a>`:'<a href="/cek-tiket.html" class="btn btn-back"><i class="fa-solid fa-magnifying-glass"></i> Cek Status Pesanan</a>'}
         </div>
-      `;return}const n=d.data,s=n.participants||[];if(s.length===0){e.innerHTML=`
+      `;return}const r=o.data,s=r.participants||[];if(s.length===0){e.innerHTML=`
         <div class="e-ticket-card" style="padding: 40px; text-align: center;">
           <i class="fa-solid fa-user-xmark" style="font-size: 2.5rem; color: #F59E0B; margin-bottom: 14px;"></i>
           <p style="color: #64748B;">Tidak ada data peserta terdaftar dalam pesanan ini.</p>
         </div>
-      `;return}const m=n.midtransOrderId||n.id;let f="";if(s.length>1){const i=n.masterQrImageDataUrl;f=`
+      `;return}const v=r.midtransOrderId||r.id;let f="";if(s.length>1){const i=r.masterQrImageDataUrl;f=`
         <div class="master-qr-banner">
           <div class="master-qr-info">
             <span class="badge-master"><i class="fa-solid fa-layer-group"></i> QR CODE MASTER (${s.length} TIKET)</span>
             <h3>1 QR Code untuk Seluruh Peserta dalam Pesanan Ini</h3>
             <p>Petugas RPC cukup memindai QR Master ini untuk verifikasi dan serah terima racepack seluruh ${s.length} peserta sekaligus.</p>
             <div class="master-runner-list">
-              ${s.map((l,t)=>{var r;return`
-                <span class="master-runner-pill">#${t+1} ${a(l.fullNameKtp)} &bull; ${a(((r=l.event)==null?void 0:r.category)||"10K")}</span>
+              ${s.map((l,t)=>{var n;return`
+                <span class="master-runner-pill">#${t+1} ${a(l.fullNameKtp)} &bull; ${a(((n=l.event)==null?void 0:n.category)||"10K")}</span>
               `}).join("")}
             </div>
           </div>
           <div class="master-qr-code-box">
-            <img src="${i}" alt="Master QR ${a(m)}" class="master-qr-img" />
-            <span class="master-qr-ref">ORDER: ${a(m.substring(0,18))}</span>
+            <img src="${i}" alt="Master QR ${a(v)}" class="master-qr-img" />
+            <span class="master-qr-ref">ORDER: ${a(v.substring(0,18))}</span>
           </div>
         </div>
-      `}const T=s.map((i,l)=>{var b,k,h,y,R;const t=(((b=i.event)==null?void 0:b.category)||"10K").toUpperCase(),r=((k=i.event)==null?void 0:k.ticketName)||`TIKET ${t} MARATHON`,I=t.includes("21K")?"05:15 WIB":t.includes("10K")?"05:45 WIB":"06:15 WIB",$=i.qrImageDataUrl,g=((h=i.event)==null?void 0:h.benefits)||[],x=g.length>0?g.map(E=>`
+      `}const T=s.map((i,l)=>{var b,k,h,y,R;const t=(((b=i.event)==null?void 0:b.category)||"10K").toUpperCase(),n=((k=i.event)==null?void 0:k.ticketName)||`TIKET ${t} MARATHON`,I=t.includes("21K")?"05:15 WIB":t.includes("10K")?"05:45 WIB":"06:15 WIB",$=i.qrImageDataUrl,g=((h=i.event)==null?void 0:h.benefits)||[],x=g.length>0?g.map(E=>`
             <div class="stub-checklist-item">
               <i class="fa-regular fa-square-check"></i> ${a(E.name)}
             </div>
@@ -74,7 +74,7 @@ import{a as S}from"./api-iQl_QkSJ.js";import{l as P}from"./branding-D6uQxWn9.js"
                 <i class="fa-solid fa-person-running"></i>
               </div>
               <div class="ticket-brand-titles">
-                <h2>TEGAL BAHARI MARATHON 2027</h2>
+                <h2>TEGAL BAHARI MARATHON 2026</h2>
                 <p>OFFICIAL RACE ENTRY PASS &bull; VERIFIKASI RESMI</p>
               </div>
             </div>
@@ -84,7 +84,7 @@ import{a as S}from"./api-iQl_QkSJ.js";import{l as P}from"./branding-D6uQxWn9.js"
                 <i class="fa-solid fa-circle-check"></i> TERDAFTAR &amp; LUNAS
               </span>
               <div class="order-code-text">
-                REF ID: <strong>${a(m)}</strong>
+                REF ID: <strong>${a(v)}</strong>
               </div>
             </div>
           </div>
@@ -102,7 +102,7 @@ import{a as S}from"./api-iQl_QkSJ.js";import{l as P}from"./branding-D6uQxWn9.js"
                   <div class="ticket-entry-badge">
                     <i class="fa-solid fa-ticket"></i> TIKET RESMI PESERTA
                   </div>
-                  <h3 class="ticket-name-big">${a(r)}</h3>
+                  <h3 class="ticket-name-big">${a(n)}</h3>
                   <span class="runner-name-display">${a(i.fullNameKtp)}</span>
                 </div>
 
@@ -150,7 +150,7 @@ import{a as S}from"./api-iQl_QkSJ.js";import{l as P}from"./branding-D6uQxWn9.js"
 
                 <div class="detail-item">
                   <div class="detail-label"><i class="fa-solid fa-location-dot"></i> Lokasi &amp; Tanggal</div>
-                  <div class="detail-val">Alun-Alun Tegal &bull; ${M((R=i.event)==null?void 0:R.eventDate)}</div>
+                  <div class="detail-val">Alun-Alun Tegal &bull; ${C((R=i.event)==null?void 0:R.eventDate)}</div>
                 </div>
               </div>
 
@@ -188,7 +188,7 @@ import{a as S}from"./api-iQl_QkSJ.js";import{l as P}from"./branding-D6uQxWn9.js"
               <!-- Simulated Barcode -->
               <div class="stub-barcode-container">
                 <div class="simulated-barcode"></div>
-                <div class="barcode-code-text">${a(m)}</div>
+                <div class="barcode-code-text">${a(v)}</div>
               </div>
 
               <!-- RPC Checklist Breakdown (Mengikuti Tiket Event yang didaftar) -->
@@ -203,23 +203,23 @@ import{a as S}from"./api-iQl_QkSJ.js";import{l as P}from"./branding-D6uQxWn9.js"
               <div class="stub-officer-box">
                 <div style="font-weight: 700; text-transform: uppercase;">Paraf &amp; Stempel Petugas RPC</div>
                 <div style="height: 16px;"></div>
-                <div>Tgl: _____ / _____ / 2027</div>
+                <div>Tgl: _____ / _____ / 2026</div>
               </div>
             </div>
           </div>
         </div>
-      `}).join("");if(e.innerHTML=f+T,v&&n.racepackInstructions){const i=n.racepackInstructions,l=i.title||"Petunjuk Pengambilan Racepack & Race Day:",t=Array.isArray(i.points)?i.points:[];t.length>0&&(v.innerHTML=`
+      `}).join("");if(e.innerHTML=f+T,c&&r.racepackInstructions){const i=r.racepackInstructions,l=i.title||"Petunjuk Pengambilan Racepack & Race Day:",t=Array.isArray(i.points)?i.points:[];t.length>0&&(c.innerHTML=`
           <h4><i class="fa-solid fa-circle-info" style="color: var(--color-primary);"></i> ${a(l)}</h4>
           <ul>
-            ${t.map(r=>`<li>${a(r)}</li>`).join("")}
+            ${t.map(n=>`<li>${a(n)}</li>`).join("")}
           </ul>
-        `)}}catch(o){e.innerHTML=`
+        `)}}catch(m){e.innerHTML=`
       <div class="e-ticket-card" style="padding: 48px 24px; text-align: center;">
         <i class="fa-solid fa-triangle-exclamation" style="font-size: 3rem; color: #F59E0B; margin-bottom: 16px;"></i>
         <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 8px;">Gagal Menghubungkan ke Server</h3>
-        <p style="color: #64748B; margin-bottom: 20px;">${a(o.message)}</p>
+        <p style="color: #64748B; margin-bottom: 20px;">${a(m.message)}</p>
         <button onclick="location.reload()" class="btn btn-print">
           <i class="fa-solid fa-rotate-right"></i> Coba Muat Ulang
         </button>
       </div>
-    `}}document.addEventListener("DOMContentLoaded",C);
+    `}}document.addEventListener("DOMContentLoaded",M);

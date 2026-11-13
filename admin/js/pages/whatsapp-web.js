@@ -171,7 +171,7 @@ function selectWhatsAppContact(c) {
 
   if (chatMessagesBox) {
     const timeStr = c.createdAt ? new Date(c.createdAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : '10:00';
-    let sampleMsg = `Halo ${c.customerName} 👋\n\nTerima kasih telah mendaftar di *Tegal Run 2027*!\n\n📋 *Detail Tiket Lari:*\n• Kategori: ${c.ticketName}\n• Order ID: ${c.midtransOrderId || c.orderId}\n• Status: ${isPaid ? '✅ LUNAS (SETTLEMENT)' : '⏳ MENUNGGU PEMBAYARAN'}\n• Nomor BIB: ${c.bibNumbers || '-'}\n\n${isPaid ? '🎉 E-Tiket PDF resmi dan QR Check-in Anda telah terverifikasi.' : 'Silakan selesaikan pembayaran untuk mengamankan slot race Anda.'}\n\nSalam,\n*Komite Resmi Tegal Run 2027*`;
+    let sampleMsg = `Halo ${c.customerName} 👋\n\nTerima kasih telah mendaftar di *Tegal Run 2026*!\n\n📋 *Detail Tiket Lari:*\n• Kategori: ${c.ticketName}\n• Order ID: ${c.midtransOrderId || c.orderId}\n• Status: ${isPaid ? '✅ LUNAS (SETTLEMENT)' : '⏳ MENUNGGU PEMBAYARAN'}\n• Nomor BIB: ${c.bibNumbers || '-'}\n\n${isPaid ? '🎉 E-Tiket PDF resmi dan QR Check-in Anda telah terverifikasi.' : 'Silakan selesaikan pembayaran untuk mengamankan slot race Anda.'}\n\nSalam,\n*Komite Resmi Tegal Run 2026*`;
 
     chatMessagesBox.innerHTML = `
       <div class="wa-system-pill">
@@ -258,20 +258,20 @@ function handleWaTemplateChange() {
 
   const c = waActiveContact || {
     customerName: 'Peserta',
-    ticketName: 'Tegal Run 2027',
+    ticketName: 'Tegal Run 2026',
     midtransOrderId: 'TR-ORD-001',
     bibNumbers: '10K-001',
     totalAmount: 250000
   };
 
   if (val === 'PAID_TICKET') {
-    input.value = `Halo ${c.customerName},\n\nPembayaran tiket ${c.ticketName} (Order ID: ${c.midtransOrderId || c.orderId}) telah BERHASIL diverifikasi ✅.\n\nNomor BIB: ${c.bibNumbers || '-'}\nTotal: Rp${(c.totalAmount || 0).toLocaleString('id-ID')}\n\nE-Tiket resmi Anda siap digunakan untuk pengambilan Race Pack. Simpan bukti ini dengan baik. Sampai jumpa di Race Day Tegal Run 2027! 🏃‍♂️🔥`;
+    input.value = `Halo ${c.customerName},\n\nPembayaran tiket ${c.ticketName} (Order ID: ${c.midtransOrderId || c.orderId}) telah BERHASIL diverifikasi ✅.\n\nNomor BIB: ${c.bibNumbers || '-'}\nTotal: Rp${(c.totalAmount || 0).toLocaleString('id-ID')}\n\nE-Tiket resmi Anda siap digunakan untuk pengambilan Race Pack. Simpan bukti ini dengan baik. Sampai jumpa di Race Day Tegal Run 2026! 🏃‍♂️🔥`;
   } else if (val === 'PENDING_INVOICE') {
     input.value = `Halo ${c.customerName},\n\nPesanan tiket ${c.ticketName} Anda (Order ID: ${c.midtransOrderId || c.orderId}) masih menunggu pembayaran ⏳.\n\nTotal Tagihan: Rp${(c.totalAmount || 0).toLocaleString('id-ID')}\n\nMohon selesaikan pembayaran sebelum batas waktu berakhir agar slot Anda tidak dibatalkan otomatis oleh sistem. Terima kasih!`;
   } else if (val === 'RACEPACK_INFO') {
-    input.value = `Halo ${c.customerName},\n\nPengambilan Race Pack (BIB, Jersey & Goodie Bag) Tegal Run 2027 akan dilaksanakan pada:\n📅 H-2 & H-1 Race Day\n📍 Race Village Alun-Alun Kota Tegal\n⏰ 09.00 - 18.00 WIB\n\nTunjukkan E-Tiket & KTP asli saat pengambilan. Terima kasih!`;
+    input.value = `Halo ${c.customerName},\n\nPengambilan Race Pack (BIB, Jersey & Goodie Bag) Tegal Run 2026 akan dilaksanakan pada:\n📅 H-2 & H-1 Race Day\n📍 Race Village Alun-Alun Kota Tegal\n⏰ 09.00 - 18.00 WIB\n\nTunjukkan E-Tiket & KTP asli saat pengambilan. Terima kasih!`;
   } else if (val === 'THANK_YOU') {
-    input.value = `Halo ${c.customerName},\n\nTerima kasih telah menjadi bagian dari Tegal Run 2027! Semangat berlatih dan jaga kesehatan menuju garis start. Jika membutuhkan bantuan, hubungi kami di sini. Salam Pelari! 🏅`;
+    input.value = `Halo ${c.customerName},\n\nTerima kasih telah menjadi bagian dari Tegal Run 2026! Semangat berlatih dan jaga kesehatan menuju garis start. Jika membutuhkan bantuan, hubungi kami di sini. Salam Pelari! 🏅`;
   }
 }
 

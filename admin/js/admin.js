@@ -1,5 +1,5 @@
 // =============================================================================
-// MODULAR ADMIN PANEL ORCHESTRATOR - TEGAL RUN 2027
+// MODULAR ADMIN PANEL ORCHESTRATOR - TEGAL RUN 2026
 // =============================================================================
 
 // 1. Raw HTML Templates for Modular Panes & Modals

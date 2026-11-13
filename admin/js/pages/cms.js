@@ -934,7 +934,7 @@ async function loadCmsSettings() {
 
       setVal('cmsSiteTitle', s.site_title);
       setVal('cmsSiteTagline', s.site_tagline);
-      setVal('cmsNavbarTitle', typeof s.navbar_title === 'string' ? s.navbar_title : 'TEGAL RUN 2027');
+      setVal('cmsNavbarTitle', typeof s.navbar_title === 'string' ? s.navbar_title : 'TEGAL RUN 2026');
       setVal('cmsNavbarIcon', CMS_NAVBAR_ICONS.includes(s.navbar_icon) ? s.navbar_icon : CMS_NAVBAR_ICONS[0]);
       setVal('cmsNavbarIconUrl', s.navbar_icon_url);
       setVal('cmsFaviconUrl', s.favicon_url);

@@ -4,7 +4,7 @@ import { applyHomeAppearance } from './home-appearance.js';
 let eventNameObserver;
 
 function replaceConfiguredEventName(value, eventName) {
-  return value.replace(/tegal[\s_-]*run[\s_-]*2027/gi, () => eventName);
+  return value.replace(/tegal[\s_-]*run[\s_-]*202[67]/gi, () => eventName);
 }
 
 function applyEventNameToElement(element, eventName) {

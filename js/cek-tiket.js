@@ -1,6 +1,6 @@
 /**
  * CEK STATUS TIKET & E-TIKET CONTROLLER
- * Tegal Run 2027
+ * Tegal Run 2026
  */
 
 import { apiFetch } from './api.js';
@@ -186,7 +186,7 @@ async function handleSearchSubmit(e) {
     <div style="text-align: center; padding: 50px 20px; color: #64748B;">
       <i class="fa-solid fa-spinner fa-spin" style="font-size: 2.2rem; color: var(--color-primary); margin-bottom: 12px;"></i>
       <h4 style="color: var(--color-text-title);">Memverifikasi Data Pendaftaran...</h4>
-      <p style="font-size: 0.88rem;">Menghubungkan ke database resmi panitia Tegal Run 2027...</p>
+      <p style="font-size: 0.88rem;">Menghubungkan ke database resmi panitia Tegal Run 2026...</p>
     </div>
   `;
 
@@ -269,7 +269,7 @@ function renderSearchResults(orders) {
     `).join('');
 
     const firstP = order.participants?.[0];
-    const ticketName = firstP?.event?.ticketName || 'Tegal Run 2027';
+    const ticketName = firstP?.event?.ticketName || 'Tegal Run 2026';
     const category = firstP?.event?.category || '10K';
 
     return `
