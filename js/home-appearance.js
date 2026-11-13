@@ -1,14 +1,14 @@
 export const DEFAULT_APPEARANCE = {
   hero_animation: 'SPEED',
-  theme_primary_color: '#FF6B00',
-  theme_background_color: '#F8FAFC',
+  theme_primary_color: '#006FBA',
+  theme_background_color: '#F3FBFF',
   theme_surface_color: '#FFFFFF',
-  theme_border_color: '#E2E8F0',
-  theme_heading_color: '#0F172A',
-  theme_text_color: '#334155',
-  theme_muted_color: '#64748B',
+  theme_border_color: '#CDEBF5',
+  theme_heading_color: '#062C65',
+  theme_text_color: '#152238',
+  theme_muted_color: '#46657C',
   theme_nav_color: '#FFFFFF',
-  theme_button_color: '#FF6B00',
+  theme_button_color: '#006FBA',
   theme_button_text_color: '#FFFFFF'
 };
 
