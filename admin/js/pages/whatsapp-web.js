@@ -1,12 +1,32 @@
 import { adminState } from '../core/state.js';
 import { fetchAdmin } from '../core/api.js';
-import { showAdminToast, escapeHtml } from '../core/utils.js';
+import { showAdminToast, showConfirmDialog, escapeHtml } from '../core/utils.js';
 
 // ==============================================================
 // WHATSAPP WEB CONSOLE & LIVE MESSENGER
 // ==============================================================
 let waWebContacts = [];
 let waActiveContact = null;
+
+function initWhatsAppStatusDrawer() {
+  const drawer = document.getElementById('waStatusDrawer');
+  const button = document.getElementById('btnToggleWaStatus');
+  const panel = document.getElementById('waStatusPanel');
+  if (!drawer || !button || !panel) return;
+  const setOpen = open => {
+    drawer.classList.toggle('is-open', open);
+    panel.hidden = !open;
+    button.setAttribute('aria-expanded', String(open));
+    button.setAttribute('aria-label', `${open ? 'Tutup' : 'Buka'} panel koneksi WhatsApp`);
+  };
+  button.addEventListener('click', () => setOpen(!drawer.classList.contains('is-open')));
+  drawer.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && drawer.classList.contains('is-open')) {
+      setOpen(false);
+      button.focus();
+    }
+  });
+}
 
 async function loadWhatsAppWebConsole() {
   const container = document.getElementById('waContactListContainer');
@@ -29,14 +49,13 @@ async function loadWhatsAppWebConsole() {
     if (logsRes && logsRes.status === 'success' && logsRes.data) {
       waWebContacts = logsRes.data.items || [];
       renderWhatsAppWebContactList(waWebContacts);
-      if (waWebContacts.length > 0 && !waActiveContact) {
-        selectWhatsAppContact(waWebContacts[0]);
-      }
+      const selected = waWebContacts.find(contact => contact.orderId === waActiveContact?.orderId);
+      if (selected || waWebContacts.length > 0) selectWhatsAppContact(selected || waWebContacts[0]);
     }
   } catch (err) {
     console.warn('Gagal memuat konsol WhatsApp Web:', err);
     if (container) {
-      container.innerHTML = `<div style="padding: 20px; text-align: center; color: #EF4444; font-size: 0.85rem;">Gagal memuat kontak: ${err.message}</div>`;
+      container.innerHTML = `<div style="padding: 20px; text-align: center; color: #EF4444; font-size: 0.85rem;">Gagal memuat kontak: ${escapeHtml(err.message)}</div>`;
     }
   }
 }
@@ -164,28 +183,63 @@ function selectWhatsAppContact(c) {
   if (activeBadge) {
     activeBadge.innerHTML = `
       <span class="badge" style="background: ${isPaid ? '#ECFDF5' : '#FFFBEB'}; color: ${isPaid ? '#059669' : '#D97706'}; font-size: 0.7rem; padding: 2px 8px;">
-        ${c.ticketName} • ${isPaid ? 'Lunas' : 'Belum Bayar'}
+        ${escapeHtml(c.ticketName)} • ${isPaid ? 'Lunas' : 'Belum Bayar'}
       </span>
     `;
   }
 
-  if (chatMessagesBox) {
-    const timeStr = c.createdAt ? new Date(c.createdAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : '10:00';
-    let sampleMsg = `Halo ${c.customerName} 👋\n\nTerima kasih telah mendaftar di *Tegal Run 2026*!\n\n📋 *Detail Tiket Lari:*\n• Kategori: ${c.ticketName}\n• Order ID: ${c.midtransOrderId || c.orderId}\n• Status: ${isPaid ? '✅ LUNAS (SETTLEMENT)' : '⏳ MENUNGGU PEMBAYARAN'}\n• Nomor BIB: ${c.bibNumbers || '-'}\n\n${isPaid ? '🎉 E-Tiket PDF resmi dan QR Check-in Anda telah terverifikasi.' : 'Silakan selesaikan pembayaran untuk mengamankan slot race Anda.'}\n\nSalam,\n*Komite Resmi Tegal Run 2026*`;
+  if (chatMessagesBox) void loadWhatsAppHistory(c.orderId);
+}
 
-    chatMessagesBox.innerHTML = `
-      <div class="wa-system-pill">
-        <i class="fa-solid fa-lock"></i> Sesi chat langsung WhatsApp Web Server (Multi-Device Engine)
-      </div>
-      <div class="wa-bubble wa-bubble-out">
-        ${escapeHtml(sampleMsg).replace(/\n/g, '<br>')}
-        <div class="wa-bubble-time">
-          <span>${timeStr}</span>
-          <i class="fa-solid fa-check-double" style="color: #38BDF8;"></i>
-        </div>
-      </div>
-    `;
-    chatMessagesBox.scrollTop = chatMessagesBox.scrollHeight;
+let historyRequest = 0;
+async function loadWhatsAppHistory(orderId) {
+  const box = document.getElementById('waChatMessagesBox');
+  if (!box) return;
+  const request = ++historyRequest;
+  box.textContent = 'Memuat riwayat pesan...';
+  try {
+    const res = await fetchAdmin(`/admin/notifications/whatsapp/history/${encodeURIComponent(orderId)}`);
+    if (request !== historyRequest || waActiveContact?.orderId !== orderId) return;
+    if (res?.status !== 'success' || !Array.isArray(res.data?.items)) throw new Error(res?.message || 'Gagal memuat riwayat.');
+    const items = res.data.items;
+    box.innerHTML = `<div class="wa-system-pill">Maksimal 100 pesan keluar terbaru. Pesan lama sebelum fitur ini dan pesan masuk tidak tersedia.</div>` +
+      (items.length ? items.map(item => {
+        const data = item.metadata || {};
+        const status = data.status === 'SENT' ? 'Diterima gateway' : 'Status tidak pasti; periksa WhatsApp';
+        const time = new Date(item.createdAt).toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' });
+        return `<div class="wa-bubble wa-bubble-out">${data.kind === 'PDF' ? '<i class="fa-solid fa-file-pdf"></i> ' : ''}${escapeHtml(data.message || '').replace(/\n/g, '<br>')}<div class="wa-bubble-time">${escapeHtml(time)} &bull; ${escapeHtml(status)}</div></div>`;
+      }).join('') : '<p class="wa-history-empty">Belum ada riwayat pesan keluar untuk pesanan ini.</p>');
+    box.scrollTop = box.scrollHeight;
+  } catch (error) {
+    if (request !== historyRequest || waActiveContact?.orderId !== orderId) return;
+    box.innerHTML = `<p class="wa-history-empty">Gagal memuat riwayat: ${escapeHtml(error.message)}</p>`;
+  }
+}
+
+async function handleClearWaConsole() {
+  if (!waActiveContact) {
+    showAdminToast('warning', 'Pilih Peserta', 'Pilih peserta terlebih dahulu.');
+    return;
+  }
+  const orderId = waActiveContact.orderId;
+  const confirmed = await showConfirmDialog({
+    title: 'Bersihkan Console?',
+    message: `Hapus riwayat console untuk ${waActiveContact.customerName}? Pesan di WhatsApp tidak akan dihapus.`,
+    confirmText: 'Ya, Bersihkan',
+    type: 'danger',
+  });
+  if (!confirmed) return;
+  const button = document.getElementById('btnClearWaConsole');
+  if (button) button.disabled = true;
+  try {
+    const res = await fetchAdmin(`/admin/notifications/whatsapp/history/${encodeURIComponent(orderId)}`, { method: 'DELETE' });
+    if (res?.status !== 'success') throw new Error(res?.message || 'Gagal membersihkan console.');
+    showAdminToast('success', 'Console Dibersihkan', escapeHtml(res.message));
+    if (waActiveContact?.orderId === orderId) await loadWhatsAppHistory(orderId);
+  } catch (error) {
+    showAdminToast('error', 'Gagal', escapeHtml(error.message));
+  } finally {
+    if (button) button.disabled = false;
   }
 }
 
@@ -200,6 +254,7 @@ async function handleSendDirectWaMessage() {
     showAdminToast('warning', 'Pilih Peserta', 'Pilih kontak peserta terlebih dahulu dari daftar di sebelah kiri.');
     return;
   }
+  const orderId = waActiveContact.orderId;
 
   const btn = document.getElementById('btnSendWaDirectMsg');
   const originalHtml = btn?.innerHTML;
@@ -212,35 +267,22 @@ async function handleSendDirectWaMessage() {
     const res = await fetchAdmin('/admin/notifications/whatsapp/send-direct', {
       method: 'POST',
       body: JSON.stringify({
-        phoneNumber: waActiveContact.customerPhone,
+        orderId,
         message: msg
       })
     });
 
     if (res && res.status === 'success') {
-      showAdminToast('success', 'Terkirim', 'Pesan WhatsApp berhasil terkirim ke ' + waActiveContact.customerPhone);
-
-      const chatBox = document.getElementById('waChatMessagesBox');
-      if (chatBox) {
-        const timeStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-        const bubble = document.createElement('div');
-        bubble.className = 'wa-bubble wa-bubble-out';
-        bubble.innerHTML = `
-          ${escapeHtml(msg).replace(/\n/g, '<br>')}
-          <div class="wa-bubble-time">
-            <span>${timeStr}</span>
-            <i class="fa-solid fa-check-double" style="color: #38BDF8;"></i>
-          </div>
-        `;
-        chatBox.appendChild(bubble);
-        chatBox.scrollTop = chatBox.scrollHeight;
-      }
-      if (input) input.value = '';
+      showAdminToast('success', 'Diproses', 'Pesan diterima gateway WhatsApp.');
+      if (input && waActiveContact?.orderId === orderId) input.value = '';
+      if (waActiveContact?.orderId === orderId) await loadWhatsAppHistory(orderId);
     } else {
-      showAdminToast('error', 'Gagal Kirim', res?.message || 'Gagal mengirim pesan.');
+      showAdminToast('error', 'Gagal Kirim', escapeHtml(res?.message || 'Gagal mengirim pesan.'));
+      if (waActiveContact?.orderId === orderId) await loadWhatsAppHistory(orderId);
     }
   } catch (err) {
-    showAdminToast('error', 'Kesalahan', err.message);
+    showAdminToast('error', 'Kesalahan', escapeHtml(err.message));
+    if (waActiveContact?.orderId === orderId) await loadWhatsAppHistory(orderId);
   } finally {
     if (btn) {
       btn.disabled = false;
@@ -281,27 +323,30 @@ async function handleQuickDispatchTicket(type) {
     return;
   }
 
+  const contact = waActiveContact;
   try {
     const res = await fetchAdmin('/admin/notifications/dispatch-single', {
       method: 'POST',
-      body: JSON.stringify({ orderId: waActiveContact.orderId })
+      body: JSON.stringify({ orderId: contact.orderId })
     });
 
     if (res && res.status === 'success') {
-      showAdminToast('success', 'Terkirim', `Notifikasi berhasil diproses ke ${waActiveContact.customerName}.`);
-      waActiveContact.whatsappSent = true;
+      showAdminToast('success', 'Diproses', 'Notifikasi diproses. Periksa riwayat dan status pengiriman.');
+      contact.whatsappSent = res.data?.whatsappSent === true;
       renderWhatsAppWebContactList(waWebContacts);
-      selectWhatsAppContact(waActiveContact);
+      if (waActiveContact?.orderId === contact.orderId) selectWhatsAppContact(contact);
     } else {
-      showAdminToast('error', 'Gagal Kirim', res?.message || 'Gagal mengirim notifikasi.');
+      showAdminToast('error', 'Gagal Kirim', escapeHtml(res?.message || 'Gagal mengirim notifikasi.'));
+      if (waActiveContact?.orderId === contact.orderId) await loadWhatsAppHistory(contact.orderId);
     }
   } catch (err) {
-    showAdminToast('error', 'Kesalahan', err.message);
+    showAdminToast('error', 'Kesalahan', escapeHtml(err.message));
   }
 }
 
 
 export {
+  initWhatsAppStatusDrawer,
   loadWhatsAppWebConsole,
   renderWhatsAppWebConsoleHeader,
   renderWhatsAppWebContactList,
@@ -309,5 +354,6 @@ export {
   handleSendDirectWaMessage,
   handleWaTemplateChange,
   handleQuickDispatchTicket,
+  handleClearWaConsole,
   waWebContacts
 };

@@ -11,6 +11,8 @@ let notifLogsState = {
   stats: {},
 };
 
+const channelLabels = { WA: 'WhatsApp', EMAIL: 'Email', BOTH: 'WA + Email', DISABLED: 'Nonaktif' };
+
 async function loadNotificationLogs({ showLoading = true } = {}) {
   const tbody = document.getElementById('notifLogsTableBody');
   if (tbody && showLoading) {
@@ -85,6 +87,9 @@ async function loadNotificationLogs({ showLoading = true } = {}) {
 function renderNotifLogsTable(items) {
   const tbody = document.getElementById('notifLogsTableBody');
   if (!tbody) return;
+  const channel = notifLogsState.stats.notificationChannel;
+  const channelLabel = channelLabels[channel] || 'Tidak tersedia';
+  const canSendPdf = ['WA', 'EMAIL', 'BOTH'].includes(channel);
 
   if (items.length === 0) {
     tbody.innerHTML = `
@@ -112,6 +117,12 @@ function renderNotifLogsTable(items) {
     if (it.emailSent) {
       emailBadge = `<span class="badge" style="background:#ECFDF5;color:#047857;border:1px solid #A7F3D0;"><i class="fa-solid fa-envelope-circle-check"></i> Terkirim</span>`;
     }
+    const pdfStatus = channel => {
+      const delivery = (it.pdfDeliveries || []).find(item => item.channel === channel);
+      if (!delivery) return '';
+      const labels = { PENDING: 'Antrean', PROCESSING: 'Membuat PDF', SENDING: 'Mengirim', SENT: 'Terkirim', FAILED: 'Gagal / periksa' };
+      return `<div style="font-size:0.72rem;margin-top:4px;" title="${escapeHtml(delivery.error || '')}">PDF: ${escapeHtml(labels[delivery.status] || delivery.status)}${delivery.error ? ` - ${escapeHtml(delivery.error)}` : ''}</div>`;
+    };
 
     // Payment Status Badge
     const isPaid = it.orderStatus === 'SETTLEMENT' || it.orderStatus === 'CAPTURE';
@@ -125,30 +136,38 @@ function renderNotifLogsTable(items) {
 
     return `
       <tr>
-        <td>${idx + 1}</td>
-        <td><code>${escapeHtml(it.midtransOrderId || it.orderId.slice(0, 10))}</code></td>
-        <td><strong>${escapeHtml(it.customerName)}</strong></td>
-        <td>
+        <td data-label="No">${idx + 1}</td>
+        <td data-label="Order ID"><code>${escapeHtml(it.midtransOrderId || it.orderId.slice(0, 10))}</code></td>
+        <td data-label="Peserta"><strong>${escapeHtml(it.customerName)}</strong></td>
+        <td data-label="Kontak">
           <div style="font-size: 0.82rem;">
             <div><i class="fa-brands fa-whatsapp" style="color: #25D366;"></i> ${escapeHtml(it.customerPhone)}</div>
             <div style="color: #64748B; font-size: 0.76rem;"><i class="fa-solid fa-envelope" style="color: #38BDF8;"></i> ${escapeHtml(it.customerEmail)}</div>
           </div>
         </td>
-        <td>
+        <td data-label="Kategori & BIB">
           <span class="badge" style="background:#EFF6FF;color:#1D4ED8;font-weight:700;">${escapeHtml(it.ticketCategory)}</span>
           <div style="font-size: 0.74rem; color: #64748B; margin-top: 2px;">BIB: ${escapeHtml(it.bibNumbers)}</div>
         </td>
-        <td>${payBadge}</td>
-        <td>${waBadge}</td>
-        <td>${emailBadge}</td>
-        <td style="font-size: 0.78rem;">${sentTime}</td>
-        <td style="text-align: center;">
-          <div style="display: flex; gap: 6px; justify-content: center;">
-            <button class="btn btn-sm ${it.whatsappSent ? 'btn-secondary' : 'btn-primary'} btn-dispatch-single" data-id="${it.orderId}" data-name="${escapeHtml(it.customerName)}" data-permission="notifications:dispatch" title="Kirim Notifikasi via WhatsApp & Email">
-              <i class="fa-solid fa-paper-plane"></i> ${it.whatsappSent ? 'Kirim Ulang' : 'Kirim'}
-            </button>
-            <a href="/e-ticket.html?orderId=${it.orderId}" target="_blank" class="btn btn-secondary btn-sm" title="Lihat E-Tiket Digital PDF">
-              <i class="fa-solid fa-file-pdf"></i>
+        <td data-label="Pembayaran">${payBadge}</td>
+        <td data-label="WhatsApp"><div>${waBadge}${pdfStatus('WA')}</div></td>
+        <td data-label="Email"><div>${emailBadge}${pdfStatus('EMAIL')}</div></td>
+        <td data-label="Waktu terkirim" style="font-size: 0.78rem;">${sentTime}</td>
+        <td data-label="Aksi" class="notif-log-cell-actions">
+          <div class="notif-log-row-actions">
+            <div class="notif-log-send-box" data-permission="notifications:dispatch">
+              <span class="notif-log-channel">Kirim via ${escapeHtml(channelLabel)}</span>
+              <div class="notif-log-send-buttons">
+                <button class="btn btn-sm btn-secondary btn-dispatch-single" data-id="${escapeHtml(it.orderId)}" data-name="${escapeHtml(it.customerName)}" title="Kirim notifikasi sesuai konfigurasi">
+                  <i class="fa-solid fa-paper-plane"></i> Notifikasi
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm btn-dispatch-pdf" data-index="${idx}" ${isPaid && canSendPdf ? '' : 'disabled'} title="${!isPaid ? 'PDF hanya tersedia untuk pesanan lunas' : canSendPdf ? 'Kirim PDF sesuai saluran notifikasi aktif' : 'Aktifkan saluran notifikasi di konfigurasi'}">
+                  <i class="fa-solid fa-file-arrow-up"></i> PDF
+                </button>
+              </div>
+            </div>
+            <a href="/e-ticket.html?orderId=${encodeURIComponent(it.orderId)}" target="_blank" rel="noopener" class="btn btn-secondary btn-sm notif-log-view" title="Buka pratinjau E-Tiket">
+              <i class="fa-solid fa-eye"></i> Preview
             </a>
           </div>
         </td>
@@ -164,10 +183,54 @@ function renderNotifLogsTable(items) {
       handleDispatchSingle(orderId, name, btn);
     });
   });
+  document.querySelectorAll('.btn-dispatch-pdf').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item = items[Number(btn.dataset.index)];
+      if (item && canSendPdf) handleDispatchPdf(item, channel, btn);
+    });
+  });
   applyRbacUi(adminState.profile);
 }
 
+async function handleDispatchPdf(item, channel, btnEl) {
+  const original = btnEl.innerHTML;
+  btnEl.disabled = true;
+  const targets = channel === 'BOTH' ? ['WA', 'EMAIL'] : [channel];
+  const retry = (item.pdfDeliveries || []).filter(delivery =>
+    targets.includes(delivery.channel) && ['SENT', 'FAILED'].includes(delivery.status));
+  const retryWarning = retry.length
+    ? ' Ada PDF yang sudah terkirim atau gagal. Pengiriman sebelumnya mungkin sudah diterima dan mengirim ulang dapat menghasilkan duplikat; periksa status dan penerima terlebih dahulu.'
+    : '';
+  try {
+    const confirmed = await showConfirmDialog({
+      title: 'Kirim PDF E-Tiket?',
+      message: `PDF untuk ${item.customerName} akan dikirim ke kontak pembeli melalui ${channel === 'BOTH' ? 'WhatsApp dan email' : channel === 'WA' ? 'WhatsApp' : 'email'}.${retryWarning}`,
+      confirmText: retry.length ? 'Ya, Kirim Ulang' : 'Ya, Antrekan PDF',
+      type: 'warning',
+    });
+    if (!confirmed) return;
+    btnEl.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Memproses';
+    const res = await fetchAdmin('/admin/notifications/dispatch-pdf', {
+      method: 'POST',
+      body: JSON.stringify({ orderId: item.orderId, channel, confirmResend: retry.length > 0 }),
+    });
+    if (res?.status === 'success') {
+      showAdminToast('success', 'Permintaan PDF Diproses', escapeHtml(res.message));
+      await loadNotificationLogs({ showLoading: false });
+    } else {
+      showAdminToast('error', 'Gagal Mengirim PDF', escapeHtml(res?.message || 'Gagal memasukkan PDF ke antrean.'));
+      await loadNotificationLogs({ showLoading: false });
+    }
+  } catch (error) {
+    showAdminToast('error', 'Kesalahan', escapeHtml(error.message));
+  } finally {
+    btnEl.disabled = false;
+    btnEl.innerHTML = original;
+  }
+}
+
 async function handleDispatchSingle(orderId, name, btnEl) {
+  const original = btnEl?.innerHTML;
   if (btnEl) {
     btnEl.disabled = true;
     btnEl.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
@@ -180,7 +243,7 @@ async function handleDispatchSingle(orderId, name, btnEl) {
     });
 
     if (res && res.status === 'success') {
-      showAdminToast('success', 'Terkirim!', `Notifikasi tiket untuk ${name || 'peserta'} berhasil dikirim.`);
+      showAdminToast('success', 'Diproses', res.message || `Permintaan untuk ${name || 'peserta'} diproses.`);
       loadNotificationLogs();
     } else {
       showAdminToast('error', 'Gagal Mengirim', res?.message || 'Pengiriman notifikasi gagal.');
@@ -190,7 +253,7 @@ async function handleDispatchSingle(orderId, name, btnEl) {
   } finally {
     if (btnEl) {
       btnEl.disabled = false;
-      btnEl.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Kirim';
+      btnEl.innerHTML = original;
     }
   }
 }
@@ -198,7 +261,7 @@ async function handleDispatchSingle(orderId, name, btnEl) {
 async function handleBatchSendNotif() {
   const confirmed = await showConfirmDialog({
     title: 'Kirim Notifikasi Massal?',
-    message: 'Apakah Anda ingin mengirimkan notifikasi tiket (WhatsApp & Email) untuk SEMUA peserta yang berstatus Lunas / Menunggu Pembayaran?',
+    message: 'Kirim notifikasi untuk maksimal 50 pesanan terbaru. PDF yang gagal akan diantrikan lagi. Periksa dulu status pengiriman yang tidak pasti agar tidak terjadi pengiriman ganda.',
     confirmText: 'Ya, Kirim Sekarang',
     type: 'warning',
   });

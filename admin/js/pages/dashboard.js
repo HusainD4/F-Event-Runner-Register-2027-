@@ -2,6 +2,7 @@ import { adminState } from '../core/state.js';
 import { fetchAdmin } from '../core/api.js';
 import { showAdminToast, formatRupiah } from '../core/utils.js';
 import { applyRbacUi } from '../core/rbac.js';
+import { loadOrders } from './orders.js';
 
 async function loadDashboardData() {
   const role = adminState.profile?.role;

@@ -1,5 +1,11 @@
 import { apiFetch } from './api.js';
 import { loadWebsiteBranding } from './branding.js';
+import '@fontsource/plus-jakarta-sans/400.css';
+import '@fontsource/plus-jakarta-sans/500.css';
+import '@fontsource/plus-jakarta-sans/600.css';
+import '@fontsource/plus-jakarta-sans/700.css';
+import '@fontsource/plus-jakarta-sans/800.css';
+import '@fortawesome/fontawesome-free/css/all.min.css';
 
 const websiteBrandingPromise = loadWebsiteBranding();
 
@@ -57,6 +63,7 @@ async function loadETicket() {
     const json = await res.json();
 
     if (!res.ok || json.status !== 'success') {
+      mount.dataset.renderStatus = 'error';
       mount.innerHTML = `
         <div class="e-ticket-card" style="padding: 48px 24px; text-align: center;">
           <i class="fa-solid fa-circle-xmark" style="font-size: 3rem; color: #EF4444; margin-bottom: 16px;"></i>
@@ -83,6 +90,7 @@ async function loadETicket() {
     document.title = `E-Tiket Resmi - ${eventTitle}`;
 
     if (participants.length === 0) {
+      mount.dataset.renderStatus = 'error';
       mount.innerHTML = `
         <div class="e-ticket-card" style="padding: 40px; text-align: center;">
           <i class="fa-solid fa-user-xmark" style="font-size: 2.5rem; color: #F59E0B; margin-bottom: 14px;"></i>
@@ -93,6 +101,29 @@ async function loadETicket() {
     }
 
     const orderRef = order.midtransOrderId || order.id;
+    const isGroup = participants.length > 1;
+    const racepackQr = isGroup ? order.masterQrImageDataUrl : participants[0].qrImageDataUrl;
+    if (!racepackQr || participants.some(participant => !participant.qrImageDataUrl)) {
+      throw new Error('QR racepack tidak tersedia. Silakan coba lagi.');
+    }
+    const racepackPage = `
+      <section class="racepack-qr-page${isGroup ? ' racepack-qr-page-group' : ''}" aria-label="QR pengambilan racepack">
+        <div class="racepack-qr-heading">
+          <span>RACEPACK COLLECTION</span>
+          <h2>QR Pengambilan Racepack</h2>
+          <p>Tunjukkan kode ini kepada petugas untuk verifikasi.</p>
+        </div>
+        <div class="racepack-qr-frame">
+          <img src="${racepackQr}" alt="${isGroup ? 'QR master pesanan' : 'QR peserta'} untuk pengambilan racepack" />
+        </div>
+        <div class="racepack-qr-detail">
+          <strong>${isGroup ? `QR MASTER &bull; ${participants.length} PESERTA` : escapeHtml(participants[0].fullNameKtp)}</strong>
+          <span>${isGroup ? 'Untuk seluruh peserta dalam pesanan ini' : escapeHtml(participants[0].event?.category || 'Tiket peserta')}</span>
+          <span>REF: ${escapeHtml(orderRef)}</span>
+        </div>
+        <p class="racepack-qr-note">Jaga kode ini dan hanya tunjukkan kepada petugas resmi.</p>
+      </section>
+    `;
 
     // 1. Tampilkan Banner Master QR jika pesanan memiliki lebih dari 1 tiket
     let masterQrHtml = '';
@@ -289,6 +320,7 @@ async function loadETicket() {
             </div>
           </div>
         </div>
+        ${idx === 0 ? racepackPage : ''}
       `;
     }).join('');
 
@@ -310,7 +342,9 @@ async function loadETicket() {
         instructionsMount.hidden = false;
       }
     }
+    mount.dataset.renderStatus = 'ready';
   } catch (err) {
+    mount.dataset.renderStatus = 'error';
     mount.innerHTML = `
       <div class="e-ticket-card" style="padding: 48px 24px; text-align: center;">
         <i class="fa-solid fa-triangle-exclamation" style="font-size: 3rem; color: #F59E0B; margin-bottom: 16px;"></i>

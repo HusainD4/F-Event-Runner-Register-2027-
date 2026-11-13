@@ -40,9 +40,9 @@ import { initBibSettingsListeners } from './pages/bib-settings.js';
 import { handleCmsSubmit } from './pages/cms.js';
 import { openCreateAdminUserModal, handleAdminUserSubmit, openCreateRoleModal, handleRoleSubmit, handleResetDefaultRoles, DEFAULT_ROLE_DIRECTORY } from './pages/admins.js';
 import { openCreateRouteModal, handleRoutePointFormSubmit, handleRouteSettingsSubmit, updateRouteSettingPreviews } from './pages/routes.js';
-import { handleNotificationSettingsSubmit, handleSendTestNotif, handleGenerateWaQr, handleDisconnectWa, handleRealtimeWhatsAppSession } from './pages/notifications.js';
+import { handleNotificationSettingsSubmit, handleFillDefaultEmailTemplates, handleSendTestNotif, handleGenerateWaQr, handleDisconnectWa, handleRealtimeWhatsAppSession } from './pages/notifications.js';
 import { loadNotificationLogs, handleBatchSendNotif } from './pages/notif-logs.js';
-import { loadWhatsAppWebConsole, handleSendDirectWaMessage, handleWaTemplateChange, handleQuickDispatchTicket, renderWhatsAppWebContactList, waWebContacts } from './pages/whatsapp-web.js';
+import { initWhatsAppStatusDrawer, loadWhatsAppWebConsole, handleSendDirectWaMessage, handleWaTemplateChange, handleQuickDispatchTicket, handleClearWaConsole, renderWhatsAppWebContactList, waWebContacts } from './pages/whatsapp-web.js';
 import { loadAuditLogs } from './pages/logs.js';
 import { handleSyncMidtransDashboard, loadDashboardStats } from './pages/dashboard.js';
 import { initBackupPage } from './pages/backups.js';
@@ -209,6 +209,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('formCmsSettings')?.addEventListener('submit', handleCmsSubmit);
   document.getElementById('formWebsiteCms')?.addEventListener('submit', handleCmsSubmit);
   document.getElementById('formNotificationSettings')?.addEventListener('submit', handleNotificationSettingsSubmit);
+  document.getElementById('btnFillDefaultEmailTemplates')?.addEventListener('click', handleFillDefaultEmailTemplates);
   document.getElementById('btnSendTestNotif')?.addEventListener('click', handleSendTestNotif);
   document.getElementById('formEventBenefit')?.addEventListener('submit', handleBenefitFormSubmit);
   document.getElementById('btnCancelBenefitEdit')?.addEventListener('click', resetBenefitForm);
@@ -301,11 +302,13 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // WhatsApp Web Console & Direct Messenger
+  initWhatsAppStatusDrawer();
   document.getElementById('btnRefreshWaWeb')?.addEventListener('click', loadWhatsAppWebConsole);
   document.getElementById('btnWaWebSync')?.addEventListener('click', loadWhatsAppWebConsole);
   document.getElementById('btnGoToWaQr')?.addEventListener('click', () => switchAdminTab('notifications'));
   document.getElementById('btnSyncMidtransDashboard')?.addEventListener('click', handleSyncMidtransDashboard);
   document.getElementById('btnSendWaDirectMsg')?.addEventListener('click', handleSendDirectWaMessage);
+  document.getElementById('btnClearWaConsole')?.addEventListener('click', handleClearWaConsole);
   document.getElementById('waQuickTemplateSelect')?.addEventListener('change', handleWaTemplateChange);
   document.getElementById('btnQuickSendPaidTicket')?.addEventListener('click', () => handleQuickDispatchTicket('PAID'));
   document.getElementById('btnQuickSendPending')?.addEventListener('click', () => handleQuickDispatchTicket('PENDING'));

@@ -6,12 +6,14 @@
   "type": "module",
   "scripts": {
     "dev": "vite --port 5173",
-    "build": "chmod +x node_modules/.bin/* && vite build",
+    "build": "vite build",
     "preview": "vite preview --port 5173"
   },
   "dependencies": {
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "@fontsource/plus-jakarta-sans": "^5.2.6",
+    "@fortawesome/fontawesome-free": "^6.7.2",
     "socket.io-client": "^4.8.4"
   },
   "devDependencies": {

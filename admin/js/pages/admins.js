@@ -9,7 +9,7 @@ const DEFAULT_ROLE_DIRECTORY = [
     authority: 'Tinggi (Root Access)',
     authorityColor: '#DC2626',
     desc: 'Pemegang kendali tertinggi seluruh sistem, server, database, konfigurasi keuangan, dan manajemen izin RBAC.',
-    pages: ['Dashboard', 'Event & Tiket', 'Manajemen Peserta', 'Transaksi & Keuangan', 'Log Notifikasi', 'WhatsApp Web Console', 'Konten Website/CMS', 'Countdown & Status', 'Konfigurasi Notifikasi', 'Rute & Checkpoint', 'Kelola Admin & RBAC', 'Log Audit Sistem'],
+    pages: ['Dashboard', 'Event & Tiket', 'Manajemen Peserta', 'Transaksi & Keuangan', 'Log Notifikasi', 'WhatsApp Web Console', 'Konten Website/CMS', 'Countdown & Status', 'Konfigurasi Notifikasi', 'Rute & Checkpoint', 'Kelola Admin & RBAC', 'Pemantauan Semua Role', 'Log Audit Sistem'],
     reason: 'Akses tak terbatas (*) ke semua modul untuk kontrol dan audit menyeluruh.'
   },
   {
@@ -117,6 +117,7 @@ const SYSTEM_MODULES_FALLBACK = [
   { key: 'page:routes', label: 'Rute & Checkpoint', icon: 'fa-map-pin', desc: 'Pos medis, water station & jalur', apiPermissions: ['routes:read', 'routes:manage'] },
   { key: 'page:bib-settings', label: 'Pengaturan BIB & E-Tiket', icon: 'fa-id-badge', desc: 'Konfigurasi BIB, QR & petunjuk', apiPermissions: ['bib:manage'] },
   { key: 'page:admins', label: 'Kelola Admin & RBAC', icon: 'fa-shield-halved', desc: 'Akun staf & hak akses role', apiPermissions: ['admins:manage'] },
+  { key: 'page:role-monitoring', label: 'Pemantauan Semua Role', icon: 'fa-users-viewfinder', desc: 'Pantau sesi online seluruh role dan cabut sesi akun admin', apiPermissions: [] },
   { key: 'page:logs', label: 'Log Audit Sistem', icon: 'fa-clock-rotate-left', desc: 'Rekam jejak audit keamanan', apiPermissions: ['logs:read'] }
 ];
 
@@ -408,7 +409,7 @@ function renderRoleModuleCheckboxes(selectedPages = [], isSuperadmin = false) {
   if (!container) return;
 
   const modules = (adminState.systemModules || SYSTEM_MODULES_FALLBACK)
-    .filter(module => isSuperadmin || module.key !== 'page:admins');
+    .filter(module => isSuperadmin || !['page:admins', 'page:role-monitoring'].includes(module.key));
 
   container.innerHTML = modules.map(m => {
     const isChecked = isSuperadmin || selectedPages.includes(m.key);

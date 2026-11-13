@@ -684,6 +684,10 @@ body {
   letter-spacing: 1px;
 }
 
+.racepack-qr-page {
+  display: none;
+}
+
 /* Responsive (Mobile & Small Tablets) */
 @media (max-width: 768px) {
   body {
@@ -760,7 +764,7 @@ body {
 }
 
 /* =========================================================================
-   STRICT 1-PAGE PDF PRINT STYLING
+   PRINT AND PDF
    ========================================================================= */
 @media print {
   @page {
@@ -779,16 +783,89 @@ body {
   }
 
   .action-bar,
-  .instructions-box,
-  .master-qr-banner,
-  .ticket-separator {
+  .ticket-separator,
+  .master-qr-banner {
     display: none !important;
+  }
+
+  .instructions-box {
+    box-shadow: none;
+    break-inside: avoid;
+    margin-top: 12px;
+  }
+
+  .instructions-box[hidden] {
+    display: none;
   }
 
   .ticket-container {
     max-width: 100% !important;
     margin: 0 !important;
     padding: 0 !important;
+  }
+
+  .racepack-qr-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    break-before: page;
+    break-inside: avoid;
+    padding: 18mm 12mm 12mm;
+    color: #0F172A;
+  }
+
+  .racepack-qr-page-group {
+    break-after: page;
+  }
+
+  .racepack-qr-heading span {
+    color: #C2410C;
+    font-size: 10pt;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+  }
+
+  .racepack-qr-heading h2 {
+    margin: 8px 0;
+    font-size: 22pt;
+  }
+
+  .racepack-qr-heading p,
+  .racepack-qr-note {
+    color: #475569;
+    font-size: 10pt;
+  }
+
+  .racepack-qr-frame {
+    margin: 12mm 0 7mm;
+    padding: 5mm;
+    border: 1px solid #CBD5E1;
+    border-radius: 12px;
+    background: #FFFFFF;
+  }
+
+  .racepack-qr-frame img {
+    display: block;
+    width: 90mm;
+    height: 90mm;
+  }
+
+  .racepack-qr-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    font-size: 10pt;
+  }
+
+  .racepack-qr-detail strong {
+    font-size: 14pt;
+  }
+
+  .racepack-qr-note {
+    margin-top: 8mm;
   }
 
   .e-ticket-card {
@@ -798,14 +875,12 @@ body {
     margin: 0 0 16px 0 !important;
     page-break-inside: avoid !important;
     break-inside: avoid !important;
-    page-break-after: always !important;
-    break-after: page !important;
     overflow: hidden !important;
   }
 
-  .e-ticket-card:last-child {
-    page-break-after: auto !important;
-    break-after: auto !important;
+  .e-ticket-card:not(:last-child) {
+    page-break-after: always !important;
+    break-after: page !important;
   }
 
   .ticket-header {

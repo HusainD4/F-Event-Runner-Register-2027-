@@ -24,7 +24,8 @@ export const SYSTEM_MODULES = [
   { key: 'page:orders', name: 'Transaksi & Order', desc: 'Verifikasi status bayar Midtrans' },
   { key: 'page:countdown', name: 'Countdown & Status', desc: 'Atur tanggal lomba & tutup pendaftaran' },
   { key: 'page:cms', name: 'Website CMS', desc: 'Kelola teks, foto banner & Google Maps' },
-  { key: 'page:admins', name: 'Kelola Admin & RBAC', desc: 'Kelola staf & hak akses 12 role (Khusus Superadmin)' },
+  { key: 'page:admins', name: 'Kelola Admin & RBAC', desc: 'Kelola staf & hak akses role (Khusus Superadmin)' },
+  { key: 'page:role-monitoring', name: 'Pemantauan Semua Role', desc: 'Pantau sesi semua role (Khusus Superadmin)' },
   { key: 'page:routes', name: 'Rute & Checkpoint', desc: 'Kelola rute, water station & pos medis' },
   { key: 'page:notifications', name: 'Konfigurasi Notifikasi', desc: 'Atur WhatsApp Gateway & SMTP Email' },
   { key: 'page:notif-logs', name: 'Log Notifikasi', desc: 'Pantau pengiriman e-tiket & resend' },
@@ -33,7 +34,7 @@ export const SYSTEM_MODULES = [
 ];
 
 export const DEFAULT_ROLE_DIRECTORY = [
-  { name: 'SUPERADMIN', title: 'Pemilik Sistem & Kontrol Tertinggi', desc: 'Akses tanpa batas (*) ke seluruh modul, sistem database, dan pengaturan RBAC 12 Role.', allowedPages: ['Semua Halaman (12 Modul)'], badge: 'SUPERADMIN', level: 'Level 1 (Penuh)' },
+  { name: 'SUPERADMIN', title: 'Pemilik Sistem & Kontrol Tertinggi', desc: 'Akses tanpa batas (*) ke seluruh modul, sistem database, dan pengaturan RBAC.', allowedPages: ['Semua Modul Admin'], badge: 'SUPERADMIN', level: 'Level 1 (Penuh)' },
   { name: 'ADMINISTRATOR', title: 'Koordinator Operasional Harian', desc: 'Mengelola operasional event, pendaftar, status pembayaran, CMS konten, dan rute lari.', allowedPages: ['Dashboard', 'Event & Tiket', 'Peserta', 'Transaksi', 'CMS Website', 'Countdown', 'Rute', 'Log Notifikasi', 'WhatsApp Web'], badge: 'OPERATIONAL', level: 'Level 2 (Tinggi)' },
   { name: 'FINANCE', title: 'Divisi Keuangan & Pembayaran', desc: 'Memantau arus kas, status invoice Midtrans, settlement dana, dan rekonsiliasi audit keuangan.', allowedPages: ['Dashboard', 'Transaksi & Order', 'Audit Logs'], badge: 'FINANCE', level: 'Level 3 (Finansial)' },
   { name: 'SPONSORSHIP', title: 'Divisi Sponsorship & Kemitraan', desc: 'Mengelola konten promosi sponsor pada CMS website, tier sponsorship, dan kategori lomba pendukung.', allowedPages: ['Dashboard', 'Website CMS', 'Event & Tiket', 'Log Notifikasi'], badge: 'MARKETING', level: 'Level 4 (Promosi)' },

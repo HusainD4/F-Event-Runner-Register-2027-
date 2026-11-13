@@ -1,11 +1,11 @@
 <div class="admin-tab-pane" id="pane-notif-logs">
           <div class="admin-section">
-            <div class="admin-section-header">
+            <div class="admin-section-header notif-log-header">
               <div>
                 <h3><i class="fa-solid fa-paper-plane" style="color: var(--color-primary);"></i> Log Pengiriman Notifikasi &amp; Status Peserta</h3>
-                <p>Pantau data peserta yang sudah menerima e-tiket / notifikasi WhatsApp &amp; Email, serta kirim manual secara instan.</p>
+                <p>Pantau notifikasi dan antrean PDF peserta. PDF dapat dikirim manual untuk pesanan lunas.</p>
               </div>
-              <div class="admin-action-bar">
+              <div class="admin-action-bar notif-log-actions">
                 <button class="btn btn-secondary btn-sm" id="btnRefreshNotifLogs">
                   <i class="fa-solid fa-rotate"></i> Segarkan Data
                 </button>
@@ -16,7 +16,7 @@
             </div>
 
             <!-- KPI Summary Cards -->
-            <div class="admin-kpi-grid" style="margin-bottom: 24px;">
+            <div class="admin-kpi-grid notif-log-stats">
               <div class="kpi-card">
                 <div class="kpi-icon blue"><i class="fa-solid fa-receipt"></i></div>
                 <div class="kpi-details">
@@ -55,23 +55,21 @@
             </div>
 
             <!-- Filter & Search Bar -->
-            <div style="display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; justify-content: space-between;">
-              <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
-                <input type="text" class="form-input form-input-sm" id="searchNotifLogs" placeholder="Cari Nama, No WA, Order ID, BIB..." style="width: 260px;">
-                <select class="form-input form-input-sm" id="filterNotifDeliveryStatus" style="width: 190px;">
+            <div class="notif-log-toolbar">
+              <div class="notif-log-filters">
+                <input type="text" class="form-input form-input-sm" id="searchNotifLogs" aria-label="Cari pesanan atau peserta" placeholder="Cari nama, WA, order ID, BIB...">
+                <select class="form-input form-input-sm" id="filterNotifDeliveryStatus" aria-label="Filter status notifikasi">
                   <option value="">Semua Status Pengiriman</option>
                   <option value="SENT">Sudah Terkirim (Sent)</option>
                   <option value="UNSENT">Belum Terkirim / Pending</option>
                 </select>
               </div>
-              <div style="font-size: 0.82rem; color: var(--color-text-muted);">
-                <i class="fa-solid fa-circle-info"></i> Klik <strong>"Kirim Sekarang"</strong> untuk mengirim pesan WhatsApp berisi status pembayaran &amp; file PDF tiket.
-              </div>
             </div>
+            <p class="notif-log-hint"><i class="fa-solid fa-circle-info"></i> Notifikasi dan PDF manual mengikuti <strong>Saluran Pengiriman Aktif</strong>. PDF otomatis tetap mengikuti pengaturan lampiran PDF.</p>
 
             <!-- Table of Notification Logs -->
             <div class="table-responsive">
-              <table class="admin-table">
+              <table class="admin-table notif-log-table">
                 <thead>
                   <tr>
                     <th style="width: 45px;">No</th>

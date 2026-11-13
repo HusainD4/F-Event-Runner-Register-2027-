@@ -3,7 +3,7 @@
             <div class="admin-section-header">
               <div>
                 <h3><i class="fa-solid fa-bell" style="color: var(--color-primary);"></i> Konfigurasi Notifikasi & Gateway E-Tiket</h3>
-                <p>Pengaturan pengiriman otomatis/manual bukti E-Tiket, file PDF, ucapan terima kasih, dan WhatsApp Web Scan QR.</p>
+                <p>Pengaturan pengiriman otomatis/manual tautan E-Tiket, pemberitahuan transaksi, dan WhatsApp Web Scan QR.</p>
               </div>
             </div>
 
@@ -102,10 +102,22 @@
                       <option value="DISABLED">Nonaktifkan Semua Notifikasi</option>
                     </select>
                     <small style="color: var(--color-text-muted); font-size: 0.76rem; display: block; margin-top: 6px;">
-                      Pilih media pengiriman yang akan menerima bukti tiket digital PDF dan pemberitahuan transaksi.
+                      Pilih media pengiriman pemberitahuan transaksi dan tautan E-Tiket. PDF dapat disimpan dari halaman E-Tiket.
                     </small>
                   </div>
                 </div>
+              </div>
+
+              <div style="background: #FFFFFF; border: 1px solid var(--color-border-subtle); border-radius: var(--radius-md); padding: 20px; margin-bottom: 24px;">
+                <h4 style="margin-bottom: 12px;"><i class="fa-solid fa-file-pdf"></i> Pengiriman Lampiran PDF E-Tiket</h4>
+                <label class="form-label" for="notifSettingPdfChannel">Kirim PDF setelah pembayaran lunas melalui:</label>
+                <select class="form-input" id="notifSettingPdfChannel">
+                  <option value="DISABLED">Tidak mengirim lampiran PDF</option>
+                  <option value="WA">WhatsApp saja</option>
+                  <option value="EMAIL">Email saja</option>
+                  <option value="BOTH">WhatsApp dan email</option>
+                </select>
+                <small style="display: block; margin-top: 6px; color: var(--color-text-muted);">Pilihan ini terpisah dari saluran pesan teks. PDF dibuat dalam antrean setelah pembayaran lunas; mode manual memerlukan tombol Kirim di Log Notifikasi. Pastikan WA dan/atau SMTP terhubung.</small>
               </div>
 
               <!-- Email SMTP Settings -->
@@ -142,9 +154,11 @@
               <!-- Message Templates -->
               <div style="background: #FFFFFF; border: 1px solid var(--color-border-subtle); border-radius: var(--radius-md); padding: 20px; margin-bottom: 24px; box-shadow: var(--shadow-sm);">
                 <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 16px;">
-                  <h4 style="font-size: 1rem; color: var(--color-text-title);"><i class="fa-solid fa-comment-dots"></i> Template Pesan Otomatis (Status, Berkas PDF &amp; Ucapan)</h4>
+                  <h4 style="font-size: 1rem; color: var(--color-text-title);"><i class="fa-solid fa-comment-dots"></i> Template Pesan WhatsApp</h4>
                   <div style="display: flex; gap: 6px; flex-wrap: wrap;">
                     <span style="font-size: 0.72rem; padding: 3px 8px; border-radius: 4px; background: #F1F5F9; color: #475569; font-weight: 600; font-family: monospace; border: 1px solid #E2E8F0;">{fullName}</span>
+                    <span style="font-size: 0.72rem; padding: 3px 8px; border-radius: 4px; background: #F1F5F9; color: #475569; font-weight: 600; font-family: monospace; border: 1px solid #E2E8F0;">{eventName}</span>
+                    <span style="font-size: 0.72rem; padding: 3px 8px; border-radius: 4px; background: #F1F5F9; color: #475569; font-weight: 600; font-family: monospace; border: 1px solid #E2E8F0;">{participantCount}</span>
                     <span style="font-size: 0.72rem; padding: 3px 8px; border-radius: 4px; background: #F1F5F9; color: #475569; font-weight: 600; font-family: monospace; border: 1px solid #E2E8F0;">{ticketName}</span>
                     <span style="font-size: 0.72rem; padding: 3px 8px; border-radius: 4px; background: #F1F5F9; color: #475569; font-weight: 600; font-family: monospace; border: 1px solid #E2E8F0;">{bibNumber}</span>
                     <span style="font-size: 0.72rem; padding: 3px 8px; border-radius: 4px; background: #F1F5F9; color: #475569; font-weight: 600; font-family: monospace; border: 1px solid #E2E8F0;">{orderId}</span>
@@ -156,7 +170,7 @@
                 </div>
 
                 <div class="form-group">
-                  <label class="form-label"><i class="fa-solid fa-circle-check" style="color: #10B981;"></i> Template: Pembayaran Berhasil (E-Tiket Terbit, Berkas PDF &amp; Ucapan Terima Kasih)</label>
+                  <label class="form-label"><i class="fa-solid fa-circle-check" style="color: #10B981;"></i> Template: Pembayaran Berhasil (E-Tiket Terbit)</label>
                   <textarea class="form-input" id="notifSettingTemplatePaid" rows="6" placeholder="Halo {fullName}! Pembayaran tiket {ticketName} ({orderId}) sebesar {totalAmount} telah BERHASIL diverifikasi! Nomor BIB Anda: {bibNumber}. Unduh E-Tiket di: {eTicketUrl}"></textarea>
                   <small style="color: var(--color-text-muted); font-size: 0.75rem;">Mencakup status lunas, nomor BIB resmi, tautan cetak file tiket digital PDF, serta ucapan terima kasih panitia.</small>
                 </div>
@@ -169,6 +183,23 @@
                 <div class="form-group">
                   <label class="form-label"><i class="fa-solid fa-ban" style="color: #EF4444;"></i> Template: Pesanan Dibatalkan (Cancel)</label>
                   <textarea class="form-input" id="notifSettingTemplateCancel" rows="3" placeholder="Halo {fullName}, pesanan tiket {ticketName} ({orderId}) telah dibatalkan. Kuota telah dilepaskan kembali."></textarea>
+                </div>
+                <h4 style="margin: 20px 0 8px; font-size: 1rem; color: var(--color-text-title);"><i class="fa-solid fa-envelope"></i> Template Pesan Email</h4>
+                <p style="font-size: 0.8rem; color: var(--color-text-muted); margin-bottom: 12px;">Gunakan placeholder di atas. Template default tersedia untuk setiap status; jika kolom disimpan kosong, email menggunakan template WhatsApp. Lampiran PDF dikirim melalui pesan terpisah sesuai pengaturan PDF.</p>
+                <button type="button" class="btn btn-secondary btn-sm" id="btnFillDefaultEmailTemplates" data-permission="notifications:manage" style="margin-bottom: 16px;">
+                  <i class="fa-solid fa-wand-magic-sparkles"></i> Isi Template Default yang Kosong
+                </button>
+                <div class="form-group">
+                  <label class="form-label" for="notifSettingEmailTemplatePaid">Email: Pembayaran Berhasil</label>
+                  <textarea class="form-input" id="notifSettingEmailTemplatePaid" rows="6" placeholder="Halo {fullName}, pembayaran Anda berhasil. E-Tiket: {eTicketUrl}"></textarea>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="notifSettingEmailTemplatePending">Email: Menunggu Pembayaran</label>
+                  <textarea class="form-input" id="notifSettingEmailTemplatePending" rows="4" placeholder="Halo {fullName}, selesaikan pembayaran melalui {paymentUrl}"></textarea>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="notifSettingEmailTemplateCancel">Email: Pesanan Dibatalkan</label>
+                  <textarea class="form-input" id="notifSettingEmailTemplateCancel" rows="3" placeholder="Halo {fullName}, pesanan {orderId} telah dibatalkan."></textarea>
                 </div>
               </div>
 

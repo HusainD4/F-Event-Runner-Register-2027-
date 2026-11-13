@@ -2388,6 +2388,335 @@
   box-shadow: var(--shadow-sm);
 }
 
+/* Notification log and WhatsApp console */
+#pane-notif-logs .notif-log-stats {
+  margin-bottom: 20px;
+}
+
+.notif-log-toolbar,
+.notif-log-filters,
+.notif-log-row-actions,
+.wa-console-actions,
+.wa-template-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.notif-log-filters input {
+  width: 260px;
+}
+
+.notif-log-filters select {
+  width: 190px;
+}
+
+.notif-log-hint {
+  margin: 10px 0 16px;
+  color: #64748B;
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.notif-log-table {
+  min-width: 1000px;
+}
+
+.notif-log-row-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: stretch;
+  gap: 6px;
+  width: 174px;
+  margin: 0 auto;
+}
+
+.notif-log-send-box {
+  border: 1px solid #DCE5EF;
+  border-radius: 9px;
+  background: #F8FAFC;
+  padding: 6px;
+}
+
+.notif-log-send-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+}
+
+.notif-log-row-actions .notif-log-channel {
+  display: block;
+  margin-bottom: 5px;
+  color: #64748B;
+  font-size: 0.68rem;
+  line-height: 1.3;
+}
+
+.notif-log-row-actions .btn {
+  min-height: 30px;
+  padding: 5px 8px;
+  font-size: 0.7rem;
+  white-space: nowrap;
+}
+
+.notif-log-row-actions .notif-log-view {
+  display: flex;
+  justify-content: center;
+  padding-inline: 8px;
+}
+
+#pane-whatsapp-web .wa-console {
+  padding: 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+#pane-whatsapp-web .wa-status-drawer {
+  position: fixed;
+  z-index: 900;
+  top: 120px;
+  right: 0;
+  width: 0;
+}
+
+#pane-whatsapp-web .wa-status-drawer.is-open {
+  width: min(320px, calc(100vw - 48px));
+}
+
+.wa-status-handle {
+  position: absolute;
+  top: 0;
+  right: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 40px;
+  padding: 12px 6px;
+  border: 0;
+  border-radius: 12px 0 0 12px;
+  background: #087C55;
+  color: #FFFFFF;
+  cursor: pointer;
+  box-shadow: -3px 4px 14px rgba(15, 23, 42, 0.16);
+}
+
+.wa-status-handle span {
+  writing-mode: vertical-rl;
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.wa-status-handle:focus-visible {
+  outline: 3px solid #F59E0B;
+  outline-offset: 2px;
+}
+
+.wa-status-drawer.is-open .wa-status-arrow {
+  transform: rotate(180deg);
+}
+
+#pane-whatsapp-web .wa-console-header:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 16px;
+  max-height: calc(100dvh - 135px);
+  overflow-y: auto;
+  padding: 18px;
+  background: #FFFFFF;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 12px 0 0 12px;
+  box-shadow: 0 12px 36px rgba(15, 23, 42, 0.18);
+}
+
+#pane-whatsapp-web .wa-console-actions {
+  align-items: stretch;
+  flex-direction: column;
+}
+
+#pane-whatsapp-web .wa-console-actions .btn {
+  justify-content: center;
+}
+
+.wa-console-intro {
+  min-width: 0;
+}
+
+.wa-console-intro h3 {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0 0 5px;
+  color: #0F172A;
+  font-size: 1.1rem;
+}
+
+.wa-console-intro h3 i {
+  color: #16A34A;
+  font-size: 1.35rem;
+}
+
+.wa-console-intro p {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.82rem;
+}
+
+.wa-template-row {
+  gap: 10px;
+}
+
+#pane-whatsapp-web .wa-web-layout {
+  grid-template-columns: minmax(240px, 320px) minmax(0, 1fr);
+  min-height: 520px;
+}
+
+#pane-whatsapp-web .wa-web-sidebar,
+#pane-whatsapp-web .wa-web-main,
+#pane-whatsapp-web .wa-chat-scroll {
+  min-width: 0;
+  min-height: 0;
+}
+
+#pane-whatsapp-web .wa-chat-scroll {
+  background: #F1F5F9;
+}
+
+#pane-whatsapp-web #waChatHeaderActions {
+  flex-wrap: wrap;
+}
+
+.wa-history-empty {
+  color: #64748B;
+  font-size: 0.8rem;
+  text-align: center;
+  margin: 20px auto;
+}
+
+@media screen and (max-width: 900px) {
+  #pane-whatsapp-web .wa-web-layout {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+  }
+
+  #pane-whatsapp-web .wa-web-sidebar {
+    border-right: 0;
+    border-bottom: 1px solid var(--color-border-subtle);
+  }
+
+  #pane-whatsapp-web .wa-web-contact-list {
+    flex: none;
+    max-height: 220px;
+  }
+
+  #pane-whatsapp-web .wa-chat-scroll {
+    min-height: 260px;
+    max-height: 420px;
+  }
+}
+
+@media screen and (max-width: 680px) {
+  #pane-notif-logs .notif-log-header,
+  #pane-whatsapp-web .wa-console-header {
+    align-items: stretch;
+  }
+
+  #pane-notif-logs .notif-log-actions,
+  .wa-console-actions,
+  .notif-log-filters {
+    width: 100%;
+  }
+
+  .notif-log-filters input,
+  .notif-log-filters select {
+    width: 100%;
+  }
+
+  #pane-notif-logs .table-responsive {
+    overflow: visible;
+  }
+
+  .notif-log-table,
+  .notif-log-table tbody,
+  .notif-log-table tr,
+  .notif-log-table td {
+    display: block;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .notif-log-table thead {
+    display: none;
+  }
+
+  .notif-log-table tbody tr {
+    box-sizing: border-box;
+    margin-bottom: 12px;
+    padding: 10px 12px;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    background: #FFFFFF;
+  }
+
+  .notif-log-table tbody td[data-label] {
+    display: grid;
+    grid-template-columns: minmax(82px, 32%) minmax(0, 1fr);
+    gap: 6px;
+    padding: 6px 0;
+    border: 0;
+    text-align: left;
+    overflow-wrap: anywhere;
+  }
+
+  .notif-log-table td[data-label]::before {
+    content: attr(data-label);
+    color: #64748B;
+    font-size: 0.72rem;
+    font-weight: 700;
+  }
+
+  .notif-log-table td[data-label="No"] {
+    display: none;
+  }
+
+  .notif-log-row-actions {
+    width: min(174px, 100%);
+    margin: 0;
+  }
+
+  #pane-whatsapp-web .wa-status-drawer {
+    top: 90px;
+  }
+
+  #pane-whatsapp-web .wa-console-header:not([hidden]) {
+    max-height: calc(100dvh - 100px);
+    padding: 15px;
+  }
+
+  #pane-whatsapp-web .wa-chat-header,
+  #pane-whatsapp-web .wa-chat-input-bar {
+    padding: 12px;
+  }
+
+  #pane-whatsapp-web .wa-chat-input-row,
+  .wa-template-row {
+    min-width: 0;
+  }
+
+  #pane-whatsapp-web .wa-chat-input-row textarea {
+    min-width: 0;
+  }
+
+  #pane-whatsapp-web .wa-bubble {
+    max-width: 92%;
+  }
+}
+
 @media (max-width: 900px) {
   .wa-web-layout {
     grid-template-columns: 1fr;

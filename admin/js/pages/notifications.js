@@ -6,14 +6,18 @@ import { renderWhatsAppWebConsoleHeader } from './whatsapp-web.js';
 // NOTIFICATION & GATEWAY SETTINGS + WHATSAPP WEB QR
 // =============================================================================
 let waQrTimer = null;
+let defaultEmailTemplates = null;
 
 async function loadNotificationSettings() {
   try {
     const res = await fetchAdmin('/admin/notifications/settings');
     if (res && res.status === 'success' && res.data) {
       const d = res.data;
+      defaultEmailTemplates = d.email_template_defaults || null;
       const chEl = document.getElementById('notifSettingChannel');
       if (chEl && d.notif_channel) chEl.value = d.notif_channel;
+      const pdfEl = document.getElementById('notifSettingPdfChannel');
+      if (pdfEl) pdfEl.value = d.pdf_delivery_channel || 'DISABLED';
 
       const modeEl = document.getElementById('notifSettingDispatchMode');
       if (modeEl && d.wa_dispatch_mode) modeEl.value = d.wa_dispatch_mode;
@@ -34,6 +38,9 @@ async function loadNotificationSettings() {
       setVal('notifSettingTemplatePaid', d.template_msg_paid);
       setVal('notifSettingTemplatePending', d.template_msg_pending);
       setVal('notifSettingTemplateCancel', d.template_msg_cancel);
+      setVal('notifSettingEmailTemplatePaid', d.template_email_paid);
+      setVal('notifSettingEmailTemplatePending', d.template_email_pending);
+      setVal('notifSettingEmailTemplateCancel', d.template_email_cancel);
 
       // Render WhatsApp Web session info
       lastKnownWaStatus = d.wa_session?.status || null;
@@ -42,6 +49,29 @@ async function loadNotificationSettings() {
   } catch (err) {
     showAdminToast('error', 'Gagal Memuat Pengaturan', err.message);
   }
+}
+
+function handleFillDefaultEmailTemplates() {
+  if (!defaultEmailTemplates) {
+    showAdminToast('error', 'Gagal', 'Template default belum dimuat. Buka kembali halaman konfigurasi notifikasi.');
+    return;
+  }
+  const fields = [
+    ['notifSettingEmailTemplatePaid', 'PAID'],
+    ['notifSettingEmailTemplatePending', 'PENDING'],
+    ['notifSettingEmailTemplateCancel', 'CANCEL'],
+  ];
+  let filled = 0;
+  for (const [id, key] of fields) {
+    const field = document.getElementById(id);
+    if (field && !field.value.trim() && typeof defaultEmailTemplates[key] === 'string') {
+      field.value = defaultEmailTemplates[key];
+      filled++;
+    }
+  }
+  showAdminToast('success', 'Template Default', filled
+    ? `${filled} template kosong diisi. Simpan konfigurasi untuk menerapkan perubahan.`
+    : 'Tidak ada template kosong yang perlu diisi.');
 }
 
 function renderWhatsAppSession(session) {
@@ -198,6 +228,7 @@ async function handleNotificationSettingsSubmit(e) {
 
   const settings = {
     notif_channel: document.getElementById('notifSettingChannel')?.value || 'WA',
+    pdf_delivery_channel: document.getElementById('notifSettingPdfChannel')?.value || 'DISABLED',
     wa_dispatch_mode: document.getElementById('notifSettingDispatchMode')?.value || 'AUTO',
     email_smtp_host: getVal('notifSettingSmtpHost'),
     email_smtp_port: getVal('notifSettingSmtpPort'),
@@ -207,6 +238,9 @@ async function handleNotificationSettingsSubmit(e) {
     template_msg_paid: getVal('notifSettingTemplatePaid'),
     template_msg_pending: getVal('notifSettingTemplatePending'),
     template_msg_cancel: getVal('notifSettingTemplateCancel'),
+    template_email_paid: getVal('notifSettingEmailTemplatePaid'),
+    template_email_pending: getVal('notifSettingEmailTemplatePending'),
+    template_email_cancel: getVal('notifSettingEmailTemplateCancel'),
   };
 
   const btn = document.getElementById('btnSaveNotifSettings');
@@ -282,5 +316,6 @@ export {
   handleDisconnectWa,
   handleRealtimeWhatsAppSession,
   handleNotificationSettingsSubmit,
+  handleFillDefaultEmailTemplates,
   handleSendTestNotif
 };
