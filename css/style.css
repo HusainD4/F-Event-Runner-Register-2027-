@@ -348,14 +348,38 @@ body.home-custom-theme {
     radial-gradient(circle at 10% 15%, var(--color-primary-subtle) 0%, transparent 40%),
     radial-gradient(circle at 90% 45%, var(--color-primary-subtle) 0%, transparent 45%);
 }
-body.home-custom-theme .btn-primary,
 body.home-custom-theme .top-navbar .brand-icon,
 body.home-custom-theme .popular-badge,
-body.home-custom-theme .btn-register-ticket,
-body.home-custom-theme .dock-item.dock-cta a,
 body.home-custom-theme .facility-card:hover .facility-icon-wrap,
 body.home-custom-theme .legal-item:hover .legal-icon-wrap {
   background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+}
+body.home-custom-theme .btn-primary,
+body.home-custom-theme .btn-register-ticket,
+body.home-custom-theme .dock-item.dock-cta a {
+  background: var(--theme-button);
+  color: var(--theme-button-text);
+}
+body.home-custom-theme .btn-primary:hover,
+body.home-custom-theme .btn-register-ticket:hover,
+body.home-custom-theme .dock-item.dock-cta a:hover { filter: brightness(0.9); }
+body.home-custom-theme .facility-card,
+body.home-custom-theme .faq-item,
+body.home-custom-theme .ticket-card,
+body.home-custom-theme .hero-col-content .countdown-box,
+body.home-custom-theme .glass-footer { background: var(--color-surface-white); border-color: var(--color-border-subtle); }
+body.home-custom-theme .top-navbar .nav-brand,
+body.home-custom-theme .top-navbar .nav-dropdown-item strong { color: var(--color-text-title); }
+body.home-custom-theme .top-navbar .nav-dropdown-menu,
+body.home-custom-theme .top-navbar .nav-dropdown-menu::before,
+body.home-custom-theme .mobile-bottom-dock { background: var(--nav-bg); border-color: var(--nav-border); }
+body.home-custom-theme .top-navbar .nav-dropdown-item,
+body.home-custom-theme .mobile-bottom-dock .dock-item a:not(#dockDaftarBtn) { color: var(--color-text-main); }
+body.home-custom-theme .top-navbar .nav-dropdown-item:hover { background: var(--color-primary-subtle); }
+@media (max-width: 868px) {
+  body.home-custom-theme .top-navbar .nav-links,
+  body.home-custom-theme .top-navbar .nav-dropdown-menu,
+  body.home-custom-theme .top-navbar .nav-mobile-toggle { background: var(--nav-bg); color: var(--color-text-main); }
 }
 body.home-custom-theme .top-navbar .nav-dropdown-item i,
 body.home-custom-theme .top-navbar .brand-text span { color: var(--color-primary); }

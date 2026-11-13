@@ -1,6 +1,6 @@
 import { fetchAdmin } from '../core/api.js';
 import { showAdminToast } from '../core/utils.js';
-import { DEFAULT_APPEARANCE, normalizeAppearance, setAnimatedTitle } from '../../../js/home-appearance.js';
+import { DEFAULT_APPEARANCE, APPEARANCE_COLOR_FIELDS, applyAppearanceColors, normalizeAppearance, setAnimatedTitle } from '../../../js/home-appearance.js';
 import '../../../css/hero-animation.css';
 
 let statsItems = [];
@@ -581,17 +581,14 @@ function updateTicketImagePreview() {
 
 function initCmsButtons() {
   renderNavbarIconPicker();
-  const appearanceInputs = [
-    document.getElementById('cmsHeroTitle'),
-    document.getElementById('cmsThemePrimary'),
-    document.getElementById('cmsThemeBackground')
-  ];
+  const colorInputs = [...document.querySelectorAll('[data-theme-color]')];
+  const getAppearanceColors = () => Object.fromEntries(colorInputs.map(input => [input.dataset.themeColor, input.value]));
+  const appearanceInputs = [document.getElementById('cmsHeroTitle'), ...colorInputs];
   const updateAppearancePreviews = () => {
     const title = document.getElementById('cmsHeroTitle')?.value.trim() || 'RUN FEST';
-    const appearance = normalizeAppearance({
-      theme_primary_color: document.getElementById('cmsThemePrimary')?.value,
-      theme_background_color: document.getElementById('cmsThemeBackground')?.value
-    });
+    const appearance = normalizeAppearance(getAppearanceColors());
+    const themePreview = document.getElementById('cmsThemePreview');
+    if (themePreview) applyAppearanceColors(themePreview.style, appearance);
     document.querySelectorAll('.cms-animation-preview').forEach(preview => {
       preview.style.setProperty('--color-primary', appearance.theme_primary_color);
       preview.style.setProperty('--color-primary-glow', `${appearance.theme_primary_color}40`);
@@ -602,6 +599,11 @@ function initCmsButtons() {
   appearanceInputs.forEach(input => {
     if (input) input.oninput = updateAppearancePreviews;
   });
+  const resetColors = document.getElementById('btnResetHomeColors');
+  if (resetColors) resetColors.onclick = () => {
+    colorInputs.forEach(input => { input.value = DEFAULT_APPEARANCE[input.dataset.themeColor]; });
+    updateAppearancePreviews();
+  };
   updateAppearancePreviews();
   const setAllSectionVisibility = visible => {
     Object.values(CMS_VISIBILITY_IDS).forEach(id => {
@@ -893,8 +895,9 @@ async function loadCmsSettings() {
       setVal('cmsHeroBadge', s.hero_badge);
       setVal('cmsHeroTitle', s.hero_title);
       const appearance = normalizeAppearance(s);
-      setVal('cmsThemePrimary', appearance.theme_primary_color);
-      setVal('cmsThemeBackground', appearance.theme_background_color);
+      document.querySelectorAll('[data-theme-color]').forEach(input => {
+        input.value = appearance[input.dataset.themeColor];
+      });
       const animationInput = document.querySelector(`input[name="cmsHeroAnimation"][value="${appearance.hero_animation}"]`);
       if (animationInput) animationInput.checked = true;
       setVal('cmsHeroSubtitle', s.hero_subtitle);
@@ -1034,8 +1037,9 @@ async function handleCmsSubmit(e) {
     hero_badge: getVal('cmsHeroBadge'),
     hero_title: getVal('cmsHeroTitle'),
     hero_animation: document.querySelector('input[name="cmsHeroAnimation"]:checked')?.value || DEFAULT_APPEARANCE.hero_animation,
-    theme_primary_color: getVal('cmsThemePrimary'),
-    theme_background_color: getVal('cmsThemeBackground'),
+    ...Object.fromEntries(APPEARANCE_COLOR_FIELDS.map(key => [
+      key, document.querySelector(`[data-theme-color="${key}"]`)?.value || ''
+    ])),
     hero_subtitle: getVal('cmsHeroSubtitle'),
     hero_bg_image: getVal('cmsHeroBgImage'),
     coming_soon_title: getVal('cmsComingSoonTitle') || 'COMING SOON EVENT!',

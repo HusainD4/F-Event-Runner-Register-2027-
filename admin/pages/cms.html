@@ -158,9 +158,31 @@
                 <h4>Warna &amp; animasi halaman utama</h4>
                 <p class="form-hint">Pratinjau mengikuti judul dan warna yang dipilih. Perubahan diterapkan setelah disimpan.</p>
                 <div class="cms-appearance-colors">
-                  <label for="cmsThemePrimary">Warna aksen <input id="cmsThemePrimary" type="color" value="#ff6b00"></label>
-                  <label for="cmsThemeBackground">Warna latar <input id="cmsThemeBackground" type="color" value="#f8fafc"></label>
+                  <label>Warna aksen <input data-theme-color="theme_primary_color" type="color" value="#ff6b00"></label>
+                  <label>Latar halaman <input data-theme-color="theme_background_color" type="color" value="#f8fafc"></label>
+                  <label>Latar kartu <input data-theme-color="theme_surface_color" type="color" value="#ffffff"></label>
+                  <label>Garis kartu <input data-theme-color="theme_border_color" type="color" value="#e2e8f0"></label>
+                  <label>Judul bagian <input data-theme-color="theme_heading_color" type="color" value="#0f172a"></label>
+                  <label>Teks utama <input data-theme-color="theme_text_color" type="color" value="#334155"></label>
+                  <label>Teks keterangan <input data-theme-color="theme_muted_color" type="color" value="#64748b"></label>
+                  <label>Latar navigasi <input data-theme-color="theme_nav_color" type="color" value="#ffffff"></label>
+                  <label>Latar tombol utama <input data-theme-color="theme_button_color" type="color" value="#ff6b00"></label>
+                  <label>Teks tombol utama <input data-theme-color="theme_button_text_color" type="color" value="#ffffff"></label>
                 </div>
+                <button type="button" class="btn btn-secondary btn-sm" id="btnResetHomeColors">Kembalikan warna bawaan</button>
+                <div class="cms-theme-preview" id="cmsThemePreview" aria-label="Contoh pratinjau warna halaman utama">
+                  <div class="cms-theme-preview-nav">RUN FEST <span>Beranda &nbsp; Informasi</span></div>
+                  <div class="cms-theme-preview-content">
+                    <strong class="cms-theme-preview-accent">AKSEN EVENT</strong>
+                    <h5>Judul bagian event</h5>
+                    <p>Teks utama dan <span>keterangan event</span></p>
+                    <div class="cms-theme-preview-card">
+                      <strong>Contoh kartu</strong><p>Detail informasi event</p>
+                      <span class="cms-theme-preview-button">Tombol utama</span>
+                    </div>
+                  </div>
+                </div>
+                <p class="form-hint">Ini contoh pratinjau warna, bukan seluruh halaman. Warna khusus status, gambar, dan beberapa elemen bawaan tetap mengikuti desain masing-masing.</p>
                 <fieldset class="cms-animation-options">
                   <legend class="form-label">Template animasi judul</legend>
                   <div class="cms-animation-grid">
