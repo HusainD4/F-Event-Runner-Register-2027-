@@ -1,6 +1,7 @@
 import { fetchAdmin } from '../core/api.js';
 import { showAdminToast } from '../core/utils.js';
 import { DEFAULT_APPEARANCE, APPEARANCE_COLOR_FIELDS, HOME_THEME_SECTIONS, SECTION_COLOR_LABELS, applyAppearanceColors, normalizeAppearance, normalizeSectionColors, setAnimatedTitle } from '../../../js/home-appearance.js';
+import { COLOR_PALETTES, createColorPalette } from './color-palettes.js';
 import '../../../css/hero-animation.css';
 
 let statsItems = [];
@@ -621,6 +622,39 @@ function initCmsButtons() {
     sectionContainer?.querySelectorAll('[data-section-enabled]').forEach(input => { input.checked = false; });
     updateAppearancePreviews();
   };
+  const palettePreset = document.getElementById('cmsPalettePreset');
+  const palettePreview = document.getElementById('cmsPalettePreview');
+  const paletteInputs = {
+    primary: document.getElementById('cmsPalettePrimary'),
+    secondary: document.getElementById('cmsPaletteSecondary'),
+    accent: document.getElementById('cmsPaletteAccent')
+  };
+  const readPalette = () => createColorPalette(Object.fromEntries(
+    Object.entries(paletteInputs).map(([key, input]) => [key, input.value])
+  ));
+  const updatePalettePreview = () => applyAppearanceColors(palettePreview.style, readPalette());
+  if (palettePreset && palettePreview && Object.values(paletteInputs).every(Boolean)) {
+    palettePreset.onchange = () => {
+      const preset = COLOR_PALETTES[palettePreset.value];
+      if (preset) Object.entries(paletteInputs).forEach(([key, input]) => { input.value = preset[key]; });
+      updatePalettePreview();
+    };
+    Object.values(paletteInputs).forEach(input => {
+      input.oninput = () => {
+        palettePreset.value = 'custom';
+        updatePalettePreview();
+      };
+    });
+    document.getElementById('btnApplyPalette').onclick = () => {
+      const palette = readPalette();
+      colorInputs.forEach(input => { input.value = palette[input.dataset.themeColor]; });
+      if (document.getElementById('cmsPaletteResetSections').checked) {
+        sectionContainer?.querySelectorAll('[data-section-enabled]').forEach(input => { input.checked = false; });
+      }
+      updateAppearancePreviews();
+    };
+    updatePalettePreview();
+  }
   updateAppearancePreviews();
   const setAllSectionVisibility = visible => {
     Object.values(CMS_VISIBILITY_IDS).forEach(id => {

@@ -157,6 +157,43 @@
               <div class="cms-appearance-panel">
                 <h4>Warna &amp; animasi halaman utama</h4>
                 <p class="form-hint">Pratinjau mengikuti judul dan warna yang dipilih. Perubahan diterapkan setelah disimpan.</p>
+                <div class="cms-palette-builder">
+                  <h4>Template warna siap pakai</h4>
+                  <p class="form-hint">Pilih template atau sesuaikan tiga warna. Palet lengkap dibuat otomatis dan dapat diedit lagi sebelum disimpan.</p>
+                  <label class="cms-palette-select">Template
+                    <select id="cmsPalettePreset" class="form-input">
+                      <option value="ocean">Ocean Blue</option>
+                      <option value="forest">Fresh Forest</option>
+                      <option value="sunset">Sunset Energy</option>
+                      <option value="violet">Violet Dream</option>
+                      <option value="ruby">Ruby Festival</option>
+                      <option value="custom">Warna sendiri</option>
+                    </select>
+                  </label>
+                  <div class="cms-palette-seeds">
+                    <label>Primer <input id="cmsPalettePrimary" type="color" value="#006fba"></label>
+                    <label>Sekunder <input id="cmsPaletteSecondary" type="color" value="#062c65"></label>
+                    <label>Tambahan / glow <input id="cmsPaletteAccent" type="color" value="#27c9e8"></label>
+                  </div>
+                  <div class="cms-theme-preview cms-palette-preview" id="cmsPalettePreview" aria-label="Pratinjau template warna">
+                    <div class="cms-theme-preview-nav">RUN FEST <span>Beranda &nbsp; Informasi</span></div>
+                    <div class="cms-theme-preview-content">
+                      <strong class="cms-theme-preview-accent">AKSEN EVENT</strong>
+                      <h5>Judul bagian event</h5>
+                      <p>Teks utama dan <span>keterangan event</span></p>
+                      <div class="cms-theme-preview-card">
+                        <strong>Contoh kartu</strong><p>Detail informasi event</p>
+                        <span class="cms-theme-preview-button">Tombol utama</span>
+                        <span class="cms-theme-preview-secondary">Tombol sekunder</span>
+                        <span class="cms-theme-preview-input">Contoh input</span>
+                      </div>
+                    </div>
+                  </div>
+                  <label class="cms-palette-reset-sections"><input type="checkbox" id="cmsPaletteResetSections"> Nonaktifkan warna khusus per bagian saat menerapkan template</label>
+                  <p class="form-hint">Jika tidak dicentang, warna khusus per bagian tetap dipertahankan. Nilai tiga warna di atas hanya untuk membuat palet; yang disimpan adalah warna hasilnya.</p>
+                  <button type="button" class="btn btn-primary btn-sm" id="btnApplyPalette">Terapkan template ke warna</button>
+                </div>
+                <h4>Penyesuaian warna lengkap</h4>
                 <div class="cms-appearance-colors">
                   <label>Warna aksen <input data-theme-color="theme_primary_color" type="color" value="#ff6b00"></label>
                   <label>Latar halaman <input data-theme-color="theme_background_color" type="color" value="#f8fafc"></label>

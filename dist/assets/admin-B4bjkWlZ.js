@@ -1,4 +1,4 @@
-import{f as ja,e as Ga,h as Ua,a as qa,o as Ha,c as Wa,l as _a,b as w,d as Ja,g as Qa,i as Va,j as Ya,k as Xa,m as $a,n as Za,p as an,q as nn,r as en,s as tn,t as sn,u as ln,D as on,v as Ra,w as rn,x as dn,y as cn,z as pn,A as mn,B as un,C as bn,E as gn,F as vn,G as fn,H as k,I as hn,J as kn,K as yn,L as xn,M as wn,N as En,O as La,P as Fn,Q as An,R as Sn,S as Pn,T as Tn,U as Cn,V as Bn,W as In,X as Rn,Y as Ln,Z as Nn,_ as Dn,$ as Mn,a0 as E,a1 as Kn,a2 as Na,a3 as zn,a4 as On,a5 as Un,a6 as jn,a7 as Da,a8 as Gn,a9 as qn,aa as Hn,ab as Wn,ac as y,ad as _n,ae as Jn,af as Qn,ag as Vn,ah as Yn,ai as Xn}from"./auth-u9dnBVZO.js";import{a as $n,b as Zn}from"./api-iQl_QkSJ.js";import{a as ae}from"./home-appearance-Db1ttUVV.js";const ne=`<div class="admin-tab-pane active" id="pane-dashboard">
+import{f as ja,e as Ga,h as Ua,a as qa,o as Ha,c as Wa,l as _a,b as w,d as Ja,g as Qa,i as Va,j as Ya,k as Xa,m as $a,n as Za,p as an,q as nn,r as en,s as tn,t as sn,u as ln,D as on,v as Ra,w as rn,x as dn,y as cn,z as pn,A as mn,B as un,C as bn,E as gn,F as vn,G as fn,H as k,I as hn,J as kn,K as yn,L as xn,M as wn,N as En,O as La,P as Fn,Q as An,R as Sn,S as Pn,T as Tn,U as Cn,V as Bn,W as In,X as Rn,Y as Ln,Z as Nn,_ as Dn,$ as Mn,a0 as E,a1 as Kn,a2 as Na,a3 as zn,a4 as On,a5 as Un,a6 as jn,a7 as Da,a8 as Gn,a9 as qn,aa as Hn,ab as Wn,ac as y,ad as _n,ae as Jn,af as Qn,ag as Vn,ah as Yn,ai as Xn}from"./auth-C-gcTU_n.js";import{a as $n,b as Zn}from"./api-iQl_QkSJ.js";import{a as ae}from"./home-appearance-Db1ttUVV.js";const ne=`<div class="admin-tab-pane active" id="pane-dashboard">
           <!-- Top KPI Grid: Pemisahan Jelas Total Biaya Layanan & Hasil Akhir Murni Bersih -->
           <div class="admin-kpi-grid">
             <div class="kpi-card" data-dashboard-widget="dashboard:participants">
@@ -1331,6 +1331,43 @@ import{f as ja,e as Ga,h as Ua,a as qa,o as Ha,c as Wa,l as _a,b as w,d as Ja,g 
               <div class="cms-appearance-panel">
                 <h4>Warna &amp; animasi halaman utama</h4>
                 <p class="form-hint">Pratinjau mengikuti judul dan warna yang dipilih. Perubahan diterapkan setelah disimpan.</p>
+                <div class="cms-palette-builder">
+                  <h4>Template warna siap pakai</h4>
+                  <p class="form-hint">Pilih template atau sesuaikan tiga warna. Palet lengkap dibuat otomatis dan dapat diedit lagi sebelum disimpan.</p>
+                  <label class="cms-palette-select">Template
+                    <select id="cmsPalettePreset" class="form-input">
+                      <option value="ocean">Ocean Blue</option>
+                      <option value="forest">Fresh Forest</option>
+                      <option value="sunset">Sunset Energy</option>
+                      <option value="violet">Violet Dream</option>
+                      <option value="ruby">Ruby Festival</option>
+                      <option value="custom">Warna sendiri</option>
+                    </select>
+                  </label>
+                  <div class="cms-palette-seeds">
+                    <label>Primer <input id="cmsPalettePrimary" type="color" value="#006fba"></label>
+                    <label>Sekunder <input id="cmsPaletteSecondary" type="color" value="#062c65"></label>
+                    <label>Tambahan / glow <input id="cmsPaletteAccent" type="color" value="#27c9e8"></label>
+                  </div>
+                  <div class="cms-theme-preview cms-palette-preview" id="cmsPalettePreview" aria-label="Pratinjau template warna">
+                    <div class="cms-theme-preview-nav">RUN FEST <span>Beranda &nbsp; Informasi</span></div>
+                    <div class="cms-theme-preview-content">
+                      <strong class="cms-theme-preview-accent">AKSEN EVENT</strong>
+                      <h5>Judul bagian event</h5>
+                      <p>Teks utama dan <span>keterangan event</span></p>
+                      <div class="cms-theme-preview-card">
+                        <strong>Contoh kartu</strong><p>Detail informasi event</p>
+                        <span class="cms-theme-preview-button">Tombol utama</span>
+                        <span class="cms-theme-preview-secondary">Tombol sekunder</span>
+                        <span class="cms-theme-preview-input">Contoh input</span>
+                      </div>
+                    </div>
+                  </div>
+                  <label class="cms-palette-reset-sections"><input type="checkbox" id="cmsPaletteResetSections"> Nonaktifkan warna khusus per bagian saat menerapkan template</label>
+                  <p class="form-hint">Jika tidak dicentang, warna khusus per bagian tetap dipertahankan. Nilai tiga warna di atas hanya untuk membuat palet; yang disimpan adalah warna hasilnya.</p>
+                  <button type="button" class="btn btn-primary btn-sm" id="btnApplyPalette">Terapkan template ke warna</button>
+                </div>
+                <h4>Penyesuaian warna lengkap</h4>
                 <div class="cms-appearance-colors">
                   <label>Warna aksen <input data-theme-color="theme_primary_color" type="color" value="#ff6b00"></label>
                   <label>Latar halaman <input data-theme-color="theme_background_color" type="color" value="#f8fafc"></label>
