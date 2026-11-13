@@ -1,6 +1,6 @@
 .jersey-gallery-track { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
-.jersey-gallery-slide { width: 100%; min-width: 0; height: clamp(220px, 42vw, 430px); padding: 8px; border: 1px solid var(--color-border-subtle, #dbe3eb); border-radius: 14px; background: var(--color-bg-base, #f8fafc); cursor: zoom-in; }
-.jersey-gallery-slide img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.jersey-gallery-slide { justify-self: center; width: max-content; max-width: 100%; min-width: 0; padding: 8px; border: 1px solid var(--color-border-subtle, #dbe3eb); border-radius: 14px; background: var(--color-bg-base, #f8fafc); cursor: zoom-in; }
+.jersey-gallery-slide img { display: block; width: auto; height: auto; max-width: 100%; max-height: min(60vh, 430px); object-fit: contain; }
 .jersey-gallery-slide img[hidden], .jersey-gallery-error[hidden] { display: none; }
 .jersey-gallery-error { color: #b91c1c; font-size: .85rem; }
 .jersey-gallery-hint { display: block; margin-top: 10px; color: var(--color-text-muted, #64748b); font-size: .78rem; }
