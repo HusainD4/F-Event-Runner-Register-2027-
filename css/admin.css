@@ -6435,6 +6435,13 @@
 .cms-theme-preview p span, .cms-theme-preview-card p { color: var(--color-text-muted); }
 .cms-theme-preview-card { margin-top: 12px; padding: 14px; border: 1px solid var(--color-border-subtle); border-radius: 8px; background: var(--color-surface-white); color: var(--color-text-title); }
 .cms-theme-preview-button { display: inline-block; margin-top: 8px; padding: 7px 12px; border-radius: 8px; background: var(--theme-button); color: var(--theme-button-text); font-size: 0.8rem; font-weight: 700; }
+.cms-theme-preview-button { box-shadow: 0 5px 15px var(--theme-glow); }
+.cms-theme-preview-secondary, .cms-theme-preview-input { display: inline-block; margin: 8px 4px 0 0; padding: 7px 10px; border: 1px solid var(--color-border); border-radius: 8px; font-size: 0.8rem; }
+.cms-theme-preview-secondary { background: var(--theme-secondary-button); color: var(--theme-secondary-text); }
+.cms-theme-preview-input { background: var(--theme-input); color: var(--theme-input-text); }
+.cms-theme-preview-content { background: radial-gradient(circle at 80% 10%, var(--theme-ambient), transparent 60%); }
+.cms-theme-preview-card { box-shadow: 0 5px 15px var(--theme-shadow); }
+.cms-theme-preview-nav span { color: var(--nav-text); }
 .cms-animation-options { padding: 0; margin: 0; border: 0; min-width: 0; }
 .cms-animation-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
 .cms-animation-choice { display: flex; flex-direction: column; gap: 6px; min-width: 0; padding: 10px; border: 1px solid #cbd5e1; border-radius: 12px; cursor: pointer; }
@@ -6457,3 +6464,5 @@
 .cms-section-color-sample strong { color: var(--sample-heading); }
 .cms-section-color-sample span { color: var(--sample-accent); }
 .cms-section-color-sample em { padding: 8px; border-radius: 5px; background: var(--sample-surface); font-style: normal; }
+.cms-section-color-sample em { border: 1px solid var(--sample-border); }
+.cms-section-color-sample b { justify-self: start; padding: 6px 10px; border-radius: 6px; background: var(--sample-button); color: var(--sample-button_text); box-shadow: 0 4px 14px var(--sample-glow); }

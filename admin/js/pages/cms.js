@@ -603,7 +603,7 @@ function initCmsButtons() {
     }
     document.querySelectorAll('.cms-animation-preview').forEach(preview => {
       preview.style.setProperty('--color-primary', appearance.theme_primary_color);
-      preview.style.setProperty('--color-primary-glow', `${appearance.theme_primary_color}40`);
+      preview.style.setProperty('--color-primary-glow', `${appearance.theme_glow_color}59`);
       preview.style.backgroundColor = appearance.theme_background_color;
       setAnimatedTitle(preview.querySelector('.cms-animation-title'), title, preview.dataset.animation);
     });
@@ -951,7 +951,7 @@ async function loadCmsSettings() {
           });
           const sample = document.createElement('div');
           sample.className = 'cms-section-color-sample';
-          sample.innerHTML = '<strong>Judul bagian</strong><span>Contoh teks dan aksen</span><em>Contoh kartu</em>';
+          sample.innerHTML = '<strong>Judul bagian</strong><span>Contoh teks dan aksen</span><em>Contoh kartu</em><b>Contoh tombol</b>';
           fieldset.append(sample);
           sectionContainer.append(fieldset);
         });

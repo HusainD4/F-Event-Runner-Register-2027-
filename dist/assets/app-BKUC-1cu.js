@@ -1,4 +1,4 @@
-import{b as X,a as ze,l as Ke}from"./api-iQl_QkSJ.js";import{a as je}from"./branding-BfJdYcQT.js";import{a as Ge,s as We}from"./home-appearance-Cphxc5oZ.js";/* empty css                       */const Je=`<!-- =========================================================================
+import{b as X,a as ze,l as Ke}from"./api-iQl_QkSJ.js";import{a as je}from"./branding-D6uQxWn9.js";import{a as Ge,s as We}from"./home-appearance-Db1ttUVV.js";/* empty css                       */const Je=`<!-- =========================================================================
      PAGE SKELETON LOADER (MINIMALIST & ANIMATED)
      ========================================================================= -->
 <div class="page-skeleton" id="pageSkeleton">

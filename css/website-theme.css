@@ -7,9 +7,66 @@ body.home-custom-theme :is(#beranda, #kategori, #rute, #fasilitas, #legal, #faq,
   --color-bg: var(--section-background);
   --bg-glass-card: var(--section-surface);
   --color-surface-white: var(--section-surface);
+  --color-border: var(--section-border);
+  --color-border-subtle: var(--section-border);
+  --border-glass: var(--section-border);
+  --theme-glow: var(--section-glow-soft);
+  --theme-glow-strong: var(--section-glow-strong);
+  --color-primary-glow: var(--section-glow-soft);
+  --theme-button: var(--section-button);
+  --theme-button-text: var(--section-button_text);
+}
+body.home-custom-theme {
+  background-image: radial-gradient(circle at 10% 15%, var(--theme-ambient), transparent 40%),
+    radial-gradient(circle at 90% 45%, var(--theme-ambient), transparent 45%);
+}
+body.home-custom-theme :is(.btn-glow, .btn-primary, .btn-register-ticket, .dock-item.dock-cta a, .btn-print):not(:disabled):not(.is-event-status) {
+  box-shadow: 0 6px 20px -3px var(--theme-glow);
+}
+body.home-custom-theme .btn-glow { animation-name: theme-glow-pulse; }
+body.home-custom-theme :is(.btn-glow, .btn-primary, .btn-register-ticket, .dock-item.dock-cta a, .btn-print):not(:disabled):not(.is-event-status):hover {
+  box-shadow: 0 8px 26px -3px var(--theme-glow-strong);
+}
+@keyframes theme-glow-pulse {
+  0%, 100% { box-shadow: 0 6px 20px -3px var(--theme-glow); }
+  50% { box-shadow: 0 8px 28px 2px var(--theme-glow-strong); }
+}
+@media (prefers-reduced-motion: reduce) {
+  body.home-custom-theme .btn-glow { animation: none; }
+}
+body.home-custom-theme :is(.btn-secondary, .td-header-action, .btn-back):not(:disabled) {
+  background: var(--theme-secondary-button);
+  color: var(--theme-secondary-text);
+  border-color: var(--color-border);
+}
+body.home-custom-theme :is(.form-input, input:not([type]), input[type="text"], input[type="email"], input[type="tel"], input[type="password"], select, textarea):not(:disabled) {
+  background-color: var(--theme-input);
+  color: var(--theme-input-text);
+  border-color: var(--color-border);
+}
+body.home-custom-theme :is(.glass-card, .td-card, .payment-card, .search-card) {
+  box-shadow: 0 10px 25px -5px var(--theme-shadow);
+}
+body.home-custom-theme .top-navbar .brand-icon { box-shadow: 0 4px 14px var(--theme-glow); }
+body.home-custom-theme .top-navbar .nav-link:hover { box-shadow: 0 4px 12px var(--theme-glow); }
+body.home-custom-theme :is(.top-navbar, .td-header-brand) .brand-icon {
+  background: var(--color-primary);
+  color: var(--theme-button-text);
+}
+body.home-custom-theme :is(.nav-dropdown-menu, .nav-links) { background: var(--nav-bg); }
+body.home-custom-theme #regModal :is(.form-input, .form-select, .form-textarea):not(:disabled) {
+  background-color: var(--theme-input);
+  color: var(--theme-input-text);
+  border-color: var(--color-border);
+}
+body.home-custom-theme #regModal .form-select:not(:disabled) {
+  appearance: auto;
+  -webkit-appearance: auto;
+  background-image: none;
 }
 body.home-custom-theme .hero-section {
-  background: var(--section-background, var(--color-bg-base));
+  background: radial-gradient(ellipse at 82% 18%, var(--theme-ambient), transparent 40%),
+    var(--section-background, var(--color-bg-base));
 }
 body.home-custom-theme .hero-title::after,
 body.home-custom-theme .countdown-box::before,
@@ -65,7 +122,28 @@ body.home-custom-theme :is(.td-card, .search-card, .payment-card, .cancel-dialog
   background: var(--color-surface-white); border-color: var(--color-border);
 }
 body.home-custom-theme :is(.td-benefit-card, .order-summary-box) { background: var(--color-bg-base); border-color: var(--color-border); }
-body.home-custom-theme :is(.btn-primary, .btn-print) { background: var(--theme-button); color: var(--theme-button-text); }
+body.home-custom-theme :is(.btn-primary, .btn-print, .btn-register-ticket, .dock-item.dock-cta a):not(:disabled):not(.is-event-status),
+body.home-custom-theme :is(.btn-primary, .btn-print, .btn-register-ticket, .dock-item.dock-cta a):not(:disabled):not(.is-event-status):hover {
+  background: var(--theme-button);
+  color: var(--theme-button-text);
+}
+body.home-custom-theme :is(.btn-detail-ticket, .btn-detail-ticket:hover) {
+  background: var(--theme-secondary-button);
+  color: var(--theme-secondary-text);
+  border-color: var(--color-border);
+}
+body.home-custom-theme :is(.ticket-card:not(.ticket-sale-closed), .facility-card, .legal-box, .legal-item):hover {
+  box-shadow: 0 12px 30px -8px var(--theme-glow);
+  border-color: var(--color-border);
+}
+body.home-custom-theme .ticket-card.featured:not(.ticket-sale-closed) { box-shadow: 0 12px 30px -8px var(--theme-glow); }
+body.home-custom-theme :is(.facility-card:hover .facility-icon-wrap, .legal-item:hover .legal-icon-wrap) {
+  background: var(--color-primary);
+  box-shadow: 0 6px 18px var(--theme-glow);
+}
+body.home-custom-theme .legal-box::before { background: var(--color-primary); }
+body.home-custom-theme .search-input-wrapper input:focus { box-shadow: 0 0 0 4px var(--theme-glow); }
+body.home-custom-theme .type-pill.active { box-shadow: 0 4px 12px var(--theme-glow); }
 body.home-custom-theme .security-ribbon { background: repeating-linear-gradient(45deg, var(--color-primary), var(--color-primary) 12px, var(--color-primary-dark) 12px, var(--color-primary-dark) 24px); }
 body.admin-body.home-custom-theme {
   background-color: var(--color-bg-base);
