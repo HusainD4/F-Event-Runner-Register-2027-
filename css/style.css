@@ -343,6 +343,26 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+body.home-custom-theme {
+  background-image:
+    radial-gradient(circle at 10% 15%, var(--color-primary-subtle) 0%, transparent 40%),
+    radial-gradient(circle at 90% 45%, var(--color-primary-subtle) 0%, transparent 45%);
+}
+body.home-custom-theme .btn-primary,
+body.home-custom-theme .top-navbar .brand-icon,
+body.home-custom-theme .popular-badge,
+body.home-custom-theme .btn-register-ticket,
+body.home-custom-theme .dock-item.dock-cta a,
+body.home-custom-theme .facility-card:hover .facility-icon-wrap,
+body.home-custom-theme .legal-item:hover .legal-icon-wrap {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+}
+body.home-custom-theme .top-navbar .nav-dropdown-item i,
+body.home-custom-theme .top-navbar .brand-text span { color: var(--color-primary); }
+body.home-custom-theme .top-navbar .nav-link.active,
+body.home-custom-theme .top-navbar .nav-dropdown-item i { background: var(--color-primary-subtle); }
+body.home-custom-theme .top-navbar .nav-dropdown-item:hover i { background: var(--color-primary); color: #fff; }
+
 /* Ambient Glow Orbs */
 .ambient-glow {
   position: fixed;

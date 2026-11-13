@@ -1,4 +1,4 @@
-import{f as ja,e as Ga,h as Ua,a as qa,o as Ha,c as Wa,l as Ja,b as w,d as Qa,g as _a,i as Va,j as Ya,k as Xa,m as $a,n as Za,p as an,q as nn,r as en,s as tn,t as sn,u as ln,D as on,v as Ra,w as rn,x as dn,y as cn,z as pn,A as mn,B as un,C as bn,E as gn,F as vn,G as fn,H as k,I as hn,J as kn,K as yn,L as xn,M as wn,N as En,O as La,P as Fn,Q as An,R as Sn,S as Pn,T as Tn,U as Cn,V as Bn,W as In,X as Rn,Y as Ln,Z as Nn,_ as Mn,$ as Dn,a0 as E,a1 as Kn,a2 as Na,a3 as zn,a4 as On,a5 as Un,a6 as jn,a7 as Ma,a8 as Gn,a9 as qn,aa as Hn,ab as Wn,ac as y,ad as Jn,ae as Qn,af as _n,ag as Vn,ah as Yn,ai as Xn}from"./auth-CrNu_0VN.js";import{a as $n}from"./api-BRII7mFt.js";const Zn=`<div class="admin-tab-pane active" id="pane-dashboard">
+import{f as ja,e as Ga,h as Ua,a as qa,o as Ha,c as Wa,l as Ja,b as w,d as Qa,g as _a,i as Va,j as Ya,k as Xa,m as $a,n as Za,p as an,q as nn,r as en,s as tn,t as sn,u as ln,D as on,v as Ra,w as rn,x as dn,y as cn,z as pn,A as mn,B as un,C as bn,E as gn,F as vn,G as fn,H as k,I as hn,J as kn,K as yn,L as xn,M as wn,N as En,O as La,P as Fn,Q as An,R as Sn,S as Pn,T as Tn,U as Cn,V as Bn,W as In,X as Rn,Y as Ln,Z as Nn,_ as Mn,$ as Dn,a0 as E,a1 as Kn,a2 as Na,a3 as zn,a4 as On,a5 as Un,a6 as jn,a7 as Ma,a8 as Gn,a9 as qn,aa as Hn,ab as Wn,ac as y,ad as Jn,ae as Qn,af as _n,ag as Vn,ah as Yn,ai as Xn}from"./auth-DGA2H-HK.js";import{a as $n}from"./api-BRII7mFt.js";const Zn=`<div class="admin-tab-pane active" id="pane-dashboard">
           <!-- Top KPI Grid: Pemisahan Jelas Total Biaya Layanan & Hasil Akhir Murni Bersih -->
           <div class="admin-kpi-grid">
             <div class="kpi-card" data-dashboard-widget="dashboard:participants">
@@ -1326,6 +1326,37 @@ import{f as ja,e as Ga,h as Ua,a as qa,o as Ha,c as Wa,l as Ja,b as w,d as Qa,g 
               <div class="form-group">
                 <label class="form-label">Judul Utama Hero (H1)</label>
                 <input type="text" class="form-input" id="cmsHeroTitle" placeholder="Tegal Run 2027: Lari Bersama Menembus Batas">
+              </div>
+
+              <div class="cms-appearance-panel">
+                <h4>Warna &amp; animasi halaman utama</h4>
+                <p class="form-hint">Pratinjau mengikuti judul dan warna yang dipilih. Perubahan diterapkan setelah disimpan.</p>
+                <div class="cms-appearance-colors">
+                  <label for="cmsThemePrimary">Warna aksen <input id="cmsThemePrimary" type="color" value="#ff6b00"></label>
+                  <label for="cmsThemeBackground">Warna latar <input id="cmsThemeBackground" type="color" value="#f8fafc"></label>
+                </div>
+                <fieldset class="cms-animation-options">
+                  <legend class="form-label">Template animasi judul</legend>
+                  <div class="cms-animation-grid">
+                    <label class="cms-animation-choice">
+                      <input type="radio" name="cmsHeroAnimation" value="SPEED" checked>
+                      <span class="cms-animation-preview" data-animation="SPEED"><span class="cms-animation-title"></span></span>
+                      <strong>Speed Start</strong><small>Gerakan start dan jejak kecepatan</small>
+                    </label>
+                    <label class="cms-animation-choice">
+                      <input type="radio" name="cmsHeroAnimation" value="PULSE">
+                      <span class="cms-animation-preview" data-animation="PULSE"><span class="cms-animation-title"></span></span>
+                      <strong>Energy Pulse</strong><small>Denyut dan cahaya lembut</small>
+                    </label>
+                    <label class="cms-animation-choice">
+                      <input type="radio" name="cmsHeroAnimation" value="RISE">
+                      <span class="cms-animation-preview" data-animation="RISE"><span class="cms-animation-title"></span></span>
+                      <strong>Float Rise</strong><small>Gerakan mengambang perlahan</small>
+                    </label>
+                  </div>
+                  <label class="cms-animation-none"><input type="radio" name="cmsHeroAnimation" value="NONE"> Tanpa animasi</label>
+                </fieldset>
+                <p class="form-hint">Pilih warna dengan kontras yang cukup agar teks tetap mudah dibaca. Animasi mengikuti pengaturan kurangi gerakan pada perangkat pengunjung.</p>
               </div>
 
               <div class="form-group">

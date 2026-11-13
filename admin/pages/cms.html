@@ -154,6 +154,37 @@
                 <input type="text" class="form-input" id="cmsHeroTitle" placeholder="Tegal Run 2027: Lari Bersama Menembus Batas">
               </div>
 
+              <div class="cms-appearance-panel">
+                <h4>Warna &amp; animasi halaman utama</h4>
+                <p class="form-hint">Pratinjau mengikuti judul dan warna yang dipilih. Perubahan diterapkan setelah disimpan.</p>
+                <div class="cms-appearance-colors">
+                  <label for="cmsThemePrimary">Warna aksen <input id="cmsThemePrimary" type="color" value="#ff6b00"></label>
+                  <label for="cmsThemeBackground">Warna latar <input id="cmsThemeBackground" type="color" value="#f8fafc"></label>
+                </div>
+                <fieldset class="cms-animation-options">
+                  <legend class="form-label">Template animasi judul</legend>
+                  <div class="cms-animation-grid">
+                    <label class="cms-animation-choice">
+                      <input type="radio" name="cmsHeroAnimation" value="SPEED" checked>
+                      <span class="cms-animation-preview" data-animation="SPEED"><span class="cms-animation-title"></span></span>
+                      <strong>Speed Start</strong><small>Gerakan start dan jejak kecepatan</small>
+                    </label>
+                    <label class="cms-animation-choice">
+                      <input type="radio" name="cmsHeroAnimation" value="PULSE">
+                      <span class="cms-animation-preview" data-animation="PULSE"><span class="cms-animation-title"></span></span>
+                      <strong>Energy Pulse</strong><small>Denyut dan cahaya lembut</small>
+                    </label>
+                    <label class="cms-animation-choice">
+                      <input type="radio" name="cmsHeroAnimation" value="RISE">
+                      <span class="cms-animation-preview" data-animation="RISE"><span class="cms-animation-title"></span></span>
+                      <strong>Float Rise</strong><small>Gerakan mengambang perlahan</small>
+                    </label>
+                  </div>
+                  <label class="cms-animation-none"><input type="radio" name="cmsHeroAnimation" value="NONE"> Tanpa animasi</label>
+                </fieldset>
+                <p class="form-hint">Pilih warna dengan kontras yang cukup agar teks tetap mudah dibaca. Animasi mengikuti pengaturan kurangi gerakan pada perangkat pengunjung.</p>
+              </div>
+
               <div class="form-group">
                 <label class="form-label">Subjudul Hero / Deskripsi Singkat</label>
                 <textarea class="form-input" id="cmsHeroSubtitle" rows="2" placeholder="Kompetisi lari terbesar di Kota Bahari dengan standar race profesional..."></textarea>

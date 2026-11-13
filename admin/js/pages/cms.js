@@ -1,5 +1,7 @@
 import { fetchAdmin } from '../core/api.js';
 import { showAdminToast } from '../core/utils.js';
+import { DEFAULT_APPEARANCE, normalizeAppearance, setAnimatedTitle } from '../../../js/home-appearance.js';
+import '../../../css/hero-animation.css';
 
 let statsItems = [];
 let facilitiesItems = [];
@@ -579,6 +581,28 @@ function updateTicketImagePreview() {
 
 function initCmsButtons() {
   renderNavbarIconPicker();
+  const appearanceInputs = [
+    document.getElementById('cmsHeroTitle'),
+    document.getElementById('cmsThemePrimary'),
+    document.getElementById('cmsThemeBackground')
+  ];
+  const updateAppearancePreviews = () => {
+    const title = document.getElementById('cmsHeroTitle')?.value.trim() || 'RUN FEST';
+    const appearance = normalizeAppearance({
+      theme_primary_color: document.getElementById('cmsThemePrimary')?.value,
+      theme_background_color: document.getElementById('cmsThemeBackground')?.value
+    });
+    document.querySelectorAll('.cms-animation-preview').forEach(preview => {
+      preview.style.setProperty('--color-primary', appearance.theme_primary_color);
+      preview.style.setProperty('--color-primary-glow', `${appearance.theme_primary_color}40`);
+      preview.style.backgroundColor = appearance.theme_background_color;
+      setAnimatedTitle(preview.querySelector('.cms-animation-title'), title, preview.dataset.animation);
+    });
+  };
+  appearanceInputs.forEach(input => {
+    if (input) input.oninput = updateAppearancePreviews;
+  });
+  updateAppearancePreviews();
   const setAllSectionVisibility = visible => {
     Object.values(CMS_VISIBILITY_IDS).forEach(id => {
       const toggle = document.getElementById(id);
@@ -868,6 +892,11 @@ async function loadCmsSettings() {
       updateFaviconPreview();
       setVal('cmsHeroBadge', s.hero_badge);
       setVal('cmsHeroTitle', s.hero_title);
+      const appearance = normalizeAppearance(s);
+      setVal('cmsThemePrimary', appearance.theme_primary_color);
+      setVal('cmsThemeBackground', appearance.theme_background_color);
+      const animationInput = document.querySelector(`input[name="cmsHeroAnimation"][value="${appearance.hero_animation}"]`);
+      if (animationInput) animationInput.checked = true;
       setVal('cmsHeroSubtitle', s.hero_subtitle);
       setVal('cmsHeroBgImage', s.hero_bg_image);
       setVal('cmsComingSoonTitle', s.coming_soon_title || 'COMING SOON EVENT!');
@@ -1004,6 +1033,9 @@ async function handleCmsSubmit(e) {
     favicon_url: getVal('cmsFaviconUrl'),
     hero_badge: getVal('cmsHeroBadge'),
     hero_title: getVal('cmsHeroTitle'),
+    hero_animation: document.querySelector('input[name="cmsHeroAnimation"]:checked')?.value || DEFAULT_APPEARANCE.hero_animation,
+    theme_primary_color: getVal('cmsThemePrimary'),
+    theme_background_color: getVal('cmsThemeBackground'),
     hero_subtitle: getVal('cmsHeroSubtitle'),
     hero_bg_image: getVal('cmsHeroBgImage'),
     coming_soon_title: getVal('cmsComingSoonTitle') || 'COMING SOON EVENT!',

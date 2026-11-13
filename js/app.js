@@ -1,5 +1,7 @@
 import { apiClient, apiFetch, loadMidtransSdk } from './api.js';
 import { applyWebsiteBranding } from './branding.js';
+import { applyHomeAppearance, setAnimatedTitle } from './home-appearance.js';
+import '../css/hero-animation.css';
 
 // Import Modular HTML Templates
 // 1. Layout
@@ -2375,6 +2377,7 @@ async function loadWebsiteSettings() {
   try {
     const cms = await apiClient.getWebsiteSettings();
     if (!cms) return;
+    applyHomeAppearance(cms);
     let visibility = {};
     try {
       visibility = cms.cms_visibility ? JSON.parse(cms.cms_visibility) : {};
@@ -2470,7 +2473,7 @@ async function loadWebsiteSettings() {
     const heroTitle = document.querySelector('.hero-title');
     if (heroTitle) {
       const titleText = typeof cms.hero_title === 'string' ? cms.hero_title.trim() : '';
-      heroTitle.textContent = titleText;
+      setAnimatedTitle(heroTitle, titleText, cms.hero_animation);
       heroTitle.hidden = !titleText;
     }
 
@@ -2759,6 +2762,8 @@ async function loadWebsiteSettings() {
       if (copyEl) copyEl.textContent = cms.footer_copyright;
     }
     applyWebsiteBranding(cms);
+    const animatedHeroText = document.querySelector('.hero-title .event-title-text');
+    if (animatedHeroText) animatedHeroText.dataset.text = animatedHeroText.textContent;
   } catch (err) {
     console.warn('Failed to apply website settings:', err);
   }
