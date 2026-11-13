@@ -1,6 +1,7 @@
 import { apiClient, apiFetch, loadMidtransSdk } from './api.js';
 import { applyWebsiteBranding } from './branding.js';
 import { applyHomeAppearance, setAnimatedTitle } from './home-appearance.js';
+import { syncNavigationVisibility } from './navigation-visibility.js';
 import '../css/hero-animation.css';
 
 // Import Modular HTML Templates
@@ -2376,7 +2377,11 @@ async function loadWebsiteSettings() {
     applyHomeAppearance(cms);
     let visibility = {};
     try {
-      visibility = cms.cms_visibility ? JSON.parse(cms.cms_visibility) : {};
+      const parsed = cms.cms_visibility ? JSON.parse(cms.cms_visibility) : {};
+      if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+        throw new Error('Visibilitas CMS harus berupa objek.');
+      }
+      visibility = parsed;
     } catch (error) {
       console.warn('Pengaturan visibilitas CMS tidak valid:', error);
     }
@@ -2413,6 +2418,7 @@ async function loadWebsiteSettings() {
     document.querySelectorAll('.glass-footer').forEach(element => {
       element.hidden = visibility.footer === false;
     });
+    syncNavigationVisibility(visibility);
     updateComingSoonSection(visibility);
 
     // 1. Judul Website (Title Browser Tab)
@@ -3036,11 +3042,12 @@ function initApp() {
   window.addEventListener('scroll', () => {
     const scrollY = window.pageYOffset;
     sections.forEach(current => {
+      if (current.hidden) return;
       const sectionHeight = current.offsetHeight;
       const sectionTop = current.offsetTop - 120;
       const sectionId = current.getAttribute('id');
-      const dockLink = document.querySelector(`.mobile-bottom-dock a[href*="${sectionId}"]`);
-      if (dockLink) {
+      const dockLink = document.querySelector(`.mobile-bottom-dock a[href="#${sectionId}"]`);
+      if (dockLink && !dockLink.closest('li')?.hidden) {
         if (scrollY > sectionTop && scrollY <= sectionTop + sectionHeight) {
           document.querySelectorAll('.mobile-bottom-dock a').forEach(a => a.classList.remove('active'));
           dockLink.classList.add('active');

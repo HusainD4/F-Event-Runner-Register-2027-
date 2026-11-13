@@ -1192,7 +1192,7 @@ import{f as qa,e as Ha,h as Ga,a as Wa,o as Ja,c as _a,l as Qa,b as w,d as Va,g 
         <div>
           <span class="cms-quick-actions-eyebrow"><i class="fa-solid fa-wand-magic-sparkles"></i> PENGATURAN CEPAT</span>
           <h3 id="cmsQuickActionsTitle">Tampilan Website</h3>
-          <p>Atur section yang terlihat tanpa mencari pengaturan satu per satu.</p>
+          <p>Atur section yang terlihat. Tautan menu dan navigasi ke section yang dimatikan ikut disembunyikan; tombol pendaftaran tetap mengikuti status pendaftaran.</p>
         </div>
         <div class="cms-quick-actions-buttons">
           <button type="button" class="btn btn-secondary btn-sm" id="btnEnableAllCmsSections">

@@ -5261,6 +5261,16 @@ h1, h2, h3, h4, h5, h6 {
 
 .site-coming-soon[hidden],
 .mobile-bottom-dock[hidden],
+.top-navbar [hidden],
+.mobile-bottom-dock [hidden],
+.glass-footer[hidden],
+.glass-footer [hidden],
+#beranda[hidden],
+#kategori[hidden],
+#rute[hidden],
+#fasilitas[hidden],
+#legal[hidden],
+#faq[hidden],
 .coming-soon-ticket-image img[hidden],
 .coming-soon-ticket-image-fallback[hidden] {
   display: none !important;
