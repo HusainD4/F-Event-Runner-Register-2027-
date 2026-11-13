@@ -37,10 +37,10 @@ import { loadRacepackQueue, handleRacepackQueueSocketEvent } from './pages/racep
 import { loadOrders, handleOrderStatusSubmit } from './pages/orders.js';
 import { handleSaveGlobalCountdown, handleResetGlobalCountdown, handleToggleGlobalClosed, handleSaveRegistrationInfo, handleMaintenanceToggleChange } from './pages/countdown.js';
 import { initBibSettingsListeners } from './pages/bib-settings.js';
-import { handleCmsSubmit } from './pages/cms.js';
+import { handleCmsSubmit, initCmsTabs } from './pages/cms.js';
 import { openCreateAdminUserModal, handleAdminUserSubmit, openCreateRoleModal, handleRoleSubmit, handleResetDefaultRoles, DEFAULT_ROLE_DIRECTORY } from './pages/admins.js';
 import { openCreateRouteModal, handleRoutePointFormSubmit, handleRouteSettingsSubmit, updateRouteSettingPreviews } from './pages/routes.js';
-import { handleNotificationSettingsSubmit, handleFillDefaultEmailTemplates, handleSendTestNotif, handleGenerateWaQr, handleDisconnectWa, handleRealtimeWhatsAppSession } from './pages/notifications.js';
+import { initNotificationTabs, selectNotificationTab, handleFillDefaultEmailTemplates, handleSendTestNotif, handleGenerateWaQr, handleDisconnectWa, handleRealtimeWhatsAppSession } from './pages/notifications.js';
 import { loadNotificationLogs, handleBatchSendNotif } from './pages/notif-logs.js';
 import { initWhatsAppStatusDrawer, loadWhatsAppWebConsole, handleSendDirectWaMessage, handleWaTemplateChange, handleQuickDispatchTicket, handleClearWaConsole, renderWhatsAppWebContactList, waWebContacts } from './pages/whatsapp-web.js';
 import { loadAuditLogs } from './pages/logs.js';
@@ -207,8 +207,10 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.getElementById('formCmsSettings')?.addEventListener('submit', handleCmsSubmit);
+  initCmsTabs(document.querySelector('#pane-cms [role="tablist"]'));
   document.getElementById('formWebsiteCms')?.addEventListener('submit', handleCmsSubmit);
-  document.getElementById('formNotificationSettings')?.addEventListener('submit', handleNotificationSettingsSubmit);
+  initNotificationTabs();
+  document.getElementById('formNotificationSettings')?.addEventListener('submit', event => event.preventDefault());
   document.getElementById('btnFillDefaultEmailTemplates')?.addEventListener('click', handleFillDefaultEmailTemplates);
   document.getElementById('btnSendTestNotif')?.addEventListener('click', handleSendTestNotif);
   document.getElementById('formEventBenefit')?.addEventListener('submit', handleBenefitFormSubmit);
@@ -305,7 +307,10 @@ document.addEventListener('DOMContentLoaded', () => {
   initWhatsAppStatusDrawer();
   document.getElementById('btnRefreshWaWeb')?.addEventListener('click', loadWhatsAppWebConsole);
   document.getElementById('btnWaWebSync')?.addEventListener('click', loadWhatsAppWebConsole);
-  document.getElementById('btnGoToWaQr')?.addEventListener('click', () => switchAdminTab('notifications'));
+  document.getElementById('btnGoToWaQr')?.addEventListener('click', () => {
+    switchAdminTab('notifications');
+    if (adminState.activeTab === 'notifications') selectNotificationTab('notifTabGateway');
+  });
   document.getElementById('btnSyncMidtransDashboard')?.addEventListener('click', handleSyncMidtransDashboard);
   document.getElementById('btnSendWaDirectMsg')?.addEventListener('click', handleSendDirectWaMessage);
   document.getElementById('btnClearWaConsole')?.addEventListener('click', handleClearWaConsole);

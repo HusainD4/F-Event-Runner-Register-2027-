@@ -7,7 +7,18 @@
               </div>
             </div>
 
-            <!-- WhatsApp Web QR Code Pairing Box (Native Backend Direct) -->
+            <div class="notification-tabs" role="tablist" aria-label="Fitur konfigurasi notifikasi">
+              <button type="button" role="tab" id="notifTabGateway" aria-controls="notifPanelGateway" aria-selected="true" tabindex="0"><i class="fa-brands fa-whatsapp"></i> Koneksi WA</button>
+              <button type="button" role="tab" id="notifTabMode" aria-controls="notifPanelMode" aria-selected="false" tabindex="-1"><i class="fa-solid fa-clock"></i> Mode</button>
+              <button type="button" role="tab" id="notifTabChannel" aria-controls="notifPanelChannel" aria-selected="false" tabindex="-1"><i class="fa-solid fa-sliders"></i> Saluran</button>
+              <button type="button" role="tab" id="notifTabPdf" aria-controls="notifPanelPdf" aria-selected="false" tabindex="-1"><i class="fa-solid fa-file-pdf"></i> PDF</button>
+              <button type="button" role="tab" id="notifTabSmtp" aria-controls="notifPanelSmtp" aria-selected="false" tabindex="-1"><i class="fa-solid fa-envelope"></i> SMTP</button>
+              <button type="button" role="tab" id="notifTabWaTemplate" aria-controls="notifPanelWaTemplate" aria-selected="false" tabindex="-1"><i class="fa-solid fa-comment-dots"></i> Template WA</button>
+              <button type="button" role="tab" id="notifTabEmailTemplate" aria-controls="notifPanelEmailTemplate" aria-selected="false" tabindex="-1"><i class="fa-solid fa-envelope-open-text"></i> Template Email</button>
+              <button type="button" role="tab" id="notifTabTest" aria-controls="notifPanelTest" aria-selected="false" tabindex="-1"><i class="fa-solid fa-vial"></i> Uji Kirim</button>
+            </div>
+
+            <div id="notifPanelGateway" role="tabpanel" aria-labelledby="notifTabGateway" class="notification-panel">
             <div class="wa-qr-box" style="background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: var(--radius-lg); padding: 24px; margin-bottom: 24px;">
               <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; margin-bottom: 16px;">
                 <div>
@@ -67,10 +78,11 @@
                 </div>
               </div>
             </div>
+            </div>
 
             <form id="formNotificationSettings">
               <!-- Dispatch Mode & Channel Selection -->
-              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; margin-bottom: 24px;">
+              <div id="notifPanelMode" role="tabpanel" aria-labelledby="notifTabMode" class="notification-panel" hidden>
                 <!-- Mode Pengiriman: Otomatis vs Manual -->
                 <div style="background: #FFFFFF; border: 1px solid var(--color-border-subtle); border-radius: var(--radius-md); padding: 20px; box-shadow: var(--shadow-sm);">
                   <h4 style="margin-bottom: 12px; font-size: 0.95rem; color: #D97706; display: flex; align-items: center; gap: 8px;">
@@ -87,8 +99,11 @@
                     </small>
                   </div>
                 </div>
+                <div class="notification-save"><button type="button" class="btn btn-primary btn-sm" data-notif-save="mode" data-permission="notifications:manage"><i class="fa-solid fa-floppy-disk"></i> Simpan Mode</button></div>
+              </div>
 
                 <!-- Saluran Pengiriman Aktif -->
+              <div id="notifPanelChannel" role="tabpanel" aria-labelledby="notifTabChannel" class="notification-panel" hidden>
                 <div style="background: #FFFFFF; border: 1px solid var(--color-border-subtle); border-radius: var(--radius-md); padding: 20px; box-shadow: var(--shadow-sm);">
                   <h4 style="margin-bottom: 12px; font-size: 0.95rem; color: var(--color-text-title); display: flex; align-items: center; gap: 8px;">
                     <i class="fa-solid fa-sliders"></i> Saluran Pengiriman Aktif
@@ -106,8 +121,10 @@
                     </small>
                   </div>
                 </div>
+                <div class="notification-save"><button type="button" class="btn btn-primary btn-sm" data-notif-save="channel" data-permission="notifications:manage"><i class="fa-solid fa-floppy-disk"></i> Simpan Saluran</button></div>
               </div>
 
+              <div id="notifPanelPdf" role="tabpanel" aria-labelledby="notifTabPdf" class="notification-panel" hidden>
               <div style="background: #FFFFFF; border: 1px solid var(--color-border-subtle); border-radius: var(--radius-md); padding: 20px; margin-bottom: 24px;">
                 <h4 style="margin-bottom: 12px;"><i class="fa-solid fa-file-pdf"></i> Pengiriman Lampiran PDF E-Tiket</h4>
                 <label class="form-label" for="notifSettingPdfChannel">Kirim PDF setelah pembayaran lunas melalui:</label>
@@ -119,8 +136,11 @@
                 </select>
                 <small style="display: block; margin-top: 6px; color: var(--color-text-muted);">Pilihan ini terpisah dari saluran pesan teks. PDF dibuat dalam antrean setelah pembayaran lunas; mode manual memerlukan tombol Kirim di Log Notifikasi. Pastikan WA dan/atau SMTP terhubung.</small>
               </div>
+              <div class="notification-save"><button type="button" class="btn btn-primary btn-sm" data-notif-save="pdf" data-permission="notifications:manage"><i class="fa-solid fa-floppy-disk"></i> Simpan PDF</button></div>
+              </div>
 
               <!-- Email SMTP Settings -->
+              <div id="notifPanelSmtp" role="tabpanel" aria-labelledby="notifTabSmtp" class="notification-panel" hidden>
               <div style="background: #FFFFFF; border: 1px solid var(--color-border-subtle); border-radius: var(--radius-md); padding: 20px; margin-bottom: 24px; box-shadow: var(--shadow-sm);">
                 <h4 style="margin-bottom: 16px; font-size: 0.95rem; color: #0284C7; display: flex; align-items: center; gap: 8px;">
                   <i class="fa-solid fa-envelope" style="font-size: 1.1rem;"></i> Email SMTP (Gmail / Custom Server)
@@ -150,8 +170,11 @@
                   </div>
                 </div>
               </div>
+              <div class="notification-save"><button type="button" class="btn btn-primary btn-sm" data-notif-save="smtp" data-permission="notifications:manage"><i class="fa-solid fa-floppy-disk"></i> Simpan SMTP</button></div>
+              </div>
 
               <!-- Message Templates -->
+              <div id="notifPanelWaTemplate" role="tabpanel" aria-labelledby="notifTabWaTemplate" class="notification-panel" hidden>
               <div style="background: #FFFFFF; border: 1px solid var(--color-border-subtle); border-radius: var(--radius-md); padding: 20px; margin-bottom: 24px; box-shadow: var(--shadow-sm);">
                 <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 16px;">
                   <h4 style="font-size: 1rem; color: var(--color-text-title);"><i class="fa-solid fa-comment-dots"></i> Template Pesan WhatsApp</h4>
@@ -184,8 +207,13 @@
                   <label class="form-label"><i class="fa-solid fa-ban" style="color: #EF4444;"></i> Template: Pesanan Dibatalkan (Cancel)</label>
                   <textarea class="form-input" id="notifSettingTemplateCancel" rows="3" placeholder="Halo {fullName}, pesanan tiket {ticketName} ({orderId}) telah dibatalkan. Kuota telah dilepaskan kembali."></textarea>
                 </div>
+              </div>
+              <div class="notification-save"><button type="button" class="btn btn-primary btn-sm" data-notif-save="waTemplate" data-permission="notifications:manage"><i class="fa-solid fa-floppy-disk"></i> Simpan Template WA</button></div>
+              </div>
+              <div id="notifPanelEmailTemplate" role="tabpanel" aria-labelledby="notifTabEmailTemplate" class="notification-panel" hidden>
+              <div class="notification-template-card">
                 <h4 style="margin: 20px 0 8px; font-size: 1rem; color: var(--color-text-title);"><i class="fa-solid fa-envelope"></i> Template Pesan Email</h4>
-                <p style="font-size: 0.8rem; color: var(--color-text-muted); margin-bottom: 12px;">Gunakan placeholder di atas. Template default tersedia untuk setiap status; jika kolom disimpan kosong, email menggunakan template WhatsApp. Lampiran PDF dikirim melalui pesan terpisah sesuai pengaturan PDF.</p>
+                <p style="font-size: 0.8rem; color: var(--color-text-muted); margin-bottom: 12px;">Placeholder: {fullName}, {eventName}, {participantCount}, {ticketName}, {bibNumber}, {orderId}, {totalAmount}, {eTicketUrl}, {pdfUrl}, {paymentUrl}. Jika disimpan kosong, email menggunakan template WhatsApp. Lampiran PDF dikirim terpisah.</p>
                 <button type="button" class="btn btn-secondary btn-sm" id="btnFillDefaultEmailTemplates" data-permission="notifications:manage" style="margin-bottom: 16px;">
                   <i class="fa-solid fa-wand-magic-sparkles"></i> Isi Template Default yang Kosong
                 </button>
@@ -202,16 +230,12 @@
                   <textarea class="form-input" id="notifSettingEmailTemplateCancel" rows="3" placeholder="Halo {fullName}, pesanan {orderId} telah dibatalkan."></textarea>
                 </div>
               </div>
-
-              <!-- Action Bar -->
-              <div style="display: flex; gap: 12px; align-items: center; justify-content: flex-end; margin-bottom: 30px;">
-                <button type="submit" class="btn btn-primary btn-glow" id="btnSaveNotifSettings" data-permission="notifications:manage">
-                  <i class="fa-solid fa-floppy-disk"></i> Simpan Seluruh Konfigurasi Notifikasi
-                </button>
+              <div class="notification-save"><button type="button" class="btn btn-primary btn-sm" data-notif-save="emailTemplate" data-permission="notifications:manage"><i class="fa-solid fa-floppy-disk"></i> Simpan Template Email</button></div>
               </div>
             </form>
 
             <!-- Test Notification Dispatch Box -->
+            <div id="notifPanelTest" role="tabpanel" aria-labelledby="notifTabTest" class="notification-panel" hidden>
             <div style="background: #EFF6FF; border: 1px dashed #93C5FD; border-radius: var(--radius-md); padding: 20px;">
               <h4 style="margin-bottom: 8px; font-size: 0.95rem; color: #1D4ED8;"><i class="fa-solid fa-paper-plane"></i> Uji Coba Pengiriman Pesan Langsung</h4>
               <p style="font-size: 0.8rem; color: #475569; margin-bottom: 16px;">Kirim pesan pengujian untuk memastikan WhatsApp Web langsung dari backend dan kredensial SMTP Email berfungsi dengan benar.</p>
@@ -236,6 +260,7 @@
                   <i class="fa-solid fa-vial"></i> Kirim Tes
                 </button>
               </div>
+            </div>
             </div>
           </div>
         </div>

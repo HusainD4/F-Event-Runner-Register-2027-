@@ -1,7 +1,7 @@
 <div class="admin-tab-pane" id="pane-cms">
-          <form id="formCmsSettings">
+          <form id="formCmsSettings" novalidate>
     <div class="cms-submit-actions cms-submit-actions-top">
-      <span class="cms-save-context"><i class="fa-solid fa-cloud-arrow-up"></i> Perubahan akan diterapkan setelah disimpan</span>
+      <span class="cms-save-context"><i class="fa-solid fa-cloud-arrow-up"></i> Simpan menerapkan perubahan dari semua tab</span>
       <div class="cms-save-buttons">
         <a href="/" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm">
           <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
@@ -13,7 +13,19 @@
         </button>
       </div>
     </div>
-    <section class="cms-quick-actions" aria-labelledby="cmsQuickActionsTitle">
+    <div class="notification-tabs" role="tablist" aria-label="Fitur konten website dan CMS">
+      <button type="button" role="tab" id="cmsTabVisibility" aria-controls="cmsPanelVisibility" aria-selected="true" tabindex="0"><i class="fa-solid fa-eye"></i> Tampilan</button>
+      <button type="button" role="tab" id="cmsTabHero" aria-controls="cmsPanelHero" aria-selected="false" tabindex="-1"><i class="fa-solid fa-heading"></i> Identitas &amp; Hero</button>
+      <button type="button" role="tab" id="cmsTabStats" aria-controls="cmsPanelStats" aria-selected="false" tabindex="-1"><i class="fa-solid fa-chart-line"></i> Statistik</button>
+      <button type="button" role="tab" id="cmsTabRoute" aria-controls="cmsPanelRoute" aria-selected="false" tabindex="-1"><i class="fa-solid fa-map-location-dot"></i> Rute</button>
+      <button type="button" role="tab" id="cmsTabFaq" aria-controls="cmsPanelFaq" aria-selected="false" tabindex="-1"><i class="fa-solid fa-circle-question"></i> FAQ</button>
+      <button type="button" role="tab" id="cmsTabComingSoon" aria-controls="cmsPanelComingSoon" aria-selected="false" tabindex="-1"><i class="fa-solid fa-ticket"></i> Coming Soon</button>
+      <button type="button" role="tab" id="cmsTabMedia" aria-controls="cmsPanelMedia" aria-selected="false" tabindex="-1"><i class="fa-solid fa-images"></i> Fasilitas &amp; Tiket</button>
+      <button type="button" role="tab" id="cmsTabLegal" aria-controls="cmsPanelLegal" aria-selected="false" tabindex="-1"><i class="fa-solid fa-shield-halved"></i> Legalitas</button>
+      <button type="button" role="tab" id="cmsTabDocuments" aria-controls="cmsPanelDocuments" aria-selected="false" tabindex="-1"><i class="fa-solid fa-file-shield"></i> Dokumen Legal</button>
+      <button type="button" role="tab" id="cmsTabContact" aria-controls="cmsPanelContact" aria-selected="false" tabindex="-1"><i class="fa-solid fa-address-book"></i> Kontak &amp; Footer</button>
+    </div>
+    <section class="cms-quick-actions cms-panel" id="cmsPanelVisibility" role="tabpanel" aria-labelledby="cmsTabVisibility">
       <div class="cms-quick-actions-heading">
         <div>
           <span class="cms-quick-actions-eyebrow"><i class="fa-solid fa-wand-magic-sparkles"></i> PENGATURAN CEPAT</span>
@@ -41,7 +53,7 @@
       </div>
     </section>
     <!-- 1. Identitas & Hero Section -->
-            <div class="admin-section">
+            <div class="admin-section cms-panel" id="cmsPanelHero" role="tabpanel" aria-labelledby="cmsTabHero" hidden>
               <div class="admin-section-header">
                 <div>
                   <h3><i class="fa-solid fa-heading" style="color: var(--color-primary);"></i> Identitas Website & Banner Hero Utama</h3>
@@ -264,7 +276,7 @@
             </div>
 
             <!-- 1.5. Live Event Stats Grid (Bebas Tambah & Bisa Otomatis dari Data) -->
-            <div class="admin-section">
+            <div class="admin-section cms-panel" id="cmsPanelStats" role="tabpanel" aria-labelledby="cmsTabStats" hidden>
               <div class="admin-section-header" style="flex-wrap: wrap; gap: 12px;">
                 <div>
                   <h3><i class="fa-solid fa-chart-line" style="color: var(--color-primary);"></i> Live Event Stats Grid (Banner Statistik Hero)</h3>
@@ -286,7 +298,7 @@
             </div>
 
             <!-- 2. Rute Lari & Google Maps Embed -->
-            <div class="admin-section">
+            <div class="admin-section cms-panel" id="cmsPanelRoute" role="tabpanel" aria-labelledby="cmsTabRoute" hidden>
               <div class="admin-section-header">
                 <div>
                   <h3><i class="fa-solid fa-map-location-dot" style="color: var(--color-primary);"></i> Manajemen Rute & Checkpoint</h3>
@@ -297,7 +309,7 @@
             </div>
 
             <!-- 3. Fasilitas, Kategori & Gambar Media -->
-            <div class="admin-section">
+            <div class="admin-section cms-panel" id="cmsPanelFaq" role="tabpanel" aria-labelledby="cmsTabFaq" hidden>
               <div class="admin-section-header" style="flex-wrap: wrap; gap: 12px;">
                 <div>
                   <h3><i class="fa-solid fa-circle-question" style="color: var(--color-primary);"></i> Pertanyaan yang Sering Diajukan (FAQ)</h3>
@@ -310,7 +322,7 @@
               <div id="cmsFaqItemsContainer" class="cms-repeater-grid"></div>
             </div>
 
-            <div class="admin-section">
+            <div class="admin-section cms-panel" id="cmsPanelComingSoon" role="tabpanel" aria-labelledby="cmsTabComingSoon" hidden>
               <div class="admin-section-header">
                 <div>
                   <h3><i class="fa-solid fa-ticket" style="color: var(--color-primary);"></i> Tampilan Saat Semua Section Nonaktif</h3>
@@ -346,7 +358,7 @@
             </div>
 
             <!-- 4. Kontak & Footer -->
-            <div class="admin-section">
+            <div class="admin-section cms-panel" id="cmsPanelMedia" role="tabpanel" aria-labelledby="cmsTabMedia" hidden>
               <div class="admin-section-header" style="flex-wrap: wrap; gap: 12px;">
                 <div>
                   <h3><i class="fa-solid fa-images" style="color: var(--color-primary);"></i> Section Fasilitas, Kategori & Media Gambar</h3>
@@ -429,7 +441,7 @@
             </div>
 
             <!-- 3.5. Perizinan & Kepatuhan Hukum (Legal) -->
-            <div class="admin-section">
+            <div class="admin-section cms-panel" id="cmsPanelLegal" role="tabpanel" aria-labelledby="cmsTabLegal" hidden>
               <div class="admin-section-header" style="flex-wrap: wrap; gap: 12px;">
                 <div>
                   <h3><i class="fa-solid fa-shield-halved" style="color: var(--color-primary);"></i> Section Perizinan & Kepatuhan Hukum</h3>
@@ -474,7 +486,7 @@
               </div>
             </div>
 
-            <div class="admin-section">
+            <div class="admin-section cms-panel" id="cmsPanelDocuments" role="tabpanel" aria-labelledby="cmsTabDocuments" hidden>
               <div class="admin-section-header">
                 <div>
                   <h3><i class="fa-solid fa-file-shield" style="color: var(--color-primary);"></i> Dokumen Modal Legal</h3>
@@ -512,7 +524,7 @@
             </div>
 
             <!-- 4. Kontak & Footer -->
-            <div class="admin-section">
+            <div class="admin-section cms-panel" id="cmsPanelContact" role="tabpanel" aria-labelledby="cmsTabContact" hidden>
               <div class="admin-section-header">
                 <div>
                   <h3><i class="fa-solid fa-address-book" style="color: var(--color-primary);"></i> Informasi Kontak & Footer Website</h3>
@@ -540,6 +552,7 @@
                 <label class="form-label">Teks Hak Cipta Footer</label>
                 <input type="text" class="form-input" id="cmsFooterCopyright" placeholder="Hak Cipta Terpelihara © 2026 Panitia Resmi Tegal Run.">
               </div>
+            </div>
               <aside class="cms-live-preview is-open" id="cmsLivePreview" aria-label="Pratinjau halaman utama">
                 <button type="button" class="cms-preview-handle" id="btnToggleCmsPreview"
                   aria-expanded="true" aria-controls="cmsPreviewPanel" aria-label="Lipat pratinjau halaman utama"
@@ -574,6 +587,5 @@
                 </div>
               </aside>
 
-            </div>
           </form>
         </div>

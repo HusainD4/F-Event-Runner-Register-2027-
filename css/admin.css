@@ -2376,6 +2376,88 @@
 /* ==============================================================
    WHATSAPP WEB CONSOLE & LIVE MESSENGER STYLES
    ============================================================== */
+#pane-notifications .notification-tabs,
+#pane-cms .notification-tabs {
+  display: flex;
+  gap: 5px;
+  max-width: 100%;
+  overflow-x: auto;
+  padding: 5px;
+  margin-bottom: 20px;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  background: #F8FAFC;
+  scrollbar-width: thin;
+}
+
+#pane-notifications .notification-tabs button,
+#pane-cms .notification-tabs button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  flex: 0 0 auto;
+  min-height: 38px;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #475569;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+#pane-cms .notification-tabs {
+  position: sticky;
+  top: calc(var(--admin-topbar-height) + 86px);
+  z-index: 849;
+}
+
+#pane-notifications .notification-tabs button[aria-selected="true"],
+#pane-cms .notification-tabs button[aria-selected="true"] {
+  background: #FFFFFF;
+  color: #C2410C;
+  box-shadow: 0 1px 5px rgba(15, 23, 42, 0.12);
+}
+
+#pane-notifications .notification-tabs button:focus-visible,
+#pane-cms .notification-tabs button:focus-visible {
+  outline: 2px solid #F97316;
+  outline-offset: -2px;
+}
+
+#pane-notifications .notification-panel[hidden],
+#pane-cms .cms-panel[hidden] {
+  display: none !important;
+}
+
+#pane-notifications .notification-save {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0 0 24px;
+}
+
+#pane-notifications .notification-template-card {
+  padding: 20px;
+  margin-bottom: 24px;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  background: #FFFFFF;
+  box-shadow: var(--shadow-sm);
+}
+
+@media screen and (max-width: 680px) {
+  #pane-notifications #waQrGrid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+  #pane-notifications .notification-save .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
 .wa-web-layout {
   display: grid;
   grid-template-columns: 340px 1fr;

@@ -1,14 +1,54 @@
 import { fetchAdmin } from '../core/api.js';
 import { showAdminToast, showConfirmDialog, escapeHtml } from '../core/utils.js';
 import { renderWhatsAppWebConsoleHeader } from './whatsapp-web.js';
+import { initTabList, selectTab } from '../core/tabs.js';
 
 // =============================================================================
 // NOTIFICATION & GATEWAY SETTINGS + WHATSAPP WEB QR
 // =============================================================================
 let waQrTimer = null;
 let defaultEmailTemplates = null;
+let settingsLoaded = false;
+
+const settingGroups = {
+  mode: { wa_dispatch_mode: 'notifSettingDispatchMode' },
+  channel: { notif_channel: 'notifSettingChannel' },
+  pdf: { pdf_delivery_channel: 'notifSettingPdfChannel' },
+  smtp: {
+    email_smtp_host: 'notifSettingSmtpHost',
+    email_smtp_port: 'notifSettingSmtpPort',
+    email_smtp_user: 'notifSettingSmtpUser',
+    email_smtp_pass: 'notifSettingSmtpPass',
+    email_from_name: 'notifSettingEmailFromName',
+  },
+  waTemplate: {
+    template_msg_paid: 'notifSettingTemplatePaid',
+    template_msg_pending: 'notifSettingTemplatePending',
+    template_msg_cancel: 'notifSettingTemplateCancel',
+  },
+  emailTemplate: {
+    template_email_paid: 'notifSettingEmailTemplatePaid',
+    template_email_pending: 'notifSettingEmailTemplatePending',
+    template_email_cancel: 'notifSettingEmailTemplateCancel',
+  },
+};
+
+function selectNotificationTab(id) {
+  const tablist = document.querySelector('#pane-notifications .notification-tabs');
+  if (tablist) selectTab(tablist, id);
+}
+
+function initNotificationTabs() {
+  const tablist = document.querySelector('#pane-notifications .notification-tabs');
+  if (!tablist) return;
+  initTabList(tablist);
+  document.querySelectorAll('#pane-notifications [data-notif-save]').forEach(button => {
+    button.addEventListener('click', () => handleNotificationSettingsSubmit(button.dataset.notifSave, button));
+  });
+}
 
 async function loadNotificationSettings() {
+  settingsLoaded = false;
   try {
     const res = await fetchAdmin('/admin/notifications/settings');
     if (res && res.status === 'success' && res.data) {
@@ -45,9 +85,12 @@ async function loadNotificationSettings() {
       // Render WhatsApp Web session info
       lastKnownWaStatus = d.wa_session?.status || null;
       renderWhatsAppSession(d.wa_session);
+      settingsLoaded = true;
+    } else {
+      showAdminToast('error', 'Gagal Memuat Pengaturan', escapeHtml(res?.message || 'Respons pengaturan tidak valid.'));
     }
   } catch (err) {
-    showAdminToast('error', 'Gagal Memuat Pengaturan', err.message);
+    showAdminToast('error', 'Gagal Memuat Pengaturan', escapeHtml(err.message));
   }
 }
 
@@ -222,28 +265,26 @@ function handleRealtimeWhatsAppSession(session) {
   }
 }
 
-async function handleNotificationSettingsSubmit(e) {
-  e.preventDefault();
-  const getVal = (id) => (document.getElementById(id)?.value || '').trim();
-
-  const settings = {
-    notif_channel: document.getElementById('notifSettingChannel')?.value || 'WA',
-    pdf_delivery_channel: document.getElementById('notifSettingPdfChannel')?.value || 'DISABLED',
-    wa_dispatch_mode: document.getElementById('notifSettingDispatchMode')?.value || 'AUTO',
-    email_smtp_host: getVal('notifSettingSmtpHost'),
-    email_smtp_port: getVal('notifSettingSmtpPort'),
-    email_smtp_user: getVal('notifSettingSmtpUser'),
-    email_smtp_pass: getVal('notifSettingSmtpPass'),
-    email_from_name: getVal('notifSettingEmailFromName'),
-    template_msg_paid: getVal('notifSettingTemplatePaid'),
-    template_msg_pending: getVal('notifSettingTemplatePending'),
-    template_msg_cancel: getVal('notifSettingTemplateCancel'),
-    template_email_paid: getVal('notifSettingEmailTemplatePaid'),
-    template_email_pending: getVal('notifSettingEmailTemplatePending'),
-    template_email_cancel: getVal('notifSettingEmailTemplateCancel'),
-  };
-
-  const btn = document.getElementById('btnSaveNotifSettings');
+async function handleNotificationSettingsSubmit(group, btn) {
+  if (!settingsLoaded) {
+    showAdminToast('error', 'Gagal Menyimpan', 'Pengaturan belum berhasil dimuat. Muat ulang halaman terlebih dahulu.');
+    return;
+  }
+  const fields = settingGroups[group];
+  if (!fields) {
+    showAdminToast('error', 'Gagal Menyimpan', 'Bagian pengaturan tidak dikenal.');
+    return;
+  }
+  const settings = {};
+  for (const [key, id] of Object.entries(fields)) {
+    const field = document.getElementById(id);
+    if (!field) {
+      showAdminToast('error', 'Gagal Menyimpan', 'Kolom pengaturan tidak ditemukan.');
+      return;
+    }
+    if (!field.reportValidity()) return;
+    settings[key] = field.value.trim();
+  }
   const originalText = btn?.innerHTML;
   if (btn) {
     btn.disabled = true;
@@ -257,12 +298,12 @@ async function handleNotificationSettingsSubmit(e) {
     });
 
     if (res && res.status === 'success') {
-      showAdminToast('success', 'Berhasil', 'Seluruh konfigurasi notifikasi, mode pengiriman & template pesan berhasil disimpan.');
+      showAdminToast('success', 'Berhasil', 'Pengaturan bagian ini berhasil disimpan.');
     } else {
-      showAdminToast('error', 'Gagal Menyimpan', res?.message || 'Terjadi kesalahan.');
+      showAdminToast('error', 'Gagal Menyimpan', escapeHtml(res?.message || 'Terjadi kesalahan.'));
     }
   } catch (err) {
-    showAdminToast('error', 'Gagal', err.message);
+    showAdminToast('error', 'Gagal', escapeHtml(err.message));
   } finally {
     if (btn) {
       btn.disabled = false;
@@ -310,6 +351,8 @@ async function handleSendTestNotif() {
 }
 
 export {
+  initNotificationTabs,
+  selectNotificationTab,
   loadNotificationSettings,
   renderWhatsAppSession,
   handleGenerateWaQr,

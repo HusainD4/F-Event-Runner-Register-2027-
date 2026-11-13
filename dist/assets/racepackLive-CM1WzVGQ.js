@@ -1,1 +1,0 @@
-import{b as p}from"./api-Biu4OxHL.js";/* empty css              */import{ap as a}from"./auth-xEqRcnAS.js";import{a as e}from"./home-appearance-Db1ttUVV.js";import"./jersey-gallery-B9xQZexv.js";/* empty css                       */a();p.getWebsiteSettings().then(i=>{i&&e(i)});

@@ -1,5 +1,6 @@
 import { fetchAdmin } from '../core/api.js';
 import { showAdminToast } from '../core/utils.js';
+import { initTabList, selectTab } from '../core/tabs.js';
 import { DEFAULT_APPEARANCE, APPEARANCE_COLOR_FIELDS, HOME_THEME_SECTIONS, SECTION_COLOR_LABELS, applyAppearanceColors, normalizeAppearance, normalizeSectionColors, setAnimatedTitle } from '../../../js/home-appearance.js';
 import { COLOR_PALETTES, createColorPalette } from './color-palettes.js';
 import { isValidGalleryImageUrl, parseJerseyGallery, renderJerseyGallery } from '../../../js/jersey-gallery.js';
@@ -1149,15 +1150,26 @@ async function loadCmsSettings() {
 
 async function handleCmsSubmit(e) {
   e.preventDefault();
+  const form = document.getElementById('formCmsSettings');
+  const invalid = [...form.elements].find(field => field.willValidate && !field.validity.valid);
+  if (invalid) {
+    const panel = invalid.closest('.cms-panel');
+    if (panel) selectTab(document.querySelector('#pane-cms [role="tablist"]'), panel.getAttribute('aria-labelledby'));
+    if (invalid.getClientRects().length) invalid.reportValidity();
+    else showAdminToast('warning', 'Pengaturan Tidak Valid', 'Periksa kolom yang tidak valid pada tab terkait.');
+    return;
+  }
   const jerseyGallery = getJerseyGalleryInput();
   if (jerseyGallery.error) {
     updateJerseyGalleryPreview();
+    selectTab(document.querySelector('#pane-cms [role="tablist"]'), 'cmsTabMedia');
     document.getElementById('cmsJerseyGalleryImages').focus();
     showAdminToast('warning', 'Galeri Jersey Tidak Valid', jerseyGallery.error);
     return;
   }
   const bibPreview = updateBibPreview();
   if (bibPreview.error) {
+    selectTab(document.querySelector('#pane-cms [role="tablist"]'), 'cmsTabMedia');
     document.getElementById('cmsBibPreviewImage').focus();
     showAdminToast('warning', 'Gambar BIB Tidak Valid', bibPreview.error);
     return;
@@ -1296,5 +1308,6 @@ window.loadCmsSettings = loadCmsSettings;
 
 export {
   loadCmsSettings,
-  handleCmsSubmit
+  handleCmsSubmit,
+  initTabList as initCmsTabs
 };
