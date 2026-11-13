@@ -198,6 +198,8 @@
   border-radius: var(--radius-lg);
   background: #F8FAFC;
 }
+.td-gallery-description { margin: 0 0 14px; color: var(--color-text-muted); font-size: .88rem; }
+#tdJerseyGallerySection:not([hidden]) { margin-bottom: 28px; }
 .td-jersey-media {
   display: grid;
   width: 112px;

@@ -411,6 +411,14 @@
                 <label class="form-label">Deskripsi Section Tiket</label>
                 <textarea class="form-input" id="cmsTicketsDesc" rows="2" placeholder="Tersedia kategori kompetitif bagi atlet dan fun run santai..."></textarea>
               </div>
+              <div class="form-group jersey-banner-form-group">
+                <label class="form-label" for="cmsJerseyGalleryImages">Galeri jersey &amp; panduan ukuran (global)</label>
+                <p class="form-hint">Masukkan maksimal 5 URL gambar publik, satu per baris, sesuai urutan tampilan. Gunakan gambar desain jersey dan tabel ukuran lengkap. Galeri ini sama untuk semua detail tiket dan terpisah dari tipe jersey.</p>
+                <textarea class="form-input" id="cmsJerseyGalleryImages" rows="4" placeholder="https://contoh.com/desain-jersey.jpg&#10;https://contoh.com/panduan-ukuran.jpg" aria-describedby="cmsJerseyGalleryError"></textarea>
+                <p id="cmsJerseyGalleryError" class="jersey-admin-error" role="status" hidden></p>
+                <p class="form-hint">Pratinjau langsung: geser atau gunakan tombol panah, lalu pilih gambar untuk memperbesar.</p>
+                <div id="cmsJerseyGalleryPreview" hidden></div>
+              </div>
             </div>
 
             <!-- 3.5. Perizinan & Kepatuhan Hukum (Legal) -->

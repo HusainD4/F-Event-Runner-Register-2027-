@@ -415,7 +415,6 @@ async function deleteEventApi(id) {
 let currentJerseyEventId = null;
 let currentEditingJerseyId = null;
 let currentEventJerseys = [];
-let jerseyBannerInputCounter = 0;
 
 async function openEventJerseysModal(eventId, eventName) {
   currentJerseyEventId = eventId;
@@ -452,7 +451,6 @@ function renderEventJerseys(jerseys) {
 
   list.innerHTML = jerseys.map((jersey, index) => {
     const sizes = Array.isArray(jersey.sizes) ? jersey.sizes : [];
-    const bannerImages = Array.isArray(jersey.bannerImages) ? jersey.bannerImages : [];
     return `
       <article class="jersey-admin-card">
         <div class="jersey-admin-card-image ${jersey.image ? '' : 'is-empty'}">
@@ -465,7 +463,6 @@ function renderEventJerseys(jerseys) {
           <strong>${escapeHtml(jersey.name)}</strong>
           <span>${escapeHtml(jersey.type)}</span>
           <small>Ukuran: ${escapeHtml(sizes.join(', '))}</small>
-          ${bannerImages.length ? `<small><i class="fa-regular fa-images" aria-hidden="true"></i> ${bannerImages.length} banner informasi</small>` : ''}
         </div>
         <div class="jersey-admin-card-actions">
           <button type="button" class="btn btn-secondary btn-sm btn-edit-jersey" data-index="${index}" aria-label="Edit jersey ${escapeHtml(jersey.name)}"><i class="fa-solid fa-pen"></i></button>
@@ -507,59 +504,6 @@ function updateJerseyImagePreview() {
   }
 }
 
-function getJerseyBannerImageFields() {
-  return [...document.querySelectorAll('#jerseyBannerImageFields .jersey-banner-url')]
-    .map(input => input.value.trim())
-    .filter(Boolean);
-}
-
-function updateJerseyBannerImagePreview() {
-  const fields = document.getElementById('jerseyBannerImageFields');
-  const preview = document.getElementById('jerseyBannerImagePreview');
-  const count = document.getElementById('jerseyBannerImageCount');
-  const addButton = document.getElementById('btnAddJerseyBannerImage');
-  if (!fields || !preview) return;
-
-  const inputs = [...fields.querySelectorAll('.jersey-banner-url')];
-  if (count) count.textContent = `${inputs.filter(input => input.value.trim()).length} / 5`;
-  if (addButton) addButton.disabled = inputs.length >= 5;
-
-  preview.innerHTML = inputs.map((input, index) => {
-    const url = input.value.trim();
-    if (!url || !input.checkValidity() || !/^https?:\/\//i.test(url)) return '';
-    return `
-      <div class="jersey-banner-preview-card">
-        <img src="${escapeHtml(url)}" alt="Pratinjau banner jersey ${index + 1}" loading="lazy"
-          onerror="this.hidden=true;this.parentElement.classList.add('is-invalid')">
-        <span>${index + 1}</span>
-      </div>
-    `;
-  }).join('');
-}
-
-function addJerseyBannerImageField(value = '') {
-  const fields = document.getElementById('jerseyBannerImageFields');
-  if (!fields) return;
-  if (fields.querySelectorAll('.jersey-banner-url').length >= 5) {
-    showAdminToast('warning', 'Maksimal Banner Tercapai', 'Setiap tipe jersey hanya dapat memiliki maksimal 5 banner gambar.');
-    return;
-  }
-
-  const row = document.createElement('div');
-  row.className = 'jersey-banner-input-row';
-  const index = ++jerseyBannerInputCounter;
-  row.innerHTML = `
-    <label class="sr-only" for="jerseyBannerImage-${index}">Link banner informasi ${index}</label>
-    <input class="form-input jersey-banner-url" id="jerseyBannerImage-${index}" type="url" maxlength="2048"
-      placeholder="https://contoh.com/banner-jersey-${index}.jpg" value="${escapeHtml(value)}">
-    <button type="button" class="btn btn-outline btn-sm btn-remove-jersey-banner" aria-label="Hapus banner ${index}">
-      <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
-    </button>
-  `;
-  fields.appendChild(row);
-  updateJerseyBannerImagePreview();
-}
-
 function resetJerseyForm() {
   currentEditingJerseyId = null;
   const form = document.getElementById('formEventJersey');
@@ -567,11 +511,7 @@ function resetJerseyForm() {
   document.getElementById('jerseyFormId').value = '';
   document.getElementById('btnSaveJersey').innerHTML = '<i class="fa-solid fa-plus"></i> Tambah Jersey';
   document.getElementById('btnCancelJerseyEdit').hidden = true;
-  const bannerFields = document.getElementById('jerseyBannerImageFields');
-  if (bannerFields) bannerFields.replaceChildren();
-  addJerseyBannerImageField();
   updateJerseyImagePreview();
-  updateJerseyBannerImagePreview();
 }
 
 function editJerseyForm(jersey) {
@@ -581,15 +521,9 @@ function editJerseyForm(jersey) {
   document.getElementById('jerseyFormType').value = jersey.type;
   document.getElementById('jerseyFormSizes').value = (Array.isArray(jersey.sizes) ? jersey.sizes : []).join(', ');
   document.getElementById('jerseyFormImage').value = jersey.image || '';
-  const bannerFields = document.getElementById('jerseyBannerImageFields');
-  if (bannerFields) bannerFields.replaceChildren();
-  const bannerImages = Array.isArray(jersey.bannerImages) ? jersey.bannerImages.slice(0, 5) : [];
-  bannerImages.forEach(url => addJerseyBannerImageField(url));
-  if (!bannerImages.length) addJerseyBannerImageField();
   document.getElementById('btnSaveJersey').innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Simpan Perubahan';
   document.getElementById('btnCancelJerseyEdit').hidden = false;
   updateJerseyImagePreview();
-  updateJerseyBannerImagePreview();
 }
 
 async function handleJerseyFormSubmit(event) {
@@ -598,18 +532,6 @@ async function handleJerseyFormSubmit(event) {
   const type = document.getElementById('jerseyFormType').value.trim();
   const sizes = [...new Set(document.getElementById('jerseyFormSizes').value.split(',').map(size => size.trim()).filter(Boolean))];
   const image = document.getElementById('jerseyFormImage').value.trim() || null;
-  const bannerImageInputs = [...document.querySelectorAll('#jerseyBannerImageFields .jersey-banner-url')];
-  const invalidBanner = bannerImageInputs.find(input => input.value.trim() && (!input.checkValidity() || !/^https?:\/\//i.test(input.value.trim())));
-  const bannerImages = bannerImageInputs.map(input => input.value.trim()).filter(Boolean);
-  if (invalidBanner) {
-    invalidBanner.focus();
-    showAdminToast('warning', 'Link Banner Tidak Valid', 'Gunakan URL gambar lengkap yang diawali http:// atau https://.');
-    return;
-  }
-  if (bannerImages.length > 5) {
-    showAdminToast('warning', 'Maksimal Banner Tercapai', 'Setiap tipe jersey hanya dapat memiliki maksimal 5 banner gambar.');
-    return;
-  }
   if (!currentJerseyEventId || !name || !type || !sizes.length) {
     showAdminToast('warning', 'Data Belum Lengkap', 'Nama, tipe, dan minimal satu ukuran jersey wajib diisi.');
     return;
@@ -619,7 +541,7 @@ async function handleJerseyFormSubmit(event) {
   button.disabled = true;
   button.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
   try {
-    const payload = { eventId: currentJerseyEventId, name, type, sizes, image, bannerImages };
+    const payload = { eventId: currentJerseyEventId, name, type, sizes, image };
     const response = currentEditingJerseyId
       ? await fetchAdmin(`/admin/jerseys/${currentEditingJerseyId}`, { method: 'PUT', body: JSON.stringify(payload) })
       : await fetchAdmin('/admin/jerseys', { method: 'POST', body: JSON.stringify(payload) });
@@ -634,22 +556,6 @@ async function handleJerseyFormSubmit(event) {
     button.innerHTML = originalHtml;
   }
 
-}
-
-function initializeJerseyBannerImageFields() {
-  const fields = document.getElementById('jerseyBannerImageFields');
-  const addButton = document.getElementById('btnAddJerseyBannerImage');
-  if (!fields || fields.dataset.initialized === 'true') return;
-  fields.dataset.initialized = 'true';
-  addButton?.addEventListener('click', () => addJerseyBannerImageField());
-  fields.addEventListener('input', updateJerseyBannerImagePreview);
-  fields.addEventListener('click', event => {
-    const removeButton = event.target.closest('.btn-remove-jersey-banner');
-    if (!removeButton) return;
-    removeButton.closest('.jersey-banner-input-row')?.remove();
-    updateJerseyBannerImagePreview();
-  });
-  addJerseyBannerImageField();
 }
 
 async function deleteJersey(jerseyId) {
@@ -889,7 +795,6 @@ window.openEventBenefitsModal = openEventBenefitsModal;
 window.openEventJerseysModal = openEventJerseysModal;
 
 export {
-  initializeJerseyBannerImageFields,
   loadEvents,
   renderEvents,
   openCreateEventModal,

@@ -100,6 +100,7 @@ export async function loadWebsiteBranding() {
   try {
     const settings = await apiClient.getWebsiteSettings();
     if (settings) applyWebsiteBranding(settings);
+    return settings;
   } catch (error) {
     console.warn('Branding website gagal dimuat dari backend:', error);
   }

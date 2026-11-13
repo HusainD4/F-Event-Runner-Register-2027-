@@ -2,6 +2,7 @@ import { fetchAdmin } from '../core/api.js';
 import { showAdminToast } from '../core/utils.js';
 import { DEFAULT_APPEARANCE, APPEARANCE_COLOR_FIELDS, HOME_THEME_SECTIONS, SECTION_COLOR_LABELS, applyAppearanceColors, normalizeAppearance, normalizeSectionColors, setAnimatedTitle } from '../../../js/home-appearance.js';
 import { COLOR_PALETTES, createColorPalette } from './color-palettes.js';
+import { parseJerseyGallery, renderJerseyGallery } from '../../../js/jersey-gallery.js';
 import '../../../css/hero-animation.css';
 
 let statsItems = [];
@@ -9,6 +10,25 @@ let facilitiesItems = [];
 let legalItems = [];
 let faqItems = [];
 let cmsIconDismissHandlersBound = false;
+
+function getJerseyGalleryInput() {
+  const input = document.getElementById('cmsJerseyGalleryImages');
+  const images = input.value.split(/\r?\n/).map(value => value.trim()).filter(Boolean);
+  const invalid = images.find(value => {
+    try { return value.length > 2048 || !['http:', 'https:'].includes(new URL(value).protocol); }
+    catch { return true; }
+  });
+  return { images, error: images.length > 5 ? 'Maksimal 5 gambar.' : invalid ? 'Gunakan URL gambar HTTP atau HTTPS yang valid (maksimal 2048 karakter).' : '' };
+}
+
+function updateJerseyGalleryPreview() {
+  const { images, error } = getJerseyGalleryInput();
+  const message = document.getElementById('cmsJerseyGalleryError');
+  message.textContent = error;
+  message.hidden = !error;
+  document.getElementById('cmsJerseyGalleryImages').setAttribute('aria-invalid', String(Boolean(error)));
+  renderJerseyGallery(document.getElementById('cmsJerseyGalleryPreview'), error ? [] : images);
+}
 
 const DEFAULT_FACILITIES = [
   { icon: 'fa-shirt', title: 'Jersey Running Dry-Fit', desc: 'Bahan mikro-pori cepat kering dengan sablon sublimasi awet dan nyaman untuk jarak jauh.' },
@@ -582,6 +602,11 @@ function updateTicketImagePreview() {
 
 function initCmsButtons() {
   renderNavbarIconPicker();
+  const jerseyGalleryInput = document.getElementById('cmsJerseyGalleryImages');
+  if (jerseyGalleryInput) {
+    jerseyGalleryInput.oninput = updateJerseyGalleryPreview;
+    updateJerseyGalleryPreview();
+  }
   const sectionContainer = document.getElementById('cmsSectionColors');
   const colorInputs = [...document.querySelectorAll('[data-theme-color]')];
   const getAppearanceColors = () => Object.fromEntries(colorInputs.map(input => [input.dataset.themeColor, input.value]));
@@ -1062,6 +1087,7 @@ async function loadCmsSettings() {
       setVal('cmsTicketsTitle', s.tickets_title);
       setVal('cmsTicketsDesc', s.tickets_desc);
       setVal('cmsMedalImage', s.medal_image);
+      setVal('cmsJerseyGalleryImages', parseJerseyGallery(s.jersey_gallery_images).join('\n'));
 
       // Legal & Perizinan
       setVal('cmsLegalBadge', s.legal_badge_label);
@@ -1106,6 +1132,13 @@ async function loadCmsSettings() {
 
 async function handleCmsSubmit(e) {
   e.preventDefault();
+  const jerseyGallery = getJerseyGalleryInput();
+  if (jerseyGallery.error) {
+    updateJerseyGalleryPreview();
+    document.getElementById('cmsJerseyGalleryImages').focus();
+    showAdminToast('warning', 'Galeri Jersey Tidak Valid', jerseyGallery.error);
+    return;
+  }
   const btn = document.getElementById('btnSaveCmsSubmit');
   const originalHtml = btn ? btn.innerHTML : '';
   if (btn) {
@@ -1175,6 +1208,7 @@ async function handleCmsSubmit(e) {
     tickets_title: getVal('cmsTicketsTitle'),
     tickets_desc: getVal('cmsTicketsDesc'),
     medal_image: getVal('cmsMedalImage'),
+    jersey_gallery_images: JSON.stringify(jerseyGallery.images),
 
     // Legal
     legal_badge_label: getVal('cmsLegalBadge'),

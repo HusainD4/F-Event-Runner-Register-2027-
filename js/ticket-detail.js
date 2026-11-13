@@ -1,7 +1,14 @@
 import { apiFetch } from './api.js';
 import { loadWebsiteBranding } from './branding.js';
+import { parseJerseyGallery, renderJerseyGallery } from './jersey-gallery.js';
 
-loadWebsiteBranding();
+loadWebsiteBranding().then(settings => {
+  const section = document.getElementById('tdJerseyGallerySection');
+  const container = document.getElementById('tdJerseyGallery');
+  const images = parseJerseyGallery(settings?.jersey_gallery_images);
+  renderJerseyGallery(container, images);
+  section.hidden = !images.length;
+});
 
 function showToast(type = 'success', message = '') {
   const container = document.getElementById('ticketToastContainer');
@@ -322,17 +329,6 @@ function renderTicketData(event, feeSettings = {}, isGlobalClosed = false) {
       } catch {
         sizes = [];
       }
-      let bannerImages = [];
-      try {
-        const configuredImages = Array.isArray(j.bannerImages) ? j.bannerImages : JSON.parse(j.bannerImages || '[]');
-        if (Array.isArray(configuredImages)) {
-          bannerImages = configuredImages
-            .filter(url => typeof url === 'string' && /^https?:\/\//i.test(url))
-            .slice(0, 5);
-        }
-      } catch {
-        bannerImages = [];
-      }
       return `
         <article class="td-jersey-card">
           <div class="td-jersey-media">
@@ -353,18 +349,6 @@ function renderTicketData(event, feeSettings = {}, isGlobalClosed = false) {
               </div>
             </div>
           ` : ''}
-          ${bannerImages.length ? `
-            <div class="td-jersey-banners">
-              <span class="td-jersey-size-label"><i class="fa-regular fa-images" aria-hidden="true"></i> Informasi jersey</span>
-              <div class="td-jersey-banner-grid">
-                ${bannerImages.map((url, index) => `
-                  <figure class="td-jersey-banner">
-                    <img src="${escapeHtml(url)}" alt="Informasi ${escapeHtml(j.name)} ${index + 1}" loading="lazy">
-                  </figure>
-                `).join('')}
-              </div>
-            </div>
-          ` : ''}
           </div>
         </article>
       `;
@@ -376,16 +360,6 @@ function renderTicketData(event, feeSettings = {}, isGlobalClosed = false) {
         fallback.setAttribute('aria-hidden', 'true');
         fallback.innerHTML = '<i class="fa-solid fa-shirt"></i>';
         image.replaceWith(fallback);
-      }, { once: true });
-    });
-    jerseysContainer.querySelectorAll('.td-jersey-banner img').forEach(image => {
-      image.addEventListener('error', () => {
-        const banner = image.closest('.td-jersey-banner');
-        const grid = banner?.parentElement;
-        banner?.remove();
-        if (grid && !grid.querySelector('.td-jersey-banner')) {
-          grid.closest('.td-jersey-banners')?.remove();
-        }
       }, { once: true });
     });
   } else {

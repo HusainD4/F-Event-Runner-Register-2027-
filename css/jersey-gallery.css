@@ -1,0 +1,14 @@
+.jersey-gallery-track { display: flex; overflow-x: auto; gap: 12px; scroll-snap-type: x mandatory; overscroll-behavior-inline: contain; border-radius: 14px; }
+.jersey-gallery-slide { flex: 0 0 100%; min-width: 0; height: clamp(220px, 42vw, 430px); padding: 8px; border: 1px solid var(--color-border-subtle, #dbe3eb); border-radius: 14px; background: var(--color-bg-base, #f8fafc); cursor: zoom-in; scroll-snap-align: start; }
+.jersey-gallery-slide img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.jersey-gallery-slide img[hidden], .jersey-gallery-error[hidden] { display: none; }
+.jersey-gallery-error { color: #b91c1c; font-size: .85rem; }
+.jersey-gallery-controls { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+.jersey-gallery-controls span { flex: 1; color: var(--color-text-muted, #64748b); font-size: .78rem; }
+.jersey-gallery-controls button { width: 38px; height: 38px; border: 1px solid var(--color-border-subtle, #cbd5e1); border-radius: 10px; background: var(--color-surface-white, #fff); color: var(--color-text-main, #334155); font-size: 1.4rem; cursor: pointer; }
+.jersey-gallery button:focus-visible { outline: 3px solid var(--color-primary, #006fba); outline-offset: 2px; }
+.jersey-gallery-dialog { position: fixed; inset: 0; width: min(94vw, 1100px); height: min(90vh, 900px); max-width: none; max-height: none; margin: auto; padding: 50px 16px 16px; border: 0; border-radius: 16px; background: #fff; }
+.jersey-gallery-dialog::backdrop { background: rgba(15, 23, 42, .8); }
+.jersey-gallery-dialog img { width: 100%; height: 100%; object-fit: contain; }
+.jersey-gallery-close { position: absolute; top: 8px; right: 12px; width: 36px; height: 36px; border: 0; border-radius: 50%; background: #e2e8f0; color: #0f172a; font-size: 1.5rem; cursor: pointer; }
+@media (prefers-reduced-motion: reduce) { .jersey-gallery-track { scroll-behavior: auto; } }
