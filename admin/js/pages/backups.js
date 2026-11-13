@@ -23,7 +23,7 @@ export async function loadBackupOverview() {
 
     const tables = response.data.tables;
     if (count) count.textContent = String(tables.length);
-    if (status) status.textContent = 'Semua tabel database akan disertakan pada kedua format backup.';
+    if (status) status.textContent = 'Seluruh tabel InnoDB dicadangkan dalam satu snapshot; SQL mencakup skema dan data.';
     list.innerHTML = tables.map(table => `<li>${escapeHtml(table)}</li>`).join('');
   } catch (error) {
     if (status) status.textContent = error.message || 'Daftar tabel gagal dimuat.';

@@ -3,7 +3,7 @@
     <div class="admin-section-header backup-header">
       <div>
         <h3><i class="fa-solid fa-database" aria-hidden="true"></i> Backup Database</h3>
-        <p>Unduh salinan seluruh tabel dan data database. Akses hanya tersedia untuk Superadmin.</p>
+        <p>Unduh seluruh tabel InnoDB dan datanya dalam satu snapshot konsisten. Akses hanya tersedia untuk Superadmin.</p>
       </div>
       <button type="button" class="btn btn-secondary btn-sm" id="btnRefreshBackupOverview">
         <i class="fa-solid fa-rotate" aria-hidden="true"></i> Periksa Database
@@ -23,7 +23,7 @@
         <span class="backup-download-icon"><i class="fa-solid fa-file-code" aria-hidden="true"></i></span>
         <div>
           <h4>Backup SQL lengkap</h4>
-          <p>Skema tabel dan seluruh record dalam format SQL. Impor ke database kosong.</p>
+          <p>Skema dan data tabel untuk pemulihan. Impor ke database kosong; uji hasil pemulihan sebelum dibutuhkan.</p>
         </div>
         <button type="button" class="btn btn-primary" id="btnDownloadSqlBackup">
           <i class="fa-solid fa-download" aria-hidden="true"></i> Unduh SQL
@@ -33,13 +33,15 @@
         <span class="backup-download-icon backup-csv-icon"><i class="fa-solid fa-file-csv" aria-hidden="true"></i></span>
         <div>
           <h4>Backup CSV gabungan</h4>
-          <p>Semua tabel dalam satu CSV; kolom <code>table_name</code> membedakan jenis record.</p>
+          <p>Data semua tabel untuk pemeriksaan; kolom <code>table_name</code> membedakan jenis record. CSV bukan format pemulihan database.</p>
         </div>
         <button type="button" class="btn btn-secondary" id="btnDownloadCsvBackup">
           <i class="fa-solid fa-download" aria-hidden="true"></i> Unduh CSV
         </button>
       </article>
     </div>
+
+    <p class="form-hint">Backup tidak mencakup view, trigger, prosedur, event MySQL, file gambar, Redis, konfigurasi server, atau transaksi pada Midtrans. Jangan mengubah skema database selama backup. Simpan file dengan aman.</p>
 
     <div class="backup-overview">
       <div class="backup-overview-heading">

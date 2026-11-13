@@ -3,7 +3,7 @@ import { resolve } from 'path';
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
-  const apiProxyTarget = env.VITE_DEV_API_PROXY_TARGET || 'http://localhost:3000';
+  const apiProxyTarget = env.VITE_DEV_API_PROXY_TARGET || 'https://backend-siexa.haisen.my.id/';
 
   return {
     appType: 'mpa',
@@ -27,7 +27,7 @@ export default defineConfig(({ mode }) => {
     },
     server: {
       port: 5173,
-      allowedHosts: ['siexa.haisen.my.id', 'localhost', '127.0.0.1','api.haisen.my.id'],
+      allowedHosts: ['siexa.haisen.my.id', 'localhost', '127.0.0.1','api.haisen.my.id','backend-siexa.haisen.my.id'],
       proxy: {
         '/api': {
           target: apiProxyTarget,
