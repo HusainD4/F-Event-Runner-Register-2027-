@@ -7,7 +7,7 @@ const isLocalFrontend = typeof window !== 'undefined'
   && ['localhost', '127.0.0.1'].includes(window.location.hostname)
   && ['3000', '4173', '5173', '5174', '5175'].includes(window.location.port);
 
-const configuredApiUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.haisen.my.id/api';
+const configuredApiUrl = import.meta.env.VITE_API_BASE_URL || 'https://backend-siexa.haisen.my.id/api';
 const fallbackApiUrl = import.meta.env.VITE_API_FALLBACK_URL;
 export const apiBaseUrls = isLocalFrontend
   ? ['/api']
