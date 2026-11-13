@@ -390,15 +390,19 @@ import{b as X,a as ze,l as Ke}from"./api-iQl_QkSJ.js";import{a as je}from"./bran
         </button>
       </div>
     </div>
-    <dialog class="registration-notice-dialog" id="registrationNoticeDialog" aria-labelledby="registrationNoticeDialogTitle">
+    <dialog class="registration-notice-dialog" id="registrationNoticeDialog" aria-labelledby="registrationNoticeDialogTitle" aria-describedby="registrationClosedNoticeMessage registrationOperatingHoursNotice">
       <div class="registration-notice-dialog-content">
         <button type="button" class="registration-notice-dialog-close" id="btnCloseRegistrationNotice" aria-label="Tutup informasi">
           <i class="fa-solid fa-xmark" aria-hidden="true"></i>
         </button>
         <span class="registration-notice-dialog-icon"><i class="fa-solid fa-bullhorn" aria-hidden="true"></i></span>
+        <span class="registration-notice-dialog-label">INFORMASI EVENT</span>
         <h3 id="registrationNoticeDialogTitle">Informasi Pendaftaran</h3>
         <p id="registrationClosedNoticeMessage"></p>
         <p id="registrationOperatingHoursNotice" hidden></p>
+        <form method="dialog">
+          <button type="submit" class="registration-notice-dialog-action">Saya mengerti</button>
+        </form>
       </div>
     </dialog>
 
