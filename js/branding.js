@@ -1,4 +1,5 @@
 import { apiClient } from './api.js';
+import { applyHomeAppearance } from './home-appearance.js';
 
 let eventNameObserver;
 
@@ -69,6 +70,7 @@ export function applyWebsiteFavicon(value) {
 
 export function applyWebsiteBranding(settings) {
   if (!settings || typeof settings !== 'object') return;
+  applyHomeAppearance(settings);
   applyWebsiteFavicon(settings.favicon_url);
   const eventName = typeof settings.navbar_title === 'string' ? settings.navbar_title.trim() : '';
   if (!eventName) return;

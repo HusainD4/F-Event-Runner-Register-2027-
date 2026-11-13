@@ -15,6 +15,50 @@ export const DEFAULT_APPEARANCE = {
 const animations = new Set(['SPEED', 'PULSE', 'RISE', 'NONE']);
 const isHexColor = value => typeof value === 'string' && /^#[0-9a-f]{6}$/i.test(value);
 export const APPEARANCE_COLOR_FIELDS = Object.keys(DEFAULT_APPEARANCE).filter(key => key.startsWith('theme_'));
+export const HOME_THEME_SECTIONS = [
+  { key: 'hero', label: 'Hero & countdown', selector: '#beranda' },
+  { key: 'tickets', label: 'Kategori tiket', selector: '#kategori' },
+  { key: 'route', label: 'Rute', selector: '#rute' },
+  { key: 'facilities', label: 'Fasilitas', selector: '#fasilitas' },
+  { key: 'legal', label: 'Legalitas', selector: '#legal' },
+  { key: 'faq', label: 'FAQ', selector: '#faq' },
+  { key: 'footer', label: 'Footer', selector: '.glass-footer' }
+];
+export const SECTION_COLOR_LABELS = {
+  background: 'Latar bagian',
+  heading: 'Judul',
+  text: 'Teks',
+  accent: 'Aksen & ornamen',
+  surface: 'Latar kartu'
+};
+
+export function getSectionDefaults(appearance) {
+  return {
+    background: appearance.theme_background_color,
+    heading: appearance.theme_heading_color,
+    text: appearance.theme_text_color,
+    accent: appearance.theme_primary_color,
+    surface: appearance.theme_surface_color
+  };
+}
+
+export function normalizeSectionColors(settings, appearance) {
+  let parsed = {};
+  if (typeof settings?.theme_section_colors === 'string' && settings.theme_section_colors) {
+    try {
+      parsed = JSON.parse(settings.theme_section_colors);
+    } catch (error) {
+      console.warn('Pengaturan warna per bagian tidak valid:', error);
+    }
+  }
+  const defaults = getSectionDefaults(appearance);
+  return Object.fromEntries(HOME_THEME_SECTIONS.map(({ key }) => [
+    key,
+    Object.fromEntries(Object.keys(SECTION_COLOR_LABELS).map(field => [
+      field, isHexColor(parsed?.[key]?.[field]) ? parsed[key][field] : defaults[field]
+    ]))
+  ]));
+}
 
 export function normalizeAppearance(settings = {}) {
   const appearance = {
@@ -43,6 +87,8 @@ export function applyAppearanceColors(style, settings) {
   root.setProperty('--border-glass-orange', `rgba(${rgb}, 0.3)`);
   root.setProperty('--color-bg-base', appearance.theme_background_color);
   root.setProperty('--color-bg', appearance.theme_background_color);
+  root.setProperty('--color-bg-page', appearance.theme_background_color);
+  root.setProperty('--color-card-bg', appearance.theme_surface_color);
   root.setProperty('--color-surface-white', appearance.theme_surface_color);
   root.setProperty('--bg-glass-card', appearance.theme_surface_color);
   root.setProperty('--bg-glass-nav', appearance.theme_nav_color);
@@ -64,7 +110,13 @@ export function applyAppearanceColors(style, settings) {
 }
 
 export function applyHomeAppearance(settings) {
-  applyAppearanceColors(document.documentElement.style, settings);
+  const appearance = applyAppearanceColors(document.documentElement.style, settings);
+  const sections = normalizeSectionColors(settings, appearance);
+  HOME_THEME_SECTIONS.forEach(({ key, selector }) => {
+    document.querySelectorAll(selector).forEach(element => {
+      Object.entries(sections[key]).forEach(([name, value]) => element.style.setProperty(`--section-${name}`, value));
+    });
+  });
   document.body.classList.add('home-custom-theme');
 }
 
@@ -79,3 +131,4 @@ export function setAnimatedTitle(element, text, animation) {
   element.setAttribute('aria-label', text);
   element.replaceChildren(content);
 }
+import '../css/website-theme.css';

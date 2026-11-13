@@ -1,6 +1,6 @@
 import { fetchAdmin } from '../core/api.js';
 import { showAdminToast } from '../core/utils.js';
-import { DEFAULT_APPEARANCE, APPEARANCE_COLOR_FIELDS, applyAppearanceColors, normalizeAppearance, setAnimatedTitle } from '../../../js/home-appearance.js';
+import { DEFAULT_APPEARANCE, APPEARANCE_COLOR_FIELDS, HOME_THEME_SECTIONS, SECTION_COLOR_LABELS, applyAppearanceColors, normalizeAppearance, normalizeSectionColors, setAnimatedTitle } from '../../../js/home-appearance.js';
 import '../../../css/hero-animation.css';
 
 let statsItems = [];
@@ -581,6 +581,7 @@ function updateTicketImagePreview() {
 
 function initCmsButtons() {
   renderNavbarIconPicker();
+  const sectionContainer = document.getElementById('cmsSectionColors');
   const colorInputs = [...document.querySelectorAll('[data-theme-color]')];
   const getAppearanceColors = () => Object.fromEntries(colorInputs.map(input => [input.dataset.themeColor, input.value]));
   const appearanceInputs = [document.getElementById('cmsHeroTitle'), ...colorInputs];
@@ -589,6 +590,17 @@ function initCmsButtons() {
     const appearance = normalizeAppearance(getAppearanceColors());
     const themePreview = document.getElementById('cmsThemePreview');
     if (themePreview) applyAppearanceColors(themePreview.style, appearance);
+    if (sectionContainer) {
+      const defaults = normalizeSectionColors({}, appearance);
+      sectionContainer.querySelectorAll('[data-section]').forEach(section => {
+        const enabled = section.querySelector('[data-section-enabled]').checked;
+        section.querySelectorAll('[data-section-field]').forEach(input => {
+          input.disabled = !enabled;
+          if (!enabled) input.value = defaults[section.dataset.section][input.dataset.sectionField];
+          section.style.setProperty(`--sample-${input.dataset.sectionField}`, input.value);
+        });
+      });
+    }
     document.querySelectorAll('.cms-animation-preview').forEach(preview => {
       preview.style.setProperty('--color-primary', appearance.theme_primary_color);
       preview.style.setProperty('--color-primary-glow', `${appearance.theme_primary_color}40`);
@@ -599,9 +611,14 @@ function initCmsButtons() {
   appearanceInputs.forEach(input => {
     if (input) input.oninput = updateAppearancePreviews;
   });
+  if (sectionContainer) {
+    sectionContainer.onchange = updateAppearancePreviews;
+    sectionContainer.oninput = updateAppearancePreviews;
+  }
   const resetColors = document.getElementById('btnResetHomeColors');
   if (resetColors) resetColors.onclick = () => {
     colorInputs.forEach(input => { input.value = DEFAULT_APPEARANCE[input.dataset.themeColor]; });
+    sectionContainer?.querySelectorAll('[data-section-enabled]').forEach(input => { input.checked = false; });
     updateAppearancePreviews();
   };
   updateAppearancePreviews();
@@ -898,6 +915,47 @@ async function loadCmsSettings() {
       document.querySelectorAll('[data-theme-color]').forEach(input => {
         input.value = appearance[input.dataset.themeColor];
       });
+      const sectionContainer = document.getElementById('cmsSectionColors');
+      if (sectionContainer) {
+        let configuredSections = {};
+        try {
+          configuredSections = s.theme_section_colors ? JSON.parse(s.theme_section_colors) : {};
+        } catch (error) {
+          console.warn('Warna per bagian tidak dapat dibaca:', error);
+        }
+        const sectionColors = normalizeSectionColors(s, appearance);
+        sectionContainer.replaceChildren();
+        HOME_THEME_SECTIONS.forEach(({ key, label }) => {
+          const fieldset = document.createElement('fieldset');
+          fieldset.className = 'cms-section-color-card';
+          fieldset.dataset.section = key;
+          const legend = document.createElement('legend');
+          legend.textContent = label;
+          fieldset.append(legend);
+          const toggleLabel = document.createElement('label');
+          const toggle = document.createElement('input');
+          toggle.type = 'checkbox';
+          toggle.dataset.sectionEnabled = '';
+          toggle.checked = Boolean(configuredSections?.[key]);
+          toggleLabel.append(toggle, ' Gunakan warna khusus');
+          fieldset.append(toggleLabel);
+          Object.entries(SECTION_COLOR_LABELS).forEach(([field, fieldLabel]) => {
+            const labelElement = document.createElement('label');
+            labelElement.textContent = fieldLabel;
+            const input = document.createElement('input');
+            input.type = 'color';
+            input.dataset.sectionField = field;
+            input.value = sectionColors[key][field];
+            labelElement.append(input);
+            fieldset.append(labelElement);
+          });
+          const sample = document.createElement('div');
+          sample.className = 'cms-section-color-sample';
+          sample.innerHTML = '<strong>Judul bagian</strong><span>Contoh teks dan aksen</span><em>Contoh kartu</em>';
+          fieldset.append(sample);
+          sectionContainer.append(fieldset);
+        });
+      }
       const animationInput = document.querySelector(`input[name="cmsHeroAnimation"][value="${appearance.hero_animation}"]`);
       if (animationInput) animationInput.checked = true;
       setVal('cmsHeroSubtitle', s.hero_subtitle);
@@ -1040,6 +1098,13 @@ async function handleCmsSubmit(e) {
     ...Object.fromEntries(APPEARANCE_COLOR_FIELDS.map(key => [
       key, document.querySelector(`[data-theme-color="${key}"]`)?.value || ''
     ])),
+    theme_section_colors: JSON.stringify(Object.fromEntries(
+      [...document.querySelectorAll('#cmsSectionColors [data-section]')]
+        .filter(section => section.querySelector('[data-section-enabled]').checked)
+        .map(section => [section.dataset.section, Object.fromEntries(
+          [...section.querySelectorAll('[data-section-field]')].map(input => [input.dataset.sectionField, input.value])
+        )])
+    )),
     hero_subtitle: getVal('cmsHeroSubtitle'),
     hero_bg_image: getVal('cmsHeroBgImage'),
     coming_soon_title: getVal('cmsComingSoonTitle') || 'COMING SOON EVENT!',

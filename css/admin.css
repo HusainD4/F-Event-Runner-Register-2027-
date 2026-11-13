@@ -6447,3 +6447,13 @@
 .cms-animation-title { max-width: 100%; font-size: 1.1rem; line-height: 1.2; font-weight: 900; text-align: center; }
 .cms-animation-none { display: inline-flex; gap: 8px; align-items: center; margin: 14px 0; font-size: 0.85rem; }
 @media (max-width: 700px) { .cms-animation-grid { grid-template-columns: 1fr; } }
+.cms-section-colors { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin: 14px 0 24px; }
+.cms-section-color-card { min-width: 0; padding: 14px; border: 1px solid #cbd5e1; border-radius: 12px; }
+.cms-section-color-card legend { font-weight: 800; padding: 0 5px; }
+.cms-section-color-card label { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 8px 0; font-size: 0.8rem; }
+.cms-section-color-card label:first-of-type { justify-content: flex-start; }
+.cms-section-color-card input[type="color"] { width: 48px; height: 32px; border: 1px solid #cbd5e1; border-radius: 6px; padding: 2px; }
+.cms-section-color-sample { display: grid; gap: 5px; padding: 12px; border-radius: 8px; background: var(--sample-background); color: var(--sample-text); font-size: 0.78rem; }
+.cms-section-color-sample strong { color: var(--sample-heading); }
+.cms-section-color-sample span { color: var(--sample-accent); }
+.cms-section-color-sample em { padding: 8px; border-radius: 5px; background: var(--sample-surface); font-style: normal; }

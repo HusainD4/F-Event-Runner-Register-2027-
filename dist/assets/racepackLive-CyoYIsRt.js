@@ -1,0 +1,1 @@
+import{b as i}from"./api-iQl_QkSJ.js";/* empty css              */import{aj as e}from"./auth-Kj_8DmtI.js";import{a as p}from"./home-appearance-Cphxc5oZ.js";/* empty css                       */e();i.getWebsiteSettings().then(a=>{a&&p(a)});

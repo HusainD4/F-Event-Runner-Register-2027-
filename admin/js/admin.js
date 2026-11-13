@@ -47,6 +47,12 @@ import { loadAuditLogs } from './pages/logs.js';
 import { handleSyncMidtransDashboard, loadDashboardStats } from './pages/dashboard.js';
 import { initBackupPage } from './pages/backups.js';
 import { subscribeRealtimeEvent } from '../../js/realtime.js';
+import { apiClient } from '../../js/api.js';
+import { applyHomeAppearance } from '../../js/home-appearance.js';
+
+apiClient.getWebsiteSettings().then(settings => {
+  if (settings) applyHomeAppearance(settings);
+});
 
 function handleRacepackQueueChange(event) {
   handleRacepackQueueSocketEvent(event);
