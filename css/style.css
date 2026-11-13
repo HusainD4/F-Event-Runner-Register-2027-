@@ -126,10 +126,10 @@
   display: flex;
   align-items: flex-start;
   gap: 16px;
-  margin: 0 0 22px;
-  padding: 18px 20px;
-  border: 1px solid rgba(245, 158, 11, 0.32);
-  border-radius: 16px;
+  margin: 24px auto 0;
+  padding: 20px 24px;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-radius: 18px;
   background: #fffbeb;
   color: #78350f;
 }
@@ -139,9 +139,18 @@
 }
 
 .registration-closed-notice > i {
-  margin-top: 3px;
+  display: grid;
+  flex: 0 0 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 13px;
+  background: #fef3c7;
   color: #d97706;
-  font-size: 1.25rem;
+  font-size: 1.1rem;
+}
+
+.registration-closed-notice > div {
+  min-width: 0;
 }
 
 .registration-closed-notice h3,
@@ -150,7 +159,8 @@
 }
 
 .registration-closed-notice h3 {
-  font-size: 1rem;
+  color: #78350f;
+  font-size: 1.05rem;
 }
 
 .registration-closed-notice p {
@@ -162,8 +172,9 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  margin-top: 12px;
-  padding: 9px 14px;
+  min-height: 40px;
+  margin-top: 14px;
+  padding: 9px 16px;
   border: 0;
   border-radius: 999px;
   background: #d97706;
@@ -172,6 +183,20 @@
   font-size: 0.88rem;
   font-weight: 700;
   cursor: pointer;
+}
+
+.registration-notice-button:hover {
+  background: #b45309;
+}
+
+.registration-notice-button:focus-visible {
+  outline: 3px solid #92400e;
+  outline-offset: 3px;
+}
+
+@media (max-width: 600px) {
+  .registration-closed-notice { gap: 12px; padding: 16px; }
+  .registration-closed-notice > i { flex-basis: 36px; height: 36px; }
 }
 
 .registration-notice-dialog {
@@ -1448,6 +1473,13 @@ h1, h2, h3, h4, h5, h6 {
   align-items: stretch;
 }
 
+.tickets-grid > .ticket-card:only-child {
+  grid-column: 1 / -1;
+  width: 100%;
+  max-width: 520px;
+  justify-self: center;
+}
+
 /* 1. Kartu Tiket Utama */
 .ticket-card {
   display: flex;
@@ -1484,43 +1516,6 @@ h1, h2, h3, h4, h5, h6 {
   transform: none;
   border-color: #FCA5A5;
   box-shadow: 0 10px 30px -10px rgba(127, 29, 29, 0.12);
-}
-
-.ticket-card.ticket-sale-closed::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 3;
-  pointer-events: none;
-  background:
-    linear-gradient(135deg, transparent calc(50% - 6px), rgba(127, 29, 29, 0.94) calc(50% - 2px), #DC2626 50%, rgba(127, 29, 29, 0.94) calc(50% + 2px), transparent calc(50% + 6px)),
-    linear-gradient(45deg, transparent calc(50% - 6px), rgba(127, 29, 29, 0.94) calc(50% - 2px), #DC2626 50%, rgba(127, 29, 29, 0.94) calc(50% + 2px), transparent calc(50% + 6px));
-}
-
-.ticket-card.ticket-sale-closed .global-sold-stamp {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  z-index: 4;
-  display: inline-flex;
-  align-items: center;
-  gap: 9px;
-  padding: 10px 25px;
-  border: 4px solid #991B1B;
-  border-radius: 9px;
-  outline: 2px solid rgba(255, 255, 255, 0.96);
-  background: rgba(255, 255, 255, 0.98);
-  color: #991B1B;
-  font-size: clamp(1.4rem, 4vw, 2rem);
-  font-weight: 900;
-  letter-spacing: 0.18em;
-  transform: translate(-50%, -50%) rotate(-12deg);
-  box-shadow: 0 7px 22px rgba(127, 29, 29, 0.4), 0 0 0 5px rgba(255, 255, 255, 0.42);
-}
-
-.ticket-card.ticket-sale-closed .btn-select-ticket {
-  position: relative;
-  z-index: 5;
 }
 
 .global-closed-stamp {
@@ -6031,22 +6026,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Compact, clean ticket pass layout */
-.ticket-pass-card.ticket-sale-closed::after {
-  background:
-    linear-gradient(135deg, transparent calc(50% - 2px), rgba(185, 28, 28, 0.55) 50%, transparent calc(50% + 2px)),
-    linear-gradient(45deg, transparent calc(50% - 2px), rgba(185, 28, 28, 0.55) 50%, transparent calc(50% + 2px));
-}
-
-.ticket-pass-card.ticket-sale-closed .global-sold-stamp {
-  padding: 7px 18px;
-  border-width: 3px;
-  border-radius: 8px;
-  font-size: clamp(1.15rem, 3.2vw, 1.6rem);
-  letter-spacing: 0.14em;
-  transform: translate(-50%, -50%) rotate(-8deg);
-  box-shadow: 0 5px 16px rgba(127, 29, 29, 0.28), 0 0 0 4px rgba(255, 255, 255, 0.42);
-}
-
+.ticket-stub-tag .global-sold-stamp { color: #b91c1c; }
 .ticket-pass-card .ticket-stub-header {
   min-height: 40px;
   gap: 12px;
@@ -6184,6 +6164,7 @@ h1, h2, h3, h4, h5, h6 {
 @media (max-width: 992px) {
   .tickets-grid {
     max-width: 520px;
+    margin-inline: auto;
   }
 }
 

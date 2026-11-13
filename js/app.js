@@ -678,10 +678,6 @@ function renderTickets(events) {
       </div>
     `;
 
-    if (isClosed && closedStatusLabel !== 'SOLD') {
-      card.insertAdjacentHTML('beforeend', '<span class="global-sold-stamp"><i class="fa-solid fa-ticket-slash"></i> SOLD</span>');
-    }
-
     grid.appendChild(card);
   });
 
