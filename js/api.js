@@ -9,7 +9,7 @@ const isLocalFrontend = typeof window !== 'undefined'
 
 const configuredApiUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.haisen.my.id/api';
 const fallbackApiUrl = import.meta.env.VITE_API_FALLBACK_URL;
-const apiBaseUrls = isLocalFrontend
+export const apiBaseUrls = isLocalFrontend
   ? ['/api']
   : [...new Set([configuredApiUrl, fallbackApiUrl]
     .filter(Boolean)
