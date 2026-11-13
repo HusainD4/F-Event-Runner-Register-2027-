@@ -18,10 +18,27 @@
         <button class="btn btn-secondary btn-sm" id="btnExportCsv">
           <i class="fa-solid fa-file-csv"></i> Unduh CSV
         </button>
+        <button type="button" class="btn btn-sm" id="btnClearParticipants" data-role="SUPERADMIN" style="display: none; background: #b91c1c; color: white;">
+          <i class="fa-solid fa-trash-can"></i> Kosongkan Data Peserta
+        </button>
         <button class="btn btn-primary btn-sm btn-glow" id="btnOpenCreateParticipantModal" data-permission="participants:create">
           <i class="fa-solid fa-user-plus"></i> Tambah Peserta Manual
         </button>
       </div>
+      <dialog id="clearParticipantsDialog" aria-labelledby="clearParticipantsTitle" style="width: min(94vw, 560px); max-width: 560px; border: 1px solid #fecaca; border-radius: 16px; padding: 24px;">
+        <form id="formClearParticipants">
+          <h3 id="clearParticipantsTitle" style="color: #b91c1c; margin: 0 0 12px;">Kosongkan seluruh data peserta?</h3>
+          <p>Semua peserta, pesanan, QR dan catatan racepack akan dihapus permanen, termasuk pesanan lunas. Tindakan ini tidak membatalkan atau mengembalikan pembayaran Midtrans; tiket yang diterbitkan tidak dapat digunakan lagi.</p>
+          <p>Aktifkan mode pemeliharaan, hentikan aktivitas admin/racepack, selesaikan pesanan menunggu pembayaran dan buat cadangan terlebih dahulu. Kuota pendaftaran online aktif dikembalikan berdasarkan data dan log yang tersedia; periksa kuota manual sesudahnya. Akun pembeli dan log audit tetap disimpan.</p>
+          <label class="form-label" for="clearParticipantsConfirmation">Ketik <strong>KOSONGKAN DATA PESERTA</strong> untuk melanjutkan</label>
+          <input class="form-input" id="clearParticipantsConfirmation" autocomplete="off" required>
+          <p id="clearParticipantsError" role="alert" style="color: #b91c1c;" hidden></p>
+          <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; flex-wrap: wrap;">
+            <button type="button" class="btn btn-secondary" id="btnCancelClearParticipants">Batal</button>
+            <button type="submit" class="btn" id="btnConfirmClearParticipants" style="background: #b91c1c; color: white;">Hapus Permanen</button>
+          </div>
+        </form>
+      </dialog>
     </div>
 
     <!-- Segmented Tab Filter: Pisahkan per Status Pembayaran & Racepack -->

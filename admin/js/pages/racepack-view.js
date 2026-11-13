@@ -112,6 +112,10 @@ export async function loadRacepackQueue({ force = false } = {}) {
 }
 
 function applyRacepackQueueEvent(event) {
+  if (event.type === 'reset') {
+    racepackQueue = [];
+    return;
+  }
   const participantId = event.participantId || event.participant?.id;
   if (!participantId) return;
 

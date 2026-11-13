@@ -7,6 +7,48 @@ import { verifyRacepackByCode } from './racepack.js';
 
 let currentParticipantTab = 'ALL';
 
+function openClearParticipantsDialog() {
+  if (adminState.profile?.role?.name !== 'SUPERADMIN') return;
+  const dialog = document.getElementById('clearParticipantsDialog');
+  document.getElementById('clearParticipantsConfirmation').value = '';
+  document.getElementById('clearParticipantsError').hidden = true;
+  dialog.showModal();
+}
+
+async function handleClearParticipants(event) {
+  event.preventDefault();
+  const input = document.getElementById('clearParticipantsConfirmation');
+  const error = document.getElementById('clearParticipantsError');
+  if (input.value !== 'KOSONGKAN DATA PESERTA') {
+    error.textContent = 'Ketik KOSONGKAN DATA PESERTA dengan tepat.';
+    error.hidden = false;
+    input.focus();
+    return;
+  }
+  const button = document.getElementById('btnConfirmClearParticipants');
+  const cancel = document.getElementById('btnCancelClearParticipants');
+  const dialog = document.getElementById('clearParticipantsDialog');
+  button.disabled = true;
+  cancel.disabled = true;
+  error.hidden = true;
+  try {
+    const result = await fetchAdmin('/admin/participants/clear', {
+      method: 'POST',
+      body: JSON.stringify({ confirmation: input.value })
+    });
+    if (result.status !== 'success') throw new Error(result.message || 'Pengosongan data gagal.');
+    dialog.close();
+    showAdminToast('success', 'Data dikosongkan', `${result.data.participants} peserta dan ${result.data.orders} pesanan dihapus; ${result.data.restoredStock} kuota dikembalikan.`);
+    await loadParticipants();
+  } catch (err) {
+    error.textContent = `${err.message || 'Pengosongan data gagal.'} Periksa data dan log audit sebelum mencoba lagi.`;
+    error.hidden = false;
+  } finally {
+    button.disabled = false;
+    cancel.disabled = false;
+  }
+}
+
 async function loadParticipants() {
   try {
     const res = await fetchAdmin('/admin/participants?limit=100');
@@ -392,6 +434,8 @@ function exportParticipantsCsv() {
 }
 
 export {
+  openClearParticipantsDialog,
+  handleClearParticipants,
   loadParticipants,
   renderParticipantsTable,
   openCreateParticipantModal,

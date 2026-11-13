@@ -1,4 +1,4 @@
-import{f as qa,e as Ha,h as Ga,a as Wa,o as Ja,c as _a,l as Qa,b as w,d as Va,g as Ya,i as Xa,j as $a,k as Za,m as an,n as nn,p as en,q as tn,r as sn,s as ln,t as on,u as rn,D as dn,v as Na,w as cn,x as pn,y as mn,z as un,A as bn,B as gn,C as vn,E as fn,F as hn,G as kn,H as yn,I as k,J as xn,K as wn,L as En,M as Fn,N as An,O as Sn,P as Ma,Q as Pn,R as Tn,S as Cn,T as Bn,U as In,V as Rn,W as Ln,X as Nn,Y as Mn,Z as Dn,_ as Kn,$ as zn,a0 as On,a1 as E,a2 as jn,a3 as Da,a4 as Un,a5 as Gn,a6 as qn,a7 as Hn,a8 as Ka,a9 as Wn,aa as Jn,ab as _n,ac as Qn,ad as y,ae as Vn,af as Yn,ag as Xn,ah as $n,ai as Zn,aj as ae}from"./auth-B74jVeSt.js";import{a as ne,b as ee}from"./api-iQl_QkSJ.js";import{a as ie}from"./home-appearance-Db1ttUVV.js";const te=`<div class="admin-tab-pane active" id="pane-dashboard">
+import{f as _a,e as Qa,h as Ja,a as Va,o as Ya,c as Xa,l as $a,b as w,d as Za,g as an,i as nn,j as en,k as tn,m as sn,n as ln,p as on,q as rn,r as dn,s as cn,t as pn,u as mn,v as un,w as bn,D as gn,x as Oa,y as vn,z as fn,A as hn,B as kn,C as yn,E as xn,F as wn,G as En,H as Fn,I as Pn,J as An,K as k,L as Sn,M as Tn,N as Cn,O as Bn,P as In,Q as Rn,R as za,S as Ln,T as Nn,U as Dn,V as Mn,W as Kn,X as On,Y as zn,Z as jn,_ as Un,$ as Gn,a0 as qn,a1 as Hn,a2 as Wn,a3 as E,a4 as Jn,a5 as ja,a6 as _n,a7 as Qn,a8 as Vn,a9 as Yn,aa as Ua,ab as Xn,ac as $n,ad as Zn,ae,af as y,ag as ne,ah as ee,ai as ie,aj as te,ak as se,al as le}from"./auth-Vc2z6-m2.js";import{a as oe,b as re}from"./api-iQl_QkSJ.js";import{a as de}from"./home-appearance-Db1ttUVV.js";const ce=`<div class="admin-tab-pane active" id="pane-dashboard">
           <!-- Top KPI Grid: Pemisahan Jelas Total Biaya Layanan & Hasil Akhir Murni Bersih -->
           <div class="admin-kpi-grid">
             <div class="kpi-card" data-dashboard-widget="dashboard:participants">
@@ -306,7 +306,7 @@ import{f as qa,e as Ha,h as Ga,a as Wa,o as Ja,c as _a,l as Qa,b as w,d as Va,g 
               </div>
             </div>
           </div>
-        </div>`,se=`<div class="admin-tab-pane" id="pane-events">
+        </div>`,pe=`<div class="admin-tab-pane" id="pane-events">
           <div class="admin-section">
             <div class="admin-section-header">
               <div>
@@ -331,7 +331,7 @@ import{f as qa,e as Ha,h as Ga,a as Wa,o as Ja,c as _a,l as Qa,b as w,d as Va,g 
               </div>
             </div>
           </div>
-        </div>`,le=`<div class="admin-tab-pane" id="pane-participants">
+        </div>`,me=`<div class="admin-tab-pane" id="pane-participants">
   <div class="admin-section">
     <div class="admin-section-header" style="flex-wrap: wrap; gap: 14px;">
       <div>
@@ -351,10 +351,27 @@ import{f as qa,e as Ha,h as Ga,a as Wa,o as Ja,c as _a,l as Qa,b as w,d as Va,g 
         <button class="btn btn-secondary btn-sm" id="btnExportCsv">
           <i class="fa-solid fa-file-csv"></i> Unduh CSV
         </button>
+        <button type="button" class="btn btn-sm" id="btnClearParticipants" data-role="SUPERADMIN" style="display: none; background: #b91c1c; color: white;">
+          <i class="fa-solid fa-trash-can"></i> Kosongkan Data Peserta
+        </button>
         <button class="btn btn-primary btn-sm btn-glow" id="btnOpenCreateParticipantModal" data-permission="participants:create">
           <i class="fa-solid fa-user-plus"></i> Tambah Peserta Manual
         </button>
       </div>
+      <dialog id="clearParticipantsDialog" aria-labelledby="clearParticipantsTitle" style="width: min(94vw, 560px); max-width: 560px; border: 1px solid #fecaca; border-radius: 16px; padding: 24px;">
+        <form id="formClearParticipants">
+          <h3 id="clearParticipantsTitle" style="color: #b91c1c; margin: 0 0 12px;">Kosongkan seluruh data peserta?</h3>
+          <p>Semua peserta, pesanan, QR dan catatan racepack akan dihapus permanen, termasuk pesanan lunas. Tindakan ini tidak membatalkan atau mengembalikan pembayaran Midtrans; tiket yang diterbitkan tidak dapat digunakan lagi.</p>
+          <p>Aktifkan mode pemeliharaan, hentikan aktivitas admin/racepack, selesaikan pesanan menunggu pembayaran dan buat cadangan terlebih dahulu. Kuota pendaftaran online aktif dikembalikan berdasarkan data dan log yang tersedia; periksa kuota manual sesudahnya. Akun pembeli dan log audit tetap disimpan.</p>
+          <label class="form-label" for="clearParticipantsConfirmation">Ketik <strong>KOSONGKAN DATA PESERTA</strong> untuk melanjutkan</label>
+          <input class="form-input" id="clearParticipantsConfirmation" autocomplete="off" required>
+          <p id="clearParticipantsError" role="alert" style="color: #b91c1c;" hidden></p>
+          <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; flex-wrap: wrap;">
+            <button type="button" class="btn btn-secondary" id="btnCancelClearParticipants">Batal</button>
+            <button type="submit" class="btn" id="btnConfirmClearParticipants" style="background: #b91c1c; color: white;">Hapus Permanen</button>
+          </div>
+        </form>
+      </dialog>
     </div>
 
     <!-- Segmented Tab Filter: Pisahkan per Status Pembayaran & Racepack -->
@@ -417,7 +434,7 @@ import{f as qa,e as Ha,h as Ga,a as Wa,o as Ja,c as _a,l as Qa,b as w,d as Va,g 
     </div>
   </div>
 </div>
-`,oe=`<div class="admin-tab-pane" id="pane-racepack">
+`,ue=`<div class="admin-tab-pane" id="pane-racepack">
   <div class="admin-section">
     <div class="admin-section-header" style="flex-wrap: wrap; gap: 14px;">
       <div>
@@ -707,7 +724,7 @@ import{f as qa,e as Ha,h as Ga,a as Wa,o as Ja,c as _a,l as Qa,b as w,d as Va,g 
     </div>
   </div>
 </div>
-`,re=`<div class="admin-tab-pane" id="pane-racepack-confirm">\r
+`,be=`<div class="admin-tab-pane" id="pane-racepack-confirm">\r
   <div class="admin-section racepack-confirm-section">\r
     <div class="admin-section-header">\r
       <div class="racepack-confirm-heading">\r
@@ -736,7 +753,7 @@ import{f as qa,e as Ha,h as Ga,a as Wa,o as Ja,c as _a,l as Qa,b as w,d as Va,g 
     </div>\r
   </div>\r
 </div>\r
-`,de=`<div class="admin-tab-pane" id="pane-racepack-view">\r
+`,ge=`<div class="admin-tab-pane" id="pane-racepack-view">\r
   <div class="admin-section racepack-live-section">\r
     <div class="admin-section-header racepack-live-header">\r
       <div>\r
@@ -756,7 +773,7 @@ import{f as qa,e as Ha,h as Ga,a as Wa,o as Ja,c as _a,l as Qa,b as w,d as Va,g 
     </div>\r
   </div>\r
 </div>\r
-`,ce=`<div class="admin-tab-pane" id="pane-orders">
+`,ve=`<div class="admin-tab-pane" id="pane-orders">
           <div class="admin-section">
             <div class="admin-section-header">
               <div>
@@ -805,7 +822,7 @@ import{f as qa,e as Ha,h as Ga,a as Wa,o as Ja,c as _a,l as Qa,b as w,d as Va,g 
               </table>
             </div>
           </div>
-        </div>`,pe=`<div class="admin-tab-pane" id="pane-countdown">
+        </div>`,fe=`<div class="admin-tab-pane" id="pane-countdown">
           <div class="admin-section">
             <div class="admin-section-header">
               <div>
@@ -912,7 +929,7 @@ import{f as qa,e as Ha,h as Ga,a as Wa,o as Ja,c as _a,l as Qa,b as w,d as Va,g 
               </div>
             </div>
           </div>
-          </div>`,me=`<div class="admin-tab-pane" id="pane-bib-settings">
+          </div>`,he=`<div class="admin-tab-pane" id="pane-bib-settings">
   <div class="admin-section">
     <div class="admin-section-header" style="flex-wrap: wrap; gap: 14px;">
       <div>
@@ -1172,7 +1189,7 @@ import{f as qa,e as Ha,h as Ga,a as Wa,o as Ja,c as _a,l as Qa,b as w,d as Va,g 
     </div>
   </div>
 </div>
-`,ue=`<div class="admin-tab-pane" id="pane-cms">
+`,ke=`<div class="admin-tab-pane" id="pane-cms">
           <form id="formCmsSettings">
     <div class="cms-submit-actions cms-submit-actions-top">
       <span class="cms-save-context"><i class="fa-solid fa-cloud-arrow-up"></i> Perubahan akan diterapkan setelah disimpan</span>
@@ -1750,7 +1767,7 @@ import{f as qa,e as Ha,h as Ga,a as Wa,o as Ja,c as _a,l as Qa,b as w,d as Va,g 
 
             </div>
           </form>
-        </div>`,be=`<div class="admin-tab-pane" id="pane-admins" data-role="SUPERADMIN">
+        </div>`,ye=`<div class="admin-tab-pane" id="pane-admins" data-role="SUPERADMIN">
           <!-- Sub-nav Tabs RBAC -->
           <div class="rbac-subnav" role="tablist" aria-label="Bagian pengelolaan admin">
             <button type="button" class="btn btn-primary btn-sm rbac-subnav-button" id="btnRbacTabUsers" role="tab" aria-controls="rbacSectionUsers" aria-selected="true" onclick="switchRbacSubTab('users')">
@@ -1867,7 +1884,7 @@ import{f as qa,e as Ha,h as Ga,a as Wa,o as Ja,c as _a,l as Qa,b as w,d as Va,g 
               </table>
             </div>
           </div>
-        </div>`,ge=`<div class="admin-tab-pane" id="pane-routes">
+        </div>`,xe=`<div class="admin-tab-pane" id="pane-routes">
   <div class="admin-section route-settings-section">
     <div class="admin-section-header route-section-heading">
       <div>
@@ -1964,7 +1981,7 @@ import{f as qa,e as Ha,h as Ga,a as Wa,o as Ja,c as _a,l as Qa,b as w,d as Va,g 
       </table>
     </div>
   </div>
-</div>`,ve=`<div class="admin-tab-pane" id="pane-notifications">
+</div>`,we=`<div class="admin-tab-pane" id="pane-notifications">
           <div class="admin-section">
             <div class="admin-section-header">
               <div>
@@ -2173,7 +2190,7 @@ import{f as qa,e as Ha,h as Ga,a as Wa,o as Ja,c as _a,l as Qa,b as w,d as Va,g 
               </div>
             </div>
           </div>
-        </div>`,fe=`<div class="admin-tab-pane" id="pane-notif-logs">
+        </div>`,Ee=`<div class="admin-tab-pane" id="pane-notif-logs">
           <div class="admin-section">
             <div class="admin-section-header">
               <div>
@@ -2271,7 +2288,7 @@ import{f as qa,e as Ha,h as Ga,a as Wa,o as Ja,c as _a,l as Qa,b as w,d as Va,g 
               </table>
             </div>
           </div>
-        </div>`,he=`<div class="admin-tab-pane" id="pane-whatsapp-web">
+        </div>`,Fe=`<div class="admin-tab-pane" id="pane-whatsapp-web">
           <div class="admin-section" style="padding: 0; background: transparent; border: none; box-shadow: none;">
             <!-- Header Ringkasan Status Gateway -->
             <div style="background: #FFFFFF; border: 1px solid var(--color-border-subtle); border-radius: var(--radius-lg); padding: 18px 24px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
@@ -2403,7 +2420,7 @@ import{f as qa,e as Ha,h as Ga,a as Wa,o as Ja,c as _a,l as Qa,b as w,d as Va,g 
               </div>
             </div>
           </div>
-        </div>`,ke=`<div class="admin-tab-pane" id="pane-logs">
+        </div>`,Pe=`<div class="admin-tab-pane" id="pane-logs">
           <div class="admin-section">
             <div class="admin-section-header">
               <div>
@@ -2435,7 +2452,7 @@ import{f as qa,e as Ha,h as Ga,a as Wa,o as Ja,c as _a,l as Qa,b as w,d as Va,g 
               </table>
             </div>
           </div>
-        </div>`,ye=`<div class="admin-tab-pane" id="pane-role-monitoring" data-role="SUPERADMIN">\r
+        </div>`,Ae=`<div class="admin-tab-pane" id="pane-role-monitoring" data-role="SUPERADMIN">\r
   <section class="admin-section role-monitoring-section">\r
     <div class="admin-section-header role-monitoring-header">\r
       <div>\r
@@ -2467,7 +2484,7 @@ import{f as qa,e as Ha,h as Ga,a as Wa,o as Ja,c as _a,l as Qa,b as w,d as Va,g 
     </div>\r
   </section>\r
 </div>\r
-`,xe=`<div class="admin-tab-pane" id="pane-backups" data-role="SUPERADMIN">\r
+`,Se=`<div class="admin-tab-pane" id="pane-backups" data-role="SUPERADMIN">\r
   <section class="admin-section backup-section">\r
     <div class="admin-section-header backup-header">\r
       <div>\r
@@ -2522,7 +2539,7 @@ import{f as qa,e as Ha,h as Ga,a as Wa,o as Ja,c as _a,l as Qa,b as w,d as Va,g 
     </div>\r
   </section>\r
 </div>\r
-`,we=`<!-- MODAL 1: EVENT CREATE / EDIT -->
+`,Te=`<!-- MODAL 1: EVENT CREATE / EDIT -->
   <div class="admin-modal-backdrop" id="modalEventBackdrop">
     <div class="admin-modal-dialog">
       <div class="admin-modal-header">
@@ -3088,5 +3105,5 @@ import{f as qa,e as Ha,h as Ga,a as Wa,o as Ja,c as _a,l as Qa,b as w,d as Va,g 
         <button type="button" class="btn btn-primary btn-sm btn-glow" id="btnConfirmOk">Ya, Lanjutkan</button>
       </div>
     </div>
-  </div>`;let F=!1,za=!1;async function Oa(){var o;const a=document.getElementById("backupTablesStatus"),i=document.getElementById("backupTableCount"),t=document.getElementById("backupTablesList");if(!(!t||F)){F=!0,a&&(a.textContent="Memuat daftar tabel...");try{const e=await qa("/admin/backups");if(!e||e.status!=="success"||!Array.isArray((o=e.data)==null?void 0:o.tables))throw new Error((e==null?void 0:e.message)||"Daftar tabel backup gagal dimuat.");const r=e.data.tables;i&&(i.textContent=String(r.length)),a&&(a.textContent="Semua tabel database akan disertakan pada kedua format backup."),t.innerHTML=r.map(l=>`<li>${Ha(l)}</li>`).join("")}catch(e){a&&(a.textContent=e.message||"Daftar tabel gagal dimuat."),i&&(i.textContent="-"),t.replaceChildren(),console.error("Gagal memuat cakupan backup database:",e)}finally{F=!1}}}async function ja(a){var r;if(!window.confirm(`Unduh backup ${a.toUpperCase()} seluruh database? File memuat data sensitif dan harus disimpan secara aman.`))return;const t=a==="sql"?"btnDownloadSqlBackup":"btnDownloadCsvBackup",o=document.getElementById(t),e=document.getElementById("backupTablesStatus");o&&(o.disabled=!0),e&&(e.textContent=`Menyiapkan backup ${a.toUpperCase()}...`);try{const l=await ne(`/admin/backups/${a}`,{method:"POST",credentials:"include",headers:{Accept:a==="csv"?"text/csv":"text/plain","X-Backup-Request":"download"}});if(l.status===401)throw Ga({revoke:!1}),new Error("Sesi admin telah berakhir. Silakan login kembali.");if(!l.ok){let b=`Unduhan backup gagal (HTTP ${l.status}).`;try{const g=await l.json();g.message&&(b=g.message)}catch{}throw new Error(b)}const v=await l.blob(),f=((r=(l.headers.get("Content-Disposition")||"").match(/filename="([^"]+)"/))==null?void 0:r[1])||`tegal-run-backup.${a}`,u=URL.createObjectURL(v),d=document.createElement("a");d.href=u,d.download=f,document.body.appendChild(d),d.click(),d.remove(),URL.revokeObjectURL(u),e&&(e.textContent=`Backup ${a.toUpperCase()} berhasil disiapkan.`)}catch(l){e&&(e.textContent=l.message||"Unduhan backup gagal."),console.error(`Gagal mengunduh backup ${a.toUpperCase()}:`,l)}finally{o&&(o.disabled=!1)}}function Ee(){var a,i,t;(a=document.getElementById("btnRefreshBackupOverview"))==null||a.addEventListener("click",Oa),(i=document.getElementById("btnDownloadSqlBackup"))==null||i.addEventListener("click",()=>ja("sql")),(t=document.getElementById("btnDownloadCsvBackup"))==null||t.addEventListener("click",()=>ja("csv")),window.addEventListener("admin:tab-changed",o=>{var e;((e=o.detail)==null?void 0:e.tabKey)==="backups"&&!za&&(za=!0,Oa())})}ee.getWebsiteSettings().then(a=>{a&&ie(a)});function Fe(a){Yn(a),Xn(a)}function Ae(a){["notifications","whatsapp-web"].includes($n.activeTab)&&Zn(a)}function Se(){ae("warning","Sesi Diakhiri","Superadmin telah mengakhiri sesi Anda. Silakan login kembali jika diperlukan."),Ga()}function Ua(){return[y("admin:racepack_confirmation_changed",Vn),y("admin:racepack_queue_changed",Fe),y("admin:whatsapp_session",Ae),y("admin:force_logout",Se)]}window.closeAdminModal=function(a){var i;(i=document.getElementById(a))==null||i.classList.remove("open")};function Pe(){const a=document.getElementById("adminPanesContainer")||document.querySelector(".admin-content-body");a&&a.children.length===0&&(a.innerHTML=[te,se,le,oe,re,de,ce,pe,me,ue,be,ge,ve,fe,he,ke,ye,xe].join(`
-`));const i=document.getElementById("rpcInfoDialog");i&&i.parentElement!==document.body&&document.body.appendChild(i);const t=document.getElementById("adminModalsContainer");t&&t.children.length===0&&(t.innerHTML=we)}document.addEventListener("DOMContentLoaded",()=>{var t,o,e,r,l,v,x,f,u,d,b,g,A,S,P,T,C,B,I,R,L,N,M,D,K,z,O,j,U,G,q,H,W,J,_,Q,V,Y,X,$,Z,aa,na,ea,ia,ta,sa,la,oa,ra,da,ca,pa,ma,ua,ba,ga,va,fa,ha,ka,ya,xa,wa,Ea,Fa,Aa,Sa,Pa,Ta,Ca,Ba,Ia,Ra,La;Pe(),Ee(),(t=document.getElementById("adminLoginForm"))==null||t.addEventListener("submit",Wa),(o=document.getElementById("btnToggleSidebar"))==null||o.addEventListener("click",Ja),(e=document.getElementById("sidebarOverlay"))==null||e.addEventListener("click",_a),(r=document.getElementById("btnRefreshEvents"))==null||r.addEventListener("click",Qa),(l=document.getElementById("btnRefreshOrders"))==null||l.addEventListener("click",w),(v=document.getElementById("btnRefreshLogs"))==null||v.addEventListener("click",Va),(x=document.getElementById("btnExportCsv"))==null||x.addEventListener("click",Ya),(f=document.getElementById("btnOpenCreateEventModal"))==null||f.addEventListener("click",Xa),(u=document.getElementById("btnOpenCreateParticipantModal"))==null||u.addEventListener("click",$a),(d=document.getElementById("btnOpenCreateAdminModal"))==null||d.addEventListener("click",Za),(b=document.getElementById("btnOpenCreateRouteModal"))==null||b.addEventListener("click",an),(g=document.getElementById("btnOpenCreateRoleModal"))==null||g.addEventListener("click",nn),(A=document.getElementById("btnResetDefaultRoles"))==null||A.addEventListener("click",en),(S=document.getElementById("formEvent"))==null||S.addEventListener("submit",tn),(P=document.getElementById("formParticipant"))==null||P.addEventListener("submit",sn),(T=document.getElementById("formOrderStatus"))==null||T.addEventListener("submit",ln),(C=document.getElementById("formAdminUser"))==null||C.addEventListener("submit",on),(B=document.getElementById("formRole"))==null||B.addEventListener("submit",rn),(I=document.getElementById("btnSelectAllPages"))==null||I.addEventListener("click",()=>{document.querySelectorAll('#roleModulesContainer input[type="checkbox"]:not(:disabled)').forEach(n=>{n.checked=!0,n.dispatchEvent(new Event("change",{bubbles:!0}))})}),(R=document.getElementById("btnClearAllPages"))==null||R.addEventListener("click",()=>{document.querySelectorAll('#roleModulesContainer input[type="checkbox"]:not(:disabled)').forEach(n=>{n.checked=!1,n.dispatchEvent(new Event("change",{bubbles:!0}))})}),(L=document.getElementById("btnPresetDefaultPages"))==null||L.addEventListener("click",()=>{var m;const n=((m=document.getElementById("roleFormName"))==null?void 0:m.value.trim().toUpperCase())||"",p=dn.find(c=>c.name===n)?n==="ADMINISTRATOR"?["page:dashboard","page:events","page:participants","page:racepack","page:orders","page:notif-logs","page:whatsapp-web","page:cms","page:countdown","page:routes"]:n==="FINANCE"?["page:dashboard","page:orders","page:logs"]:n==="SPONSORSHIP"?["page:dashboard","page:cms","page:events","page:notif-logs"]:n==="RACEPACK_OFFICER"?["page:dashboard","page:racepack","page:participants","page:whatsapp-web"]:n==="GATE_OPERATOR"?["page:dashboard","page:participants","page:racepack"]:n==="RACE_DIRECTOR"?["page:dashboard","page:routes","page:countdown","page:participants","page:events","page:racepack"]:n==="TIMING_JUDGE"?["page:dashboard","page:participants","page:routes"]:n==="MEDICAL_OFFICER"?["page:dashboard","page:participants","page:routes"]:n==="VOLUNTEER"?["page:dashboard","page:participants","page:racepack"]:n==="BAG_DROP_OFFICER"?["page:dashboard","page:participants"]:n==="CUSTOMER_SERVICE"?["page:dashboard","page:whatsapp-web","page:notif-logs","page:participants","page:orders","page:racepack"]:["page:dashboard"]:["page:dashboard"];document.querySelectorAll('#roleApiPermissionsContainer input[type="checkbox"]:not(:disabled)').forEach(c=>{var h;c.checked=!1,(h=c.closest(".role-permission-option"))==null||h.classList.remove("checked")}),document.querySelectorAll('#roleModulesContainer input[type="checkbox"]:not(:disabled)').forEach(c=>{const h=p.includes(c.value);c.checked=h,c.dispatchEvent(new Event("change",{bubbles:!0}))})}),(N=document.getElementById("formCmsSettings"))==null||N.addEventListener("submit",Na),(M=document.getElementById("formWebsiteCms"))==null||M.addEventListener("submit",Na),(D=document.getElementById("formNotificationSettings"))==null||D.addEventListener("submit",cn),(K=document.getElementById("btnSendTestNotif"))==null||K.addEventListener("click",pn),(z=document.getElementById("formEventBenefit"))==null||z.addEventListener("submit",mn),(O=document.getElementById("btnCancelBenefitEdit"))==null||O.addEventListener("click",un),(j=document.getElementById("formEventJersey"))==null||j.addEventListener("submit",bn),(U=document.getElementById("btnCancelJerseyEdit"))==null||U.addEventListener("click",gn),(G=document.getElementById("jerseyFormImage"))==null||G.addEventListener("input",vn),(q=document.getElementById("btnLoadJerseyGallery"))==null||q.addEventListener("click",fn),(H=document.getElementById("btnUseJerseyGallery"))==null||H.addEventListener("click",hn),(W=document.getElementById("formRoutePoint"))==null||W.addEventListener("submit",kn),(J=document.getElementById("routeSettingsForm"))==null||J.addEventListener("submit",yn),(_=document.getElementById("routeMapMode"))==null||_.addEventListener("change",k),(Q=document.getElementById("routeCheckpointMode"))==null||Q.addEventListener("change",k),(V=document.getElementById("routeSettingsMapImage"))==null||V.addEventListener("input",k),(Y=document.getElementById("routeSettingsCheckpointImage"))==null||Y.addEventListener("input",k),(X=document.getElementById("btnSaveGlobalCountdown"))==null||X.addEventListener("click",xn),($=document.getElementById("btnResetGlobalCountdown"))==null||$.addEventListener("click",wn),(Z=document.getElementById("btnToggleGlobalClosed"))==null||Z.addEventListener("click",En),(aa=document.getElementById("btnSaveWebsiteStatus"))==null||aa.addEventListener("click",Fn),(na=document.getElementById("maintenanceEnabled"))==null||na.addEventListener("change",An),(ea=document.getElementById("filterOrderStatus"))==null||ea.addEventListener("change",w),(ia=document.getElementById("searchOrder"))==null||ia.addEventListener("input",()=>{clearTimeout(window._searchOrderTimer),window._searchOrderTimer=setTimeout(w,300)}),document.querySelectorAll(".participant-tabs-nav .part-tab-btn").forEach(n=>{n.addEventListener("click",()=>{const s=n.getAttribute("data-tab");s&&Sn(s)})}),(ta=document.getElementById("filterParticipantCategory"))==null||ta.addEventListener("change",Ma),(sa=document.getElementById("searchParticipant"))==null||sa.addEventListener("input",()=>{clearTimeout(window._searchParticipantTimer),window._searchParticipantTimer=setTimeout(Ma,250)}),(la=document.getElementById("btnRefreshRacepackStats"))==null||la.addEventListener("click",()=>Pn({force:!0})),(oa=document.getElementById("btnRefreshRacepackConfirmations"))==null||oa.addEventListener("click",()=>Tn({force:!0})),(ra=document.getElementById("racepackConfirmationsTable"))==null||ra.addEventListener("click",n=>{const s=n.target.closest("[data-confirm-racepack-id]");s&&Cn(s.dataset.confirmRacepackId)});const a=document.getElementById("rpcInfoDialog");(da=document.getElementById("btnRpcInfo"))==null||da.addEventListener("click",()=>{a instanceof HTMLDialogElement&&!a.open&&a.showModal()}),(ca=document.getElementById("btnCloseRpcInfo"))==null||ca.addEventListener("click",()=>{a instanceof HTMLDialogElement&&a.close()}),a==null||a.addEventListener("click",n=>{n.target===a&&a instanceof HTMLDialogElement&&a.close()}),(pa=document.getElementById("btnStartRpcCamera"))==null||pa.addEventListener("click",Bn),(ma=document.getElementById("btnStopRpcCamera"))==null||ma.addEventListener("click",In),(ua=document.getElementById("btnTriggerNativeCamera"))==null||ua.addEventListener("click",Rn),(ba=document.getElementById("rpcNativeCameraInput"))==null||ba.addEventListener("change",Ln),(ga=document.getElementById("btnConfirmRpcCheckin"))==null||ga.addEventListener("click",Nn),(va=document.getElementById("btnRefreshRacepackQueue"))==null||va.addEventListener("click",()=>Mn({force:!0})),(fa=document.getElementById("btnRevertRpcCheckin"))==null||fa.addEventListener("click",Dn),(ha=document.getElementById("formRpcManualSearch"))==null||ha.addEventListener("submit",n=>{n.preventDefault();const s=document.getElementById("rpcSearchInput"),p=s?s.value.trim():"";p&&Kn(p)}),(ka=document.getElementById("btnGenerateWaQr"))==null||ka.addEventListener("click",zn),(ya=document.getElementById("btnDisconnectWa"))==null||ya.addEventListener("click",On),(xa=document.getElementById("btnRefreshNotifLogs"))==null||xa.addEventListener("click",E),(wa=document.getElementById("btnBatchSendNotif"))==null||wa.addEventListener("click",jn),(Ea=document.getElementById("filterNotifDeliveryStatus"))==null||Ea.addEventListener("change",E),(Fa=document.getElementById("searchNotifLogs"))==null||Fa.addEventListener("input",()=>{clearTimeout(window._searchNotifTimer),window._searchNotifTimer=setTimeout(E,300)}),(Aa=document.getElementById("btnRefreshWaWeb"))==null||Aa.addEventListener("click",Da),(Sa=document.getElementById("btnWaWebSync"))==null||Sa.addEventListener("click",Da),(Pa=document.getElementById("btnGoToWaQr"))==null||Pa.addEventListener("click",()=>Un("notifications")),(Ta=document.getElementById("btnSyncMidtransDashboard"))==null||Ta.addEventListener("click",Gn),(Ca=document.getElementById("btnSendWaDirectMsg"))==null||Ca.addEventListener("click",qn),(Ba=document.getElementById("waQuickTemplateSelect"))==null||Ba.addEventListener("change",Hn),(Ia=document.getElementById("btnQuickSendPaidTicket"))==null||Ia.addEventListener("click",()=>Ka()),(Ra=document.getElementById("btnQuickSendPending"))==null||Ra.addEventListener("click",()=>Ka()),(La=document.getElementById("waContactSearchInput"))==null||La.addEventListener("input",n=>{const s=(n.target.value||"").toLowerCase(),p=Wn.filter(m=>m.customerName.toLowerCase().includes(s)||m.customerPhone.includes(s)||m.ticketName.toLowerCase().includes(s));Jn(p)}),_n();let i=Ua();window.addEventListener("pagehide",()=>i.forEach(n=>n()),{once:!0}),window.addEventListener("pageshow",n=>{n.persisted&&(i.forEach(s=>s()),i=Ua())}),Qn()});
+  </div>`;let F=!1,Ga=!1;async function qa(){var o;const a=document.getElementById("backupTablesStatus"),i=document.getElementById("backupTableCount"),s=document.getElementById("backupTablesList");if(!(!s||F)){F=!0,a&&(a.textContent="Memuat daftar tabel...");try{const e=await _a("/admin/backups");if(!e||e.status!=="success"||!Array.isArray((o=e.data)==null?void 0:o.tables))throw new Error((e==null?void 0:e.message)||"Daftar tabel backup gagal dimuat.");const r=e.data.tables;i&&(i.textContent=String(r.length)),a&&(a.textContent="Semua tabel database akan disertakan pada kedua format backup."),s.innerHTML=r.map(l=>`<li>${Qa(l)}</li>`).join("")}catch(e){a&&(a.textContent=e.message||"Daftar tabel gagal dimuat."),i&&(i.textContent="-"),s.replaceChildren(),console.error("Gagal memuat cakupan backup database:",e)}finally{F=!1}}}async function Ha(a){var r;if(!window.confirm(`Unduh backup ${a.toUpperCase()} seluruh database? File memuat data sensitif dan harus disimpan secara aman.`))return;const s=a==="sql"?"btnDownloadSqlBackup":"btnDownloadCsvBackup",o=document.getElementById(s),e=document.getElementById("backupTablesStatus");o&&(o.disabled=!0),e&&(e.textContent=`Menyiapkan backup ${a.toUpperCase()}...`);try{const l=await oe(`/admin/backups/${a}`,{method:"POST",credentials:"include",headers:{Accept:a==="csv"?"text/csv":"text/plain","X-Backup-Request":"download"}});if(l.status===401)throw Ja({revoke:!1}),new Error("Sesi admin telah berakhir. Silakan login kembali.");if(!l.ok){let b=`Unduhan backup gagal (HTTP ${l.status}).`;try{const g=await l.json();g.message&&(b=g.message)}catch{}throw new Error(b)}const v=await l.blob(),f=((r=(l.headers.get("Content-Disposition")||"").match(/filename="([^"]+)"/))==null?void 0:r[1])||`tegal-run-backup.${a}`,u=URL.createObjectURL(v),d=document.createElement("a");d.href=u,d.download=f,document.body.appendChild(d),d.click(),d.remove(),URL.revokeObjectURL(u),e&&(e.textContent=`Backup ${a.toUpperCase()} berhasil disiapkan.`)}catch(l){e&&(e.textContent=l.message||"Unduhan backup gagal."),console.error(`Gagal mengunduh backup ${a.toUpperCase()}:`,l)}finally{o&&(o.disabled=!1)}}function Ce(){var a,i,s;(a=document.getElementById("btnRefreshBackupOverview"))==null||a.addEventListener("click",qa),(i=document.getElementById("btnDownloadSqlBackup"))==null||i.addEventListener("click",()=>Ha("sql")),(s=document.getElementById("btnDownloadCsvBackup"))==null||s.addEventListener("click",()=>Ha("csv")),window.addEventListener("admin:tab-changed",o=>{var e;((e=o.detail)==null?void 0:e.tabKey)==="backups"&&!Ga&&(Ga=!0,qa())})}re.getWebsiteSettings().then(a=>{a&&de(a)});function Be(a){ee(a),ie(a)}function Ie(a){["notifications","whatsapp-web"].includes(te.activeTab)&&se(a)}function Re(){le("warning","Sesi Diakhiri","Superadmin telah mengakhiri sesi Anda. Silakan login kembali jika diperlukan."),Ja()}function Wa(){return[y("admin:racepack_confirmation_changed",ne),y("admin:racepack_queue_changed",Be),y("admin:whatsapp_session",Ie),y("admin:force_logout",Re)]}window.closeAdminModal=function(a){var i;(i=document.getElementById(a))==null||i.classList.remove("open")};function Le(){const a=document.getElementById("adminPanesContainer")||document.querySelector(".admin-content-body");a&&a.children.length===0&&(a.innerHTML=[ce,pe,me,ue,be,ge,ve,fe,he,ke,ye,xe,we,Ee,Fe,Pe,Ae,Se].join(`
+`));const i=document.getElementById("rpcInfoDialog");i&&i.parentElement!==document.body&&document.body.appendChild(i);const s=document.getElementById("adminModalsContainer");s&&s.children.length===0&&(s.innerHTML=Te)}document.addEventListener("DOMContentLoaded",()=>{var s,o,e,r,l,v,x,f,u,d,b,g,P,A,S,T,C,B,I,R,L,N,D,M,K,O,z,j,U,G,q,H,W,J,_,Q,V,Y,X,$,Z,aa,na,ea,ia,ta,sa,la,oa,ra,da,ca,pa,ma,ua,ba,ga,va,fa,ha,ka,ya,xa,wa,Ea,Fa,Pa,Aa,Sa,Ta,Ca,Ba,Ia,Ra,La,Na,Da,Ma,Ka;Le(),Ce(),(s=document.getElementById("adminLoginForm"))==null||s.addEventListener("submit",Va),(o=document.getElementById("btnToggleSidebar"))==null||o.addEventListener("click",Ya),(e=document.getElementById("sidebarOverlay"))==null||e.addEventListener("click",Xa),(r=document.getElementById("btnRefreshEvents"))==null||r.addEventListener("click",$a),(l=document.getElementById("btnRefreshOrders"))==null||l.addEventListener("click",w),(v=document.getElementById("btnRefreshLogs"))==null||v.addEventListener("click",Za),(x=document.getElementById("btnExportCsv"))==null||x.addEventListener("click",an),(f=document.getElementById("btnClearParticipants"))==null||f.addEventListener("click",nn),(u=document.getElementById("formClearParticipants"))==null||u.addEventListener("submit",en),(d=document.getElementById("btnCancelClearParticipants"))==null||d.addEventListener("click",()=>{var n;return(n=document.getElementById("clearParticipantsDialog"))==null?void 0:n.close()}),(b=document.getElementById("clearParticipantsDialog"))==null||b.addEventListener("cancel",n=>{var t;(t=document.getElementById("btnConfirmClearParticipants"))!=null&&t.disabled&&n.preventDefault()}),(g=document.getElementById("btnOpenCreateEventModal"))==null||g.addEventListener("click",tn),(P=document.getElementById("btnOpenCreateParticipantModal"))==null||P.addEventListener("click",sn),(A=document.getElementById("btnOpenCreateAdminModal"))==null||A.addEventListener("click",ln),(S=document.getElementById("btnOpenCreateRouteModal"))==null||S.addEventListener("click",on),(T=document.getElementById("btnOpenCreateRoleModal"))==null||T.addEventListener("click",rn),(C=document.getElementById("btnResetDefaultRoles"))==null||C.addEventListener("click",dn),(B=document.getElementById("formEvent"))==null||B.addEventListener("submit",cn),(I=document.getElementById("formParticipant"))==null||I.addEventListener("submit",pn),(R=document.getElementById("formOrderStatus"))==null||R.addEventListener("submit",mn),(L=document.getElementById("formAdminUser"))==null||L.addEventListener("submit",un),(N=document.getElementById("formRole"))==null||N.addEventListener("submit",bn),(D=document.getElementById("btnSelectAllPages"))==null||D.addEventListener("click",()=>{document.querySelectorAll('#roleModulesContainer input[type="checkbox"]:not(:disabled)').forEach(n=>{n.checked=!0,n.dispatchEvent(new Event("change",{bubbles:!0}))})}),(M=document.getElementById("btnClearAllPages"))==null||M.addEventListener("click",()=>{document.querySelectorAll('#roleModulesContainer input[type="checkbox"]:not(:disabled)').forEach(n=>{n.checked=!1,n.dispatchEvent(new Event("change",{bubbles:!0}))})}),(K=document.getElementById("btnPresetDefaultPages"))==null||K.addEventListener("click",()=>{var m;const n=((m=document.getElementById("roleFormName"))==null?void 0:m.value.trim().toUpperCase())||"",p=gn.find(c=>c.name===n)?n==="ADMINISTRATOR"?["page:dashboard","page:events","page:participants","page:racepack","page:orders","page:notif-logs","page:whatsapp-web","page:cms","page:countdown","page:routes"]:n==="FINANCE"?["page:dashboard","page:orders","page:logs"]:n==="SPONSORSHIP"?["page:dashboard","page:cms","page:events","page:notif-logs"]:n==="RACEPACK_OFFICER"?["page:dashboard","page:racepack","page:participants","page:whatsapp-web"]:n==="GATE_OPERATOR"?["page:dashboard","page:participants","page:racepack"]:n==="RACE_DIRECTOR"?["page:dashboard","page:routes","page:countdown","page:participants","page:events","page:racepack"]:n==="TIMING_JUDGE"?["page:dashboard","page:participants","page:routes"]:n==="MEDICAL_OFFICER"?["page:dashboard","page:participants","page:routes"]:n==="VOLUNTEER"?["page:dashboard","page:participants","page:racepack"]:n==="BAG_DROP_OFFICER"?["page:dashboard","page:participants"]:n==="CUSTOMER_SERVICE"?["page:dashboard","page:whatsapp-web","page:notif-logs","page:participants","page:orders","page:racepack"]:["page:dashboard"]:["page:dashboard"];document.querySelectorAll('#roleApiPermissionsContainer input[type="checkbox"]:not(:disabled)').forEach(c=>{var h;c.checked=!1,(h=c.closest(".role-permission-option"))==null||h.classList.remove("checked")}),document.querySelectorAll('#roleModulesContainer input[type="checkbox"]:not(:disabled)').forEach(c=>{const h=p.includes(c.value);c.checked=h,c.dispatchEvent(new Event("change",{bubbles:!0}))})}),(O=document.getElementById("formCmsSettings"))==null||O.addEventListener("submit",Oa),(z=document.getElementById("formWebsiteCms"))==null||z.addEventListener("submit",Oa),(j=document.getElementById("formNotificationSettings"))==null||j.addEventListener("submit",vn),(U=document.getElementById("btnSendTestNotif"))==null||U.addEventListener("click",fn),(G=document.getElementById("formEventBenefit"))==null||G.addEventListener("submit",hn),(q=document.getElementById("btnCancelBenefitEdit"))==null||q.addEventListener("click",kn),(H=document.getElementById("formEventJersey"))==null||H.addEventListener("submit",yn),(W=document.getElementById("btnCancelJerseyEdit"))==null||W.addEventListener("click",xn),(J=document.getElementById("jerseyFormImage"))==null||J.addEventListener("input",wn),(_=document.getElementById("btnLoadJerseyGallery"))==null||_.addEventListener("click",En),(Q=document.getElementById("btnUseJerseyGallery"))==null||Q.addEventListener("click",Fn),(V=document.getElementById("formRoutePoint"))==null||V.addEventListener("submit",Pn),(Y=document.getElementById("routeSettingsForm"))==null||Y.addEventListener("submit",An),(X=document.getElementById("routeMapMode"))==null||X.addEventListener("change",k),($=document.getElementById("routeCheckpointMode"))==null||$.addEventListener("change",k),(Z=document.getElementById("routeSettingsMapImage"))==null||Z.addEventListener("input",k),(aa=document.getElementById("routeSettingsCheckpointImage"))==null||aa.addEventListener("input",k),(na=document.getElementById("btnSaveGlobalCountdown"))==null||na.addEventListener("click",Sn),(ea=document.getElementById("btnResetGlobalCountdown"))==null||ea.addEventListener("click",Tn),(ia=document.getElementById("btnToggleGlobalClosed"))==null||ia.addEventListener("click",Cn),(ta=document.getElementById("btnSaveWebsiteStatus"))==null||ta.addEventListener("click",Bn),(sa=document.getElementById("maintenanceEnabled"))==null||sa.addEventListener("change",In),(la=document.getElementById("filterOrderStatus"))==null||la.addEventListener("change",w),(oa=document.getElementById("searchOrder"))==null||oa.addEventListener("input",()=>{clearTimeout(window._searchOrderTimer),window._searchOrderTimer=setTimeout(w,300)}),document.querySelectorAll(".participant-tabs-nav .part-tab-btn").forEach(n=>{n.addEventListener("click",()=>{const t=n.getAttribute("data-tab");t&&Rn(t)})}),(ra=document.getElementById("filterParticipantCategory"))==null||ra.addEventListener("change",za),(da=document.getElementById("searchParticipant"))==null||da.addEventListener("input",()=>{clearTimeout(window._searchParticipantTimer),window._searchParticipantTimer=setTimeout(za,250)}),(ca=document.getElementById("btnRefreshRacepackStats"))==null||ca.addEventListener("click",()=>Ln({force:!0})),(pa=document.getElementById("btnRefreshRacepackConfirmations"))==null||pa.addEventListener("click",()=>Nn({force:!0})),(ma=document.getElementById("racepackConfirmationsTable"))==null||ma.addEventListener("click",n=>{const t=n.target.closest("[data-confirm-racepack-id]");t&&Dn(t.dataset.confirmRacepackId)});const a=document.getElementById("rpcInfoDialog");(ua=document.getElementById("btnRpcInfo"))==null||ua.addEventListener("click",()=>{a instanceof HTMLDialogElement&&!a.open&&a.showModal()}),(ba=document.getElementById("btnCloseRpcInfo"))==null||ba.addEventListener("click",()=>{a instanceof HTMLDialogElement&&a.close()}),a==null||a.addEventListener("click",n=>{n.target===a&&a instanceof HTMLDialogElement&&a.close()}),(ga=document.getElementById("btnStartRpcCamera"))==null||ga.addEventListener("click",Mn),(va=document.getElementById("btnStopRpcCamera"))==null||va.addEventListener("click",Kn),(fa=document.getElementById("btnTriggerNativeCamera"))==null||fa.addEventListener("click",On),(ha=document.getElementById("rpcNativeCameraInput"))==null||ha.addEventListener("change",zn),(ka=document.getElementById("btnConfirmRpcCheckin"))==null||ka.addEventListener("click",jn),(ya=document.getElementById("btnRefreshRacepackQueue"))==null||ya.addEventListener("click",()=>Un({force:!0})),(xa=document.getElementById("btnRevertRpcCheckin"))==null||xa.addEventListener("click",Gn),(wa=document.getElementById("formRpcManualSearch"))==null||wa.addEventListener("submit",n=>{n.preventDefault();const t=document.getElementById("rpcSearchInput"),p=t?t.value.trim():"";p&&qn(p)}),(Ea=document.getElementById("btnGenerateWaQr"))==null||Ea.addEventListener("click",Hn),(Fa=document.getElementById("btnDisconnectWa"))==null||Fa.addEventListener("click",Wn),(Pa=document.getElementById("btnRefreshNotifLogs"))==null||Pa.addEventListener("click",E),(Aa=document.getElementById("btnBatchSendNotif"))==null||Aa.addEventListener("click",Jn),(Sa=document.getElementById("filterNotifDeliveryStatus"))==null||Sa.addEventListener("change",E),(Ta=document.getElementById("searchNotifLogs"))==null||Ta.addEventListener("input",()=>{clearTimeout(window._searchNotifTimer),window._searchNotifTimer=setTimeout(E,300)}),(Ca=document.getElementById("btnRefreshWaWeb"))==null||Ca.addEventListener("click",ja),(Ba=document.getElementById("btnWaWebSync"))==null||Ba.addEventListener("click",ja),(Ia=document.getElementById("btnGoToWaQr"))==null||Ia.addEventListener("click",()=>_n("notifications")),(Ra=document.getElementById("btnSyncMidtransDashboard"))==null||Ra.addEventListener("click",Qn),(La=document.getElementById("btnSendWaDirectMsg"))==null||La.addEventListener("click",Vn),(Na=document.getElementById("waQuickTemplateSelect"))==null||Na.addEventListener("change",Yn),(Da=document.getElementById("btnQuickSendPaidTicket"))==null||Da.addEventListener("click",()=>Ua()),(Ma=document.getElementById("btnQuickSendPending"))==null||Ma.addEventListener("click",()=>Ua()),(Ka=document.getElementById("waContactSearchInput"))==null||Ka.addEventListener("input",n=>{const t=(n.target.value||"").toLowerCase(),p=Xn.filter(m=>m.customerName.toLowerCase().includes(t)||m.customerPhone.includes(t)||m.ticketName.toLowerCase().includes(t));$n(p)}),Zn();let i=Wa();window.addEventListener("pagehide",()=>i.forEach(n=>n()),{once:!0}),window.addEventListener("pageshow",n=>{n.persisted&&(i.forEach(t=>t()),i=Wa())}),ae()});
