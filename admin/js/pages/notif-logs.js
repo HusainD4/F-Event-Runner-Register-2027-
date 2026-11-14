@@ -12,6 +12,15 @@ let notifLogsState = {
 };
 
 const channelLabels = { WA: 'WhatsApp', EMAIL: 'Email', BOTH: 'WA + Email', DISABLED: 'Nonaktif' };
+const paymentStatuses = {
+  SETTLEMENT: { label: 'LUNAS', detail: 'Pembayaran berhasil', background: '#ECFDF5', color: '#047857', paid: true },
+  CAPTURE: { label: 'LUNAS', detail: 'Pembayaran berhasil', background: '#ECFDF5', color: '#047857', paid: true },
+  PENDING: { label: 'PENDING', detail: 'Menunggu pembayaran', background: '#FFFBEB', color: '#B45309' },
+  CANCEL: { label: 'GAGAL', detail: 'Dibatalkan', background: '#FEF2F2', color: '#B91C1C' },
+  EXPIRE: { label: 'GAGAL', detail: 'Kedaluwarsa', background: '#FEF2F2', color: '#B91C1C' },
+  DENY: { label: 'GAGAL', detail: 'Ditolak', background: '#FEF2F2', color: '#B91C1C' },
+  REFUND: { label: 'REFUND', detail: 'Dana dikembalikan', background: '#F1F5F9', color: '#475569' },
+};
 
 async function loadNotificationLogs({ showLoading = true } = {}) {
   const tbody = document.getElementById('notifLogsTableBody');
@@ -125,10 +134,11 @@ function renderNotifLogsTable(items) {
     };
 
     // Payment Status Badge
-    const isPaid = it.orderStatus === 'SETTLEMENT' || it.orderStatus === 'CAPTURE';
-    const payBadge = isPaid
-      ? `<span class="badge" style="background:#ECFDF5;color:#047857;font-weight:700;">LUNAS</span>`
-      : `<span class="badge" style="background:#FFFBEB;color:#B45309;font-weight:700;">PENDING</span>`;
+    const payment = Object.hasOwn(paymentStatuses, it.orderStatus) ? paymentStatuses[it.orderStatus] : null;
+    const isPaid = payment?.paid === true;
+    const payBadge = payment
+      ? `<span class="badge" style="background:${payment.background};color:${payment.color};font-weight:700;" title="${payment.detail} (${escapeHtml(it.orderStatus)})">${payment.label}</span><div style="font-size:0.72rem;color:#64748B;margin-top:3px;">${payment.detail}</div>`
+      : `<span class="badge" style="background:#F1F5F9;color:#475569;font-weight:700;">TIDAK DIKETAHUI</span><div style="font-size:0.72rem;color:#64748B;margin-top:3px;">${escapeHtml(it.orderStatus || 'Status tidak tersedia')}</div>`;
 
     const sentTime = it.lastDispatchedAt
       ? new Date(it.lastDispatchedAt).toLocaleString('id-ID', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
