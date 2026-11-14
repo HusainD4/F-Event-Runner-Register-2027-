@@ -70,7 +70,7 @@ function renderEvents(events) {
   if (!container) return;
 
   if (events.length === 0) {
-    container.innerHTML = `<div style="grid-column: span 2; text-align: center; padding: 40px; color: #94A3B8;">Belum ada event/kategori yang ditambahkan.</div>`;
+    container.innerHTML = `<div class="event-catalog-empty"><i class="fa-solid fa-ticket" aria-hidden="true"></i><strong>Belum ada kategori tiket</strong><span>Tambahkan event baru untuk mulai mengelola katalog.</span></div>`;
     return;
   }
 
@@ -89,72 +89,75 @@ function renderEvents(events) {
         : registrationClosed
           ? 'Ditutup'
           : 'Dibuka';
-    const card = document.createElement('div');
-    card.className = `admin-event-card ${registrationClosed ? 'closed-event' : ''}`;
+    const card = document.createElement('details');
+    card.className = `admin-event-card event-catalog-card ${registrationClosed ? 'closed-event' : ''}`;
 
     const eventDateStr = ev.eventDate ? `${new Date(ev.eventDate).toLocaleString('id-ID', {
       dateStyle: 'long', timeStyle: 'short', timeZone: 'Asia/Jakarta'
     })} WIB` : 'Belum diatur';
     const eventImage = ev.ticketImage || ev.medalImage;
+    const eventId = escapeHtml(ev.id);
 
     card.innerHTML = `
-      <div class="admin-event-card-header">
-        <div class="admin-event-image">
-          ${eventImage
-            ? `<img src="${escapeHtml(eventImage)}" alt="${escapeHtml(ev.ticketName)}" loading="lazy" onerror="this.hidden=true;this.parentElement.classList.add('admin-event-image-empty')">`
-            : '<i class="fa-solid fa-person-running" aria-hidden="true"></i>'}
-        </div>
-        <div>
-          <h4 class="admin-event-title">
-            ${escapeHtml(ev.ticketName)}
-          </h4>
-          <span class="admin-event-meta">
-            Kategori: <strong>${escapeHtml(ev.category)}</strong> • Pelaksanaan: <strong>${escapeHtml(eventDateStr)}</strong>
-            ${ev.followGlobalTimer ? '<span class="admin-event-timer-badge"><i class="fa-solid fa-link"></i> Ikuti timer</span>' : ''}
-          </span>
-        </div>
+      <summary class="event-catalog-summary" aria-label="Kelola kategori ${escapeHtml(ev.ticketName)}">
+      <div class="event-catalog-visual">
+        <div class="event-catalog-placeholder"><i class="fa-solid fa-person-running" aria-hidden="true"></i></div>
+        ${eventImage ? `<img src="${escapeHtml(eventImage)}" alt="" loading="lazy" onerror="this.hidden=true">` : ''}
+        <span class="event-catalog-category">${escapeHtml(ev.category)}</span>
         <span class="event-status-tag ${registrationClosed ? 'closed' : 'open'}">
-          <i class="${registrationClosed ? 'fa-solid fa-lock' : 'fa-solid fa-lock-open'}"></i>
+          <i class="${registrationClosed ? 'fa-solid fa-lock' : 'fa-solid fa-lock-open'}" aria-hidden="true"></i>
           ${statusLabel}
         </span>
       </div>
-
+      <div class="event-catalog-summary-content">
+        <h4 class="admin-event-title" title="${escapeHtml(ev.ticketName)}">${escapeHtml(ev.ticketName)}</h4>
+        <div class="event-catalog-summary-meta">
+          <strong>${escapeHtml(new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(Number(ev.price)))}</strong>
+          <span>${escapeHtml(ev.stock)} tersedia</span>
+        </div>
+        <span class="event-catalog-open-label">Kelola tiket <i class="fa-solid fa-chevron-down" aria-hidden="true"></i></span>
+      </div>
+      </summary>
+      <div class="event-catalog-content">
+        <div class="event-catalog-date"><i class="fa-regular fa-calendar" aria-hidden="true"></i><span>${escapeHtml(eventDateStr)}</span></div>
+        ${ev.followGlobalTimer ? '<span class="admin-event-timer-badge"><i class="fa-solid fa-link" aria-hidden="true"></i> Ikuti timer global</span>' : ''}
       <div class="admin-event-form">
-        <div class="form-row">
-          <div class="form-group" style="margin-bottom: 0;">
-            <label class="form-label">Sisa Kuota Tiket (Stok)</label>
-            <input type="number" class="form-input" id="eventStock-${ev.id}" value="${ev.stock}" min="0">
+        <div class="event-catalog-fields">
+          <div class="form-group">
+            <label class="form-label" for="eventStock-${eventId}">Sisa kuota</label>
+            <input type="number" class="form-input" id="eventStock-${eventId}" value="${escapeHtml(ev.stock)}" min="0">
           </div>
-          <div class="form-group" style="margin-bottom: 0;">
-            <label class="form-label">Harga Tiket (Rp)</label>
-            <input type="number" class="form-input" id="eventPrice-${ev.id}" value="${ev.price}" min="0" step="5000">
+          <div class="form-group">
+            <label class="form-label" for="eventPrice-${eventId}">Harga tiket (Rp)</label>
+            <input type="number" class="form-input" id="eventPrice-${eventId}" value="${escapeHtml(ev.price)}" min="0" step="5000">
           </div>
         </div>
 
         <div class="admin-event-actions">
           <div class="admin-event-actions-primary">
-            <button class="btn btn-primary btn-sm btn-quick-save-event" data-id="${ev.id}" data-permission="events:update">
+            <button class="btn btn-primary btn-sm btn-quick-save-event" data-id="${eventId}" data-permission="events:update">
               <i class="fa-solid fa-check"></i> Simpan
             </button>
-            <button class="btn btn-secondary btn-sm btn-edit-event" data-id="${ev.id}" data-permission="events:update">
+            <button class="btn btn-secondary btn-sm btn-edit-event" data-id="${eventId}" data-permission="events:update">
               <i class="fa-solid fa-pen-to-square"></i> Edit
             </button>
-            <button class="btn btn-outline btn-sm btn-manage-benefits" data-id="${ev.id}" data-name="${escapeHtml(ev.ticketName)}" data-permission="benefits:manage" title="Kelola Fasilitas / Benefit Tiket" style="color: #4F46E5; border-color: #C7D2FE;">
+            <button class="btn btn-outline btn-sm btn-manage-benefits" data-id="${eventId}" data-name="${escapeHtml(ev.ticketName)}" data-permission="benefits:manage" title="Kelola Fasilitas / Benefit Tiket">
               <i class="fa-solid fa-gift"></i> Benefit (${ev.benefits ? ev.benefits.length : (ev._count?.benefits || 0)})
             </button>
-            <button class="btn btn-outline btn-sm btn-manage-jerseys" data-id="${ev.id}" data-name="${escapeHtml(ev.ticketName)}" data-permission="jerseys:manage" title="Kelola tipe dan ukuran jersey">
+            <button class="btn btn-outline btn-sm btn-manage-jerseys" data-id="${eventId}" data-name="${escapeHtml(ev.ticketName)}" data-permission="jerseys:manage" title="Kelola tipe dan ukuran jersey">
               <i class="fa-solid fa-shirt"></i> Jersey (${ev.jerseys?.length || 0})
             </button>
-            <button class="btn btn-outline btn-sm btn-delete-event" data-id="${ev.id}" data-name="${escapeHtml(ev.ticketName)}" data-permission="events:delete" style="color: #EF4444; border-color: #FECACA;">
-              <i class="fa-solid fa-trash-can"></i>
+            <button class="btn btn-outline btn-sm btn-delete-event" data-id="${eventId}" data-name="${escapeHtml(ev.ticketName)}" data-permission="events:delete" aria-label="Hapus ${escapeHtml(ev.ticketName)}" title="Hapus kategori">
+              <i class="fa-solid fa-trash-can"></i> Hapus Kategori
             </button>
           </div>
 
-          <button class="btn ${ev.isClosed ? 'btn-secondary' : 'btn-outline'} btn-sm btn-toggle-close-event" data-id="${ev.id}" data-closed="${ev.isClosed}" data-timer-closed="${registrationClosedByTimer}" data-permission="events:update" ${registrationClosedByTimer ? 'disabled title="Kategori ditutup oleh timer. Perbarui tanggal atau aktifkan Ikuti Timer Global untuk menyinkronkannya."' : ''}>
+          <button class="btn ${ev.isClosed ? 'btn-secondary' : 'btn-outline'} btn-sm btn-toggle-close-event" data-id="${eventId}" data-closed="${ev.isClosed}" data-timer-closed="${registrationClosedByTimer}" data-permission="events:update" ${registrationClosedByTimer ? 'disabled title="Kategori ditutup oleh timer. Perbarui tanggal atau aktifkan Ikuti Timer Global untuk menyinkronkannya."' : ''}>
             <i class="${registrationClosedByTimer ? 'fa-solid fa-stopwatch' : ev.isClosed ? 'fa-solid fa-lock-open' : 'fa-solid fa-lock'}"></i>
             ${registrationClosedByTimer ? 'Ditutup oleh Timer' : ev.isClosed ? 'Buka Kategori' : 'Tutup Kategori'}
           </button>
         </div>
+      </div>
       </div>
     `;
 
