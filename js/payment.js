@@ -25,6 +25,8 @@ function formatRupiah(num) {
 let activeOrder = null;
 let realtimePollingTimer = null;
 let countdownTimerInterval = null;
+let expiryRetryTimer = null;
+let expiryChecking = false;
 
 function stopPaymentPolling() {
   if (realtimePollingTimer) {
@@ -38,32 +40,70 @@ function stopCountdownTimer() {
     clearInterval(countdownTimerInterval);
     countdownTimerInterval = null;
   }
+  if (expiryRetryTimer) {
+    clearTimeout(expiryRetryTimer);
+    expiryRetryTimer = null;
+  }
 }
 
-function startPaymentCountdown(createdAt, timerMinutes = 30) {
+async function verifyPaymentExpiry(orderId) {
+  if (expiryChecking || activeOrder?.id !== orderId || activeOrder?.status !== 'PENDING') return;
+  expiryChecking = true;
+  const display = document.getElementById('paymentTimerCountdown');
+  if (display) display.textContent = '00:00 - Memverifikasi status pembayaran...';
+  try {
+    const res = await apiFetch(`/orders/${encodeURIComponent(orderId)}/verify-expiry`, { method: 'POST' });
+    const json = await res.json();
+    if (!res.ok || json.status !== 'success' || !json.data?.status) throw new Error(json.message || 'Status belum dapat diverifikasi.');
+    if (json.data.status !== 'PENDING') {
+      await loadPaymentDetails();
+      return;
+    }
+    if (display) display.textContent = '00:00 - Menunggu verifikasi server...';
+  } catch (error) {
+    console.warn('Gagal memverifikasi kedaluwarsa pembayaran:', error);
+    if (display) display.textContent = '00:00 - Verifikasi gagal, mencoba kembali...';
+  } finally {
+    expiryChecking = false;
+  }
+  if (activeOrder?.id === orderId && activeOrder?.status === 'PENDING') {
+    expiryRetryTimer = setTimeout(() => verifyPaymentExpiry(orderId), 10000);
+  }
+}
+
+function startPaymentCountdown(expiresAt, orderId) {
   stopCountdownTimer();
 
-  const createdTime = new Date(createdAt).getTime();
-  const expiryTime = createdTime + (timerMinutes * 60 * 1000);
+  const expiryTime = new Date(expiresAt).getTime();
   const timerDisplay = document.getElementById('paymentTimerCountdown');
   const btnPay = document.getElementById('btnPayMidtransNow');
 
+  if (!expiresAt || !Number.isFinite(expiryTime)) {
+    if (timerDisplay) timerDisplay.textContent = 'Batas waktu tidak tersedia. Periksa kembali status pembayaran.';
+    if (btnPay) btnPay.disabled = true;
+    return;
+  }
   function update() {
     const now = Date.now();
-    const diff = Math.floor((expiryTime - now) / 1000);
+    const diff = Math.ceil((expiryTime - now) / 1000);
 
     if (diff <= 0) {
       stopCountdownTimer();
+      stopPaymentPolling();
       if (timerDisplay) {
-        timerDisplay.textContent = '00:00 (WAKTU HABIS)';
+        timerDisplay.textContent = '00:00 - Memverifikasi status pembayaran...';
         timerDisplay.style.color = '#DC2626';
       }
       if (btnPay) {
         btnPay.disabled = true;
         btnPay.style.opacity = '0.5';
         btnPay.style.cursor = 'not-allowed';
-        btnPay.innerHTML = '<i class="fa-solid fa-clock"></i> Batas Waktu Pembayaran Telah Habis';
+        btnPay.innerHTML = '<i class="fa-solid fa-clock"></i> Memverifikasi Batas Pembayaran';
       }
+      const cancelButton = document.getElementById('btnOpenCancelOrder');
+      if (cancelButton) cancelButton.disabled = true;
+      document.getElementById('modalCancelBackdrop')?.classList.remove('open');
+      verifyPaymentExpiry(orderId);
       return;
     }
 
@@ -76,11 +116,15 @@ function startPaymentCountdown(createdAt, timerMinutes = 30) {
   }
 
   update();
-  countdownTimerInterval = setInterval(update, 1000);
+  if (Date.now() < expiryTime) countdownTimerInterval = setInterval(update, 1000);
 }
 
 function startPaymentPolling(orderId) {
   stopPaymentPolling();
+  if (activeOrder?.id === orderId && Date.now() >= new Date(activeOrder.paymentExpiresAt).getTime()) {
+    verifyPaymentExpiry(orderId);
+    return;
+  }
   // Jalankan polling setiap 3 detik untuk mengecek status pembayaran secara realtime
   realtimePollingTimer = setInterval(async () => {
     try {
@@ -159,9 +203,9 @@ async function loadPaymentDetails() {
 
 function renderPaymentUI(order) {
   const mount = document.getElementById('paymentContentMount');
-  const isPaid = order.status === 'SETTLEMENT' || order.status === 'PAID';
+  const isPaid = order.status === 'SETTLEMENT' || order.status === 'CAPTURE' || order.status === 'PAID';
   const isPending = order.status === 'PENDING';
-  const isCancel = order.status === 'CANCEL' || order.status === 'EXPIRE';
+  const isCancel = order.status === 'CANCEL' || order.status === 'EXPIRE' || order.status === 'DENY';
 
   const firstP = order.participants?.[0];
   const category = firstP?.event?.category || '10K';
@@ -225,7 +269,7 @@ function renderPaymentUI(order) {
         <div style="width: 72px; height: 72px; background: #FEE2E2; color: #DC2626; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; margin: 0 auto 16px auto;">
           <i class="fa-solid fa-ban"></i>
         </div>
-        <h2 style="font-size: 1.6rem; font-weight: 800; color: #0F172A; margin-bottom: 6px;">Pesanan Dibatalkan</h2>
+        <h2 style="font-size: 1.6rem; font-weight: 800; color: #0F172A; margin-bottom: 6px;">${order.status === 'EXPIRE' ? 'Waktu pembayaran habis' : 'Pesanan Dibatalkan'}</h2>
         <p style="color: #64748B; font-size: 0.95rem; margin-bottom: 20px;">
           Pesanan tiket ini telah dibatalkan / kedaluwarsa dan kuota telah dikembalikan ke publik.
         </p>
@@ -241,20 +285,6 @@ function renderPaymentUI(order) {
     `;
     return;
   }
-
-  // PENDING - Mulai Realtime Polling & Countdown Timer
-  startPaymentPolling(order.id);
-
-  // Ambil timer setting untuk countdown
-  apiFetch('/settings/checkout-config')
-    .then(r => r.json())
-    .then(cfg => {
-      const minutes = (cfg && cfg.status === 'success' && cfg.data?.paymentTimerMinutes) ? cfg.data.paymentTimerMinutes : 30;
-      startPaymentCountdown(order.createdAt, minutes);
-    })
-    .catch(() => {
-      startPaymentCountdown(order.createdAt, 30);
-    });
 
   mount.innerHTML = `
     <div class="payment-card">
@@ -332,6 +362,9 @@ function renderPaymentUI(order) {
     </div>
   `;
 
+  startPaymentCountdown(order.paymentExpiresAt, order.id);
+  if (Date.now() < new Date(order.paymentExpiresAt).getTime()) startPaymentPolling(order.id);
+
   // Manual Sync Button
   document.getElementById('btnSyncPayment')?.addEventListener('click', async () => {
     const btn = document.getElementById('btnSyncPayment');
@@ -348,6 +381,10 @@ function renderPaymentUI(order) {
           setTimeout(() => {
             window.location.href = `/e-ticket.html?orderId=${order.id}`;
           }, 1200);
+          return;
+        }
+        if (json.data.status === 'CANCEL' || json.data.status === 'EXPIRE') {
+          await loadPaymentDetails();
           return;
         }
         showToast('warning', `Status Pembayaran: ${json.data.status || 'PENDING'}`);
@@ -384,8 +421,10 @@ function renderPaymentUI(order) {
           order.snapToken = snapToken;
         } else {
           showToast('error', json.message || 'Token pembayaran tidak dapat dimuat.');
-          btn.disabled = false;
-          btn.innerHTML = origHtml;
+          if (Date.now() < new Date(order.paymentExpiresAt).getTime()) {
+            btn.disabled = false;
+            btn.innerHTML = origHtml;
+          }
           return;
         }
       }
@@ -395,10 +434,22 @@ function renderPaymentUI(order) {
         window.snap.pay(snapToken, {
           onSuccess: async () => {
             showToast('success', 'Pembayaran berhasil dikonfirmasi! Memvalidasi...');
-            stopPaymentPolling();
-            stopCountdownTimer();
-            await apiFetch(`/orders/${order.id}/sync-midtrans`, { method: 'POST' });
-            window.location.href = `/e-ticket.html?orderId=${order.id}`;
+            try {
+              const res = await apiFetch(`/orders/${order.id}/sync-midtrans`, { method: 'POST' });
+              const json = await res.json();
+              if (res.ok && json.status === 'success' && json.data?.isPaid) {
+                stopPaymentPolling();
+                stopCountdownTimer();
+                window.location.href = `/e-ticket.html?orderId=${order.id}`;
+              } else {
+                showToast('warning', 'Pembayaran sedang diverifikasi. Silakan periksa status kembali.');
+                startPaymentPolling(order.id);
+              }
+            } catch (error) {
+              console.warn('Gagal memverifikasi pembayaran:', error);
+              showToast('warning', 'Pembayaran belum dapat diverifikasi. Silakan periksa status kembali.');
+              startPaymentPolling(order.id);
+            }
           },
           onPending: async () => {
             showToast('warning', 'Menunggu transaksi Anda selesai diverifikasi.');
@@ -418,8 +469,10 @@ function renderPaymentUI(order) {
     } catch (err) {
       showToast('error', 'Gagal membuka pembayaran: ' + err.message);
     } finally {
-      btn.disabled = false;
-      btn.innerHTML = origHtml;
+      if (Date.now() < new Date(order.paymentExpiresAt).getTime()) {
+        btn.disabled = false;
+        btn.innerHTML = origHtml;
+      }
     }
   });
 }
@@ -446,6 +499,11 @@ document.getElementById('cancelReasonSelect')?.addEventListener('change', (e) =>
 document.getElementById('formCancelOrder')?.addEventListener('submit', async (e) => {
   e.preventDefault();
   if (!activeOrder) return;
+  if (Date.now() >= new Date(activeOrder.paymentExpiresAt).getTime()) {
+    showToast('warning', 'Batas pembayaran sudah habis. Status sedang diverifikasi.');
+    verifyPaymentExpiry(activeOrder.id);
+    return;
+  }
   const reasonSelect = document.getElementById('cancelReasonSelect').value;
   const customReason = document.getElementById('cancelCustomReason').value.trim();
   const finalReason = reasonSelect === 'Lainnya' ? customReason : reasonSelect;
@@ -478,5 +536,5 @@ document.getElementById('formCancelOrder')?.addEventListener('submit', async (e)
   }
 });
 
-window.addEventListener('beforeunload', stopPaymentPolling);
+window.addEventListener('beforeunload', () => { stopPaymentPolling(); stopCountdownTimer(); });
 document.addEventListener('DOMContentLoaded', loadPaymentDetails);

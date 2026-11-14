@@ -815,10 +815,6 @@ body {
     color: #0F172A;
   }
 
-  .racepack-qr-page-group {
-    break-after: page;
-  }
-
   .racepack-qr-heading span {
     color: #C2410C;
     font-size: 10pt;
@@ -868,6 +864,60 @@ body {
     margin-top: 8mm;
   }
 
+  .racepack-qr-page-group {
+    padding-top: 8mm;
+  }
+
+  .racepack-qr-page-group .racepack-qr-frame {
+    margin: 4mm 0 3mm;
+    padding: 3mm;
+  }
+
+  .racepack-qr-page-group .racepack-qr-frame img {
+    width: 70mm;
+    height: 70mm;
+  }
+
+  .racepack-qr-page-group .racepack-qr-note {
+    margin-top: 4mm;
+  }
+
+  .racepack-participant-heading {
+    margin-top: 5mm;
+    font-size: 10pt;
+    font-weight: 700;
+  }
+
+  .racepack-participant-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 3mm;
+    width: 100%;
+    margin-top: 2mm;
+  }
+
+  .racepack-participant-item {
+    min-width: 0;
+    break-inside: avoid;
+    font-size: 7pt;
+    line-height: 1.15;
+    overflow-wrap: anywhere;
+  }
+
+  .racepack-participant-item img {
+    display: block;
+    width: min(100%, 28mm);
+    height: auto;
+    margin: 0 auto 1mm;
+  }
+
+  .racepack-participant-item span {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
   .e-ticket-card {
     box-shadow: none !important;
     border: 1.5px solid #0F172A !important;
@@ -878,9 +928,9 @@ body {
     overflow: hidden !important;
   }
 
-  .e-ticket-card:not(:last-child) {
-    page-break-after: always !important;
-    break-after: page !important;
+  .e-ticket-card ~ .e-ticket-card {
+    page-break-before: always !important;
+    break-before: page !important;
   }
 
   .ticket-header {

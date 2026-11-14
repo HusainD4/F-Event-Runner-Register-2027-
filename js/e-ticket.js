@@ -121,6 +121,17 @@ async function loadETicket() {
           <span>${isGroup ? 'Untuk seluruh peserta dalam pesanan ini' : escapeHtml(participants[0].event?.category || 'Tiket peserta')}</span>
           <span>REF: ${escapeHtml(orderRef)}</span>
         </div>
+        ${isGroup ? `
+          <div class="racepack-participant-heading">QR Peserta</div>
+          <div class="racepack-participant-grid">
+            ${participants.map((participant, index) => `
+              <div class="racepack-participant-item">
+                <img src="${participant.qrImageDataUrl}" alt="QR peserta ${escapeHtml(participant.fullNameKtp)}" />
+                <span>${index + 1}. ${escapeHtml(participant.fullNameKtp)}</span>
+              </div>
+            `).join('')}
+          </div>
+        ` : ''}
         <p class="racepack-qr-note">Jaga kode ini dan hanya tunjukkan kepada petugas resmi.</p>
       </section>
     `;
@@ -320,7 +331,6 @@ async function loadETicket() {
             </div>
           </div>
         </div>
-        ${idx === 0 ? racepackPage : ''}
       `;
     }).join('');
 
@@ -342,6 +352,8 @@ async function loadETicket() {
         instructionsMount.hidden = false;
       }
     }
+    if (instructionsMount) mount.appendChild(instructionsMount);
+    mount.insertAdjacentHTML('beforeend', racepackPage);
     mount.dataset.renderStatus = 'ready';
   } catch (err) {
     mount.dataset.renderStatus = 'error';
