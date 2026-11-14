@@ -52,16 +52,36 @@ async function handleClearParticipants(event) {
 async function loadParticipants() {
   try {
     const res = await fetchAdmin('/admin/participants?limit=100');
-    if (res.status === 'success') {
-      adminState.participants = Array.isArray(res.data) ? res.data : (res.data?.participants || []);
-      updateParticipantTabCounters(adminState.participants);
-      applyParticipantFilters();
+    if (res?.status !== 'success') throw new Error(res?.message || 'Data peserta tidak dapat dimuat.');
+    const participants = Array.isArray(res.data) ? res.data : res.data?.participants;
+    if (!Array.isArray(participants)) throw new Error('Respons data peserta tidak valid.');
+    adminState.participants = participants;
+    updateParticipantTabCounters(adminState.participants);
+    applyParticipantFilters();
 
-      const countEl = document.getElementById('kpiTotalParticipants');
-      if (countEl) countEl.textContent = res.meta?.total || res.data?.pagination?.total || adminState.participants.length;
-    }
+    const countEl = document.getElementById('kpiTotalParticipants');
+    if (countEl) countEl.textContent = res.meta?.total ?? res.data?.pagination?.total ?? adminState.participants.length;
+    return true;
   } catch (err) {
     console.error('Failed to load participants:', err);
+    showAdminToast('error', 'Gagal Memuat Peserta', escapeHtml(err.message || 'Data peserta tidak dapat dimuat.'));
+    return false;
+  }
+}
+
+async function handleRefreshParticipants() {
+  const button = document.getElementById('btnRefreshParticipants');
+  if (!button || button.disabled) return;
+  const original = button.innerHTML;
+  button.disabled = true;
+  button.innerHTML = '<i class="fa-solid fa-rotate fa-spin"></i> Memuat...';
+  try {
+    if (await loadParticipants()) {
+      showAdminToast('success', 'Data Diperbarui', 'Data peserta berhasil dimuat ulang.');
+    }
+  } finally {
+    button.disabled = false;
+    button.innerHTML = original;
   }
 }
 
@@ -437,6 +457,7 @@ export {
   openClearParticipantsDialog,
   handleClearParticipants,
   loadParticipants,
+  handleRefreshParticipants,
   renderParticipantsTable,
   openCreateParticipantModal,
   openEditParticipantModal,

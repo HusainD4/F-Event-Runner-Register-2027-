@@ -31,7 +31,7 @@ import { showAdminToast } from './core/utils.js';
 
 // 3. Page Modules
 import { loadEvents, openCreateEventModal, handleEventFormSubmit, resetBenefitForm, handleBenefitFormSubmit, handleJerseyFormSubmit, resetJerseyForm, updateJerseyImagePreview, loadJerseyGalleryChoices, useJerseyGalleryChoice } from './pages/events.js';
-import { loadParticipants, renderParticipantsTable, openCreateParticipantModal, handleParticipantFormSubmit, exportParticipantsCsv, switchParticipantFilterTab, applyParticipantFilters, openClearParticipantsDialog, handleClearParticipants } from './pages/participants.js';
+import { loadParticipants, handleRefreshParticipants, renderParticipantsTable, openCreateParticipantModal, handleParticipantFormSubmit, exportParticipantsCsv, switchParticipantFilterTab, applyParticipantFilters, openClearParticipantsDialog, handleClearParticipants } from './pages/participants.js';
 import { loadRacepackStats, loadRacepackConfirmations, handleRacepackConfirmationSocketEvent, handleRacepackScanSocketEvent, handleConfirmRacepackTableCheckin, startRpcCamera, stopRpcCamera, triggerNativeCamera, handleNativeCameraFile, handleConfirmRacepackCheckin, handleRevertRacepackCheckin, verifyRacepackByCode } from './pages/racepack.js';
 import { loadRacepackQueue, handleRacepackQueueSocketEvent } from './pages/racepack-view.js';
 import { loadOrders, handleOrderStatusSubmit } from './pages/orders.js';
@@ -137,6 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Refresh & Export
   document.getElementById('btnRefreshEvents')?.addEventListener('click', loadEvents);
   document.getElementById('btnRefreshOrders')?.addEventListener('click', loadOrders);
+  document.getElementById('btnRefreshParticipants')?.addEventListener('click', handleRefreshParticipants);
   document.getElementById('btnRefreshLogs')?.addEventListener('click', loadAuditLogs);
   document.getElementById('btnExportCsv')?.addEventListener('click', exportParticipantsCsv);
   document.getElementById('btnClearParticipants')?.addEventListener('click', openClearParticipantsDialog);
