@@ -1,3 +1,12 @@
+export function tabForKey(tablist, key) {
+  const tabs = [...tablist.querySelectorAll('[role="tab"]')];
+  const current = tabs.indexOf(document.activeElement);
+  if (current < 0 || !['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(key)) return null;
+  const index = key === 'Home' ? 0 : key === 'End' ? tabs.length - 1
+    : (current + (key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
+  return tabs[index];
+}
+
 export function selectTab(tablist, id) {
   const tabs = [...tablist.querySelectorAll('[role="tab"]')];
   if (!tabs.some(tab => tab.id === id)) return;
@@ -16,13 +25,10 @@ export function initTabList(tablist) {
     if (tab && tablist.contains(tab)) selectTab(tablist, tab.id);
   });
   tablist.addEventListener('keydown', event => {
-    const tabs = [...tablist.querySelectorAll('[role="tab"]')];
-    const current = tabs.indexOf(document.activeElement);
-    if (current < 0 || !['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+    const tab = tabForKey(tablist, event.key);
+    if (!tab) return;
     event.preventDefault();
-    const index = event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1
-      : (current + (event.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
-    selectTab(tablist, tabs[index].id);
-    tabs[index].focus();
+    selectTab(tablist, tab.id);
+    tab.focus();
   });
 }

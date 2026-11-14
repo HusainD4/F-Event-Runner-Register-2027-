@@ -9,7 +9,7 @@
         <p>Kelola data lengkap pelari, nomor BIB, status verifikasi pembayaran Midtrans, dan status serah terima Racepack (Check-in).</p>
       </div>
       <div class="admin-action-bar" style="flex-wrap: wrap; gap: 8px;">
-        <input type="text" class="form-input form-input-sm" id="searchParticipant" placeholder="Cari Nama, BIB, NIK, No. HP..." style="width: 230px;">
+        <input type="search" class="form-input form-input-sm" id="searchParticipant" aria-label="Cari peserta" maxlength="200" placeholder="Cari Nama, BIB, NIK, No. HP..." style="width: 230px;">
         <select class="form-input form-input-sm" id="filterParticipantCategory" style="width: 150px;">
           <option value="">Semua Kategori</option>
           <option value="10K">10K Only</option>
@@ -18,7 +18,7 @@
         <button type="button" class="btn btn-secondary btn-sm" id="btnRefreshParticipants" data-permission="participants:read">
           <i class="fa-solid fa-rotate"></i> Segarkan Data
         </button>
-        <button class="btn btn-secondary btn-sm" id="btnExportCsv">
+        <button type="button" class="btn btn-secondary btn-sm" id="btnExportCsv" data-permission-all="participants:read,orders:read" style="display: none;">
           <i class="fa-solid fa-file-csv"></i> Unduh CSV
         </button>
         <button type="button" class="btn btn-sm" id="btnClearParticipants" data-role="SUPERADMIN" style="display: none; background: #b91c1c; color: white;">
@@ -44,35 +44,35 @@
       </dialog>
     </div>
 
-    <!-- Segmented Tab Filter: Pisahkan per Status Pembayaran & Racepack -->
-    <div class="participant-tabs-nav" style="display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 6px; border-bottom: 1px solid #E2E8F0;">
-      <button type="button" class="btn btn-primary btn-sm part-tab-btn active" data-tab="ALL" id="partTabAll" style="border-radius: 20px; font-weight: 700; font-size: 0.8rem; display: flex; align-items: center; gap: 6px;">
-        <i class="fa-solid fa-layer-group"></i> Semua Peserta <span class="badge" style="background: rgba(255,255,255,0.3); color: #FFFFFF;" id="countPartAll">0</span>
+    <div class="notification-tabs participant-tabs-nav" role="tablist" aria-label="Filter status peserta">
+      <button type="button" role="tab" class="part-tab-btn" data-tab="ALL" id="partTabAll" aria-controls="participantResults" aria-selected="true" tabindex="0">
+        <i class="fa-solid fa-layer-group" aria-hidden="true"></i> Semua <span class="participant-tab-count" id="countPartAll">0</span>
       </button>
-      <button type="button" class="btn btn-outline btn-sm part-tab-btn" data-tab="SETTLED" id="partTabSettled" style="border-radius: 20px; font-weight: 700; font-size: 0.8rem; display: flex; align-items: center; gap: 6px; border-color: #86EFAC; color: #15803D;">
-        <i class="fa-solid fa-circle-check"></i> Pembayaran Sukses (Lunas) <span class="badge" style="background: #DCFCE7; color: #166534;" id="countPartSettled">0</span>
+      <button type="button" role="tab" class="part-tab-btn" data-tab="SETTLED" id="partTabSettled" aria-controls="participantResults" aria-selected="false" tabindex="-1">
+        <i class="fa-solid fa-circle-check" aria-hidden="true"></i> Lunas <span class="participant-tab-count" id="countPartSettled">0</span>
       </button>
-      <button type="button" class="btn btn-outline btn-sm part-tab-btn" data-tab="PENDING" id="partTabPending" style="border-radius: 20px; font-weight: 700; font-size: 0.8rem; display: flex; align-items: center; gap: 6px; border-color: #FDE68A; color: #B45309;">
-        <i class="fa-solid fa-clock"></i> Menunggu Bayar (Pending) <span class="badge" style="background: #FEF3C7; color: #92400E;" id="countPartPending">0</span>
+      <button type="button" role="tab" class="part-tab-btn" data-tab="PENDING" id="partTabPending" aria-controls="participantResults" aria-selected="false" tabindex="-1">
+        <i class="fa-solid fa-clock" aria-hidden="true"></i> Menunggu Bayar <span class="participant-tab-count" id="countPartPending">0</span>
       </button>
-      <button type="button" class="btn btn-outline btn-sm part-tab-btn" data-tab="CANCELLED" id="partTabCancelled" style="border-radius: 20px; font-weight: 700; font-size: 0.8rem; display: flex; align-items: center; gap: 6px; border-color: #FECACA; color: #B91C1C;">
-        <i class="fa-solid fa-ban"></i> Dibatalkan / Expired <span class="badge" style="background: #FEE2E2; color: #991B1B;" id="countPartCancelled">0</span>
+      <button type="button" role="tab" class="part-tab-btn" data-tab="CANCELLED" id="partTabCancelled" aria-controls="participantResults" aria-selected="false" tabindex="-1">
+        <i class="fa-solid fa-ban" aria-hidden="true"></i> Dibatalkan <span class="participant-tab-count" id="countPartCancelled">0</span>
       </button>
-      <button type="button" class="btn btn-outline btn-sm part-tab-btn" data-tab="RACEPACK_DONE" id="partTabRacepackDone" style="border-radius: 20px; font-weight: 700; font-size: 0.8rem; display: flex; align-items: center; gap: 6px; border-color: #A7F3D0; color: #047857;">
-        <i class="fa-solid fa-box-check"></i> Racepack Sudah Diambil <span class="badge" style="background: #D1FAE5; color: #065F46;" id="countPartRacepackDone">0</span>
+      <button type="button" role="tab" class="part-tab-btn" data-tab="RACEPACK_DONE" id="partTabRacepackDone" aria-controls="participantResults" aria-selected="false" tabindex="-1">
+        <i class="fa-solid fa-box-check" aria-hidden="true"></i> Racepack Diambil <span class="participant-tab-count" id="countPartRacepackDone">0</span>
       </button>
-      <button type="button" class="btn btn-outline btn-sm part-tab-btn" data-tab="RACEPACK_PENDING" id="partTabRacepackPending" style="border-radius: 20px; font-weight: 700; font-size: 0.8rem; display: flex; align-items: center; gap: 6px; border-color: #FED7AA; color: #C2410C;">
-        <i class="fa-solid fa-box-open"></i> Racepack Belum Diambil <span class="badge" style="background: #FFEDD5; color: #9A3412;" id="countPartRacepackPending">0</span>
+      <button type="button" role="tab" class="part-tab-btn" data-tab="RACEPACK_PENDING" id="partTabRacepackPending" aria-controls="participantResults" aria-selected="false" tabindex="-1">
+        <i class="fa-solid fa-box-open" aria-hidden="true"></i> Racepack Belum Diambil <span class="participant-tab-count" id="countPartRacepackPending">0</span>
       </button>
     </div>
 
+    <section id="participantResults" role="tabpanel" aria-labelledby="partTabAll" tabindex="0">
     <!-- Info Banner Aktif -->
     <div id="participantFilterBanner" style="padding: 10px 16px; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: var(--radius-md); margin-bottom: 14px; font-size: 0.82rem; color: #475569; display: flex; justify-content: space-between; align-items: center;">
       <div>
         Menampilkan tabel: <strong id="participantActiveTabTitle" style="color: #0F172A;">Semua Peserta Terdaftar</strong> (<span id="participantFilteredCount">0</span> peserta)
       </div>
       <div style="font-size: 0.78rem; color: #64748B;">
-        <i class="fa-solid fa-info-circle"></i> Gunakan tab di atas untuk memfilter tabel atau tampilkan seluruhnya.
+        <span id="participantFilterHint"><i class="fa-solid fa-info-circle"></i> Jumlah tab mengikuti pencarian dan kategori; CSV mengikuti semua filter aktif.</span>
       </div>
     </div>
 
@@ -102,5 +102,21 @@
         </tbody>
       </table>
     </div>
+    <nav class="participant-pagination" aria-label="Halaman peserta">
+      <label class="participant-page-size" for="participantPageSize">Data per halaman
+        <select id="participantPageSize" class="form-input form-input-sm">
+          <option value="10">10</option>
+          <option value="50">50</option>
+          <option value="100" selected>100</option>
+          <option value="500">500</option>
+        </select>
+      </label>
+      <span id="participantPageInfo" aria-live="polite">Halaman 1 dari 1</span>
+      <div>
+        <button type="button" class="btn btn-secondary btn-sm" id="btnParticipantPrevious">Sebelumnya</button>
+        <button type="button" class="btn btn-secondary btn-sm" id="btnParticipantNext">Berikutnya</button>
+      </div>
+    </nav>
+    </section>
   </div>
 </div>

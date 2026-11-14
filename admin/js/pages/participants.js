@@ -3,9 +3,16 @@ import { fetchAdmin } from '../core/api.js';
 import { showAdminToast, showConfirmDialog, escapeHtml } from '../core/utils.js';
 import { applyRbacUi } from '../core/rbac.js';
 import { switchAdminTab } from '../core/sidebar.js';
+import { tabForKey } from '../core/tabs.js';
+import { apiFetch } from '../../../js/api.js';
+import { handleLogout } from '../core/auth.js';
 import { verifyRacepackByCode } from './racepack.js';
 
 let currentParticipantTab = 'ALL';
+let participantPage = 1;
+let participantPageSize = 100;
+let participantPages = 1;
+let participantRequestId = 0;
 
 function openClearParticipantsDialog() {
   if (adminState.profile?.role?.name !== 'SUPERADMIN') return;
@@ -50,21 +57,45 @@ async function handleClearParticipants(event) {
 }
 
 async function loadParticipants() {
+  const requestId = ++participantRequestId;
+  const query = new URLSearchParams({
+    page: String(participantPage), limit: String(participantPageSize), tab: currentParticipantTab,
+    category: document.getElementById('filterParticipantCategory')?.value || '',
+    search: document.getElementById('searchParticipant')?.value || '',
+  });
+  const requestedPage = participantPage;
+  const requestedPageSize = participantPageSize;
+  const hint = document.getElementById('participantFilterHint');
+  if (hint) hint.textContent = 'Memuat data sesuai filter; tabel sebelumnya masih ditampilkan.';
   try {
-    const res = await fetchAdmin('/admin/participants?limit=100');
+    const res = await fetchAdmin(`/admin/participants?${query}`);
+    if (requestId !== participantRequestId) return false;
+    if (query.get('tab') !== currentParticipantTab ||
+        requestedPage !== participantPage || requestedPageSize !== participantPageSize ||
+        query.get('search') !== (document.getElementById('searchParticipant')?.value || '') ||
+        query.get('category') !== (document.getElementById('filterParticipantCategory')?.value || '')) return false;
     if (res?.status !== 'success') throw new Error(res?.message || 'Data peserta tidak dapat dimuat.');
     const participants = Array.isArray(res.data) ? res.data : res.data?.participants;
     if (!Array.isArray(participants)) throw new Error('Respons data peserta tidak valid.');
+    if (participantPage > Math.max(1, res.meta.totalPages)) {
+      participantPage = Math.max(1, res.meta.totalPages);
+      return loadParticipants();
+    }
     adminState.participants = participants;
-    updateParticipantTabCounters(adminState.participants);
-    applyParticipantFilters();
-
-    const countEl = document.getElementById('kpiTotalParticipants');
-    if (countEl) countEl.textContent = res.meta?.total ?? res.data?.pagination?.total ?? adminState.participants.length;
+    updateParticipantTabCounters(res.meta.tabCounts);
+    document.getElementById('participantFilteredCount').textContent = res.meta.total;
+    participantPages = Math.max(1, res.meta.totalPages);
+    document.getElementById('participantPageInfo').textContent = `Halaman ${participantPage} dari ${participantPages} • ${res.meta.total} peserta`;
+    document.getElementById('btnParticipantPrevious').disabled = participantPage <= 1;
+    document.getElementById('btnParticipantNext').disabled = participantPage >= participantPages;
+    renderParticipantsTable(participants);
+    if (hint) hint.textContent = 'Jumlah tab mengikuti pencarian dan kategori; CSV mengikuti semua filter aktif.';
     return true;
   } catch (err) {
+    if (requestId !== participantRequestId) return false;
+    if (hint) hint.textContent = 'Gagal memuat filter terbaru. Tabel sebelumnya masih ditampilkan; coba segarkan.';
     console.error('Failed to load participants:', err);
-    showAdminToast('error', 'Gagal Memuat Peserta', escapeHtml(err.message || 'Data peserta tidak dapat dimuat.'));
+    showAdminToast('error', 'Gagal Memuat Peserta', escapeHtml(err.message || 'Data peserta tidak dapat dimuat. Data sebelumnya masih ditampilkan.'));
     return false;
   }
 }
@@ -85,54 +116,31 @@ async function handleRefreshParticipants() {
   }
 }
 
-function updateParticipantTabCounters(participants) {
-  const allCount = participants.length;
-  let settledCount = 0;
-  let pendingCount = 0;
-  let cancelledCount = 0;
-  let racepackDoneCount = 0;
-  let racepackPendingCount = 0;
-
-  participants.forEach(p => {
-    const st = p.order?.status || 'PENDING';
-    if (st === 'SETTLEMENT' || st === 'CAPTURE' || st === 'PAID') {
-      settledCount++;
-    } else if (st === 'CANCEL' || st === 'EXPIRE' || st === 'DENY' || st === 'REFUND') {
-      cancelledCount++;
-    } else {
-      pendingCount++;
-    }
-
-    if (p.racepack?.checkedIn) {
-      racepackDoneCount++;
-    } else {
-      racepackPendingCount++;
-    }
-  });
-
+function updateParticipantTabCounters(counts) {
   const setBadge = (id, val) => {
     const el = document.getElementById(id);
     if (el) el.textContent = val;
   };
 
-  setBadge('countPartAll', allCount);
-  setBadge('countPartSettled', settledCount);
-  setBadge('countPartPending', pendingCount);
-  setBadge('countPartCancelled', cancelledCount);
-  setBadge('countPartRacepackDone', racepackDoneCount);
-  setBadge('countPartRacepackPending', racepackPendingCount);
+  setBadge('countPartAll', counts.ALL);
+  setBadge('countPartSettled', counts.SETTLED);
+  setBadge('countPartPending', counts.PENDING);
+  setBadge('countPartCancelled', counts.CANCELLED);
+  setBadge('countPartRacepackDone', counts.RACEPACK_DONE);
+  setBadge('countPartRacepackPending', counts.RACEPACK_PENDING);
 }
 
 function switchParticipantFilterTab(tabKey) {
+  const tabs = [...document.querySelectorAll('.participant-tabs-nav .part-tab-btn')];
+  const selected = tabs.find(btn => btn.dataset.tab === tabKey);
+  if (!selected) return;
   currentParticipantTab = tabKey;
-
-  document.querySelectorAll('.participant-tabs-nav .part-tab-btn').forEach(btn => {
-    if (btn.getAttribute('data-tab') === tabKey) {
-      btn.className = 'btn btn-primary btn-sm part-tab-btn active';
-    } else {
-      btn.className = 'btn btn-outline btn-sm part-tab-btn';
-    }
+  tabs.forEach(btn => {
+    const active = btn === selected;
+    btn.setAttribute('aria-selected', String(active));
+    btn.tabIndex = active ? 0 : -1;
   });
+  document.getElementById('participantResults')?.setAttribute('aria-labelledby', selected.id);
 
   const titles = {
     ALL: 'Semua Peserta Terdaftar',
@@ -149,52 +157,39 @@ function switchParticipantFilterTab(tabKey) {
   applyParticipantFilters();
 }
 
+function initParticipantFilterTabs(tablist) {
+  if (!tablist) return;
+  tablist.addEventListener('click', event => {
+    const tab = event.target.closest('.part-tab-btn');
+    if (tab && tablist.contains(tab)) switchParticipantFilterTab(tab.dataset.tab);
+  });
+  tablist.addEventListener('keydown', event => {
+    const tab = tabForKey(tablist, event.key);
+    if (!tab) return;
+    event.preventDefault();
+    switchParticipantFilterTab(tab.dataset.tab);
+    tab.focus();
+  });
+}
+
 function applyParticipantFilters() {
-  const q = (document.getElementById('searchParticipant')?.value || '').toLowerCase();
-  const categoryFilter = document.getElementById('filterParticipantCategory')?.value || '';
+  participantPage = 1;
+  void loadParticipants();
+}
 
-  let list = adminState.participants || [];
+function changeParticipantPage(delta) {
+  const next = Math.max(1, Math.min(participantPages, participantPage + delta));
+  if (next === participantPage) return;
+  participantPage = next;
+  void loadParticipants();
+}
 
-  // 1. Tab filter
-  if (currentParticipantTab === 'SETTLED') {
-    list = list.filter(p => {
-      const st = p.order?.status || 'PENDING';
-      return st === 'SETTLEMENT' || st === 'CAPTURE' || st === 'PAID';
-    });
-  } else if (currentParticipantTab === 'PENDING') {
-    list = list.filter(p => (p.order?.status || 'PENDING') === 'PENDING');
-  } else if (currentParticipantTab === 'CANCELLED') {
-    list = list.filter(p => {
-      const st = p.order?.status || 'PENDING';
-      return st === 'CANCEL' || st === 'EXPIRE' || st === 'DENY' || st === 'REFUND';
-    });
-  } else if (currentParticipantTab === 'RACEPACK_DONE') {
-    list = list.filter(p => p.racepack?.checkedIn === true);
-  } else if (currentParticipantTab === 'RACEPACK_PENDING') {
-    list = list.filter(p => !p.racepack?.checkedIn);
-  }
-
-  // 2. Category filter
-  if (categoryFilter) {
-    list = list.filter(p => (p.event?.category || '').includes(categoryFilter));
-  }
-
-  // 3. Search query
-  if (q) {
-    list = list.filter(p =>
-      p.fullNameKtp.toLowerCase().includes(q) ||
-      (p.bibName && p.bibName.toLowerCase().includes(q)) ||
-      (p.bibNumber && p.bibNumber.toLowerCase().includes(q)) ||
-      p.nik.includes(q) ||
-      (p.order?.midtransOrderId && p.order.midtransOrderId.toLowerCase().includes(q)) ||
-      (p.emergencyContactPhone && p.emergencyContactPhone.includes(q))
-    );
-  }
-
-  const countEl = document.getElementById('participantFilteredCount');
-  if (countEl) countEl.textContent = list.length;
-
-  renderParticipantsTable(list);
+function changeParticipantPageSize() {
+  const size = Number(document.getElementById('participantPageSize')?.value);
+  if (![10, 50, 100, 500].includes(size)) return;
+  participantPageSize = size;
+  participantPage = 1;
+  void loadParticipants();
 }
 
 function renderParticipantsTable(participants) {
@@ -235,7 +230,7 @@ function renderParticipantsTable(participants) {
 
     return `
       <tr>
-        <td>${idx + 1}</td>
+        <td>${(participantPage - 1) * participantPageSize + idx + 1}</td>
         <td>
           <strong style="color: #0F172A; font-size: 0.9rem;">${escapeHtml(p.fullNameKtp)}</strong>
           ${isManual ? '<span class="badge" style="background:#FFFBEB;color:#B45309;font-size:0.68rem;margin-left:4px;">Manual</span>' : ''}
@@ -421,36 +416,58 @@ async function deleteParticipantApi(id) {
   }
 }
 
-function exportParticipantsCsv() {
-  if (adminState.participants.length === 0) {
-    showAdminToast('warning', 'Peringatan', 'Tidak ada data peserta untuk diunduh.');
-    return;
+async function exportParticipantsCsv() {
+  const button = document.getElementById('btnExportCsv');
+  if (!button || button.disabled) return;
+  const original = button.innerHTML;
+  button.disabled = true;
+  try {
+    const confirmed = await showConfirmDialog({
+      title: 'Unduh Data Peserta?',
+      message: 'CSV berisi seluruh peserta sesuai filter aktif, termasuk NIK, riwayat kesehatan, kontak, dan transaksi. Simpan dan bagikan file secara aman.',
+      confirmText: 'Ya, Unduh CSV',
+      type: 'warning',
+    });
+    if (!confirmed) return;
+    button.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyiapkan CSV...';
+    const response = await apiFetch('/admin/participants/export-csv', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'text/csv' },
+      body: JSON.stringify({
+        tab: currentParticipantTab,
+        category: document.getElementById('filterParticipantCategory')?.value || '',
+        search: document.getElementById('searchParticipant')?.value || '',
+      }),
+    });
+    if (response.status === 401) {
+      handleLogout({ revoke: false });
+      throw new Error('Sesi admin telah berakhir. Silakan login kembali.');
+    }
+    if (!response.ok) {
+      const result = await response.json().catch(() => null);
+      throw new Error(result?.message || `Unduhan gagal (HTTP ${response.status}).`);
+    }
+    if (!response.headers.get('content-type')?.toLowerCase().includes('text/csv')) {
+      throw new Error('Respons unduhan bukan CSV. Periksa backend.');
+    }
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `peserta-transaksi-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    showAdminToast('success', 'CSV Disiapkan', 'Data sesuai filter aktif berhasil diunduh.');
+  } catch (error) {
+    console.error('Gagal mengunduh CSV peserta:', error);
+    showAdminToast('error', 'Unduhan Gagal', escapeHtml(error.message || 'CSV tidak dapat diunduh.'));
+  } finally {
+    button.disabled = false;
+    button.innerHTML = original;
   }
-
-  const headers = ['No', 'Nama KTP', 'Nomor BIB', 'BIB Name', 'NIK', 'Kategori', 'Gender', 'Gol Darah', 'Size Jersey', 'Emergency Contact', 'Status Bayar', 'Status Racepack'];
-  const rows = adminState.participants.map((p, idx) => [
-    idx + 1,
-    `"${p.fullNameKtp}"`,
-    `"${p.bibNumber || ''}"`,
-    `"${p.bibName || ''}"`,
-    `'${p.nik}`,
-    `"${p.event?.category || ''}"`,
-    p.gender,
-    p.bloodType,
-    p.selectedSize,
-    `"${p.emergencyContactPhone || ''}"`,
-    p.order?.status || 'PENDING',
-    p.racepack?.checkedIn ? 'Sudah Check-in' : 'Belum Check-in'
-  ]);
-
-  const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
-  const encodedUri = encodeURI(csvContent);
-  const link = document.createElement('a');
-  link.setAttribute('href', encodedUri);
-  link.setAttribute('download', `peserta_tegal_run_2026_${Date.now()}.csv`);
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
 }
 
 export {
@@ -465,5 +482,8 @@ export {
   deleteParticipantApi,
   exportParticipantsCsv,
   switchParticipantFilterTab,
-  applyParticipantFilters
+  initParticipantFilterTabs,
+  applyParticipantFilters,
+  changeParticipantPage,
+  changeParticipantPageSize
 };

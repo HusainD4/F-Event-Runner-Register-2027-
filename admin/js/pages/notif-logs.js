@@ -10,6 +10,9 @@ let notifLogsState = {
   items: [],
   stats: {},
 };
+let notificationRequestId = 0;
+let sessionCheckedAt = 0;
+let sessionRequest = null;
 
 const channelLabels = { WA: 'WhatsApp', EMAIL: 'Email', BOTH: 'WA + Email', DISABLED: 'Nonaktif' };
 const paymentStatuses = {
@@ -23,6 +26,7 @@ const paymentStatuses = {
 };
 
 async function loadNotificationLogs({ showLoading = true } = {}) {
+  const requestId = ++notificationRequestId;
   const tbody = document.getElementById('notifLogsTableBody');
   if (tbody && showLoading) {
     tbody.innerHTML = `
@@ -43,6 +47,9 @@ async function loadNotificationLogs({ showLoading = true } = {}) {
 
   try {
     const res = await fetchAdmin(`/admin/notifications/logs?${q.toString()}`);
+    if (requestId !== notificationRequestId) return;
+    if (search !== (document.getElementById('searchNotifLogs')?.value || '').trim() ||
+        status !== (document.getElementById('filterNotifDeliveryStatus')?.value || '')) return;
     if (res && res.status === 'success' && res.data) {
       notifLogsState.items = res.data.items || [];
       notifLogsState.stats = res.data.stats || {};
@@ -62,7 +69,14 @@ async function loadNotificationLogs({ showLoading = true } = {}) {
       }
 
       // Check WhatsApp Web session
-      const sessionRes = await fetchAdmin('/admin/notifications/whatsapp/session');
+      if (!sessionRequest && Date.now() - sessionCheckedAt >= 30000) {
+        sessionRequest = fetchAdmin('/admin/notifications/whatsapp/session').then(result => {
+          sessionCheckedAt = Date.now();
+          return result;
+        }).finally(() => { sessionRequest = null; });
+      }
+      const sessionRes = sessionRequest ? await sessionRequest : null;
+      if (requestId !== notificationRequestId) return;
       const sessionStatusEl = document.getElementById('kpiNotifSessionStatus');
       if (sessionStatusEl && sessionRes?.data) {
         if (sessionRes.data.status === 'CONNECTED') {
@@ -80,6 +94,7 @@ async function loadNotificationLogs({ showLoading = true } = {}) {
       }
     }
   } catch (err) {
+    if (requestId !== notificationRequestId) return;
     console.error('Failed to load notification logs:', err);
     if (tbody && showLoading) {
       tbody.innerHTML = `

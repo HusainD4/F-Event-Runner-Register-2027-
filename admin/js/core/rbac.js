@@ -51,6 +51,14 @@ export function applyRbacUi(profile) {
     }
   });
 
+  document.querySelectorAll('[data-permission-all]').forEach(el => {
+    const required = el.getAttribute('data-permission-all').split(',').map(permission => permission.trim()).filter(Boolean);
+    el.style.display = isSuper || required.every(permission => {
+      const [domain] = permission.split(':');
+      return permissions.includes(permission) || permissions.includes(`${domain}:*`);
+    }) ? '' : 'none';
+  });
+
   document.querySelectorAll('[data-dashboard-widget]').forEach(el => {
     const widget = el.getAttribute('data-dashboard-widget');
     const canSeeDashboard = isSuper || permissions.includes('page:dashboard');

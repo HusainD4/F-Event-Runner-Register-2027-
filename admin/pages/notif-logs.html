@@ -22,7 +22,7 @@
                 <div class="kpi-details">
                   <span class="kpi-label">Total Pesanan / Pendaftar</span>
                   <h3 class="kpi-val" id="kpiNotifTotalOrders">0</h3>
-                  <span class="kpi-sub">Seluruh transaksi terdata</span>
+                  <span class="kpi-sub">Maksimal 150 pesanan yang dimuat</span>
                 </div>
               </div>
 
@@ -57,7 +57,7 @@
             <!-- Filter & Search Bar -->
             <div class="notif-log-toolbar">
               <div class="notif-log-filters">
-                <input type="text" class="form-input form-input-sm" id="searchNotifLogs" aria-label="Cari pesanan atau peserta" placeholder="Cari nama, WA, order ID, BIB...">
+                <input type="search" class="form-input form-input-sm" id="searchNotifLogs" aria-label="Cari pesanan atau peserta" maxlength="200" placeholder="Cari nama, WA, order ID, BIB...">
                 <select class="form-input form-input-sm" id="filterNotifDeliveryStatus" aria-label="Filter status notifikasi">
                   <option value="">Semua Status Pengiriman</option>
                   <option value="SENT">Sudah Terkirim (Sent)</option>
@@ -65,7 +65,7 @@
                 </select>
               </div>
             </div>
-            <p class="notif-log-hint"><i class="fa-solid fa-circle-info"></i> Notifikasi dan PDF manual mengikuti <strong>Saluran Pengiriman Aktif</strong>. PDF otomatis tetap mengikuti pengaturan lampiran PDF.</p>
+            <p class="notif-log-hint"><i class="fa-solid fa-circle-info"></i> Pencarian mencakup seluruh pesanan, dengan maksimal 150 hasil terbaru. Filter status pengiriman berlaku pada hasil tersebut. Notifikasi dan PDF manual mengikuti <strong>Saluran Pengiriman Aktif</strong>.</p>
 
             <!-- Table of Notification Logs -->
             <div class="table-responsive">

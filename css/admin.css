@@ -2377,7 +2377,8 @@
    WHATSAPP WEB CONSOLE & LIVE MESSENGER STYLES
    ============================================================== */
 #pane-notifications .notification-tabs,
-#pane-cms .notification-tabs {
+#pane-cms .notification-tabs,
+#pane-participants .notification-tabs {
   display: flex;
   gap: 5px;
   max-width: 100%;
@@ -2391,7 +2392,8 @@
 }
 
 #pane-notifications .notification-tabs button,
-#pane-cms .notification-tabs button {
+#pane-cms .notification-tabs button,
+#pane-participants .notification-tabs button {
   display: inline-flex;
   align-items: center;
   gap: 7px;
@@ -2416,16 +2418,65 @@
 }
 
 #pane-notifications .notification-tabs button[aria-selected="true"],
-#pane-cms .notification-tabs button[aria-selected="true"] {
+#pane-cms .notification-tabs button[aria-selected="true"],
+#pane-participants .notification-tabs button[aria-selected="true"] {
   background: #FFFFFF;
   color: #C2410C;
   box-shadow: 0 1px 5px rgba(15, 23, 42, 0.12);
 }
 
 #pane-notifications .notification-tabs button:focus-visible,
-#pane-cms .notification-tabs button:focus-visible {
+#pane-cms .notification-tabs button:focus-visible,
+#pane-participants .notification-tabs button:focus-visible {
   outline: 2px solid #F97316;
   outline-offset: -2px;
+}
+
+#pane-participants .participant-tab-count {
+  display: inline-flex;
+  justify-content: center;
+  min-width: 22px;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: #E2E8F0;
+  color: #475569;
+  font-size: 0.72rem;
+}
+
+#pane-participants .notification-tabs button[aria-selected="true"] .participant-tab-count {
+  background: #FFEDD5;
+  color: #9A3412;
+}
+
+#participantFilterBanner {
+  gap: 8px 16px;
+  flex-wrap: wrap;
+}
+
+.participant-pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 16px;
+  color: #475569;
+  font-size: 0.85rem;
+}
+
+.participant-pagination > div {
+  display: flex;
+  gap: 8px;
+}
+
+.participant-page-size {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.participant-page-size select {
+  width: auto;
 }
 
 #pane-notifications .notification-panel[hidden],

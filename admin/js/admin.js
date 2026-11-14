@@ -31,7 +31,7 @@ import { showAdminToast } from './core/utils.js';
 
 // 3. Page Modules
 import { loadEvents, openCreateEventModal, handleEventFormSubmit, resetBenefitForm, handleBenefitFormSubmit, handleJerseyFormSubmit, resetJerseyForm, updateJerseyImagePreview, loadJerseyGalleryChoices, useJerseyGalleryChoice } from './pages/events.js';
-import { loadParticipants, handleRefreshParticipants, renderParticipantsTable, openCreateParticipantModal, handleParticipantFormSubmit, exportParticipantsCsv, switchParticipantFilterTab, applyParticipantFilters, openClearParticipantsDialog, handleClearParticipants } from './pages/participants.js';
+import { loadParticipants, handleRefreshParticipants, renderParticipantsTable, openCreateParticipantModal, handleParticipantFormSubmit, exportParticipantsCsv, initParticipantFilterTabs, applyParticipantFilters, changeParticipantPage, changeParticipantPageSize, openClearParticipantsDialog, handleClearParticipants } from './pages/participants.js';
 import { loadRacepackStats, loadRacepackConfirmations, handleRacepackConfirmationSocketEvent, handleRacepackScanSocketEvent, handleConfirmRacepackTableCheckin, startRpcCamera, stopRpcCamera, triggerNativeCamera, handleNativeCameraFile, handleConfirmRacepackCheckin, handleRevertRacepackCheckin, verifyRacepackByCode } from './pages/racepack.js';
 import { loadRacepackQueue, handleRacepackQueueSocketEvent } from './pages/racepack-view.js';
 import { loadOrders, handleOrderStatusSubmit } from './pages/orders.js';
@@ -243,17 +243,15 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Participant Filter Tabs & Search
-  document.querySelectorAll('.participant-tabs-nav .part-tab-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const tab = btn.getAttribute('data-tab');
-      if (tab) switchParticipantFilterTab(tab);
-    });
-  });
+  initParticipantFilterTabs(document.querySelector('.participant-tabs-nav'));
+  document.getElementById('btnParticipantPrevious')?.addEventListener('click', () => changeParticipantPage(-1));
+  document.getElementById('btnParticipantNext')?.addEventListener('click', () => changeParticipantPage(1));
+  document.getElementById('participantPageSize')?.addEventListener('change', changeParticipantPageSize);
 
   document.getElementById('filterParticipantCategory')?.addEventListener('change', applyParticipantFilters);
   document.getElementById('searchParticipant')?.addEventListener('input', () => {
     clearTimeout(window._searchParticipantTimer);
-    window._searchParticipantTimer = setTimeout(applyParticipantFilters, 250);
+    window._searchParticipantTimer = setTimeout(applyParticipantFilters, 500);
   });
 
   // Racepack Collection & Check-in Controls
@@ -301,7 +299,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('filterNotifDeliveryStatus')?.addEventListener('change', loadNotificationLogs);
   document.getElementById('searchNotifLogs')?.addEventListener('input', () => {
     clearTimeout(window._searchNotifTimer);
-    window._searchNotifTimer = setTimeout(loadNotificationLogs, 300);
+    window._searchNotifTimer = setTimeout(loadNotificationLogs, 500);
   });
 
   // WhatsApp Web Console & Direct Messenger
