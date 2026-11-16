@@ -208,7 +208,10 @@ function renderTicketData(event, feeSettings = {}, isGlobalClosed = false) {
   // Basic Header Info
   document.getElementById('tdCategoryTag').textContent = event.category || 'Kategori Lomba';
   document.getElementById('tdTicketName').textContent = event.ticketName;
-  document.getElementById('tdTicketSubtitle').textContent = `Total kuota: ${Number(event.stock || 0).toLocaleString('id-ID')} peserta`;
+  const remaining = Number(event.remainingStock ?? event.stock ?? 0);
+  const registered = Number(event.registeredCount ?? 0);
+  const totalCap = Number(event.totalCapacity ?? (remaining + registered));
+  document.getElementById('tdTicketSubtitle').textContent = `Total kuota: ${totalCap.toLocaleString('id-ID')} peserta`;
 
   // Status Badge
   const statusBadge = document.getElementById('tdStatusBadge');
@@ -224,8 +227,6 @@ function renderTicketData(event, feeSettings = {}, isGlobalClosed = false) {
 
   // Prices & Service Fee Calculation
   const basePrice = Number(event.price) || 0;
-  const remaining = typeof event.remainingStock === 'number' ? event.remainingStock : event.stock;
-  const registered = typeof event.registeredCount === 'number' ? event.registeredCount : 0;
   const isFeeActive = !!(feeSettings.feeEnabled && Number(feeSettings.feeAmount) > 0);
   const feeAmount = isFeeActive ? Number(feeSettings.feeAmount) : 0;
   const feeType = feeSettings.feeType || 'PER_TRANSACTION';
@@ -266,7 +267,6 @@ function renderTicketData(event, feeSettings = {}, isGlobalClosed = false) {
   document.getElementById('tdStock').textContent = `${remaining.toLocaleString('id-ID')} tiket`;
   document.getElementById('tdRegisteredCount').textContent = `${registered.toLocaleString('id-ID')} peserta`;
 
-  const totalCap = Number(event.stock) || 0;
   const pct = totalCap > 0 ? Math.max(0, Math.min(100, Math.round((remaining / totalCap) * 100))) : 0;
   document.getElementById('tdStockPercentage').textContent = `${pct}% tersedia`;
   document.getElementById('tdStockFill').style.width = `${pct}%`;
