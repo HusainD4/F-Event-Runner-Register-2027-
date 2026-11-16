@@ -111,7 +111,11 @@ export async function handleSaveBibSettingsSubmit(e) {
   e.preventDefault();
 
   const timingRadio = document.querySelector('input[name="bibTiming"]:checked');
-  const timing = timingRadio ? timingRadio.value : 'PAYMENT_SUCCESS';
+  if (!timingRadio) {
+    showAdminToast('error', 'Pengaturan Tidak Lengkap', 'Pilih waktu penerbitan nomor BIB.');
+    return;
+  }
+  const timing = timingRadio.value;
   const defaultPrefix = document.getElementById('bibInputPrefix')?.value || '';
   const digitLength = parseInt(document.getElementById('bibInputDigitLength')?.value || '4', 10);
   const startNumber = parseInt(document.getElementById('bibInputStartNumber')?.value || '1001', 10);
