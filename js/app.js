@@ -1,5 +1,5 @@
 import { apiClient, apiFetch, loadMidtransSdk } from './api.js';
-import { isValidRegistrationPhone, limitRegistrationPhoneLength } from './registration-phone.js';
+import { isValidRegistrationPhone, setupRegistrationPhone } from './registration-phone.js';
 import { applyWebsiteBranding } from './branding.js';
 import { applyHomeAppearance, setAnimatedTitle } from './home-appearance.js';
 import { syncNavigationVisibility } from './navigation-visibility.js';
@@ -1026,6 +1026,10 @@ function openRegistrationModal(selectedEvent = null) {
 
   const modal = document.getElementById('regModal');
   if (!modal) return;
+  modal.querySelectorAll('[aria-invalid="true"]').forEach(clearRegistrationError);
+  validatedRegistrationSteps.clear();
+  duplicateRegistrationNik = null;
+  registrationServerErrors.clear();
   closeRegistrationSelects();
 
   const participantCountSelect = document.getElementById('modalParticipantCount');
@@ -1171,7 +1175,6 @@ function syncBookerToParticipant1() {
   }
   if (p1Phone && bookerPhone) {
     p1Phone.value = bookerPhone;
-    p1Phone.maxLength = bookerPhone.startsWith('+') ? 14 : 13;
   }
 }
 
@@ -1606,8 +1609,8 @@ function renderParticipantForms() {
 
         <div class="form-group">
           <label class="form-label">Nomor WhatsApp Peserta (Aktif) <span class="req">*</span></label>
-          <input type="tel" inputmode="tel" maxlength="14" class="form-input p-phone" required placeholder="Contoh: 081234567890" data-index="${i}">
-          <div class="form-hint">Nomor WhatsApp aktif terdiri dari 10–13 digit, diawali 08, 62, atau +62.</div>
+          <input type="tel" inputmode="tel" maxlength="15" class="form-input p-phone" required placeholder="Contoh: +6281234567890" data-index="${i}">
+          <div class="form-hint">Gunakan +62, 10–14 digit angka. Awalan 08 otomatis diubah menjadi +62.</div>
         </div>
       </div>
 
@@ -1706,7 +1709,7 @@ function renderParticipantForms() {
     // Pasang auto format telepon
     const phoneInput = pBox.querySelector('.p-phone');
     const emgPhoneInput = pBox.querySelector('.p-emg-phone');
-    limitRegistrationPhoneLength(phoneInput);
+    setupRegistrationPhone(phoneInput);
     setupPhoneAutoFormat(emgPhoneInput);
 
     // Listen event select perubahan harga
@@ -1790,90 +1793,126 @@ function renderParticipantJerseyFields(participantBox, index, eventId, selectedJ
   });
 }
 
-function validateStep(step) {
+const validatedRegistrationSteps = new Set();
+let duplicateRegistrationNik = null;
+let registrationErrorCounter = 0;
+const registrationServerErrors = new Map();
+
+function registrationErrorTarget(field) {
+  return field?.closest('.birthdate-picker')?.querySelector('.birthdate-trigger')
+    || field?.closest('.custom-select')?.querySelector('.custom-select-trigger')
+    || field;
+}
+
+function clearRegistrationError(field) {
+  const target = registrationErrorTarget(field);
+  const errorId = field.dataset.registrationError;
+  const error = errorId && document.getElementById(errorId);
+  error?.remove();
+  [field, target].forEach(element => {
+    if (!element) return;
+    element.removeAttribute('aria-invalid');
+    if (errorId) {
+      const describedBy = (element.getAttribute('aria-describedby') || '').split(/\s+/).filter(id => id && id !== errorId);
+      if (describedBy.length) element.setAttribute('aria-describedby', describedBy.join(' '));
+      else element.removeAttribute('aria-describedby');
+    }
+  });
+  delete field.dataset.registrationError;
+  field.closest('.consent-box')?.classList.remove('is-invalid');
+}
+
+function setRegistrationError(field, message) {
+  if (!field) return;
+  const target = registrationErrorTarget(field);
+  let error = field.dataset.registrationError && document.getElementById(field.dataset.registrationError);
+  if (!error) {
+    error = document.createElement('div');
+    error.id = `registration-error-${++registrationErrorCounter}`;
+    error.className = 'registration-field-error';
+    const container = field.closest('.consent-box') || field.closest('.form-group');
+    container?.appendChild(error);
+    field.dataset.registrationError = error.id;
+  }
+  error.textContent = message;
+  [field, target].forEach(element => {
+    if (!element) return;
+    element.setAttribute('aria-invalid', 'true');
+    const describedBy = (element.getAttribute('aria-describedby') || '').split(/\s+/).filter(Boolean);
+    if (!describedBy.includes(error.id)) describedBy.push(error.id);
+    element.setAttribute('aria-describedby', describedBy.join(' '));
+  });
+  field.closest('.consent-box')?.classList.add('is-invalid');
+}
+
+function validateStep(step, notify = true) {
+  const issues = [];
+  const checkedFields = new Set();
+  const check = (field, invalid, message, title = 'Validasi Gagal') => {
+    if (!field) return;
+    checkedFields.add(field);
+    const serverError = registrationServerErrors.get(field);
+    if (serverError && serverError.value !== field.value) registrationServerErrors.delete(field);
+    else if (serverError) {
+      invalid = true;
+      message = serverError.message;
+    }
+    if (invalid) {
+      setRegistrationError(field, message);
+      issues.push({ field, message, title });
+    } else {
+      clearRegistrationError(field);
+    }
+  };
   if (step === 1) {
-    const bookerName = document.getElementById('bookerName')?.value.trim();
-    const bookerEmail = document.getElementById('bookerEmail')?.value.trim();
-    const bookerPhone = document.getElementById('bookerPhone')?.value.trim();
-
-    if (!bookerName || bookerName.length < 3) {
-      showToast('error', 'Validasi Gagal', 'Nama pemesan minimal 3 karakter.');
-      return false;
-    }
-    if (!bookerEmail || !bookerEmail.includes('@')) {
-      showToast('error', 'Validasi Gagal', 'Email pemesan tidak valid.');
-      return false;
-    }
-    if (!bookerPhone || !isValidRegistrationPhone(bookerPhone)) {
-      showToast('error', 'Validasi Gagal', 'Nomor WhatsApp harus 10–13 digit dan diawali 08, 62, atau +62.');
-      return false;
-    }
-
-    // Jalankan sync ke Peserta #1 jika checkbox dicentang
-    syncBookerToParticipant1();
-    return true;
+    const name = document.getElementById('bookerName');
+    const email = document.getElementById('bookerEmail');
+    const phone = document.getElementById('bookerPhone');
+    check(name, !name?.value.trim() || name.value.trim().length < 3, 'Nama pemesan minimal 3 karakter.');
+    check(email, !email?.value.trim() || !email.validity.valid, 'Email pemesan tidak valid.');
+    check(phone, !isValidRegistrationPhone(phone?.value.trim() || ''), 'Nomor WhatsApp harus diawali +628 dan terdiri dari 10–14 digit angka.');
   }
 
   if (step === 2) {
     const seenNiks = new Set();
     for (let i = 0; i < state.participantCount; i++) {
-      const name = document.querySelector(`.p-fullname[data-index="${i}"]`)?.value.trim();
-      const phone = document.querySelector(`.p-phone[data-index="${i}"]`)?.value.trim();
-      const bib = document.querySelector(`.p-bibname[data-index="${i}"]`)?.value.trim();
-      const nik = document.querySelector(`.p-nik[data-index="${i}"]`)?.value.trim();
-      const birthPlace = document.querySelector(`.p-birthplace[data-index="${i}"]`)?.value.trim();
-      const birthDate = document.querySelector(`.p-birthdate[data-index="${i}"]`)?.value.trim();
-      const address = document.querySelector(`.p-address[data-index="${i}"]`)?.value.trim();
-      const emgName = document.querySelector(`.p-emg-name[data-index="${i}"]`)?.value.trim();
-      const emgPhone = document.querySelector(`.p-emg-phone[data-index="${i}"]`)?.value.trim();
-
-      if (!name || name.length < 3) {
-        showToast('error', `Peserta #${i + 1}`, 'Nama lengkap KTP minimal 3 karakter.');
-        return false;
-      }
-      if (!phone || !isValidRegistrationPhone(phone)) {
-        showToast('error', `Peserta #${i + 1}`, 'Nomor WhatsApp harus 10–13 digit dan diawali 08, 62, atau +62.');
-        return false;
-      }
-      if (!bib || bib.length > 15) {
-        showToast('error', `Peserta #${i + 1}`, 'Nama BIB maksimal 15 karakter.');
-        return false;
-      }
-      if (!nik || !/^\d{16}$/.test(nik)) {
-        showToast('error', `Peserta #${i + 1}`, 'NIK harus tepat 16 digit angka sesuai KTP.');
-        return false;
-      }
+      const field = name => document.querySelector(`.${name}[data-index="${i}"]`);
+      const value = name => field(name)?.value.trim() || '';
+      const title = `Peserta #${i + 1}`;
+      const nik = value('p-nik');
       const eventId = document.querySelector(`.p-event-select[data-index="${i}"]`)?.value || state.selectedEvent?.id || '';
       const nikKey = `${eventId}:${nik}`;
-      if (seenNiks.has(nikKey)) {
-        showToast('error', `Peserta #${i + 1}`, 'NIK ini sudah digunakan peserta lain pada kategori yang sama.');
-        return false;
-      }
-      seenNiks.add(nikKey);
-      if (!birthPlace || birthPlace.length < 3) {
-        showToast('error', `Peserta #${i + 1}`, 'Tempat lahir wajib diisi.');
-        return false;
-      }
-      if (!birthDate) {
-        showToast('error', `Peserta #${i + 1}`, 'Tanggal lahir wajib diisi.');
-        return false;
-      }
-      if (!address || address.length < 10) {
-        showToast('error', `Peserta #${i + 1}`, 'Alamat lengkap wajib diisi minimal 10 karakter.');
-        return false;
-      }
-      if (!emgName || emgName.length < 3) {
-        showToast('error', `Peserta #${i + 1}`, 'Nama kontak darurat wajib diisi.');
-        return false;
-      }
-      if (!emgPhone || !/^(\+62|62|08)\d{7,12}$/.test(emgPhone.replace(/\s+/g, ''))) {
-        showToast('error', `Peserta #${i + 1}`, 'Nomor kontak darurat harus diawali 08 atau +628.');
-        return false;
-      }
+      const duplicate = seenNiks.has(nikKey) || (duplicateRegistrationNik?.index === i && duplicateRegistrationNik.nik === nik && duplicateRegistrationNik.eventId === eventId);
+      const nikValid = /^\d{16}$/.test(nik);
+      check(field('p-fullname'), value('p-fullname').length < 3, 'Nama lengkap KTP minimal 3 karakter.', title);
+      check(field('p-phone'), !isValidRegistrationPhone(value('p-phone')), 'Nomor WhatsApp harus diawali +628 dan terdiri dari 10–14 digit angka.', title);
+      check(field('p-bibname'), !value('p-bibname') || value('p-bibname').length > 15, 'Nama BIB wajib diisi, maksimal 15 karakter.', title);
+      check(field('p-nik'), !nikValid || duplicate, !nikValid ? 'NIK harus tepat 16 digit angka sesuai KTP.' : 'NIK ini sudah digunakan pada kategori yang sama.', title);
+      if (nikValid) seenNiks.add(nikKey);
+      check(field('p-birthplace'), value('p-birthplace').length < 3, 'Tempat lahir minimal 3 karakter.', title);
+      check(field('p-birthdate'), !value('p-birthdate'), 'Tanggal lahir wajib diisi.', title);
+      check(field('p-address'), value('p-address').length < 10, 'Alamat lengkap wajib diisi minimal 10 karakter.', title);
+      check(field('p-emg-name'), value('p-emg-name').length < 3, 'Nama kontak darurat wajib diisi minimal 3 karakter.', title);
+      check(field('p-emg-phone'), !/^(\+62|62|08)\d{7,12}$/.test(value('p-emg-phone').replace(/\s+/g, '')), 'Nomor kontak darurat harus diawali 08 atau +628.', title);
+      const size = field('p-size');
+      if (size) check(size, !size.value, 'Ukuran jersey belum tersedia. Hubungi panitia.', title);
     }
-    return true;
   }
 
+  for (const [field, serverError] of registrationServerErrors) {
+    if (checkedFields.has(field) || !field.isConnected || !field.closest(`#stepSection${step}`)) continue;
+    check(field, false, serverError.message);
+  }
+
+  if (notify) validatedRegistrationSteps.add(step);
+  if (issues.length) {
+    if (notify) {
+      showToast('error', issues[0].title, issues[0].message);
+      registrationErrorTarget(issues[0].field)?.focus();
+    }
+    return false;
+  }
+  if (step === 1 && notify) syncBookerToParticipant1();
   return true;
 }
 
@@ -1951,10 +1990,16 @@ async function handleCheckoutSubmit() {
   const consentWaiver = document.getElementById('checkConsentWaiver')?.checked;
 
   if (!consentPDP) {
+    const field = document.getElementById('checkConsentPDP');
+    setRegistrationError(field, 'Persetujuan pemrosesan data pribadi wajib diberikan.');
+    field?.focus();
     showToast('warning', 'Persetujuan Diperlukan', 'Harap setujui Pemrosesan Data Pribadi sesuai UU PDP No. 27/2022.');
     return;
   }
   if (!consentWaiver) {
+    const field = document.getElementById('checkConsentWaiver');
+    setRegistrationError(field, 'Persetujuan pelepasan tanggung jawab medis wajib diberikan.');
+    field?.focus();
     showToast('warning', 'Persetujuan Diperlukan', 'Harap setujui Pelepasan Tanggung Jawab Medis (Liability Waiver).');
     return;
   }
@@ -2034,6 +2079,13 @@ async function handleCheckoutSubmit() {
   }
   if (nikCheck.duplicateParticipants.length) {
     const participantNumber = nikCheck.duplicateParticipants[0];
+    const index = participantNumber - 1;
+    duplicateRegistrationNik = { index, nik: participants[index].nik, eventId: participants[index].eventId };
+    state.currentStep = 2;
+    updateModalSteps();
+    validatedRegistrationSteps.add(2);
+    validateStep(2, false);
+    registrationErrorTarget(document.querySelector(`.p-nik[data-index="${index}"]`))?.focus();
     if (submitBtn) {
       submitBtn.disabled = false;
       submitBtn.innerHTML = '<i class="fa-solid fa-credit-card"></i> Bayar Sekarang (Midtrans)';
@@ -2065,6 +2117,35 @@ async function handleCheckoutSubmit() {
       closeRegistrationModal();
       showToast('warning', 'Pendaftaran Berakhir', result.message || 'Waktu pendaftaran telah habis. Formulir Anda dibatalkan.');
       return;
+    }
+    if (Array.isArray(result.rawErrors)) {
+      const participantFields = {
+        eventId: 'p-event-select', fullNameKtp: 'p-fullname', phoneNumber: 'p-phone',
+        bibName: 'p-bibname', nik: 'p-nik', gender: 'p-gender', birthPlace: 'p-birthplace',
+        birthDate: 'p-birthdate', fullAddress: 'p-address', bloodType: 'p-blood',
+        selectedSize: 'p-size', emergencyContactName: 'p-emg-name',
+        emergencyContactPhone: 'p-emg-phone', communityName: 'p-community', medicalHistory: 'p-medical'
+      };
+      let firstError;
+      for (const error of result.rawErrors) {
+        const path = String(error.field || '').replace(/^body\./, '');
+        const participant = /^participants\.(\d+)\.(\w+)$/.exec(path);
+        const selector = participant && participantFields[participant[2]]
+          ? `.${participantFields[participant[2]]}[data-index="${Number(participant[1])}"]`
+          : ['bookerName', 'bookerEmail', 'bookerPhone'].includes(path) ? `#${path}` : null;
+        const field = selector && document.querySelector(selector);
+        if (!field) continue;
+        const step = participant ? 2 : 1;
+        registrationServerErrors.set(field, { value: field.value, message: error.message });
+        setRegistrationError(field, error.message);
+        validatedRegistrationSteps.add(step);
+        if (!firstError || step < firstError.step) firstError = { field, step };
+      }
+      if (firstError) {
+        state.currentStep = firstError.step;
+        updateModalSteps();
+        registrationErrorTarget(firstError.field)?.focus();
+      }
     }
     showToast('error', 'Gagal Memesan Tiket', result.message);
     return;
@@ -2998,7 +3079,7 @@ function initApp() {
   // Booker Phone Auto-format
   const bookerPhoneInput = document.getElementById('bookerPhone');
   if (bookerPhoneInput) {
-    limitRegistrationPhoneLength(bookerPhoneInput);
+    setupRegistrationPhone(bookerPhoneInput);
   }
 
   // Checkbox: Gunakan Data Penanggung Jawab sebagai Peserta #1
@@ -3013,6 +3094,17 @@ function initApp() {
   document.getElementById('bookerPhone')?.addEventListener('input', () => {
     syncBookerToParticipant1();
   });
+
+  const registrationModal = document.getElementById('regModal');
+  const updateRegistrationValidation = event => {
+    if (event.target.matches('#checkConsentPDP, #checkConsentWaiver')) {
+      if (event.target.checked) clearRegistrationError(event.target);
+      return;
+    }
+    if (validatedRegistrationSteps.has(state.currentStep)) validateStep(state.currentStep, false);
+  };
+  registrationModal?.addEventListener('input', updateRegistrationValidation);
+  registrationModal?.addEventListener('change', updateRegistrationValidation);
 
   // Stepper Buttons
   document.getElementById('btnModalNext')?.addEventListener('click', () => {

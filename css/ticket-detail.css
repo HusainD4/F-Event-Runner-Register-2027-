@@ -75,6 +75,9 @@
   font-size: 0.9rem;
 }
 .td-header-brand .brand-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
   font-size: 0.92rem;
   font-weight: 800;

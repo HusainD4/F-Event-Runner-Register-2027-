@@ -1,13 +1,14 @@
 export function isValidRegistrationPhone(value) {
-  return /^(?:\+?62|0)8\d+$/.test(value)
-    && value.replace(/^\+/, '').length >= 10
-    && value.replace(/^\+/, '').length <= 13;
+  return /^\+628\d{7,11}$/.test(value);
 }
 
-export function limitRegistrationPhoneLength(input) {
-  const updateLimit = () => {
-    input.maxLength = !input.value || input.value.startsWith('+') ? 14 : 13;
-  };
-  updateLimit();
-  input.addEventListener('input', updateLimit);
+export function setupRegistrationPhone(input) {
+  input.maxLength = 15;
+  input.addEventListener('input', () => {
+    if (input.value.startsWith('08')) {
+      input.value = '+628' + input.value.slice(2);
+    } else if (input.value.startsWith('628')) {
+      input.value = '+' + input.value;
+    }
+  });
 }

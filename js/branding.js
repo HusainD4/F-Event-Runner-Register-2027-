@@ -9,7 +9,7 @@ function replaceConfiguredEventName(value, eventName) {
 
 function applyEventNameToElement(element, eventName) {
   if (element.nodeType === Node.TEXT_NODE) {
-    if (!element.parentElement?.closest('script, style, textarea, input')) {
+    if (!element.parentElement?.closest('script, style, textarea, input, .footer-brand .brand-text, .td-header-brand .brand-text')) {
       element.textContent = replaceConfiguredEventName(element.textContent, eventName);
     }
     return;
@@ -73,6 +73,20 @@ export function applyWebsiteBranding(settings) {
   applyHomeAppearance(settings);
   applyWebsiteFavicon(settings.favicon_url);
   const eventName = typeof settings.navbar_title === 'string' ? settings.navbar_title.trim() : '';
+  const siteTitle = typeof settings.site_title === 'string' ? settings.site_title.trim() : '';
+  const footerTitle = siteTitle || eventName;
+  if (footerTitle) {
+    document.querySelectorAll('.footer-brand .brand-text').forEach(element => {
+      if (element.textContent !== footerTitle) element.textContent = footerTitle;
+    });
+  }
+  if (eventName) {
+    document.querySelectorAll('.td-header-brand').forEach(brand => {
+      const element = brand.querySelector('.brand-text');
+      if (element && element.textContent !== eventName) element.textContent = eventName;
+      brand.setAttribute('aria-label', `${eventName}, beranda`);
+    });
+  }
   if (!eventName) return;
 
   const updateDocumentTitle = () => {
