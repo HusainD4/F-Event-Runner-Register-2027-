@@ -200,7 +200,7 @@ export const apiClient = {
   },
 
   /**
-   * Memeriksa apakah NIK peserta sudah terdaftar pada kategori yang sama
+   * Memeriksa apakah NIK peserta sudah terdaftar
    */
   async checkParticipantNiks(participants) {
     try {
@@ -293,7 +293,9 @@ export const apiClient = {
 
       return {
         success: false,
-        message: data.message || 'Terjadi kesalahan sistem saat memproses tiket.'
+        message: data.message || 'Terjadi kesalahan sistem saat memproses tiket.',
+        code: data.code,
+        duplicateParticipants: data.duplicateParticipants
       };
 
     } catch (err) {

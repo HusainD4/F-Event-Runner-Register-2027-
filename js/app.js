@@ -1880,15 +1880,13 @@ function validateStep(step, notify = true) {
       const value = name => field(name)?.value.trim() || '';
       const title = `Peserta #${i + 1}`;
       const nik = value('p-nik');
-      const eventId = document.querySelector(`.p-event-select[data-index="${i}"]`)?.value || state.selectedEvent?.id || '';
-      const nikKey = `${eventId}:${nik}`;
-      const duplicate = seenNiks.has(nikKey) || (duplicateRegistrationNik?.index === i && duplicateRegistrationNik.nik === nik && duplicateRegistrationNik.eventId === eventId);
+      const duplicate = seenNiks.has(nik) || (duplicateRegistrationNik?.index === i && duplicateRegistrationNik.nik === nik);
       const nikValid = /^\d{16}$/.test(nik);
       check(field('p-fullname'), value('p-fullname').length < 3, 'Nama lengkap KTP minimal 3 karakter.', title);
       check(field('p-phone'), !isValidRegistrationPhone(value('p-phone')), 'Nomor WhatsApp harus diawali +628 dan terdiri dari 10–14 digit angka.', title);
       check(field('p-bibname'), !value('p-bibname') || value('p-bibname').length > 15, 'Nama BIB wajib diisi, maksimal 15 karakter.', title);
-      check(field('p-nik'), !nikValid || duplicate, !nikValid ? 'NIK harus tepat 16 digit angka sesuai KTP.' : 'NIK ini sudah digunakan pada kategori yang sama.', title);
-      if (nikValid) seenNiks.add(nikKey);
+      check(field('p-nik'), !nikValid || duplicate, !nikValid ? 'NIK harus tepat 16 digit angka sesuai KTP.' : 'NIK ini sudah terdaftar atau digunakan oleh peserta lain.', title);
+      if (nikValid) seenNiks.add(nik);
       check(field('p-birthplace'), value('p-birthplace').length < 3, 'Tempat lahir minimal 3 karakter.', title);
       check(field('p-birthdate'), !value('p-birthdate'), 'Tanggal lahir wajib diisi.', title);
       check(field('p-address'), value('p-address').length < 10, 'Alamat lengkap wajib diisi minimal 10 karakter.', title);
@@ -2090,7 +2088,7 @@ async function handleCheckoutSubmit() {
       submitBtn.disabled = false;
       submitBtn.innerHTML = '<i class="fa-solid fa-credit-card"></i> Bayar Sekarang (Midtrans)';
     }
-    showToast('error', `Peserta #${participantNumber}`, 'NIK ini sudah terdaftar pada kategori yang sama dan tidak dapat digunakan lagi.');
+    showToast('error', `Peserta #${participantNumber}`, 'NIK ini sudah terdaftar dan tidak dapat digunakan lagi.');
     return;
   }
   if (submitBtn) {
@@ -2117,6 +2115,17 @@ async function handleCheckoutSubmit() {
       closeRegistrationModal();
       showToast('warning', 'Pendaftaran Berakhir', result.message || 'Waktu pendaftaran telah habis. Formulir Anda dibatalkan.');
       return;
+    }
+    if (result.code === 'DUPLICATE_NIK' && result.duplicateParticipants?.length) {
+      const index = result.duplicateParticipants[0] - 1;
+      if (participants[index]) {
+        duplicateRegistrationNik = { index, nik: participants[index].nik };
+        state.currentStep = 2;
+        updateModalSteps();
+        validatedRegistrationSteps.add(2);
+        validateStep(2, false);
+        registrationErrorTarget(document.querySelector(`.p-nik[data-index="${index}"]`))?.focus();
+      }
     }
     if (Array.isArray(result.rawErrors)) {
       const participantFields = {
