@@ -441,7 +441,9 @@ function renderRoleApiPermissions(selectedPermissions = [], isSuperadmin = false
     item.key !== '*' && item.key !== 'admins:manage' && !item.key.startsWith('page:') && !item.key.startsWith('dashboard:')
   );
   container.innerHTML = permissions.map(item => {
-    const checked = selectedPermissions.includes(item.key);
+    const domain = item.key.split(':')[0];
+    const checked = isSuperadmin || selectedPermissions.includes(item.key)
+      || (!item.key.endsWith(':*') && selectedPermissions.includes(`${domain}:*`));
     return `
       <label class="role-permission-option ${checked ? 'checked' : ''}">
         <input type="checkbox" name="role_api" value="${item.key}" ${checked ? 'checked' : ''} ${isSuperadmin ? 'disabled' : ''} onchange="toggleRolePermissionStyle(this)">
@@ -481,11 +483,16 @@ window.toggleModuleCardStyle = function(cb) {
   if (module) {
     (module.apiPermissions || []).forEach(permission => {
       const apiCheckbox = document.querySelector(`input[name="role_api"][value="${permission}"]`);
+      const wildcard = document.querySelector(`input[name="role_api"][value="${permission.split(':')[0]}:*"]`);
       const selectedByAnotherPage = Array.from(document.querySelectorAll('input[name="role_page"]:checked'))
         .some(pageCheckbox => pageCheckbox !== cb && (adminState.systemModules || SYSTEM_MODULES_FALLBACK)
           .find(item => item.key === pageCheckbox.value)?.apiPermissions?.includes(permission));
       const shouldCheck = cb.checked || selectedByAnotherPage;
       if (apiCheckbox && !apiCheckbox.disabled && (cb.checked || !selectedByAnotherPage)) {
+        if (!shouldCheck && wildcard?.checked) {
+          wildcard.checked = false;
+          wildcard.closest('.role-permission-option')?.classList.remove('checked');
+        }
         apiCheckbox.checked = shouldCheck;
         apiCheckbox.closest('.role-permission-option')?.classList.toggle('checked', shouldCheck);
       }
@@ -499,6 +506,30 @@ window.toggleRoleOptionStyle = function(cb) {
 
 window.toggleRolePermissionStyle = function(cb) {
   cb.closest('.role-permission-option')?.classList.toggle('checked', cb.checked);
+  const [domain, action] = cb.value.split(':');
+  const inputs = Array.from(document.querySelectorAll('input[name="role_api"]'));
+  if (action === '*') {
+    const checkedPages = Array.from(document.querySelectorAll('input[name="role_page"]:checked'));
+    let retainedShared = false;
+    inputs.filter(input => input.value.startsWith(`${domain}:`) && !input.value.endsWith(':*')).forEach(input => {
+      if (input.disabled) return;
+      const pageCount = checkedPages.filter(page => (adminState.systemModules || SYSTEM_MODULES_FALLBACK)
+        .find(module => module.key === page.value)?.apiPermissions?.includes(input.value)).length;
+      const retain = !cb.checked && pageCount > 1;
+      input.checked = cb.checked || retain;
+      input.closest('.role-permission-option')?.classList.toggle('checked', input.checked);
+      retainedShared ||= retain;
+    });
+    if (retainedShared) {
+      showAdminToast('warning', 'Izin Bersama Dipertahankan', 'Izin yang digunakan oleh beberapa halaman aktif tetap dipilih agar halaman lain tidak terganggu.');
+    }
+  } else if (!cb.checked) {
+    const wildcard = inputs.find(input => input.value === `${domain}:*`);
+    if (wildcard?.checked && !wildcard.disabled) {
+      wildcard.checked = false;
+      wildcard.closest('.role-permission-option')?.classList.remove('checked');
+    }
+  }
 };
 
 function openCreateRoleModal() {
