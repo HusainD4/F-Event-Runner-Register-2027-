@@ -1,4 +1,5 @@
 import { apiClient, apiFetch, loadMidtransSdk } from './api.js';
+import { isValidRegistrationPhone, limitRegistrationPhoneLength } from './registration-phone.js';
 import { applyWebsiteBranding } from './branding.js';
 import { applyHomeAppearance, setAnimatedTitle } from './home-appearance.js';
 import { syncNavigationVisibility } from './navigation-visibility.js';
@@ -1170,6 +1171,7 @@ function syncBookerToParticipant1() {
   }
   if (p1Phone && bookerPhone) {
     p1Phone.value = bookerPhone;
+    p1Phone.maxLength = bookerPhone.startsWith('+') ? 14 : 13;
   }
 }
 
@@ -1604,8 +1606,8 @@ function renderParticipantForms() {
 
         <div class="form-group">
           <label class="form-label">Nomor WhatsApp Peserta (Aktif) <span class="req">*</span></label>
-          <input type="tel" class="form-input p-phone" required placeholder="Contoh: 081234567890" data-index="${i}">
-          <div class="form-hint">Wajib nomor aktif untuk pengiriman QR E-Tiket pelari.</div>
+          <input type="tel" inputmode="tel" maxlength="14" class="form-input p-phone" required placeholder="Contoh: 081234567890" data-index="${i}">
+          <div class="form-hint">Nomor WhatsApp aktif terdiri dari 10–13 digit, diawali 08, 62, atau +62.</div>
         </div>
       </div>
 
@@ -1704,7 +1706,7 @@ function renderParticipantForms() {
     // Pasang auto format telepon
     const phoneInput = pBox.querySelector('.p-phone');
     const emgPhoneInput = pBox.querySelector('.p-emg-phone');
-    setupPhoneAutoFormat(phoneInput);
+    limitRegistrationPhoneLength(phoneInput);
     setupPhoneAutoFormat(emgPhoneInput);
 
     // Listen event select perubahan harga
@@ -1802,8 +1804,8 @@ function validateStep(step) {
       showToast('error', 'Validasi Gagal', 'Email pemesan tidak valid.');
       return false;
     }
-    if (!bookerPhone || !/^(\+62|62|08)\d{8,13}$/.test(bookerPhone.replace(/\s+/g, ''))) {
-      showToast('error', 'Validasi Gagal', 'Nomor WhatsApp tidak valid (gunakan awalan 08 atau +628, min 10 digit).');
+    if (!bookerPhone || !isValidRegistrationPhone(bookerPhone)) {
+      showToast('error', 'Validasi Gagal', 'Nomor WhatsApp harus 10–13 digit dan diawali 08, 62, atau +62.');
       return false;
     }
 
@@ -1829,8 +1831,8 @@ function validateStep(step) {
         showToast('error', `Peserta #${i + 1}`, 'Nama lengkap KTP minimal 3 karakter.');
         return false;
       }
-      if (!phone || !/^(\+62|62|08)\d{7,12}$/.test(phone.replace(/\s+/g, ''))) {
-        showToast('error', `Peserta #${i + 1}`, 'Nomor WhatsApp peserta wajib diisi (contoh: 08123456789 atau +628123456789).');
+      if (!phone || !isValidRegistrationPhone(phone)) {
+        showToast('error', `Peserta #${i + 1}`, 'Nomor WhatsApp harus 10–13 digit dan diawali 08, 62, atau +62.');
         return false;
       }
       if (!bib || bib.length > 15) {
@@ -1961,7 +1963,7 @@ async function handleCheckoutSubmit() {
   for (let i = 0; i < state.participantCount; i++) {
     const eventId = document.querySelector(`.p-event-select[data-index="${i}"]`)?.value || state.selectedEvent.id;
     const fullNameKtp = document.querySelector(`.p-fullname[data-index="${i}"]`)?.value.trim();
-    const phoneNumber = normalizePhone(document.querySelector(`.p-phone[data-index="${i}"]`)?.value.trim());
+    const phoneNumber = document.querySelector(`.p-phone[data-index="${i}"]`)?.value.trim() || '';
     const bibName = document.querySelector(`.p-bibname[data-index="${i}"]`)?.value.trim().toUpperCase();
     const nik = document.querySelector(`.p-nik[data-index="${i}"]`)?.value.trim();
     const gender = document.querySelector(`.p-gender[data-index="${i}"]`)?.value;
@@ -2996,7 +2998,7 @@ function initApp() {
   // Booker Phone Auto-format
   const bookerPhoneInput = document.getElementById('bookerPhone');
   if (bookerPhoneInput) {
-    setupPhoneAutoFormat(bookerPhoneInput);
+    limitRegistrationPhoneLength(bookerPhoneInput);
   }
 
   // Checkbox: Gunakan Data Penanggung Jawab sebagai Peserta #1
