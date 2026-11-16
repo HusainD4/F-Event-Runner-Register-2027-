@@ -327,6 +327,61 @@
           <section class="role-editor-section">
             <div class="role-editor-section-heading">
               <div>
+                <h5>Bagian Manajemen Event &amp; Kategori</h5>
+                <p>Pilih bagian kategori dan pengaturan racepack. Daftar kategori juga dipakai halaman operasional lain.</p>
+              </div>
+              <label><input type="checkbox" id="roleEventAll" onchange="toggleAllEventSections(this)"> Semua bagian event</label>
+            </div>
+            <div id="roleEventSectionsContainer" class="role-permission-grid"></div>
+          </section>
+
+          <section class="role-editor-section">
+            <div class="role-editor-section-heading">
+              <div>
+                <h5>Bagian Pengaturan BIB &amp; E-Tiket</h5>
+                <p>Pilih bagian yang dapat dibuka dan diubah. Memerlukan izin Kelola Konfigurasi &amp; Generate BIB.</p>
+              </div>
+              <label><input type="checkbox" id="roleBibAll" onchange="toggleAllBibSections(this)"> Semua bagian BIB</label>
+            </div>
+            <div id="roleBibSectionsContainer" class="role-permission-grid"></div>
+          </section>
+
+          <section class="role-editor-section">
+            <div class="role-editor-section-heading">
+              <div>
+                <h5>Bagian Konten Website &amp; CMS</h5>
+                <p>Pilih bagian yang dapat dikelola. Konten website yang dipublikasikan tetap dapat dilihat publik. Pengaturan rute juga mengikuti izin halaman rute.</p>
+              </div>
+              <label><input type="checkbox" id="roleCmsAll" onchange="toggleAllCmsSections(this)"> Semua bagian CMS</label>
+            </div>
+            <div id="roleCmsSectionsContainer" class="role-permission-grid"></div>
+          </section>
+
+          <section class="role-editor-section">
+            <div class="role-editor-section-heading">
+              <div>
+                <h5>Bagian Countdown &amp; Status Event</h5>
+                <p>Pilih bagian yang dapat diubah. Memerlukan izin countdown. Informasi yang tampil di website tetap bersifat publik.</p>
+              </div>
+              <label><input type="checkbox" id="roleCountdownAll" onchange="toggleAllCountdownSections(this)"> Semua bagian countdown</label>
+            </div>
+            <div id="roleCountdownSectionsContainer" class="role-permission-grid"></div>
+          </section>
+
+          <section class="role-editor-section">
+            <div class="role-editor-section-heading">
+              <div>
+                <h5>Bagian Konfigurasi Notifikasi</h5>
+                <p>Pilih bagian yang dapat dilihat dan diubah. Akses sesi WhatsApp melalui halaman lain tetap mengikuti izin WhatsApp.</p>
+              </div>
+              <label><input type="checkbox" id="roleNotificationAll" onchange="toggleAllNotificationSections(this)"> Semua bagian notifikasi</label>
+            </div>
+            <div id="roleNotificationSectionsContainer" class="role-permission-grid"></div>
+          </section>
+
+          <section class="role-editor-section">
+            <div class="role-editor-section-heading">
+              <div>
                 <h5>Widget Dashboard</h5>
                 <p>Pilih ringkasan yang ditampilkan. Data keuangan hanya dikirim untuk widget yang diizinkan.</p>
               </div>

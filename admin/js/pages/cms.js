@@ -1,4 +1,5 @@
 import { fetchAdmin } from '../core/api.js';
+import { adminState } from '../core/state.js';
 import { showAdminToast } from '../core/utils.js';
 import { initTabList, selectTab } from '../core/tabs.js';
 import { DEFAULT_APPEARANCE, APPEARANCE_COLOR_FIELDS, HOME_THEME_SECTIONS, SECTION_COLOR_LABELS, applyAppearanceColors, normalizeAppearance, normalizeSectionColors, setAnimatedTitle } from '../../../js/home-appearance.js';
@@ -11,6 +12,7 @@ let facilitiesItems = [];
 let legalItems = [];
 let faqItems = [];
 let cmsIconDismissHandlersBound = false;
+let cmsAllowedFields = null;
 
 function getJerseyGalleryInput() {
   const input = document.getElementById('cmsJerseyGalleryImages');
@@ -963,10 +965,18 @@ function initCmsButtons() {
 }
 
 async function loadCmsSettings() {
+  cmsAllowedFields = null;
   try {
     const res = await fetchAdmin('/admin/settings/website');
     if (res.status !== 'success' || !res.data) {
       throw new Error(res.message || 'Pengaturan CMS tidak dapat dimuat dari backend.');
+    }
+    const role = adminState.profile?.role;
+    if (role?.name !== 'SUPERADMIN' && role?.permissions?.includes('section:cms-configured')) {
+      if (!Array.isArray(res.cmsAllowedFields)) {
+        throw new Error('Daftar izin bagian CMS tidak tersedia. Perbarui backend dan muat ulang halaman.');
+      }
+      cmsAllowedFields = new Set(res.cmsAllowedFields);
     }
     const s = res.data;
     const setVal = (id, val) => {
@@ -1151,7 +1161,7 @@ async function loadCmsSettings() {
 async function handleCmsSubmit(e) {
   e.preventDefault();
   const form = document.getElementById('formCmsSettings');
-  const invalid = [...form.elements].find(field => field.willValidate && !field.validity.valid);
+  const invalid = [...form.elements].find(field => field.closest('.cms-panel')?.dataset.cmsDenied !== 'true' && field.willValidate && !field.validity.valid);
   if (invalid) {
     const panel = invalid.closest('.cms-panel');
     if (panel) selectTab(document.querySelector('#pane-cms [role="tablist"]'), panel.getAttribute('aria-labelledby'));
@@ -1160,7 +1170,8 @@ async function handleCmsSubmit(e) {
     return;
   }
   const jerseyGallery = getJerseyGalleryInput();
-  if (jerseyGallery.error) {
+  const mediaAllowed = document.getElementById('cmsPanelMedia')?.dataset.cmsDenied !== 'true';
+  if (mediaAllowed && jerseyGallery.error) {
     updateJerseyGalleryPreview();
     selectTab(document.querySelector('#pane-cms [role="tablist"]'), 'cmsTabMedia');
     document.getElementById('cmsJerseyGalleryImages').focus();
@@ -1168,7 +1179,7 @@ async function handleCmsSubmit(e) {
     return;
   }
   const bibPreview = updateBibPreview();
-  if (bibPreview.error) {
+  if (mediaAllowed && bibPreview.error) {
     selectTab(document.querySelector('#pane-cms [role="tablist"]'), 'cmsTabMedia');
     document.getElementById('cmsBibPreviewImage').focus();
     showAdminToast('warning', 'Gambar BIB Tidak Valid', bibPreview.error);
@@ -1275,6 +1286,14 @@ async function handleCmsSubmit(e) {
   };
 
   try {
+    const role = adminState.profile?.role;
+    if (role?.name !== 'SUPERADMIN' && role?.permissions?.includes('section:cms-configured')) {
+      if (!cmsAllowedFields) throw new Error('Izin bagian CMS belum dimuat. Muat ulang halaman sebelum menyimpan.');
+      for (const key of Object.keys(payload)) {
+        if (!cmsAllowedFields.has(key)) delete payload[key];
+      }
+      if (!Object.keys(payload).length) throw new Error('Tidak ada bagian CMS yang diizinkan untuk disimpan.');
+    }
     const res = await fetchAdmin('/admin/settings/website', {
       method: 'PUT',
       body: JSON.stringify(payload)

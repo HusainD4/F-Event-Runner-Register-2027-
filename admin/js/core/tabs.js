@@ -1,5 +1,5 @@
 export function tabForKey(tablist, key) {
-  const tabs = [...tablist.querySelectorAll('[role="tab"]')];
+  const tabs = [...tablist.querySelectorAll('[role="tab"]')].filter(tab => !tab.disabled);
   const current = tabs.indexOf(document.activeElement);
   if (current < 0 || !['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(key)) return null;
   const index = key === 'Home' ? 0 : key === 'End' ? tabs.length - 1
@@ -9,7 +9,7 @@ export function tabForKey(tablist, key) {
 
 export function selectTab(tablist, id) {
   const tabs = [...tablist.querySelectorAll('[role="tab"]')];
-  if (!tabs.some(tab => tab.id === id)) return;
+  if (!tabs.some(tab => tab.id === id && !tab.disabled)) return;
   for (const tab of tabs) {
     const active = tab.id === id;
     tab.setAttribute('aria-selected', String(active));

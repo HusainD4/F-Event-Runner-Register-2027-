@@ -1,6 +1,7 @@
 import { adminState } from '../core/state.js';
 import { fetchAdmin } from '../core/api.js';
 import { showAdminToast, showConfirmDialog, escapeHtml } from '../core/utils.js';
+import { applyRbacUi } from '../core/rbac.js';
 
 // --- ADMIN USERS & RBAC (SUPERADMIN ONLY) ---
 const DEFAULT_ROLE_DIRECTORY = [
@@ -155,6 +156,11 @@ async function loadAdminsAndRoles() {
       adminState.systemModules = rolesRes.modules || SYSTEM_MODULES_FALLBACK;
       adminState.rolePermissions = rolesRes.permissions || [];
       adminState.dashboardWidgets = (rolesRes.dashboardWidgets || []).filter(widget => widget.key !== 'dashboard:configured');
+      adminState.bibSections = rolesRes.bibSections || [];
+      adminState.countdownSections = rolesRes.countdownSections || [];
+      adminState.cmsSections = rolesRes.cmsSections || [];
+      adminState.notificationSections = rolesRes.notificationSections || [];
+      adminState.eventSections = rolesRes.eventSections || [];
 
       const select = document.getElementById('adminUserRoleId');
       if (select) {
@@ -470,6 +476,196 @@ function renderRoleDashboardWidgets(selectedWidgets = [], isConfigured = false) 
   }).join('');
 }
 
+function updateBibSectionAllState() {
+  const all = document.getElementById('roleBibAll');
+  const inputs = Array.from(document.querySelectorAll('input[name="role_bib_section"]'));
+  if (!all) return;
+  const checked = inputs.filter(input => input.checked).length;
+  all.checked = inputs.length > 0 && checked === inputs.length;
+  all.indeterminate = checked > 0 && checked < inputs.length;
+}
+
+function renderBibSections(permissions = [], isSuperadmin = false) {
+  const container = document.getElementById('roleBibSectionsContainer');
+  const all = document.getElementById('roleBibAll');
+  if (!container || !all) return;
+  const configured = permissions.includes('section:bib-configured');
+  container.innerHTML = (adminState.bibSections || []).map(section => {
+    const checked = isSuperadmin || !configured || permissions.includes(section.key);
+    return `<label class="role-permission-option ${checked ? 'checked' : ''}">
+      <input type="checkbox" name="role_bib_section" value="${escapeHtml(section.key)}" ${checked ? 'checked' : ''} ${isSuperadmin ? 'disabled' : ''} onchange="toggleBibSection(this)">
+      <span>${escapeHtml(section.label)}</span>
+    </label>`;
+  }).join('');
+  all.disabled = isSuperadmin;
+  updateBibSectionAllState();
+}
+
+window.toggleBibSection = function(input) {
+  input.closest('.role-permission-option')?.classList.toggle('checked', input.checked);
+  updateBibSectionAllState();
+};
+
+window.toggleAllBibSections = function(input) {
+  document.querySelectorAll('input[name="role_bib_section"]:not(:disabled)').forEach(section => {
+    section.checked = input.checked;
+    section.closest('.role-permission-option')?.classList.toggle('checked', input.checked);
+  });
+  updateBibSectionAllState();
+};
+
+function updateCountdownSectionAllState() {
+  const all = document.getElementById('roleCountdownAll');
+  const inputs = Array.from(document.querySelectorAll('input[name="role_countdown_section"]'));
+  if (!all) return;
+  const checked = inputs.filter(input => input.checked).length;
+  all.checked = inputs.length > 0 && checked === inputs.length;
+  all.indeterminate = checked > 0 && checked < inputs.length;
+}
+
+function renderCountdownSections(permissions = [], isSuperadmin = false) {
+  const container = document.getElementById('roleCountdownSectionsContainer');
+  const all = document.getElementById('roleCountdownAll');
+  if (!container || !all) return;
+  const configured = permissions.includes('section:countdown-configured');
+  container.innerHTML = (adminState.countdownSections || []).map(section => {
+    const checked = isSuperadmin || !configured || permissions.includes(section.key);
+    return `<label class="role-permission-option ${checked ? 'checked' : ''}">
+      <input type="checkbox" name="role_countdown_section" value="${escapeHtml(section.key)}" ${checked ? 'checked' : ''} ${isSuperadmin ? 'disabled' : ''} onchange="toggleCountdownSection(this)">
+      <span>${escapeHtml(section.label)}</span>
+    </label>`;
+  }).join('');
+  all.disabled = isSuperadmin;
+  updateCountdownSectionAllState();
+}
+
+window.toggleCountdownSection = function(input) {
+  input.closest('.role-permission-option')?.classList.toggle('checked', input.checked);
+  updateCountdownSectionAllState();
+};
+
+window.toggleAllCountdownSections = function(input) {
+  document.querySelectorAll('input[name="role_countdown_section"]:not(:disabled)').forEach(section => {
+    section.checked = input.checked;
+    section.closest('.role-permission-option')?.classList.toggle('checked', input.checked);
+  });
+  updateCountdownSectionAllState();
+};
+
+function updateCmsSectionAllState() {
+  const all = document.getElementById('roleCmsAll');
+  const inputs = Array.from(document.querySelectorAll('input[name="role_cms_section"]'));
+  if (!all) return;
+  const checked = inputs.filter(input => input.checked).length;
+  all.checked = inputs.length > 0 && checked === inputs.length;
+  all.indeterminate = checked > 0 && checked < inputs.length;
+}
+
+function renderCmsSections(permissions = [], isSuperadmin = false) {
+  const container = document.getElementById('roleCmsSectionsContainer');
+  const all = document.getElementById('roleCmsAll');
+  if (!container || !all) return;
+  const configured = permissions.includes('section:cms-configured');
+  container.innerHTML = (adminState.cmsSections || []).map(section => {
+    const checked = isSuperadmin || !configured || permissions.includes(section.key);
+    return `<label class="role-permission-option ${checked ? 'checked' : ''}">
+      <input type="checkbox" name="role_cms_section" value="${escapeHtml(section.key)}" ${checked ? 'checked' : ''} ${isSuperadmin ? 'disabled' : ''} onchange="toggleCmsSection(this)">
+      <span>${escapeHtml(section.label)}</span>
+    </label>`;
+  }).join('');
+  all.disabled = isSuperadmin;
+  updateCmsSectionAllState();
+}
+
+window.toggleCmsSection = function(input) {
+  input.closest('.role-permission-option')?.classList.toggle('checked', input.checked);
+  updateCmsSectionAllState();
+};
+
+window.toggleAllCmsSections = function(input) {
+  document.querySelectorAll('input[name="role_cms_section"]:not(:disabled)').forEach(section => {
+    section.checked = input.checked;
+    section.closest('.role-permission-option')?.classList.toggle('checked', input.checked);
+  });
+  updateCmsSectionAllState();
+};
+
+function updateNotificationSectionAllState() {
+  const all = document.getElementById('roleNotificationAll');
+  const inputs = Array.from(document.querySelectorAll('input[name="role_notification_section"]'));
+  if (!all) return;
+  const checked = inputs.filter(input => input.checked).length;
+  all.checked = inputs.length > 0 && checked === inputs.length;
+  all.indeterminate = checked > 0 && checked < inputs.length;
+}
+
+function renderNotificationSections(permissions = [], isSuperadmin = false) {
+  const container = document.getElementById('roleNotificationSectionsContainer');
+  const all = document.getElementById('roleNotificationAll');
+  if (!container || !all) return;
+  const configured = permissions.includes('section:notification-configured');
+  container.innerHTML = (adminState.notificationSections || []).map(section => {
+    const checked = isSuperadmin || !configured || permissions.includes(section.key);
+    return `<label class="role-permission-option ${checked ? 'checked' : ''}">
+      <input type="checkbox" name="role_notification_section" value="${escapeHtml(section.key)}" ${checked ? 'checked' : ''} ${isSuperadmin ? 'disabled' : ''} onchange="toggleNotificationSection(this)">
+      <span>${escapeHtml(section.label)}</span>
+    </label>`;
+  }).join('');
+  all.disabled = isSuperadmin;
+  updateNotificationSectionAllState();
+}
+
+window.toggleNotificationSection = function(input) {
+  input.closest('.role-permission-option')?.classList.toggle('checked', input.checked);
+  updateNotificationSectionAllState();
+};
+
+window.toggleAllNotificationSections = function(input) {
+  document.querySelectorAll('input[name="role_notification_section"]:not(:disabled)').forEach(section => {
+    section.checked = input.checked;
+    section.closest('.role-permission-option')?.classList.toggle('checked', input.checked);
+  });
+  updateNotificationSectionAllState();
+};
+
+function updateEventSectionAllState() {
+  const all = document.getElementById('roleEventAll');
+  const inputs = Array.from(document.querySelectorAll('input[name="role_event_section"]'));
+  if (!all) return;
+  const checked = inputs.filter(input => input.checked).length;
+  all.checked = inputs.length > 0 && checked === inputs.length;
+  all.indeterminate = checked > 0 && checked < inputs.length;
+}
+
+function renderEventSections(permissions = [], isSuperadmin = false) {
+  const container = document.getElementById('roleEventSectionsContainer');
+  const all = document.getElementById('roleEventAll');
+  if (!container || !all) return;
+  const configured = permissions.includes('section:event-configured');
+  container.innerHTML = (adminState.eventSections || []).map(section => {
+    const checked = isSuperadmin || !configured || permissions.includes(section.key);
+    return `<label class="role-permission-option ${checked ? 'checked' : ''}">
+      <input type="checkbox" name="role_event_section" value="${escapeHtml(section.key)}" ${checked ? 'checked' : ''} ${isSuperadmin ? 'disabled' : ''} onchange="toggleEventSection(this)">
+      <span>${escapeHtml(section.label)}</span>
+    </label>`;
+  }).join('');
+  all.disabled = isSuperadmin;
+  updateEventSectionAllState();
+}
+
+window.toggleEventSection = function(input) {
+  input.closest('.role-permission-option')?.classList.toggle('checked', input.checked);
+  updateEventSectionAllState();
+};
+
+window.toggleAllEventSections = function(input) {
+  document.querySelectorAll('input[name="role_event_section"]:not(:disabled)').forEach(section => {
+    section.checked = input.checked;
+    section.closest('.role-permission-option')?.classList.toggle('checked', input.checked);
+  });
+  updateEventSectionAllState();
+};
+
 window.toggleModuleCardStyle = function(cb) {
   const card = cb.closest('.role-module-card');
   if (card) {
@@ -543,6 +739,11 @@ function openCreateRoleModal() {
   renderRoleModuleCheckboxes(['page:dashboard'], false);
   renderRoleApiPermissions([], false);
   renderRoleDashboardWidgets((adminState.dashboardWidgets || []).map(widget => widget.key), true);
+  renderBibSections();
+  renderCountdownSections();
+  renderCmsSections();
+  renderNotificationSections();
+  renderEventSections();
   document.getElementById('modalRoleBackdrop')?.classList.add('open');
 }
 
@@ -573,6 +774,11 @@ function openEditRoleModal(role) {
     perms.filter(permission => permission.startsWith('dashboard:') && permission !== 'dashboard:configured'),
     perms.includes('dashboard:configured')
   );
+  renderBibSections(perms, isSuper);
+  renderCountdownSections(perms, isSuper);
+  renderCmsSections(perms, isSuper);
+  renderNotificationSections(perms, isSuper);
+  renderEventSections(perms, isSuper);
   document.getElementById('modalRoleBackdrop')?.classList.add('open');
 }
 
@@ -589,6 +795,10 @@ async function handleRoleSubmit(e) {
     const selectedWidgets = Array.from(document.querySelectorAll('input[name="role_widget"]:checked')).map(cb => cb.value);
     permissions = ['*', 'dashboard:configured', ...selectedWidgets];
   } else {
+    if (!(adminState.cmsSections || []).length || !(adminState.bibSections || []).length || !(adminState.countdownSections || []).length || !(adminState.notificationSections || []).length || !(adminState.eventSections || []).length) {
+      showAdminToast('error', 'Gagal Menyimpan', 'Katalog bagian hak akses belum tersedia. Muat ulang halaman dan pastikan backend sudah diperbarui.');
+      return;
+    }
     const checkedBoxes = Array.from(document.querySelectorAll('input[name="role_page"]:checked'));
     const selectedPages = checkedBoxes.map(cb => cb.value);
 
@@ -600,6 +810,11 @@ async function handleRoleSubmit(e) {
     const apiPermissions = Array.from(document.querySelectorAll('input[name="role_api"]:checked')).map(cb => cb.value);
     const selectedWidgets = Array.from(document.querySelectorAll('input[name="role_widget"]:checked')).map(cb => cb.value);
     permissions = [...selectedPages, ...apiPermissions];
+    permissions.push('section:bib-configured', ...Array.from(document.querySelectorAll('input[name="role_bib_section"]:checked')).map(cb => cb.value));
+    permissions.push('section:countdown-configured', ...Array.from(document.querySelectorAll('input[name="role_countdown_section"]:checked')).map(cb => cb.value));
+    permissions.push('section:cms-configured', ...Array.from(document.querySelectorAll('input[name="role_cms_section"]:checked')).map(cb => cb.value));
+    permissions.push('section:notification-configured', ...Array.from(document.querySelectorAll('input[name="role_notification_section"]:checked')).map(cb => cb.value));
+    permissions.push('section:event-configured', ...Array.from(document.querySelectorAll('input[name="role_event_section"]:checked')).map(cb => cb.value));
     if (selectedPages.includes('page:dashboard')) {
       permissions.push('dashboard:configured', ...selectedWidgets);
     }

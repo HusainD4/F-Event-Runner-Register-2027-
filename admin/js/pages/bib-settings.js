@@ -1,5 +1,7 @@
 import { fetchAdmin } from '../core/api.js';
 import { showAdminToast, showConfirmDialog } from '../core/utils.js';
+import { adminState } from '../core/state.js';
+import { canAccessBibSection } from '../core/rbac.js';
 
 let bibDataCache = null;
 
@@ -17,20 +19,18 @@ function updateBibPreview() {
 }
 
 export async function loadBibSettings() {
-  try {
+  if (canAccessBibSection(adminState.profile, 'section:bib-generation')) try {
     const res = await fetchAdmin('/admin/bib/settings');
     if (res && res.status === 'success' && res.data) {
       bibDataCache = res.data;
-      const { settings, qrPrefix, unassignedCount, assignedCount } = res.data;
+      const { settings, unassignedCount, assignedCount } = res.data;
 
       // Update KPI
       const kpiAssigned = document.getElementById('kpiBibAssigned');
       const kpiUnassigned = document.getElementById('kpiBibUnassigned');
-      const kpiQrPreview = document.getElementById('kpiQrFormatPreview');
 
       if (kpiAssigned) kpiAssigned.textContent = assignedCount;
       if (kpiUnassigned) kpiUnassigned.textContent = unassignedCount;
-      if (kpiQrPreview) kpiQrPreview.textContent = `${qrPrefix || 'TEGALRUN'}|##########`;
 
       // Set Timing radio
       const timingRadios = document.querySelectorAll('input[name="bibTiming"]');
@@ -52,17 +52,28 @@ export async function loadBibSettings() {
       updateBibPreview();
 
       // Set QR Prefix input
-      const qrInput = document.getElementById('qrInputPrefix');
-      const qrExample = document.getElementById('qrPrefixExample');
-      if (qrInput) qrInput.value = qrPrefix || 'TEGALRUN';
-      if (qrExample) qrExample.textContent = qrPrefix || 'TEGALRUN';
     }
   } catch (err) {
     console.warn('Gagal memuat pengaturan BIB:', err);
   }
 
+  if (canAccessBibSection(adminState.profile, 'section:bib-qr')) try {
+    const res = await fetchAdmin('/admin/settings/qr');
+    if (!res || res.status !== 'success' || !res.data) throw new Error(res?.message || 'Gagal memuat pengaturan QR.');
+    const prefix = res.data.prefix;
+    const qrInput = document.getElementById('qrInputPrefix');
+    const qrExample = document.getElementById('qrPrefixExample');
+    const kpiQrPreview = document.getElementById('kpiQrFormatPreview');
+    if (qrInput) qrInput.value = prefix;
+    if (qrExample) qrExample.textContent = prefix;
+    if (kpiQrPreview) kpiQrPreview.textContent = `${prefix}|##########`;
+  } catch (err) {
+    console.warn('Gagal memuat pengaturan QR:', err);
+    showAdminToast('error', 'Gagal Memuat QR', err.message);
+  }
+
   // Muat petunjuk pengambilan racepack
-  try {
+  if (canAccessBibSection(adminState.profile, 'section:bib-instructions')) try {
     const resInstr = await fetchAdmin('/admin/settings/racepack-instructions');
     if (resInstr && resInstr.status === 'success' && resInstr.data) {
       const titleEl = document.getElementById('rpcInstructionsTitle');
@@ -78,7 +89,7 @@ export async function loadBibSettings() {
   }
 
   // Muat pengaturan batas waktu pembayaran & biaya layanan
-  try {
+  if (canAccessBibSection(adminState.profile, 'section:bib-payment-fee')) try {
     const resFee = await fetchAdmin('/admin/settings/payment-fee');
     if (resFee && resFee.status === 'success' && resFee.data) {
       const { paymentTimerMinutes, feeEnabled, feeType, feeAmount } = resFee.data;
