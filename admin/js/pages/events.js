@@ -62,15 +62,98 @@ async function loadEvents() {
       errorState.replaceChildren(message, retryButton);
       container.replaceChildren(errorState);
     }
+    const configContainer = document.getElementById('racepackConfigContainer');
+    if (configContainer) {
+      configContainer.innerHTML = '<p role="alert" class="racepack-config-error">Daftar racepack gagal dimuat. Segarkan daftar event untuk mencoba lagi.</p>';
+    }
   }
+}
+
+function renderRacepackConfigs(events) {
+  const container = document.getElementById('racepackConfigContainer');
+  if (!container) return;
+  if (!events.length) {
+    container.innerHTML = '<p class="form-hint">Belum ada kategori. Tambahkan kategori dan benefit terlebih dahulu.</p>';
+    return;
+  }
+  container.innerHTML = events.map(event => `
+    <article class="racepack-config" data-event-id="${escapeHtml(event.id)}">
+      <div class="racepack-config-heading">
+        <div><h4>${escapeHtml(event.ticketName)}</h4><span>Kategori ${escapeHtml(event.category)}</span></div>
+        <span class="racepack-config-status" role="status"></span>
+      </div>
+      <p class="form-hint">Pilih benefit yang diserahkan saat check-in. Semua pilihan wajib dicentang petugas.</p>
+      <fieldset class="racepack-config-options">
+        <legend>Pilih perlengkapan</legend>
+        ${(event.benefits || []).length ? event.benefits.map(benefit => `
+          <label>
+            <input type="checkbox" class="racepack-benefit-option" value="${escapeHtml(benefit.id)}" ${(event.racepackBenefitIds || []).includes(benefit.id) ? 'checked' : ''}>
+            <span>${escapeHtml(benefit.name)}</span>
+          </label>
+        `).join('') : '<span class="form-hint">Belum ada benefit. Tambahkan melalui tombol Benefit pada kategori di atas.</span>'}
+      </fieldset>
+      <div class="racepack-config-preview">
+        <h5>Pratinjau perlengkapan saat check-in</h5>
+        <p class="form-hint racepack-preview-label" aria-live="polite"></p>
+        <div class="racepack-preview-table-wrap">
+          <table class="racepack-preview-table">
+            <thead><tr><th scope="col">No.</th><th scope="col">Perlengkapan</th><th scope="col">Keterangan</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+      <button type="button" class="btn btn-secondary btn-sm btn-save-racepack-benefits">Simpan Racepack</button>
+    </article>
+  `).join('');
+
+  container.querySelectorAll('.racepack-config').forEach(section => {
+    const event = events.find(item => item.id === section.dataset.eventId);
+    const updatePreview = () => {
+      const selected = Array.from(section.querySelectorAll('.racepack-benefit-option:checked'), input => input.value);
+      const saved = event.racepackBenefitIds || [];
+      const dirty = selected.length !== saved.length || selected.some(id => !saved.includes(id));
+      const benefits = (event.benefits || []).filter(benefit => selected.includes(benefit.id));
+      section.querySelector('.racepack-preview-label').textContent = dirty
+        ? 'Pratinjau pilihan belum disimpan. Check-in masih menggunakan pilihan terakhir yang disimpan.'
+        : 'Menampilkan pilihan yang tersimpan untuk kategori ini.';
+      section.querySelector('.racepack-config-status').textContent = dirty
+        ? 'Belum disimpan' : benefits.length ? `${benefits.length} perlengkapan` : 'Check-in diblokir';
+      section.querySelector('tbody').innerHTML = benefits.length
+        ? benefits.map((benefit, index) => `<tr><td>${index + 1}</td><td>${escapeHtml(benefit.name)}</td><td>${escapeHtml(benefit.description || '-')}</td></tr>`).join('')
+        : '<tr><td colspan="3">Belum ada perlengkapan yang dipilih. Check-in diblokir jika daftar tersimpan kosong.</td></tr>';
+    };
+    section.addEventListener('change', updatePreview);
+    section.querySelector('.btn-save-racepack-benefits').addEventListener('click', async eventClick => {
+      const button = eventClick.currentTarget;
+      const benefitIds = Array.from(section.querySelectorAll('.racepack-benefit-option:checked'), input => input.value);
+      button.disabled = true;
+      try {
+        const res = await fetchAdmin(`/admin/events/${encodeURIComponent(event.id)}/racepack-benefits`, {
+          method: 'PUT',
+          body: JSON.stringify({ benefitIds }),
+        });
+        if (!res || res.status !== 'success') throw new Error(res?.message || 'Gagal menyimpan daftar racepack.');
+        event.racepackBenefitIds = benefitIds;
+        updatePreview();
+        showAdminToast('success', 'Racepack Disimpan', benefitIds.length ? res.message : 'Daftar kosong; check-in kategori ini diblokir.');
+      } catch (error) {
+        showAdminToast('error', 'Gagal Menyimpan Racepack', error.message);
+      } finally {
+        button.disabled = false;
+      }
+    });
+    updatePreview();
+  });
 }
 
 function renderEvents(events) {
   const container = document.getElementById('adminEventsContainer');
   if (!container) return;
 
+  renderRacepackConfigs(events);
   if (events.length === 0) {
     container.innerHTML = `<div class="event-catalog-empty"><i class="fa-solid fa-ticket" aria-hidden="true"></i><strong>Belum ada kategori tiket</strong><span>Tambahkan event baru untuk mulai mengelola katalog.</span></div>`;
+    applyRbacUi(adminState.profile);
     return;
   }
 

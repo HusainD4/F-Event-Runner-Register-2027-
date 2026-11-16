@@ -223,20 +223,67 @@ export function handleRacepackScanSocketEvent(event) {
   if (adminState.activeTab === 'racepack') renderRacepackDetails(currentRacepackData);
 }
 
+function checklistMarkup(benefits) {
+  if (!benefits.length) {
+    return '<p role="alert" style="color: #B91C1C;">Kategori ini belum memiliki daftar racepack. Minta admin mengatur Perlengkapan Racepack di Manajemen Event &amp; Kategori, lalu muat ulang peserta.</p>';
+  }
+  return benefits.map(benefit => `
+    <label style="display: flex; align-items: flex-start; gap: 12px; background: #F8FAFC; padding: 12px 14px; border-radius: 8px; border: 1px solid #E2E8F0; cursor: pointer;">
+      <input type="checkbox" class="racepack-item" value="${escapeHtml(benefit.id)}" style="width: 18px; height: 18px;">
+      <span><strong>${escapeHtml(benefit.name)}</strong>${benefit.description ? `<br><small>${escapeHtml(benefit.description)}</small>` : ''}</span>
+    </label>
+  `).join('');
+}
+
+function selectedChecklistItems(container, benefits) {
+  const items = Array.from(container.querySelectorAll('.racepack-item:checked'), input => input.value);
+  if (!benefits.length || items.length !== benefits.length) {
+    showAdminToast('warning', 'Checklist Belum Lengkap', benefits.length
+      ? 'Centang semua perlengkapan setelah diserahkan kepada peserta.'
+      : 'Admin harus mengatur daftar racepack kategori terlebih dahulu.');
+    return null;
+  }
+  return items;
+}
+
 export async function handleConfirmRacepackTableCheckin(participantId) {
   if (!participantId) return;
-  const confirmed = await showConfirmDialog({
-    title: 'Konfirmasi Check-in Racepack',
-    message: 'Pastikan racepack sudah diserahkan kepada peserta sebelum mengonfirmasi check-in.',
-    confirmText: 'Ya, Konfirmasi',
-    type: 'warning',
-  });
-  if (!confirmed) return;
-
   try {
+    const verification = await fetchAdmin(`/admin/racepack/verify/${encodeURIComponent(participantId)}`);
+    if (!verification || verification.status !== 'success' || !verification.data?.participant) {
+      throw new Error(verification?.message || 'Gagal memuat data peserta.');
+    }
+    const { participant, racepackBenefits = [] } = verification.data;
+    const dialog = document.createElement('dialog');
+    dialog.style.cssText = 'width: min(94vw, 520px); max-height: 85vh; overflow: auto; padding: 20px; border: 1px solid #CBD5E1; border-radius: 12px;';
+    dialog.innerHTML = `<form method="dialog">
+      <h3>Checklist Racepack</h3>
+      <p>${escapeHtml(participant.fullNameKtp)} · ${escapeHtml(participant.event?.category || '-')}</p>
+      <p>BIB: ${escapeHtml(participant.bibNumber || 'Belum diterbitkan')} · Ukuran jersey: ${escapeHtml(participant.selectedSize || '-')} · ${escapeHtml(participant.jersey?.name || '-')}</p>
+      <div class="racepack-dialog-items" style="display: flex; flex-direction: column; gap: 8px;">${checklistMarkup(racepackBenefits)}</div>
+      <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px;">
+        <button type="button" class="btn btn-secondary racepack-dialog-cancel">Batal</button>
+        <button type="submit" class="btn btn-primary" ${racepackBenefits.length ? '' : 'disabled'}>Konfirmasi</button>
+      </div>
+    </form>`;
+    document.body.appendChild(dialog);
+    const items = await new Promise(resolve => {
+      dialog.querySelector('.racepack-dialog-cancel').addEventListener('click', () => dialog.close());
+      dialog.querySelector('form').addEventListener('submit', event => {
+        event.preventDefault();
+        const selected = selectedChecklistItems(dialog, racepackBenefits);
+        if (selected) {
+          resolve(selected);
+          dialog.close();
+        }
+      });
+      dialog.addEventListener('close', () => { resolve(null); dialog.remove(); }, { once: true });
+      dialog.showModal();
+    });
+    if (!items) return;
     const res = await fetchAdmin('/admin/racepack/checkin', {
       method: 'POST',
-      body: JSON.stringify({ participantId }),
+      body: JSON.stringify({ participantId, items, notes: 'Serah terima dikonfirmasi melalui daftar antrean.' }),
     });
     if (!res || res.status !== 'success') {
       throw new Error(res?.message || 'Check-in racepack gagal dikonfirmasi.');
@@ -396,11 +443,16 @@ export function renderRacepackDetails(data) {
   setEl('rpcOrderId', p.order?.midtransOrderId || p.orderId);
 
   // 3. Jersey
-  const size = p.selectedSize || 'M';
-  setEl('rpcJerseyBadge', `Ukuran Jersey: ${size}`);
-  setEl('chkJerseySizeText', size);
-  setEl('chkJerseyTypeText', p.jersey?.name || 'Dry-Fit Official Tegal Run');
-  setEl('chkBibText', p.bibNumber || 'Auto-assigned');
+  setEl('rpcJerseyBadge', `Jersey: ${p.selectedSize || '-'} · ${p.jersey?.name || '-'}`);
+  const checklist = document.getElementById('rpcChecklistGroup');
+  const benefits = data.racepackBenefits || p.racepackBenefits || [];
+  if (checklist) {
+    checklist.innerHTML = rpc?.checkedIn
+      ? (Array.isArray(rpc.items) && rpc.items.length
+        ? `<p>Perlengkapan yang tercatat saat penyerahan:</p><ul>${rpc.items.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>`
+        : '<p>Catatan perlengkapan tidak tersedia.</p>')
+      : checklistMarkup(benefits);
+  }
 
   // 4. Status Check-in Sebelumnya
   const alreadyBox = document.getElementById('rpcAlreadyCheckedInBox');
@@ -424,9 +476,9 @@ export function renderRacepackDetails(data) {
       if (rpc?.queued) {
         confirmBtn.innerHTML = '<i class="fa-solid fa-box-check"></i> Konfirmasi Check-in';
         confirmBtn.className = 'btn btn-primary btn-glow';
-        confirmBtn.disabled = false;
-        confirmBtn.style.opacity = '1';
-        confirmBtn.style.cursor = 'pointer';
+        confirmBtn.disabled = !isPaid || !benefits.length;
+        confirmBtn.style.opacity = confirmBtn.disabled ? '0.6' : '1';
+        confirmBtn.style.cursor = confirmBtn.disabled ? 'not-allowed' : 'pointer';
       } else {
         confirmBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Kirim ke Antrean';
         confirmBtn.className = 'btn btn-primary btn-glow';
@@ -598,8 +650,12 @@ export async function handleConfirmRacepackCheckin() {
 
   const btn = document.getElementById('btnConfirmRpcCheckin');
   const queued = Boolean(currentRacepackData.racepack?.queued);
+  let items = null;
 
   if (queued) {
+    const checklist = document.getElementById('rpcChecklistGroup');
+    const benefits = currentRacepackData.racepackBenefits || p.racepackBenefits || [];
+    if (!checklist || !(items = selectedChecklistItems(checklist, benefits))) return;
     const confirmed = await showConfirmDialog({
       title: 'Konfirmasi Check-in Racepack',
       message: `Pastikan racepack sudah diserahkan kepada ${p.fullNameKtp}. Konfirmasi check-in sekarang?`,
@@ -630,15 +686,6 @@ export async function handleConfirmRacepackCheckin() {
       renderRacepackDetails(currentRacepackData);
       showAdminToast('success', 'Dikirim ke Antrean', `${p.fullNameKtp} siap dikonfirmasi di halaman ini.`);
     } else {
-      const items = [
-        ['chkItemBib', 'Nomor BIB'],
-        ['chkItemJersey', 'Jersey'],
-        ['chkItemChip', 'Timing Chip'],
-        ['chkItemBag', 'Drawstring Bag & Race Guide'],
-        ['chkItemRefreshment', 'Suplemen & Refreshment'],
-      ]
-        .filter(([id]) => document.getElementById(id)?.checked)
-        .map(([, item]) => item);
       const res = await fetchAdmin('/admin/racepack/checkin', {
         method: 'POST',
         body: JSON.stringify({
@@ -662,7 +709,10 @@ export async function handleConfirmRacepackCheckin() {
     showAdminToast('error', queued ? 'Gagal Check-in' : 'Gagal Mengirim', err.message);
   } finally {
     if (btn && !currentRacepackData.racepack?.checkedIn) {
-      btn.disabled = false;
+      const currentBenefits = currentRacepackData.racepackBenefits || currentRacepackData.participant?.racepackBenefits || [];
+      btn.disabled = !currentRacepackData.isPaid || (currentRacepackData.racepack?.queued && !currentBenefits.length);
+      btn.style.opacity = btn.disabled ? '0.6' : '1';
+      btn.style.cursor = btn.disabled ? 'not-allowed' : 'pointer';
       btn.innerHTML = currentRacepackData.racepack?.queued
         ? '<i class="fa-solid fa-box-check"></i> Konfirmasi Check-in'
         : '<i class="fa-solid fa-paper-plane"></i> Kirim ke Antrean';
