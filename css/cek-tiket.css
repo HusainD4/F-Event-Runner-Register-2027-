@@ -248,3 +248,194 @@
     padding: 20px 16px;
   }
 }
+
+@media (max-width: 640px) {
+  body.td-page main.container {
+    width: 100%;
+    max-width: 520px !important;
+    padding: 14px 14px calc(72px + env(safe-area-inset-bottom)) !important;
+  }
+
+  .td-header-inner {
+    height: 54px;
+  }
+
+  .search-card {
+    margin-top: 12px;
+    margin-bottom: 18px;
+    padding: 16px 14px !important;
+    border-radius: 16px;
+    box-shadow: 0 6px 20px rgba(15, 23, 42, .06);
+  }
+
+  .search-card .form-group {
+    margin-bottom: 10px !important;
+  }
+
+  .search-card .form-label {
+    margin-bottom: 7px;
+    font-size: .82rem !important;
+  }
+
+  .mobile-type-select {
+    min-height: 44px;
+    margin-top: 0;
+    padding: 0 12px !important;
+    border-radius: 11px;
+    font-size: .86rem;
+  }
+
+  .search-input-wrapper {
+    margin: 12px 0 8px;
+  }
+
+  .search-input-wrapper i#searchIcon {
+    left: 13px;
+    font-size: .92rem;
+  }
+
+  .search-input-wrapper input {
+    height: 48px;
+    padding: 0 12px 0 39px;
+    border-radius: 11px;
+    font-size: .88rem;
+  }
+
+  #searchFormatHint {
+    gap: 7px !important;
+    font-size: .74rem;
+    line-height: 1.45;
+  }
+
+  .search-card .btn-submit-wrapper {
+    justify-content: stretch !important;
+    margin-top: 12px !important;
+  }
+
+  .search-card .btn-submit-wrapper .btn {
+    min-height: 44px;
+    border-radius: 11px;
+    font-size: .86rem;
+    box-shadow: none;
+  }
+
+  #resultContainer {
+    margin-top: 14px !important;
+  }
+
+  .ticket-result-card {
+    margin-bottom: 14px;
+    padding: 18px 14px !important;
+    border-radius: 16px;
+    box-shadow: 0 6px 20px rgba(15, 23, 42, .06);
+  }
+
+  .ticket-result-card > div:first-child {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+    margin-bottom: 14px !important;
+  }
+
+  .ticket-result-card > div:first-child > div:last-child {
+    align-self: flex-start;
+  }
+
+  .ticket-result-card > div:first-child span[style*="monospace"] {
+    display: block;
+    overflow-wrap: anywhere;
+    font-size: .7rem !important;
+  }
+
+  .ticket-result-card > div:first-child h3 {
+    font-size: 1.08rem !important;
+    line-height: 1.35;
+  }
+
+  .ticket-badge-pill {
+    padding: 5px 9px;
+    font-size: .68rem;
+  }
+
+  .participant-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 12px;
+    border-radius: 12px;
+  }
+
+  .participant-row > div:last-child {
+    padding-top: 9px;
+    border-top: 1px solid #e2e8f0;
+    text-align: left !important;
+  }
+
+  .participant-row > div:last-child strong {
+    font-size: 1.05rem !important;
+    overflow-wrap: anywhere;
+  }
+
+  .ticket-result-card > div:last-child {
+    flex-direction: column;
+    align-items: stretch !important;
+    gap: 12px !important;
+    padding-top: 12px !important;
+  }
+
+  .ticket-result-card > div:last-child > div:last-child {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px !important;
+    width: 100%;
+  }
+
+  .ticket-result-card > div:last-child .btn {
+    width: 100%;
+    min-height: 42px;
+    justify-content: center;
+    text-align: center;
+    white-space: normal;
+  }
+
+  .cancel-dialog-backdrop {
+    align-items: flex-end;
+    padding: 10px;
+  }
+
+  .cancel-dialog {
+    max-height: min(88dvh, 680px);
+    padding: 18px 15px !important;
+    border-radius: 18px 18px 14px 14px;
+  }
+
+  .cancel-dialog h4 {
+    font-size: .98rem !important;
+  }
+
+  .cancel-dialog .modal-actions {
+    flex-direction: column-reverse;
+    gap: 8px;
+  }
+
+  .cancel-dialog .modal-actions .btn {
+    min-height: 42px;
+  }
+}
+
+@media (max-width: 380px) {
+  body.td-page main.container {
+    padding-right: 10px !important;
+    padding-left: 10px !important;
+  }
+
+  .search-card,
+  .ticket-result-card {
+    padding-right: 12px !important;
+    padding-left: 12px !important;
+  }
+
+  .ticket-result-card > div:first-child h3 {
+    font-size: 1rem !important;
+  }
+}
