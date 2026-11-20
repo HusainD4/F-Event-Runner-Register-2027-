@@ -70,8 +70,34 @@ function handleAdminForceLogout() {
   handleLogout();
 }
 
+function refreshActiveAdminPage() {
+  const refreshers = {
+    dashboard: loadDashboardStats,
+    participants: loadParticipants,
+    orders: loadOrders,
+    'notif-logs': () => loadNotificationLogs({ showLoading: false }),
+  };
+  refreshers[adminState.activeTab]?.();
+}
+
+function handleAdminDataChanged(event) {
+  if (!Array.isArray(event?.topics)) return;
+  const topicByPage = {
+    dashboard: 'dashboard',
+    participants: 'participants',
+    orders: 'orders',
+    'notif-logs': 'notif-logs',
+  };
+  const topic = topicByPage[adminState.activeTab];
+  if (topic && event.topics.includes(topic)) refreshActiveAdminPage();
+}
+
 function subscribeAdminRealtimeEvents() {
+  const handleRealtimeReconnect = () => refreshActiveAdminPage();
+  window.addEventListener('realtime:reconnected', handleRealtimeReconnect);
   return [
+    () => window.removeEventListener('realtime:reconnected', handleRealtimeReconnect),
+    subscribeRealtimeEvent('admin:data_changed', handleAdminDataChanged),
     subscribeRealtimeEvent('admin:racepack_confirmation_changed', handleRacepackConfirmationSocketEvent),
     subscribeRealtimeEvent('admin:racepack_queue_changed', handleRacepackQueueChange),
     subscribeRealtimeEvent('admin:whatsapp_session', handleWhatsAppSessionUpdate),

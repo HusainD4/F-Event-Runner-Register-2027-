@@ -1,6 +1,7 @@
 import { apiFetch } from './api.js';
 import { loadWebsiteBranding } from './branding.js';
 import { isValidGalleryImageUrl, parseJerseyGallery, renderJerseyGallery } from './jersey-gallery.js';
+import { connectRealtimeSocket, subscribeRealtimeEvent } from './realtime.js';
 
 loadWebsiteBranding().then(settings => {
   const section = document.getElementById('tdJerseyGallerySection');
@@ -62,10 +63,15 @@ function formatRupiah(num) {
 }
 
 let countdownInterval = null;
+let ticketDetailRequestId = 0;
+let activeEventId = null;
 
 function startCountdown(targetDateStr) {
+  clearInterval(countdownInterval);
+  countdownInterval = null;
   if (!targetDateStr) return;
   const targetTime = new Date(targetDateStr).getTime();
+  if (!Number.isFinite(targetTime)) return;
 
   function update() {
     const now = Date.now();
@@ -96,13 +102,14 @@ function startCountdown(targetDateStr) {
   countdownInterval = setInterval(update, 1000);
 }
 
-async function loadTicketDetail() {
-  const params = new URLSearchParams(window.location.search);
-  const eventId = params.get('id');
+async function loadTicketDetail({ quiet = false } = {}) {
+  const requestId = ++ticketDetailRequestId;
+  const eventId = activeEventId;
 
   const loadingEl = document.getElementById('tdLoadingState');
   const errorEl = document.getElementById('tdErrorState');
   const contentEl = document.getElementById('tdContentSection');
+  const statusEl = document.getElementById('tdRealtimeStatus');
 
   if (!eventId) {
     loadingEl.style.display = 'none';
@@ -113,10 +120,11 @@ async function loadTicketDetail() {
 
   try {
     const [res, cfgRes, countdownRes] = await Promise.all([
-      apiFetch(`/events/${eventId}`),
+      apiFetch(`/events/${encodeURIComponent(eventId)}`),
       apiFetch('/settings/checkout-config').catch(() => null),
       apiFetch('/settings/countdown').catch(() => null)
     ]);
+    if (requestId !== ticketDetailRequestId) return;
 
     const text = await res.text();
     let result = null;
@@ -125,8 +133,14 @@ async function loadTicketDetail() {
     } catch {
       throw new Error('Respons server tidak dapat dibaca.');
     }
+    if (requestId !== ticketDetailRequestId) return;
 
     if (!res.ok || result.status !== 'success' || !result.data) {
+      if (quiet && contentEl.style.display === 'block') {
+        statusEl.textContent = 'Kategori ini sudah tidak tersedia. Kembali ke beranda untuk melihat pilihan tiket lainnya.';
+        statusEl.hidden = false;
+        return;
+      }
       loadingEl.style.display = 'none';
       errorEl.style.display = 'block';
       document.getElementById('tdErrorMessage').textContent = 'Kategori ini tidak ditemukan atau sudah tidak tersedia. Silakan kembali ke beranda untuk melihat pilihan lainnya.';
@@ -153,8 +167,14 @@ async function loadTicketDetail() {
         console.warn('Gagal membaca status pendaftaran global:', error);
       }
     }
+    if (requestId !== ticketDetailRequestId) return;
 
     if (isGlobalClosed) {
+      if (quiet && contentEl.style.display === 'block') {
+        renderTicketData(result.data, feeSettings, true);
+        statusEl.hidden = true;
+        return;
+      }
       loadingEl.style.display = 'none';
       errorEl.style.display = 'block';
       const errorTitle = document.querySelector('#tdErrorState h3');
@@ -167,10 +187,18 @@ async function loadTicketDetail() {
     renderTicketData(event, feeSettings, isGlobalClosed);
 
     loadingEl.style.display = 'none';
+    errorEl.style.display = 'none';
     contentEl.style.display = 'block';
-    contentEl.classList.add('td-content-enter');
+    statusEl.hidden = true;
+    if (!contentEl.classList.contains('td-content-enter')) contentEl.classList.add('td-content-enter');
   } catch (err) {
     console.error('Gagal memuat detail tiket:', err);
+    if (requestId !== ticketDetailRequestId) return;
+    if (quiet && contentEl.style.display === 'block') {
+      statusEl.textContent = 'Pembaruan tiket belum dapat dimuat. Informasi yang tampil mungkin belum terbaru.';
+      statusEl.hidden = false;
+      return;
+    }
     loadingEl.style.display = 'none';
     errorEl.style.display = 'block';
     document.getElementById('tdErrorMessage').textContent = 'Informasi tiket belum dapat dimuat. Periksa koneksi internet Anda, lalu coba kembali.';
@@ -186,7 +214,7 @@ function renderTicketData(event, feeSettings = {}, isGlobalClosed = false) {
   const coverImg = document.getElementById('tdTicketCoverImg');
   const cover = document.getElementById('tdTicketCover');
   if (coverImg) {
-    const coverUrl = event.ticketImage || event.medalImage;
+    const coverUrl = event.ticketImage;
     if (coverUrl) {
       coverImg.onerror = () => {
         coverImg.hidden = true;
@@ -202,6 +230,24 @@ function renderTicketData(event, feeSettings = {}, isGlobalClosed = false) {
       coverImg.style.display = 'none';
       coverImg.hidden = true;
       if (cover) cover.classList.add('td-ticket-cover-empty');
+    }
+  }
+
+  const medalHighlight = document.getElementById('tdMedalHighlight');
+  const medalImage = document.getElementById('tdMedalImage');
+  if (medalHighlight && medalImage) {
+    if (event.medalImage) {
+      medalImage.hidden = false;
+      medalImage.alt = `Medali finisher ${event.category || ''}`.trim();
+      medalImage.onerror = () => {
+        medalImage.hidden = true;
+      };
+      medalImage.src = event.medalImage;
+      medalHighlight.hidden = false;
+    } else {
+      medalHighlight.hidden = true;
+      medalImage.removeAttribute('src');
+      medalImage.hidden = true;
     }
   }
 
@@ -267,8 +313,16 @@ function renderTicketData(event, feeSettings = {}, isGlobalClosed = false) {
   document.getElementById('tdStock').textContent = `${remaining.toLocaleString('id-ID')} tiket`;
   document.getElementById('tdRegisteredCount').textContent = `${registered.toLocaleString('id-ID')} peserta`;
 
-  const pct = totalCap > 0 ? Math.max(0, Math.min(100, Math.round((remaining / totalCap) * 100))) : 0;
-  document.getElementById('tdStockPercentage').textContent = `${pct}% tersedia`;
+  const stockRatio = totalCap > 0 ? Math.max(0, Math.min(1, remaining / totalCap)) : 0;
+  const pct = stockRatio * 100;
+  const percentageDigits = totalCap > 0
+    ? Math.min(6, Math.max(1, Math.ceil(Math.log10(totalCap)) - 2))
+    : 0;
+  const formattedPercentage = pct.toLocaleString('id-ID', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: percentageDigits,
+  });
+  document.getElementById('tdStockPercentage').textContent = `${formattedPercentage}% tersedia`;
   document.getElementById('tdStockFill').style.width = `${pct}%`;
 
   // Event Date
@@ -290,6 +344,7 @@ function renderTicketData(event, feeSettings = {}, isGlobalClosed = false) {
     document.getElementById('tdHours').textContent = '--';
     document.getElementById('tdMinutes').textContent = '--';
     document.getElementById('tdSeconds').textContent = '--';
+    startCountdown(null);
   }
 
   // Fasilitas beserta gambar mengikuti data benefit dari backend.
@@ -432,7 +487,17 @@ function renderTicketData(event, feeSettings = {}, isGlobalClosed = false) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  activeEventId = new URLSearchParams(window.location.search).get('id');
   loadTicketDetail();
+  const refreshTicket = event => {
+    if (!Array.isArray(event?.topics)) return;
+    if (event.topics.some(topic => ['events', 'countdown'].includes(topic))) {
+      loadTicketDetail({ quiet: true });
+    }
+  };
+  subscribeRealtimeEvent('public:data_changed', refreshTicket);
+  window.addEventListener('realtime:reconnected', () => loadTicketDetail({ quiet: true }));
+  connectRealtimeSocket();
 
   // Share button
   document.getElementById('btnShareTicket')?.addEventListener('click', async () => {

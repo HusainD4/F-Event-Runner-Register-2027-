@@ -1758,13 +1758,6 @@
   min-width: 0;
   padding: 10px 12px;
 }
-#pane-events .event-catalog-summary-content .admin-event-title {
-  margin: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: .9rem;
-}
 #pane-events .event-catalog-summary-meta {
   display: flex;
   align-items: baseline;
@@ -1847,10 +1840,78 @@
 }
 
 #pane-events .admin-event-title {
-  margin: 4px 0 7px;
-  font-size: 1.08rem;
-  line-height: 1.35;
-  overflow-wrap: anywhere;
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  font-size: .88rem;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#pane-events .event-catalog-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+  padding: 10px 12px 0;
+}
+
+#pane-events .event-visibility-toggle {
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 36px;
+  align-items: center;
+  width: 36px;
+  height: 28px;
+  cursor: pointer;
+}
+
+#pane-events .event-visibility-toggle input {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  cursor: pointer;
+  opacity: 0;
+}
+
+#pane-events .event-visibility-switch {
+  position: relative;
+  width: 32px;
+  height: 18px;
+  border-radius: 999px;
+  background: #cbd5e1;
+  transition: background-color .18s ease;
+}
+
+#pane-events .event-visibility-switch::after {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, .25);
+  content: "";
+  transition: transform .18s ease;
+}
+
+#pane-events .event-visibility-toggle input:checked + .event-visibility-switch {
+  background: #16a34a;
+}
+
+#pane-events .event-visibility-toggle input:checked + .event-visibility-switch::after {
+  transform: translateX(14px);
+}
+
+#pane-events .event-visibility-toggle input:focus-visible + .event-visibility-switch {
+  outline: 2px solid #f97316;
+  outline-offset: 2px;
 }
 
 #pane-events .event-catalog-date {
@@ -4301,11 +4362,25 @@
 }
 
 #pane-cms .cms-preview-brand strong {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
   overflow: hidden;
   color: #0F172A;
   font-size: 0.82rem;
+}
+
+#pane-cms .cms-preview-brand strong span,
+#pane-cms .cms-preview-brand strong small {
+  overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+#pane-cms .cms-preview-brand strong small {
+  color: #FF6B00;
+  font-size: 0.65rem;
+  font-weight: 700;
 }
 
 #pane-cms .cms-preview-icon,

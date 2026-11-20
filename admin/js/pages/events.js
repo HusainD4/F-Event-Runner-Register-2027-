@@ -193,7 +193,6 @@ function renderEvents(events) {
         </span>
       </div>
       <div class="event-catalog-summary-content">
-        <h4 class="admin-event-title" title="${escapeHtml(ev.ticketName)}">${escapeHtml(ev.ticketName)}</h4>
         <div class="event-catalog-summary-meta">
           <strong>${escapeHtml(new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(Number(ev.price)))}</strong>
           <span>${escapeHtml(ev.stock)} tersedia</span>
@@ -201,6 +200,13 @@ function renderEvents(events) {
         <span class="event-catalog-open-label">Kelola tiket <i class="fa-solid fa-chevron-down" aria-hidden="true"></i></span>
       </div>
       </summary>
+      <div class="event-catalog-title-row">
+        <h4 class="admin-event-title" title="${escapeHtml(ev.ticketName)}">${escapeHtml(ev.ticketName)}</h4>
+        <label class="event-visibility-toggle" data-permission="events:update" title="${ev.isVisible === false ? 'Tampilkan di Halaman Utama' : 'Sembunyikan dari Halaman Utama'}">
+          <input type="checkbox" class="btn-toggle-homepage-visibility" data-id="${eventId}" ${ev.isVisible !== false ? 'checked' : ''} aria-label="${ev.isVisible === false ? 'Tampilkan' : 'Sembunyikan'} ${escapeHtml(ev.ticketName)} ${ev.isVisible === false ? 'di' : 'dari'} halaman utama">
+          <span class="event-visibility-switch" aria-hidden="true"></span>
+        </label>
+      </div>
       <div class="event-catalog-content">
         <div class="event-catalog-date"><i class="fa-regular fa-calendar" aria-hidden="true"></i><span>${escapeHtml(eventDateStr)}</span></div>
         ${ev.followGlobalTimer ? '<span class="admin-event-timer-badge"><i class="fa-solid fa-link" aria-hidden="true"></i> Ikuti timer global</span>' : ''}
@@ -285,6 +291,27 @@ function renderEvents(events) {
       if (confirmed) {
         await updateEventApi(id, { isClosed: newState }, newState ? 'Kategori ditutup!' : 'Kategori dibuka!');
       }
+    });
+  });
+
+  document.querySelectorAll('.btn-toggle-homepage-visibility').forEach(toggle => {
+    toggle.addEventListener('change', async () => {
+      const id = toggle.getAttribute('data-id');
+      const isVisible = toggle.checked;
+      const wasOpen = toggle.closest('.event-catalog-card')?.open;
+      const updated = await updateEventApi(
+        id,
+        { isVisible },
+        isVisible ? 'Kategori ditampilkan di halaman utama!' : 'Kategori disembunyikan dari halaman utama!'
+      );
+      if (!updated) {
+        toggle.checked = !isVisible;
+        return;
+      }
+      const refreshedCard = Array.from(document.querySelectorAll('.btn-toggle-homepage-visibility'))
+        .find(input => input.getAttribute('data-id') === id)
+        ?.closest('.event-catalog-card');
+      if (wasOpen && refreshedCard) refreshedCard.open = true;
     });
   });
 
@@ -473,12 +500,15 @@ async function updateEventApi(id, payload, successMsg) {
 
     if (res.status === 'success') {
       showAdminToast('success', 'Berhasil', successMsg);
-      loadEvents();
+      await loadEvents();
+      return true;
     } else {
       showAdminToast('error', 'Gagal', res.message);
+      return false;
     }
   } catch (err) {
     showAdminToast('error', 'Kesalahan Server', err.message);
+    return false;
   }
 }
 

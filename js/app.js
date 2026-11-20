@@ -2,7 +2,12 @@ import { apiClient, apiFetch, loadMidtransSdk } from './api.js';
 import { isValidRegistrationPhone, setupRegistrationPhone } from './registration-phone.js';
 import { applyWebsiteBranding } from './branding.js';
 import { applyHomeAppearance, setAnimatedTitle } from './home-appearance.js';
-import { syncNavigationVisibility } from './navigation-visibility.js';
+import {
+  areAllHomeSectionsHidden,
+  syncNavigationVisibility,
+  syncRegistrationCtaVisibility
+} from './navigation-visibility.js';
+import { connectRealtimeSocket, subscribeRealtimeEvent } from './realtime.js';
 import '../css/hero-animation.css';
 
 // Import Modular HTML Templates
@@ -440,7 +445,9 @@ function applyRegistrationStatus() {
     }
     if (navBtn) {
       navBtn.disabled = true;
+      navBtn.classList.add('btn-primary');
       navBtn.classList.remove('btn-glow');
+      navBtn.classList.remove('is-coming-soon');
       navBtn.classList.add('is-event-status');
       navBtn.innerHTML = `<i class="fa-solid ${status.icon}" aria-hidden="true"></i><span>${status.label}</span>`;
     }
@@ -448,6 +455,7 @@ function applyRegistrationStatus() {
       dockBtn.style.opacity = '0.6';
       dockBtn.style.pointerEvents = 'none';
     }
+    syncRegistrationCtaVisibility(state.cmsVisibility);
     if (state.events.length) renderTickets(state.events);
     return;
   }
@@ -472,14 +480,15 @@ function applyRegistrationStatus() {
   }
   if (navBtn) {
     navBtn.disabled = false;
-    navBtn.classList.remove('is-event-status');
-    navBtn.classList.add('btn-glow');
+    navBtn.classList.remove('is-event-status', 'is-coming-soon');
+    navBtn.classList.add('btn-primary', 'btn-glow');
     navBtn.innerHTML = '<i class="fa-solid fa-bolt"></i> Daftar Tiket';
   }
   if (dockBtn) {
     dockBtn.style.opacity = '';
     dockBtn.style.pointerEvents = '';
   }
+  syncRegistrationCtaVisibility(state.cmsVisibility);
   if (state.events.length) renderTickets(state.events);
 }
 
@@ -491,6 +500,7 @@ async function loadEvents() {
     state.events = Array.isArray(events) ? events : [];
     const heroCta = document.getElementById('heroCtaBtn');
     if (heroCta) heroCta.hidden = state.events.length === 0;
+    renderTickets(state.events);
     applyRegistrationStatus();
     renderStatsBanner(state.cmsStatsItems);
 
@@ -530,28 +540,72 @@ async function loadEvents() {
   }
 }
 
+function handlePublicDataChanged(event) {
+  if (!Array.isArray(event?.topics)) return;
+  const topics = new Set(event.topics);
+  if (topics.has('events') || topics.has('countdown')) loadEvents();
+  if (topics.has('cms')) loadWebsiteSettings();
+  if (topics.has('routes')) loadRouteData();
+  if (topics.has('countdown')) loadCountdownSettings();
+}
+
+function initPublicRealtimeUpdates() {
+  subscribeRealtimeEvent('public:data_changed', handlePublicDataChanged);
+  window.addEventListener('realtime:reconnected', () => {
+    loadEvents();
+    loadWebsiteSettings();
+    loadCountdownSettings();
+    loadRouteData();
+  });
+  connectRealtimeSocket();
+}
+
 function renderTickets(events) {
   const grid = document.getElementById('ticketsGrid');
   if (!grid) return;
 
   grid.innerHTML = '';
+  const hasTickets = Array.isArray(events) && events.length > 0;
+  const tag = document.getElementById('ticketsSectionTag');
+  const title = document.getElementById('ticketsSectionTitle');
+  const description = document.getElementById('ticketsSectionDescription');
+  grid.classList.toggle('is-empty', !hasTickets);
+  grid.setAttribute('aria-busy', 'false');
 
-  if (!Array.isArray(events) || events.length === 0) {
+  if (tag) {
+    tag.innerHTML = hasTickets
+      ? '<i class="fa-solid fa-tags" aria-hidden="true"></i> Tiket yang Tersedia'
+      : '<i class="fa-solid fa-circle-info" aria-hidden="true"></i> Informasi Pendaftaran';
+  }
+  if (title) title.textContent = hasTickets ? 'Pilih Tantangan Jarak Lari Anda' : 'Kategori Tiket Segera Tersedia';
+  if (description) {
+    description.textContent = hasTickets
+      ? 'Tersedia kategori kompetitif bagi atlet dan fun run santai bagi keluarga & komunitas. Seluruh peserta yang finis sebelum batas waktu (Cut-Off Time) berhak atas Medali Finisher resmi.'
+      : 'Kami sedang menyiapkan pilihan kategori lomba. Informasi tiket dan pendaftaran akan ditampilkan di halaman ini.';
+  }
+  const mediaWrap = document.getElementById('ticketsCmsMediaWrap');
+  if (mediaWrap && !hasTickets) mediaWrap.hidden = true;
+
+  if (!hasTickets) {
     grid.innerHTML = `
-      <div style="text-align: center; grid-column: 1 / -1; padding: 60px 20px;">
-        <i class="fa-solid fa-ticket-simple" style="font-size: 3rem; color: #94A3B8; margin-bottom: 16px;"></i>
-        <h3 style="color: var(--color-text-title); font-size: 1.25rem; margin-bottom: 6px;">Tidak Ada Kategori Tiket</h3>
-        <p style="color: var(--color-text-muted); font-size: 0.9rem;">Belum ada kategori lomba yang dibuka di database.</p>
+      <div class="tickets-empty-state" role="status">
+        <span class="tickets-empty-icon" aria-hidden="true"><i class="fa-solid fa-ticket-simple"></i></span>
+        <span class="tickets-empty-label">Informasi Tegal Run</span>
+        <h3>Kategori lomba sedang disiapkan</h3>
+        <p>Pilihan kategori, harga, dan detail pendaftaran akan tersedia di sini. Silakan kunjungi kembali halaman ini untuk melihat informasi terbaru.</p>
       </div>
     `;
     return;
   }
 
+  if (mediaWrap) mediaWrap.hidden = false;
   events.forEach((ev) => {
     const is10k = ev.category === '10K';
     const currentStock = Number(ev.remainingStock ?? ev.stock ?? 0);
     const totalCapacity = Number(ev.totalCapacity ?? (currentStock + Number(ev.registeredCount || 0)));
-    const percentage = totalCapacity > 0 ? Math.max(0, Math.min(100, Math.round((currentStock / totalCapacity) * 100))) : 0;
+    const percentage = totalCapacity > 0
+      ? Math.max(0, Math.min(100, (currentStock / totalCapacity) * 100))
+      : 0;
     const isGlobalClosed = state.isGlobalClosed;
     const eventPhase = ev.registrationPhase || (ev.eventDate ? getTimerPhase(new Date(ev.eventDate)) : 'UPCOMING');
     const eventDateClosed = typeof ev.registrationClosedByTimer === 'boolean'
@@ -598,7 +652,7 @@ function renderTickets(events) {
         `).join('')
       : `<li class="benefit-item" style="color: var(--color-text-muted); font-style: italic;">Belum ada benefit tercantum</li>`;
 
-    const ticketImage = ev.ticketImage || ev.medalImage;
+    const ticketImage = ev.ticketImage;
     const bannerHtml = `
       <div class="ticket-card-banner${ticketImage ? '' : ' ticket-card-banner-empty'}">
         ${ticketImage
@@ -606,7 +660,12 @@ function renderTickets(events) {
           : '<i class="fa-solid fa-person-running" aria-hidden="true"></i>'}
         <div class="ticket-card-banner-overlay">
           <span class="ticket-banner-badge"><i class="fa-solid fa-person-running"></i> ${escapeHtml(ev.category)} Marathon</span>
-          ${ev.medalImage ? `<span class="ticket-banner-medal-badge"><i class="fa-solid fa-medal"></i> Medali Finisher</span>` : ''}
+          ${ev.medalImage ? `
+            <span class="ticket-banner-medal-badge">
+              <img src="${escapeHtml(ev.medalImage)}" alt="Medali finisher ${escapeHtml(ev.category)}" loading="lazy" onerror="this.hidden=true">
+              <span>Medali Finisher</span>
+            </span>
+          ` : ''}
         </div>
       </div>
     `;
@@ -2409,11 +2468,11 @@ function renderFaqItems(rawItems) {
 function updateComingSoonSection(visibility) {
   const section = document.getElementById('siteComingSoon');
   if (!section) return;
-  const allSectionKeys = ['hero', 'stats', 'route', 'facilities', 'tickets', 'legal', 'faq', 'footer'];
-  const allSectionsOff = allSectionKeys.every(key => visibility[key] === false);
+  const allSectionsOff = areAllHomeSectionsHidden(visibility);
   section.hidden = !allSectionsOff;
   const mobileDock = document.querySelector('.mobile-bottom-dock');
   if (mobileDock) mobileDock.hidden = allSectionsOff;
+  syncRegistrationCtaVisibility(visibility);
   if (!allSectionsOff) return;
 
   const title = document.getElementById('comingSoonTitle');
@@ -2548,9 +2607,16 @@ async function loadWebsiteSettings() {
       document.title = cms.site_title;
     }
     const navbarBrand = document.querySelector('.top-navbar .nav-brand');
-    const navbarText = navbarBrand?.querySelector('.brand-text');
-    if (navbarText && typeof cms.navbar_title === 'string') {
-      navbarText.textContent = cms.navbar_title.trim();
+    const navbarPlatformText = navbarBrand?.querySelector('#navbarPlatformName');
+    const navbarEventText = navbarBrand?.querySelector('#navbarEventName');
+    const platformName = typeof cms.platform_name === 'string' && cms.platform_name.trim()
+      ? cms.platform_name.trim()
+      : 'SIEXA';
+    if (navbarPlatformText) navbarPlatformText.textContent = platformName;
+    const mobileNavbarPlatformText = document.getElementById('mobileNavbarPlatformName');
+    if (mobileNavbarPlatformText) mobileNavbarPlatformText.textContent = platformName;
+    if (navbarEventText && typeof cms.navbar_title === 'string') {
+      navbarEventText.textContent = cms.navbar_title.trim();
     }
 
     const navbarIconContainer = navbarBrand?.querySelector('.brand-icon');
@@ -3012,6 +3078,7 @@ function initApp() {
   loadWebsiteSettings();
   loadRouteData();
   loadEvents();
+  initPublicRealtimeUpdates();
   initNavbarDropdowns();
   document.getElementById('btnShowRegistrationNotice')?.addEventListener('click', () => {
     const dialog = document.getElementById('registrationNoticeDialog');

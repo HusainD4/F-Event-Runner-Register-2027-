@@ -77,14 +77,19 @@
                   <span class="cms-branding-symbol"><i class="fa-solid fa-swatchbook"></i></span>
                   <div>
                     <h4>Branding Navbar</h4>
-                    <p>Atur nama dan identitas visual yang tampil di navbar website.</p>
+                    <p>Atur nama platform, nama event, dan identitas visual yang tampil di navbar website.</p>
                   </div>
                 </div>
 
                 <div class="form-group">
-                  <label class="form-label" for="cmsNavbarTitle">Judul / Nama yang Tampil di Navbar</label>
+                  <label class="form-label" for="cmsPlatformName">Nama Platform</label>
+                  <input type="text" class="form-input" id="cmsPlatformName" maxlength="40" placeholder="SIEXA">
+                  <div class="form-hint">Nama platform tampil sebagai identitas utama di navbar.</div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="cmsNavbarTitle">Nama Event di Navbar</label>
                   <input type="text" class="form-input" id="cmsNavbarTitle" maxlength="80" placeholder="TEGAL RUN 2026">
-                  <div class="form-hint">Nama navbar bisa berbeda dari judul tab browser.</div>
+                  <div class="form-hint">Nama event tampil di bawah nama platform dan bisa berbeda dari judul tab browser.</div>
                 </div>
 
                 <fieldset class="cms-mode-fieldset">
@@ -124,7 +129,10 @@
                   <span class="cms-preview-label">Pratinjau navbar</span>
                   <div class="cms-preview-brand">
                     <span class="cms-preview-icon" id="cmsNavbarIconPreview"><i class="fa-solid fa-person-running"></i></span>
-                    <strong id="cmsNavbarTitlePreview">TEGAL RUN 2026</strong>
+                    <strong class="cms-preview-brand-text">
+                      <span id="cmsPlatformNamePreview">SIEXA</span>
+                      <small id="cmsNavbarTitlePreview">TEGAL RUN 2026</small>
+                    </strong>
                   </div>
                 </div>
               </div>

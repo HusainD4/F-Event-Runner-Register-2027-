@@ -87,13 +87,154 @@
   color: var(--color-primary);
 }
 .td-hero {
-  padding: 40px 0 30px 0;
+  width: min(100% - 32px, 1180px);
+  padding: 32px 0 48px;
+}
+.td-ticket-cover-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  gap: 12px;
+  padding: 22px;
+  background: linear-gradient(180deg, rgba(15, 23, 42, .08) 18%, rgba(15, 23, 42, .28) 48%, rgba(15, 23, 42, .88) 100%);
+}
+.td-cover-copy {
+  width: min(100%, 620px);
+  padding-right: 100px;
+}
+.td-category-tag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 25px;
+  margin-bottom: 9px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: .7rem;
+  font-weight: 800;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+.td-cover-copy h1 {
+  margin: 0 0 6px;
+  color: #fff;
+  font-size: clamp(1.45rem, 3vw, 2rem);
+  font-weight: 800;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+.td-cover-copy p {
+  margin: 0;
+  color: rgba(255, 255, 255, .86);
+  font-size: .86rem;
+}
+.td-overview-card {
+  overflow: hidden;
+  padding: 0;
+}
+.td-medal-highlight {
+  position: absolute;
+  z-index: 3;
+  top: 16px;
+  right: 18px;
+  display: grid;
+  width: 88px;
+  justify-items: center;
+  gap: 5px;
+  padding: 7px 7px 8px;
+  border-radius: 14px 14px 14px 5px;
+  background: rgba(255, 255, 255, .96);
+  color: #7c2d12;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, .24);
+  transform: rotate(3deg);
+}
+.td-medal-highlight::before {
+  position: absolute;
+  top: -5px;
+  right: 9px;
+  width: 10px;
+  height: 10px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: #f97316;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, .25);
+  content: "";
+}
+.td-medal-highlight[hidden] {
+  display: none;
+}
+.td-ticket-cover .td-medal-highlight img {
+  display: block;
+  width: 74px;
+  height: 74px;
+  border: 0;
+  border-radius: 9px;
+  object-fit: cover;
+  background: #fff7ed;
+}
+.td-ticket-cover .td-medal-highlight img[hidden] {
+  display: none;
+}
+.td-medal-highlight span {
+  font-size: .58rem;
+  font-weight: 900;
+  letter-spacing: .055em;
+  line-height: 1.1;
+  text-align: center;
+  text-transform: uppercase;
+}
+.td-overview-content {
+  padding: 24px 26px 26px;
+}
+.td-quota-progress {
+  margin-top: 16px;
+}
+.td-quota-progress-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+  color: var(--color-text-muted);
+  font-size: .78rem;
+  font-weight: 700;
+}
+.td-quota-progress .stock-bar-bg {
+  height: 9px;
+}
+.td-price-value {
+  color: var(--color-primary);
+}
+.td-date-value {
+  font-size: .88rem;
+  line-height: 1.45;
+}
+.td-checkout-card {
+  border: 1px solid var(--border-glass-orange);
+}
+.td-live-update-status {
+  margin: 0 0 14px;
+  padding: 10px 14px;
+  border: 1px solid #fed7aa;
+  border-radius: 10px;
+  background: #fff7ed;
+  color: #9a3412;
+  font-size: .84rem;
+}
+.td-live-update-status[hidden] {
+  display: none;
 }
 .td-grid {
   display: grid;
-  grid-template-columns: 1.4fr 0.8fr;
-  gap: 32px;
+  grid-template-columns: minmax(0, 1.55fr) minmax(280px, .8fr);
+  gap: 24px;
   align-items: start;
+}
+.td-col-main,
+.td-col-side {
+  min-width: 0;
 }
 .td-card {
   background: #FFFFFF;
@@ -336,25 +477,37 @@
 }
 .td-spec-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
-  margin-bottom: 20px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 0;
 }
 .td-spec-box {
+  min-width: 0;
+  min-height: 78px;
   background: #F8FAFC;
   border: 1px solid var(--color-border-subtle);
-  border-radius: var(--radius-md);
-  padding: 14px 16px;
+  border-radius: 12px;
+  padding: 12px 14px;
 }
 .td-spec-label {
-  font-size: 0.76rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font-size: 0.68rem;
   color: var(--color-text-muted);
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 4px;
+  letter-spacing: 0.035em;
+  line-height: 1.4;
+  margin-bottom: 7px;
+}
+.td-spec-label i {
+  flex: 0 0 auto;
+  margin-top: 1px;
+  color: var(--color-primary);
 }
 .td-spec-val {
+  overflow-wrap: anywhere;
   font-size: 1.05rem;
   font-weight: 800;
   color: var(--color-text-title);
@@ -398,8 +551,8 @@
 }
 @media (max-width: 900px) {
   .td-grid {
-    grid-template-columns: 1fr;
-    gap: 0;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
   }
   .td-col-main,
   .td-col-side {
@@ -418,13 +571,10 @@
     order: 2;
   }
   .td-hero {
-    padding: 24px 0 20px 0;
+    padding-top: 24px;
   }
 }
 @media (max-width: 600px) {
-  .td-page .td-hero.container {
-    padding: 20px 22px;
-  }
   .td-header-bar {
     padding: 7px 0;
   }
@@ -457,9 +607,60 @@
     padding: 20px 16px;
     border-radius: 16px;
   }
+  .td-overview-card {
+    padding: 0;
+  }
+  .td-overview-content {
+    padding: 18px;
+  }
+  .td-ticket-cover-overlay {
+    padding: 16px;
+  }
+  .td-cover-copy {
+    padding-right: 82px;
+  }
+  .td-cover-copy h1 {
+    font-size: clamp(1.25rem, 6vw, 1.6rem);
+  }
+  .td-cover-copy p {
+    font-size: .76rem;
+  }
+  .td-medal-highlight {
+    top: 12px;
+    right: 12px;
+    width: 72px;
+    gap: 4px;
+    padding: 5px 5px 6px;
+    border-radius: 11px 11px 11px 4px;
+  }
+  .td-ticket-cover .td-medal-highlight img {
+    width: 62px;
+    height: 62px;
+    border-radius: 7px;
+  }
+  .td-medal-highlight span {
+    font-size: .5rem;
+  }
+  .td-badge {
+    padding: 5px 9px;
+    font-size: .64rem;
+  }
   .td-spec-grid {
-    grid-template-columns: 1fr;
-    gap: 10px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .td-spec-box {
+    min-height: 74px;
+    padding: 10px;
+  }
+  .td-spec-label {
+    font-size: .6rem;
+  }
+  .td-spec-val {
+    font-size: .92rem;
+  }
+  .td-date-value {
+    font-size: .76rem;
   }
   .td-benefit-card {
     align-items: flex-start;
@@ -524,8 +725,9 @@
     padding-left: 16px;
     padding-right: 16px;
   }
-  .td-page .td-hero.container {
-    padding: 16px 18px;
+  .td-hero {
+    width: calc(100% - 24px);
+    padding: 16px 0 30px;
   }
   .td-header-inner {
     grid-template-columns: 40px minmax(0, auto) 40px;
@@ -535,11 +737,11 @@
     padding: 18px 14px;
     margin-bottom: 16px;
   }
-  .td-ticket-cover + div {
-    padding: 18px 16px 20px !important;
+  .td-overview-card {
+    padding: 0;
   }
-  .td-ticket-cover > div {
-    padding: 18px !important;
+  .td-overview-content {
+    padding: 14px;
   }
   #tdTicketName {
     font-size: clamp(1.35rem, 6vw, 1.7rem) !important;
@@ -555,10 +757,254 @@
   }
 }
 
+.td-overview-content {
+  padding: 24px 26px 26px;
+}
+
+.td-spec-grid {
+  gap: 12px;
+}
+
+.td-spec-box {
+  min-height: 78px;
+  padding: 12px 14px;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 12px;
+  background: #F8FAFC;
+}
+
+.td-benefit-card,
+.td-jersey-card {
+  padding: 14px;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(145deg, #FFFFFF 0%, #F7FBFF 100%);
+  box-shadow: 0 4px 14px rgba(15, 23, 42, .035);
+  transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease;
+}
+
+.td-benefit-card:hover,
+.td-jersey-card:hover {
+  border-color: rgba(0, 111, 186, .24);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, .075);
+  transform: translateY(-2px);
+}
+
+.td-benefit-media {
+  width: 68px;
+  height: 68px;
+  flex-basis: 68px;
+  border: 1px solid rgba(0, 111, 186, .1);
+  border-radius: 16px;
+  background: linear-gradient(145deg, #F0F8FE, #E6F3FC);
+}
+
+.td-benefit-icon {
+  width: 40px;
+  height: 40px;
+  background: #FFFFFF;
+  box-shadow: 0 2px 8px rgba(0, 111, 186, .1);
+  font-size: 1.05rem;
+}
+
+.td-benefit-image {
+  width: calc(100% - 12px);
+  height: calc(100% - 12px);
+  border-radius: 10px;
+}
+
+.td-jersey-media {
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  border-radius: 12px;
+  background: #FFFFFF;
+}
+
+.td-jersey-type,
+.td-jersey-size {
+  border-color: var(--color-border-subtle);
+  background: #FFFFFF;
+}
+
+.td-jersey-banner {
+  border: 0;
+  border-radius: 10px;
+  box-shadow: none;
+}
+
+.td-empty-state {
+  padding: 14px 16px;
+  border: 1px dashed var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  background: #F8FAFC;
+}
+
+.td-benefits-section > .td-section-title {
+  margin-bottom: 10px;
+  font-size: clamp(1.12rem, 2vw, 1.3rem);
+  letter-spacing: -.025em;
+}
+
+.td-benefits-section > .td-section-title i {
+  display: inline-grid;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  place-items: center;
+  border-radius: 12px;
+  background: linear-gradient(145deg, #EAF6FF, #D9EEFC);
+  color: #0878BD !important;
+  font-size: 1rem;
+}
+
+.td-benefits-section > p {
+  margin-bottom: 22px !important;
+  color: #60758B !important;
+  font-size: .9rem !important;
+  line-height: 1.65;
+}
+
+.td-gallery-description {
+  max-width: 62ch;
+  line-height: 1.6;
+}
+
+#tdJerseyGallerySection {
+  margin-bottom: 30px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+#tdJerseyGallery .jersey-gallery-slide {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+#tdJerseyGallery .jersey-gallery-slide img {
+  max-height: min(60vh, 480px);
+}
+
+.td-medal-highlight {
+  top: 30px;
+  right: 32px;
+  width: 88px;
+  gap: 5px;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  transform: rotate(-2deg);
+  transform-origin: 50% -22px;
+  animation: td-pin-sway 3.2s ease-in-out infinite;
+  will-change: transform;
+}
+
+.td-medal-highlight::before {
+  top: -12px;
+  right: auto;
+  left: calc(50% - 7px);
+  width: 14px;
+  height: 14px;
+  border: 2px solid #E2E8F0;
+  background: radial-gradient(circle at 35% 30%, #FFFFFF 0 10%, #CBD5E1 48%, #64748B 100%);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, .42), inset 0 0 0 2px rgba(255,255,255,.55);
+}
+
+.td-medal-highlight::after {
+  position: absolute;
+  z-index: 1;
+  top: -27px;
+  left: calc(50% - 8px);
+  width: 16px;
+  height: 23px;
+  border: 2px solid #CBD5E1;
+  border-bottom: 0;
+  border-radius: 10px 10px 0 0;
+  content: "";
+  filter: drop-shadow(0 1px 1px rgba(15, 23, 42, .32));
+  pointer-events: none;
+}
+
+.td-ticket-cover .td-medal-highlight img {
+  width: 80px;
+  height: 80px;
+  border-radius: 0;
+  background: transparent;
+  filter: drop-shadow(0 6px 6px rgba(15, 23, 42, .3));
+  object-fit: contain;
+}
+
+.td-medal-highlight span {
+  color: #FFFFFF;
+  font-size: .56rem;
+  text-shadow: 0 1px 5px rgba(15, 23, 42, .85);
+}
+
+@keyframes td-pin-sway {
+  0%, 100% { transform: rotate(-4deg); }
+  50% { transform: rotate(5deg); }
+}
+
+@media (max-width: 600px) {
+  .td-overview-content {
+    padding: 18px;
+  }
+
+  .td-spec-box {
+    padding: 10px;
+  }
+
+  .td-benefit-media {
+    width: 56px;
+    height: 56px;
+    flex-basis: 56px;
+    border-radius: 14px;
+  }
+
+  .td-benefit-icon {
+    width: 34px;
+    height: 34px;
+    font-size: .9rem;
+  }
+
+  .td-benefit-image {
+    width: calc(100% - 8px);
+    height: calc(100% - 8px);
+  }
+
+  .td-medal-highlight {
+    top: 27px;
+    right: 18px;
+    width: 74px;
+  }
+
+  .td-ticket-cover .td-medal-highlight img {
+    width: 68px;
+    height: 68px;
+  }
+
+  #tdJerseyGallerySection {
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .td-medal-highlight {
+    animation: none;
+  }
+
+  .td-benefit-card,
+  .td-jersey-card {
+    transition: none;
+  }
+}
+
 .td-ticket-cover {
   position: relative;
   width: 100%;
-  height: clamp(180px, 30vw, 320px);
+  height: clamp(220px, 34vw, 340px);
   overflow: hidden;
   background: linear-gradient(135deg, #0F172A, #334155);
 }
@@ -647,6 +1093,6 @@
 
 @media (max-width: 600px) {
   .td-ticket-cover {
-    height: 210px;
+    height: 230px;
   }
 }

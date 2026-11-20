@@ -1473,6 +1473,62 @@ h1, h2, h3, h4, h5, h6 {
   align-items: stretch;
 }
 
+.tickets-grid.is-empty {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.tickets-empty-state {
+  display: grid;
+  justify-items: center;
+  width: min(100%, 760px);
+  justify-self: center;
+  padding: clamp(32px, 6vw, 64px) clamp(22px, 6vw, 72px);
+  border: 1px solid rgba(148, 163, 184, .24);
+  border-radius: 24px;
+  background:
+    radial-gradient(ellipse at 50% 0, rgba(255, 107, 0, .08), transparent 58%),
+    linear-gradient(145deg, #fff, #f8fafc);
+  box-shadow: 0 20px 55px rgba(15, 23, 42, .07);
+  text-align: center;
+}
+
+.tickets-empty-icon {
+  display: grid;
+  width: 68px;
+  height: 68px;
+  margin-bottom: 20px;
+  place-items: center;
+  border: 1px solid rgba(255, 107, 0, .16);
+  border-radius: 22px;
+  background: #fff7ed;
+  color: #ea580c;
+  font-size: 1.65rem;
+}
+
+.tickets-empty-label {
+  margin-bottom: 10px;
+  color: #c2410c;
+  font-size: .72rem;
+  font-weight: 800;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+.tickets-empty-state h3 {
+  margin: 0;
+  color: #0f172a;
+  font-size: clamp(1.35rem, 3vw, 1.8rem);
+  line-height: 1.25;
+}
+
+.tickets-empty-state p {
+  max-width: 520px;
+  margin: 12px 0 0;
+  color: #64748b;
+  font-size: .96rem;
+  line-height: 1.75;
+}
+
 .tickets-grid > .ticket-card:only-child {
   grid-column: 1 / -1;
   width: 100%;
@@ -1624,9 +1680,11 @@ h1, h2, h3, h4, h5, h6 {
   inset: 0;
   background: linear-gradient(180deg, rgba(15, 23, 42, 0.1) 0%, rgba(15, 23, 42, 0.75) 100%);
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: flex-end;
-  padding: 14px 18px;
+  gap: 8px;
+  padding: 12px 14px;
   z-index: 2;
 }
 
@@ -1646,18 +1704,39 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .ticket-banner-medal-badge {
-  background: rgba(255, 107, 0, 0.9);
+  max-width: 100%;
+  background: rgba(15, 23, 42, 0.78);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   color: #FFFFFF;
-  font-size: 0.75rem;
+  font-size: 0.68rem;
   font-weight: 800;
-  padding: 5px 12px;
+  padding: 4px 9px 4px 4px;
   border-radius: var(--radius-full, 9999px);
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  box-shadow: 0 4px 12px rgba(255, 107, 0, 0.3);
+  gap: 7px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.ticket-banner-medal-badge img {
+  display: block;
+  flex: 0 0 30px;
+  width: 30px !important;
+  height: 30px !important;
+  border: 0;
+  border-radius: 4px;
+  object-fit: cover !important;
+  object-position: center !important;
+  transform: none !important;
+}
+
+.ticket-banner-medal-badge img[hidden] {
+  display: none !important;
+}
+
+.ticket-banner-medal-badge img[hidden] + span {
+  padding-left: 5px;
 }
 
 /* 4. Konten Bodi Utama Kartu Tiket */
@@ -2470,6 +2549,14 @@ h1, h2, h3, h4, h5, h6 {
   .legal-cta-box .btn {
     width: 100%;
   }
+}
+
+#navDaftarBtn.is-coming-soon {
+  border: 1px solid var(--color-border-subtle, #CBD5E1);
+  background: #F1F5F9;
+  box-shadow: none;
+  color: var(--color-text-muted, #64748B);
+  cursor: not-allowed;
 }
 
 @media (max-width: 576px) {

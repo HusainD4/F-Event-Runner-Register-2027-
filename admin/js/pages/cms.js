@@ -495,6 +495,8 @@ function updateNavbarIconPreview() {
   const imageInput = document.getElementById('cmsNavbarIconUrl');
   const preview = document.getElementById('cmsNavbarIconPreview');
   const previewTitle = document.getElementById('cmsNavbarTitlePreview');
+  const previewPlatform = document.getElementById('cmsPlatformNamePreview');
+  const platformName = document.getElementById('cmsPlatformName');
   const navbarTitle = document.getElementById('cmsNavbarTitle');
   const mode = document.querySelector('input[name="cmsNavbarIconMode"]:checked')?.value || 'ICON';
   const iconField = document.getElementById('cmsNavbarIconField');
@@ -508,6 +510,7 @@ function updateNavbarIconPreview() {
     imageInput.required = mode === 'IMAGE';
   }
   if (previewTitle) previewTitle.textContent = navbarTitle?.value.trim() || 'Nama Website';
+  if (previewPlatform) previewPlatform.textContent = platformName?.value.trim() || 'SIEXA';
 
   const imageUrl = mode === 'IMAGE' ? (imageInput?.value.trim() || '') : '';
   if (imageUrl) {
@@ -737,6 +740,8 @@ function initCmsButtons() {
   if (navbarIconUrl) navbarIconUrl.oninput = updateNavbarIconPreview;
   const navbarTitle = document.getElementById('cmsNavbarTitle');
   if (navbarTitle) navbarTitle.oninput = updateNavbarIconPreview;
+  const platformName = document.getElementById('cmsPlatformName');
+  if (platformName) platformName.oninput = updateNavbarIconPreview;
   const faviconUrl = document.getElementById('cmsFaviconUrl');
   if (faviconUrl) faviconUrl.oninput = updateFaviconPreview;
   const medalImage = document.getElementById('cmsMedalImage');
@@ -986,6 +991,7 @@ async function loadCmsSettings() {
 
       setVal('cmsSiteTitle', s.site_title);
       setVal('cmsSiteTagline', s.site_tagline);
+      setVal('cmsPlatformName', typeof s.platform_name === 'string' ? s.platform_name : 'SIEXA');
       setVal('cmsNavbarTitle', typeof s.navbar_title === 'string' ? s.navbar_title : 'TEGAL RUN 2026');
       setVal('cmsNavbarIcon', CMS_NAVBAR_ICONS.includes(s.navbar_icon) ? s.navbar_icon : CMS_NAVBAR_ICONS[0]);
       setVal('cmsNavbarIconUrl', s.navbar_icon_url);
@@ -1200,6 +1206,7 @@ async function handleCmsSubmit(e) {
   const payload = {
     site_title: getVal('cmsSiteTitle'),
     site_tagline: getVal('cmsSiteTagline'),
+    platform_name: getVal('cmsPlatformName') || 'SIEXA',
     navbar_title: getVal('cmsNavbarTitle'),
     navbar_icon_mode: navbarIconMode,
     navbar_icon: CMS_NAVBAR_ICONS.includes(getVal('cmsNavbarIcon')) ? getVal('cmsNavbarIcon') : CMS_NAVBAR_ICONS[0],

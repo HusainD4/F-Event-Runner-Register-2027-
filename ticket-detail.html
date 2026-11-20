@@ -68,33 +68,37 @@
 
   <!-- Main Ticket Content -->
   <main class="container td-hero" id="tdContentSection" style="display: none;padding-top: 25px;">
+    <p class="td-live-update-status" id="tdRealtimeStatus" role="status" aria-live="polite" hidden></p>
     <div class="td-grid">
       
       <!-- Informasi utama tiket -->
       <div class="td-col-main">
-        <div class="td-card" style="padding: 0; overflow: hidden;">
+        <div class="td-card td-overview-card">
           <!-- Sampul kategori tiket -->
           <div class="td-ticket-cover" id="tdTicketCover">
             <img id="tdTicketCoverImg" src="" alt="Ilustrasi kategori lomba">
-            <div style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(15,23,42,0.85) 100%); display: flex; justify-content: space-between; align-items: flex-end; padding: 24px; flex-wrap: wrap; gap: 12px;">
-              <div>
-                <span class="ticket-category-tag" id="tdCategoryTag" style="color: #FFF; background: var(--color-primary); padding: 4px 12px; border-radius: 20px; font-weight: 800; font-size: 0.78rem; display: inline-block; margin-bottom: 8px;"></span>
-                <h1 style="font-size: 1.85rem; font-weight: 800; color: #FFFFFF; margin: 0 0 6px 0;" id="tdTicketName">
-                </h1>
-                <p style="color: rgba(255, 255, 255, 0.85); font-size: 0.92rem; margin: 0;" id="tdTicketSubtitle"></p>
+            <div class="td-ticket-cover-overlay">
+              <div class="td-cover-copy">
+                <span class="td-category-tag" id="tdCategoryTag"></span>
+                <h1 id="tdTicketName"></h1>
+                <p id="tdTicketSubtitle"></p>
               </div>
               <span class="td-badge open" id="tdStatusBadge">
                 <i class="fa-solid fa-lock-open"></i> Pendaftaran Dibuka
               </span>
             </div>
+            <div class="td-medal-highlight" id="tdMedalHighlight" hidden>
+              <img id="tdMedalImage" alt="" loading="lazy">
+              <span>Medali Finisher</span>
+            </div>
           </div>
 
-          <div style="padding: 28px 32px 32px 32px;">
+          <div class="td-overview-content">
             <!-- Key Metrics -->
             <div class="td-spec-grid">
             <div class="td-spec-box">
               <div class="td-spec-label"><i class="fa-solid fa-tags"></i> Harga Tiket</div>
-              <div class="td-spec-val" id="tdPrice" style="color: var(--color-primary);">Rp 0</div>
+              <div class="td-spec-val td-price-value" id="tdPrice">Rp 0</div>
             </div>
             <div class="td-spec-box">
               <div class="td-spec-label"><i class="fa-solid fa-ticket"></i> Kuota Tersisa</div>
@@ -102,7 +106,7 @@
             </div>
             <div class="td-spec-box">
               <div class="td-spec-label"><i class="fa-solid fa-calendar-day"></i> Jadwal Pelaksanaan</div>
-              <div class="td-spec-val" id="tdEventDate" style="font-size: 0.95rem;">-</div>
+              <div class="td-spec-val td-date-value" id="tdEventDate">-</div>
             </div>
             <div class="td-spec-box">
               <div class="td-spec-label"><i class="fa-solid fa-users"></i> Jumlah Peserta Terdaftar</div>
@@ -111,12 +115,12 @@
           </div>
 
           <!-- Quota Progress Bar -->
-          <div style="margin-top: 10px;">
-            <div style="display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 700; color: var(--color-text-muted); margin-bottom: 6px;">
+          <div class="td-quota-progress">
+            <div class="td-quota-progress-label">
               <span>Kuota Tersedia</span>
               <span id="tdStockPercentage">0%</span>
             </div>
-            <div class="stock-bar-bg" style="height: 10px;">
+            <div class="stock-bar-bg">
               <div class="stock-bar-fill" id="tdStockFill" style="width: 0%;"></div>
             </div>
           </div>
@@ -124,7 +128,7 @@
       </div>
 
         <!-- Fasilitas kategori -->
-        <div class="td-card">
+        <div class="td-card td-benefits-section">
           <h3 class="td-section-title">
             <i class="fa-solid fa-gift" style="color: var(--color-primary);"></i>
             Fasilitas dan Benefit Kategori
@@ -199,7 +203,7 @@
         </div>
 
         <!-- Rincian biaya dan tindakan -->
-        <div class="td-card" style="border: 2px solid var(--border-glass-orange);">
+        <div class="td-card td-checkout-card">
           <div style="margin-bottom: 16px;">
             <div style="font-size: 0.95rem; font-weight: 800; color: var(--color-text-title); margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
               <i class="fa-solid fa-receipt" style="color: var(--color-primary);"></i> Rincian Biaya
