@@ -882,7 +882,7 @@
 }
 
 #tdJerseyGallery .jersey-gallery-slide img {
-  max-height: min(60vh, 480px);
+  height: auto;
 }
 
 .td-medal-highlight {

@@ -1,11 +1,249 @@
-.jersey-gallery-track { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
-.jersey-gallery-slide { justify-self: center; width: max-content; max-width: 100%; min-width: 0; padding: 8px; border: 1px solid var(--color-border-subtle, #dbe3eb); border-radius: 14px; background: var(--color-bg-base, #f8fafc); cursor: zoom-in; }
-.jersey-gallery-slide img { display: block; width: auto; height: auto; max-width: 100%; max-height: min(60vh, 430px); object-fit: contain; }
-.jersey-gallery-slide img[hidden], .jersey-gallery-error[hidden] { display: none; }
-.jersey-gallery-error { color: #b91c1c; font-size: .85rem; }
-.jersey-gallery-hint { display: block; margin-top: 10px; color: var(--color-text-muted, #64748b); font-size: .78rem; }
-.jersey-gallery button:focus-visible { outline: 3px solid var(--color-primary, #006fba); outline-offset: 2px; }
-.jersey-gallery-dialog { position: fixed; inset: 0; width: min(94vw, 1100px); height: min(90vh, 900px); max-width: none; max-height: none; margin: auto; padding: 50px 16px 16px; border: 0; border-radius: 16px; background: #fff; }
-.jersey-gallery-dialog::backdrop { background: rgba(15, 23, 42, .8); }
-.jersey-gallery-dialog img { width: 100%; height: 100%; object-fit: contain; }
-.jersey-gallery-close { position: absolute; top: 8px; right: 12px; width: 36px; height: 36px; border: 0; border-radius: 50%; background: #e2e8f0; color: #0f172a; font-size: 1.5rem; cursor: pointer; }
+.jersey-gallery-track {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.jersey-gallery-slide {
+  display: block;
+  justify-self: stretch;
+  width: 100%;
+  max-width: 960px;
+  box-sizing: border-box;
+  min-width: 0;
+  padding: 8px;
+  border: 1px solid var(--color-border-subtle, #dbe3eb);
+  border-radius: 14px;
+  background: var(--color-bg-base, #f8fafc);
+  line-height: 0;
+  cursor: zoom-in;
+}
+
+.jersey-gallery-slide img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+}
+
+.jersey-gallery-slide img[hidden],
+.jersey-gallery-error[hidden] {
+  display: none;
+}
+
+.jersey-gallery-error {
+  color: #b91c1c;
+  font-size: .85rem;
+  line-height: 1.5;
+}
+
+.jersey-gallery-hint {
+  display: block;
+  margin-top: 10px;
+  color: var(--color-text-muted, #64748b);
+  font-size: .78rem;
+  text-align: center;
+}
+
+.jersey-gallery button:focus-visible {
+  outline: 3px solid var(--color-primary, #006fba);
+  outline-offset: 3px;
+}
+
+.jersey-gallery-dialog {
+  position: fixed;
+  inset: 0;
+  width: fit-content;
+  height: fit-content;
+  max-width: none;
+  max-height: none;
+  margin: auto;
+  padding: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, .16);
+  border-radius: 20px;
+  background: rgba(10, 17, 30, .96);
+  color: #f8fafc;
+  box-shadow: 0 28px 90px rgba(0, 0, 0, .38);
+}
+
+.jersey-gallery-dialog:not([open]) {
+  display: none;
+}
+
+.jersey-gallery-dialog[open] {
+  display: flex;
+  flex-direction: column;
+  width: fit-content;
+  height: fit-content;
+  max-width: min(94vw, 1280px);
+  max-height: 90dvh;
+  box-sizing: border-box;
+  animation: jersey-gallery-enter .22s cubic-bezier(.2, .8, .2, 1) both;
+}
+
+.jersey-gallery-dialog::backdrop {
+  background: rgba(4, 10, 20, .76);
+  backdrop-filter: blur(7px);
+  animation: jersey-gallery-backdrop .22s ease-out both;
+}
+
+.jersey-gallery-toolbar {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 12px;
+  min-height: 42px;
+  padding: 0 2px 10px 6px;
+}
+
+.jersey-gallery-dialog-title {
+  overflow: hidden;
+  color: rgba(248, 250, 252, .9);
+  font-size: .84rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.jersey-gallery-counter {
+  margin-left: auto;
+  color: rgba(226, 232, 240, .7);
+  font-size: .78rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.jersey-gallery-close,
+.jersey-gallery-nav {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, .14);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .1);
+  color: #fff;
+  cursor: pointer;
+  transition: background-color .18s ease, transform .18s ease;
+}
+
+.jersey-gallery-close {
+  font-size: 1.45rem;
+  line-height: 1;
+}
+
+.jersey-gallery-close:hover,
+.jersey-gallery-nav:hover {
+  transform: scale(1.06);
+  background: rgba(255, 255, 255, .2);
+}
+
+.jersey-gallery-stage {
+  position: relative;
+  display: grid;
+  flex: 0 0 auto;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  place-items: center;
+}
+
+.jersey-gallery-stage img {
+  display: block;
+  flex: 0 0 auto;
+  max-width: none;
+  max-height: none;
+  border-radius: 10px;
+  object-fit: contain;
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity .16s ease, transform .22s ease;
+}
+
+.jersey-gallery-stage img.is-changing {
+  opacity: .35;
+  transform: scale(.985);
+}
+
+.jersey-gallery-nav {
+  position: absolute;
+  top: 50%;
+  width: 42px;
+  height: 42px;
+  transform: translateY(-50%);
+}
+
+.jersey-gallery-nav:hover {
+  transform: translateY(-50%) scale(1.06);
+}
+
+.jersey-gallery-nav::before {
+  width: 9px;
+  height: 9px;
+  border-top: 2px solid currentColor;
+  border-right: 2px solid currentColor;
+  content: "";
+}
+
+.jersey-gallery-nav.is-previous {
+  left: 10px;
+}
+
+.jersey-gallery-nav.is-previous::before {
+  margin-left: 4px;
+  transform: rotate(-135deg);
+}
+
+.jersey-gallery-nav.is-next {
+  right: 10px;
+}
+
+.jersey-gallery-nav.is-next::before {
+  margin-right: 4px;
+  transform: rotate(45deg);
+}
+
+@keyframes jersey-gallery-enter {
+  from { opacity: 0; transform: translateY(8px) scale(.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes jersey-gallery-backdrop {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (max-width: 600px) {
+  .jersey-gallery-dialog {
+    max-width: calc(100vw - 16px);
+    max-height: calc(100dvh - 16px);
+    padding: 10px;
+    border: 0;
+    border-radius: 16px;
+  }
+
+  .jersey-gallery-nav.is-previous {
+    left: 4px;
+  }
+
+  .jersey-gallery-nav.is-next {
+    right: 4px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .jersey-gallery-dialog[open],
+  .jersey-gallery-dialog::backdrop {
+    animation: none;
+  }
+
+  .jersey-gallery-close,
+  .jersey-gallery-nav,
+  .jersey-gallery-stage img {
+    transition: none;
+  }
+}
