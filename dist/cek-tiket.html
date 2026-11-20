@@ -59,23 +59,21 @@
     .admin-modal-close { background: transparent; border: none; font-size: 1.25rem; color: #94A3B8; cursor: pointer; padding: 4px; border-radius: 4px; }
     .req { color: #DC2626; }
 
-    /* Ringkas & Simpel Khusus Mode Mobile (< 576px) */
+    /* Ringkas & Simpel Khusus Mode Mobile */
     @media (max-width: 576px) {
       .container { padding-left: 12px; padding-right: 12px; }
       .search-card { padding: 14px; margin-top: 14px; border-radius: 12px; }
-      .search-type-selector { display: none; } /* Sembunyikan tab pil rumit di mobile */
-      .mobile-type-select { display: block; }  /* Munculkan dropdown simpel */
       .btn-submit-wrapper, .btn-submit-wrapper button, .modal-actions button { width: 100%; }
       .modal-actions { flex-direction: column-reverse; gap: 8px; }
       #searchFormatHint { font-size: 0.75rem; margin-bottom: 14px; }
     }
   </style>
-  <script type="module" crossorigin src="/assets/cekTiket-D5-Qt85B.js"></script>
+  <script type="module" crossorigin src="/assets/cekTiket-C83_nYps.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/api-B-hi7Nx4.js">
   <link rel="modulepreload" crossorigin href="/assets/home-appearance-Db1ttUVV.js">
   <link rel="modulepreload" crossorigin href="/assets/branding-BGZxbfxc.js">
   <link rel="stylesheet" crossorigin href="/assets/home-appearance-CKLvbDP9.css">
-  <link rel="stylesheet" crossorigin href="/assets/cekTiket-BOIEzoa9.css">
+  <link rel="stylesheet" crossorigin href="/assets/cekTiket-D-CyX-Hf.css">
   <link rel="stylesheet" crossorigin href="/assets/style-AngrGkYb.css">
 </head>
 <body class="td-page">
@@ -112,7 +110,7 @@
     <div class="search-card">
       <form id="formCekTiket">
         <div class="form-group" style="margin-bottom: 12px;">
-          <label class="form-label" style="font-size: 0.85rem; font-weight: 700; color: var(--color-text-title); display: block;">Pilih Jenis Pencarian:</label>
+          <label class="form-label" for="mobileSearchTypeSelect" style="font-size: 0.85rem; font-weight: 700; color: var(--color-text-title); display: block;">Pilih Jenis Pencarian:</label>
           
           <!-- Dropdown ringkas khusus Mobile -->
           <select class="form-input mobile-type-select" id="mobileSearchTypeSelect">
@@ -214,22 +212,5 @@
   </div>
 
 
-  <!-- Script Penyelaras Dropdown Mobile & Tab Desktop (Tanpa mengubah logic utama backend) -->
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const mobileSelect = document.getElementById('mobileSearchTypeSelect');
-      const hiddenInput = document.getElementById('selectedSearchType');
-      const desktopTabs = document.querySelectorAll('#searchTypeTabs .type-pill');
-
-      if (mobileSelect && hiddenInput) {
-        mobileSelect.addEventListener('change', (e) => {
-          hiddenInput.value = e.target.value;
-          desktopTabs.forEach(btn => {
-            btn.classList.toggle('active', btn.dataset.type === e.target.value);
-          });
-        });
-      }
-    });
-  </script>
 </body>
 </html>

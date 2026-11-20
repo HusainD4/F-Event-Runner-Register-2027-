@@ -90,36 +90,40 @@ const typeConfig = {
 function setupTypeTabs() {
   const pills = document.querySelectorAll('#searchTypeTabs .type-pill');
   const hiddenInput = document.getElementById('selectedSearchType');
+  const mobileSelect = document.getElementById('mobileSearchTypeSelect');
   const kwInput = document.getElementById('searchKeyword');
   const hintEl = document.querySelector('#searchFormatHint span');
   const iconEl = document.getElementById('searchIcon');
 
-  pills.forEach(pill => {
-    pill.addEventListener('click', () => {
-      pills.forEach(p => p.classList.remove('active'));
-      pill.classList.add('active');
+  const selectType = type => {
+    const selectedType = typeConfig[type] ? type : 'all';
+    const conf = typeConfig[selectedType];
+    if (hiddenInput) hiddenInput.value = selectedType;
+    if (mobileSelect) mobileSelect.value = selectedType;
+    pills.forEach(pill => pill.classList.toggle('active', pill.dataset.type === selectedType));
 
-      const t = pill.getAttribute('data-type') || 'all';
-      if (hiddenInput) hiddenInput.value = t;
-
-      const conf = typeConfig[t] || typeConfig.all;
-      if (kwInput) {
-        kwInput.placeholder = conf.placeholder;
-        if (t === 'nik') {
-          kwInput.maxLength = 16;
-          kwInput.inputMode = 'numeric';
-        } else if (t === 'phone') {
-          kwInput.maxLength = 16;
-          kwInput.inputMode = 'tel';
-        } else {
-          kwInput.removeAttribute('maxlength');
-          kwInput.inputMode = 'text';
-        }
+    if (kwInput) {
+      kwInput.placeholder = conf.placeholder;
+      if (selectedType === 'nik') {
+        kwInput.maxLength = 16;
+        kwInput.inputMode = 'numeric';
+      } else if (selectedType === 'phone') {
+        kwInput.maxLength = 16;
+        kwInput.inputMode = 'tel';
+      } else {
+        kwInput.removeAttribute('maxlength');
+        kwInput.inputMode = 'text';
       }
-      if (hintEl) hintEl.textContent = conf.hint;
-      if (iconEl) iconEl.className = conf.icon;
-    });
+    }
+    if (hintEl) hintEl.textContent = conf.hint;
+    if (iconEl) iconEl.className = conf.icon;
+  };
+
+  pills.forEach(pill => {
+    pill.addEventListener('click', () => selectType(pill.dataset.type || 'all'));
   });
+  mobileSelect?.addEventListener('change', () => selectType(mobileSelect.value));
+  selectType(hiddenInput?.value || 'all');
 }
 
 function validateSearchInput(keyword, type) {
