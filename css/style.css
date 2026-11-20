@@ -5938,6 +5938,10 @@ h1, h2, h3, h4, h5, h6 {
     transform: rotate(0.7deg);
   }
 
+  .athletic-hero-card::before {
+    inset: 12% -2% -7% 14%;
+  }
+
   .athletic-hero-img-wrap {
     aspect-ratio: 4 / 3;
     border-radius: 17px;
@@ -5981,7 +5985,7 @@ h1, h2, h3, h4, h5, h6 {
   .hero-col-visual {
     order: 4;
     position: relative;
-    margin: 34px 0 26px;
+    margin: 34px 0 44px;
     padding-inline: 12px;
   }
 
