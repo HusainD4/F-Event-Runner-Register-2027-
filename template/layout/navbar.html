@@ -62,7 +62,7 @@
         display: block;
         width: max-content;
         max-width: min(48vw, 170px);
-        padding: 9px 14px 17px;
+        padding: 16px 14px 17px;
         overflow: hidden;
         clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 82%, 0 100%);
         background: linear-gradient(155deg, #087FC2, #0756A4);
@@ -73,7 +73,43 @@
         letter-spacing: .11em;
         pointer-events: none;
         text-overflow: ellipsis;
+        transform-origin: 50% 0;
+        backface-visibility: hidden;
+        animation: mobile-ribbon-wave 3.8s ease-in-out infinite;
+        will-change: transform;
         white-space: nowrap;
+      }
+      .mobile-platform-ribbon::after {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(105deg, transparent 30%, rgba(255,255,255,.2) 48%, transparent 66%);
+        content: "";
+        opacity: .7;
+        pointer-events: none;
+        transform: translateX(-120%);
+        animation: mobile-ribbon-sheen 3.2s ease-in-out infinite;
+      }
+      @keyframes mobile-ribbon-wave {
+        0%, 100% {
+          clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 82%, 0 100%);
+          transform: perspective(420px) rotateY(0) skewX(0);
+        }
+        22% {
+          clip-path: polygon(0 0, 100% 0, 97% 98%, 48% 84%, 2% 100%);
+          transform: perspective(420px) rotateY(-11deg) skewX(2deg);
+        }
+        48% {
+          clip-path: polygon(0 0, 100% 0, 100% 96%, 52% 84%, 0 100%);
+          transform: perspective(420px) rotateY(4deg) skewX(-1deg);
+        }
+        74% {
+          clip-path: polygon(0 0, 100% 0, 98% 100%, 52% 82%, 0 97%);
+          transform: perspective(420px) rotateY(11deg) skewX(-2deg);
+        }
+      }
+      @keyframes mobile-ribbon-sheen {
+        0%, 30% { transform: translateX(-120%); }
+        70%, 100% { transform: translateX(120%); }
       }
       .top-navbar-container { top: 52px; }
       .top-navbar .brand-platform-name { display: none; }
@@ -81,8 +117,15 @@
     @media screen and (max-width: 380px) {
       .mobile-platform-ribbon {
         left: 12px;
-        padding: 8px 11px 15px;
+        padding: 14px 11px 15px;
         font-size: .66rem;
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .mobile-platform-ribbon,
+      .mobile-platform-ribbon::after {
+        animation: none;
+        transform: none;
       }
     }
   </style>
